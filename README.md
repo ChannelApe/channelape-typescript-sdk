@@ -3,7 +3,8 @@
 TypeScript SDK for the [ChannelApe REST API](https://docs.channelape.io/)
 
 ## Features
-- Sessions
+- [Getting Started](#getting-started)
+- [Sessions](#sessions)
 
 ## Getting Started
 
