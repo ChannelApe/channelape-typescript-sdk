@@ -8,11 +8,11 @@ module.exports = function(config) {
     testRunner: "mocha",
     mutator: "typescript",
     transpilers: ["typescript"],
-    reporter: ["clear-text", "progress"],
+    reporter: ["clear-text", "progress", "html"],
     testFramework: "mocha",
     coverageAnalysis: "off",
     tsconfigFile: "tsconfig.json",
-    thresholds: { high: 80, low: 60, break: 30 },
+    thresholds: { high: 80, low: 50, break: 50 },
     mutate: [
       "src/**/*.ts",
       "!src/index.ts"

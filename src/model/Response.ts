@@ -1,8 +1,7 @@
 export default class Response {
 
   constructor(private response: any, private data: any) {}
-
-
+  
   public getBody() {
     return this.data;
   }

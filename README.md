@@ -7,15 +7,25 @@ TypeScript SDK for the [ChannelApe REST API](https://docs.channelape.io/)
 
 ## Getting Started
 
-Create the channel ape client and initialize it.
+Create the channel api client with your credentials.
 
-```javascript```
-    const channelapeClient = new ChannelapeClient({
-      email: 'johndoe123@gmail.com',
-      password: 'mysecretpassword',
-      endpoint: 'https://api.channelape.com'
-    }).init();
+```
+  const channelapeClient = new ChannelapeClient({
+    email: 'johndoe123@gmail.com',
+    password: 'mysecretpassword',
+    endpoint: 'https://api.channelape.com'
+  });
+```
 
-```javascript```
+The channelape sdk is asynchronous and all functions return promises.
 
 ### Sessions
+
+A session is created when instantiating the client. It can be retrieved for later use
+
+```
+  channelapeClient.getSession()
+    .then((session: SessionResponse) => {
+      // do what you need to do with session data here
+    });
+```

@@ -77,10 +77,11 @@
   },
   "dependencies": {
     "@types/log4js": "^2.3.5",
+    "@types/node": "^9.4.7",
     "@types/q": "^1.0.7",
     "guid": "0.0.12",
-    "log4js": "^2.3.10",
     "leaky-bucket": "2.1.1",
+    "log4js": "^2.3.10",
     "node-rest-client": "3.1.0",
     "uuid": "3.1.0"
   }
