@@ -1,5 +1,5 @@
 export default interface ClientConfiguration{
-  secret?: string;
+  sessionId?: string;
   email?: string;
   password?: string;
   endpoint: string;

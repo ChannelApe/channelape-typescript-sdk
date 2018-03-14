@@ -17,9 +17,6 @@ describe('Response', () => {
       }
     };
     const actualResponse: any = new Response(expectedResponse, expectedData);
-    expect(actualResponse).to.not.be.undefined;
-    expect(actualResponse.getBody()).to.not.be.undefined;
-    expect(actualResponse.getStatus()).to.not.be.undefined;
     expect(actualResponse.getBody()).to.deep.equal(expectedData);
     expect(actualResponse.getStatus()).to.deep.equal(expectedResponse.statusCode);
   });

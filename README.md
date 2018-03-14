@@ -6,7 +6,7 @@ TypeScript SDK for the [ChannelApe REST API](https://docs.channelape.io/)
 - [Getting Started](#getting-started)
 - [Sessions](#sessions)
 
-## Getting Started
+### Getting Started
 
 Create the channel api client with your credentials.
 
@@ -18,11 +18,18 @@ Create the channel api client with your credentials.
   });
 ```
 
+or if you have your sessionId:
+```
+  const channelapeClient = new ChannelapeClient({
+    sessionId: '123-456-789'
+    endpoint: 'https://api.channelape.com'
+  });
+```
 The channelape sdk is asynchronous and all functions return promises.
 
 ### Sessions
 
-A session is created when instantiating the client. It can be retrieved for later use
+A session is created when instantiating the client. It can be retrieved for later use.
 
 ```
   channelapeClient.getSession()

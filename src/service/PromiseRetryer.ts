@@ -45,7 +45,7 @@ export default class PromiseRetryer {
     const promise = this.retryFunction();
     promise
       .then((response: Response) => this.responseHandler(response, attempt, deferred))
-      .catch((err: any) => this.errorResponseHandler(attempt, deferred));
+      .catch((err: any) => this.errorResponseHandler(attempt, deferred, err));
     return deferred.promise;
   }
 
@@ -54,10 +54,9 @@ export default class PromiseRetryer {
     const shouldRetry = 
     (this.finalResponseCodes.indexOf(status) === -1 && attempt <= this.maxAttempts);
     if (shouldRetry) {
-      this.logger.warn(`Received response status of ${status}`);
-      this.logger.warn(`Retrying attempt #${attempt}`);
+      this.logger.warn(`response status of ${status} | Retrying attempt #${attempt}`);
       const delay = this.minDelay + (Math.random() * (attempt * this.base));
-      this.logger.info(`Waiting ${delay}ms before next attempt.`);
+      this.logger.warn(`Waiting ${delay}ms before next attempt.`);
       setTimeout(() => {
         const nextAttempt = attempt + 1;
         deferred.resolve(this.run(nextAttempt));
@@ -67,17 +66,18 @@ export default class PromiseRetryer {
     }
   }
 
-  private errorResponseHandler(attempt: number, deferred: any) {
+  private errorResponseHandler(attempt: number, deferred: any, err: any) {
     const shouldRetry = (attempt <= this.maxAttempts);
     if (shouldRetry) {
-      this.logger.warn('There was an error in connection to the server. Did something timeout?');
-      this.logger.warn(`Retrying attempt #${attempt}`);
+      this.logger.warn(`There was an error in connection | Retrying attempt #${attempt}`);
       const delay = this.minDelay + (Math.random() * (attempt * this.base));
-      this.logger.info(`Waiting ${delay}ms before next attempt.`);
+      this.logger.warn(`Waiting ${delay}ms before next attempt.`);
       setTimeout(() => {
         const nextAttempt = attempt + 1;
         deferred.resolve(this.run(nextAttempt));
       }, delay);
+    } else {
+      deferred.reject(new Error(err));
     }
   }
 }
