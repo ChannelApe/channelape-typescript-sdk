@@ -18,8 +18,7 @@ export default class SessionRetrievalService {
   
   constructor(private client: any, private endpoint:string) {}
 
-  public retrieveSession(
-    sessionRequest: SessionIdSessionRequest | CredentialSessionRequest) {
+  public retrieveSession(sessionRequest: SessionIdSessionRequest | CredentialSessionRequest): Promise<SessionResponse> {
     if ((<SessionIdSessionRequest>sessionRequest).sessionId) {
       return this.retrieveSessionBySessionId((<SessionIdSessionRequest>sessionRequest));
     }
@@ -28,38 +27,41 @@ export default class SessionRetrievalService {
   }
     
   private retrieveSessionByCredentials(
-    sessionRequest: CredentialSessionRequest): Q.Promise<SessionResponse> {
+    sessionRequest: CredentialSessionRequest): Promise<SessionResponse> {
     
     this.logger.info(STARTING_TO_RETRIEVE_MESSAGE);
-    const deferred = Q.defer<SessionResponse>();
     const requestUrl = `${this.endpoint}/${Versions.V1}${Endpoints.SESSIONS}`;
     this.logger.debug(`HTTP Request: POST ${requestUrl}`);
-    const req = this.client.post(requestUrl, [], (response: SessionResponse, data: any) => {
-      deferred.resolve(response);
-    });
 
-    req.on('error', (err: any) => {
-      this.logger.error(`${FATAL_ERROR_MESSAGE}${err}`);
-      deferred.reject(err);
+    return new Promise((resolve, reject) => {
+      const req = this.client.post(requestUrl, [], (response: SessionResponse, data: any) => {
+        resolve(response);
+      });
+  
+      req.on('error', (err: any) => {
+        this.logger.error(`${FATAL_ERROR_MESSAGE}${err}`);
+        reject(err);
+      });
     });
-    return deferred.promise;
+    
   }
 
   private retrieveSessionBySessionId(
-    sessionRequest: SessionIdSessionRequest): Q.Promise<SessionResponse> {
+    sessionRequest: SessionIdSessionRequest): Promise<SessionResponse> {
 
     this.logger.info(STARTING_TO_RETRIEVE_MESSAGE);
-    const deferred = Q.defer<SessionResponse>();
     const requestUrl = `${this.endpoint}/${Versions.V1}${Endpoints.SESSIONS}/${sessionRequest.sessionId}`;
     this.logger.debug(`HTTP Request: GET ${requestUrl}`);
-    const req = this.client.get(requestUrl, [], (response: SessionResponse, data: any) => {
-      deferred.resolve(response);
-    });
 
-    req.on('error', (err: any) => {
-      this.logger.error(`${FATAL_ERROR_MESSAGE}${err}`);
-      deferred.reject(err);
+    return new Promise((resolve, reject) => {
+      const req = this.client.get(requestUrl, [], (response: SessionResponse, data: any) => {
+        resolve(response);
+      });
+  
+      req.on('error', (err: any) => {
+        this.logger.error(`${FATAL_ERROR_MESSAGE}${err}`);
+        reject(err);
+      });
     });
-    return deferred.promise;
   }
 }

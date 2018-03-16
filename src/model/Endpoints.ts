@@ -1,3 +1,4 @@
 export enum Endpoints {
-  SESSIONS = '/sessions'
+  SESSIONS = '/sessions',
+  ORDERS = '/orders'
 }

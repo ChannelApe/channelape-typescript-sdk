@@ -10,11 +10,13 @@ export class ChannelapeClient{
 
   private sessionRetrievalService: SessionRetrievalService;
   
-  constructor(private config: ClientConfiguration) {  }
+  constructor(private config: ClientConfiguration) { 
+    if (!config.endpoint) {
+      config.endpoint = 'https://api.channelape.com';
+    }
+  }
 
-  public getSession() {
-    const deferred = Q.defer<SessionResponse>();
-
+  public getSession() : Promise<SessionResponse> {
     if (this.config.email && this.config.password) {
       const sessionRequest: CredentialSessionRequest = {
         email: this.config.email,
@@ -22,30 +24,31 @@ export class ChannelapeClient{
       };
       const client = new Client({ user: sessionRequest.email, password: sessionRequest.password });
       this.sessionRetrievalService = new SessionRetrievalService(client, this.config.endpoint);
-      this.sessionRetrievalService.retrieveSession(sessionRequest)
-      .then((response: SessionResponse) => {
-        deferred.resolve(response);
-      })
-      .catch((e) => {
-        deferred.reject(e);
-      });
-    }else {
-      const sessionRequest: SessionIdSessionRequest = {
-        sessionId: this.config.sessionId
-      };
-      const client = new Client();
-      this.sessionRetrievalService = new SessionRetrievalService(client, this.config.endpoint);
-      this.sessionRetrievalService.retrieveSession(sessionRequest)
-      .then((response: SessionResponse) => {
-        deferred.resolve(response);
-      })
-      .catch((e) => {
-        deferred.reject(e);
+      return new Promise((resolve, reject) => {
+        
+        this.sessionRetrievalService.retrieveSession(sessionRequest)
+        .then((response: SessionResponse) => {
+          resolve(response);
+        })
+        .catch((e) => {
+          reject(e);
+        });
       });
     }
-    
 
-    
-    return deferred.promise;
+    const sessionRequest: SessionIdSessionRequest = {
+      sessionId: this.config.sessionId
+    };
+    const client = new Client();
+    this.sessionRetrievalService = new SessionRetrievalService(client, this.config.endpoint);
+    return new Promise((resolve, reject) => {
+      this.sessionRetrievalService.retrieveSession(sessionRequest)
+      .then((response: SessionResponse) => {
+        resolve(response);
+      })
+      .catch((e) => {
+        reject(e);
+      });
+    });
   }
 }
