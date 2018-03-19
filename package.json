@@ -2,8 +2,8 @@
   "name": "@channelape-inc/channelape-typescript-sdk",
   "version": "1.0.0",
   "description": "An javascript client for interacting with ChannelApe's API",
-  "main": "dist/channelape-client.js",
-  "typings": "dist/channelape-client.d.ts",
+  "main": "dist/src/ChannelapeClient.js",
+  "typings": "dist/src/ChannelapeClient.d.ts",
   "scripts": {
     "postinstall": "node ./node_modules/typescript/bin/tsc",
     "start": "node ./dist/channelape-client.js",

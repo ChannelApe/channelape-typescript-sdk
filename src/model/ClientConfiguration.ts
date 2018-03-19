@@ -1,4 +1,4 @@
-export default interface ClientConfiguration{
+export default interface ClientConfiguration {
   sessionId?: string;
   email?: string;
   password?: string;

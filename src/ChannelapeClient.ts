@@ -6,10 +6,10 @@ import SessionResponse from './auth/model/SessionResponse';
 import * as Q from 'q';
 import SessionIdSessionRequest from './auth/model/SessionIdSessionRequest';
 
-export class ChannelapeClient{
+export class ChannelapeClient {
 
   private sessionRetrievalService: SessionRetrievalService;
-  
+
   constructor(private config: ClientConfiguration) {  }
 
   public getSession() {
@@ -29,7 +29,7 @@ export class ChannelapeClient{
       .catch((e) => {
         deferred.reject(e);
       });
-    }else {
+    } else {
       const sessionRequest: SessionIdSessionRequest = {
         sessionId: this.config.sessionId
       };
@@ -43,9 +43,7 @@ export class ChannelapeClient{
         deferred.reject(e);
       });
     }
-    
 
-    
     return deferred.promise;
   }
 }

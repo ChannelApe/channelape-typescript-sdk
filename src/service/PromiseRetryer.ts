@@ -7,7 +7,7 @@ export default class PromiseRetryer {
   private minDelay = 1000;
   private maxAttempts = 30;
   private base = 1000;
-  private retryFunction : Function = () => {};
+  private retryFunction: Function = () => {};
   private finalResponseCodes: number[] = [];
 
   constructor(private logName: string) {
@@ -40,7 +40,7 @@ export default class PromiseRetryer {
     return this;
   }
 
-  public run(attempt: number = 1) : Q.Promise<{}> {
+  public run(attempt: number = 1): Q.Promise<{}> {
     const deferred = Q.defer();
     const promise = this.retryFunction();
     promise
@@ -51,7 +51,7 @@ export default class PromiseRetryer {
 
   private responseHandler(response: Response, attempt: number, deferred: any) {
     const status = response.getStatus();
-    const shouldRetry = 
+    const shouldRetry =
     (this.finalResponseCodes.indexOf(status) === -1 && attempt <= this.maxAttempts);
     if (shouldRetry) {
       this.logger.warn(`response status of ${status} | Retrying attempt #${attempt}`);

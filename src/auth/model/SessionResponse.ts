@@ -1,4 +1,4 @@
-export default interface SessionResponse{
+export default interface SessionResponse {
   sessionId: string;
-  userId: string; 
+  userId: string;
 }
