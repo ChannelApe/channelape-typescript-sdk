@@ -13,7 +13,7 @@
     "test": "node ./node_modules/mocha/bin/mocha test/**/*.spec.* --recursive --compilers ts:ts-node/register",
     "cover": "./node_modules/.bin/nyc npm t",
     "mutate": "./node_modules/.bin/stryker run",
-    "lint": "./node_modules/.bin/tslint --fix -c ./tslint.json 'src/**/*{.ts,.tsx}'"
+    "lint": "tslint --project ."
   },
   "files": [
     "dist"
