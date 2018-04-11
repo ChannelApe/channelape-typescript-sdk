@@ -1,18 +1,18 @@
 {
   "name": "@channelape-inc/channelape-typescript-sdk",
   "version": "1.0.0",
-  "description": "An javascript client for interacting with ChannelApe's API",
+  "description": "A client for interacting with ChannelApe's API",
   "main": "dist/src/ChannelapeClient.js",
   "typings": "dist/src/ChannelapeClient.d.ts",
   "scripts": {
-    "postinstall": "node ./node_modules/typescript/bin/tsc",
+    "postinstall": "npm run compile",
     "start": "node ./dist/channelape-client.js",
     "prepublishOnly": "npm run compile",
     "compile": "tsc -p . --declaration",
     "dev": "tsc --watch & nodemon dist",
-    "test": "node ./node_modules/mocha/bin/mocha test/**/*.spec.* --recursive --compilers ts:ts-node/register",
-    "cover": "./node_modules/.bin/nyc npm t",
-    "mutate": "./node_modules/.bin/stryker run",
+    "test": "mocha test/**/*.spec.* --recursive --compilers ts:ts-node/register",
+    "cover": "nyc npm t",
+    "mutate": "stryker run",
     "lint": "tslint --project ."
   },
   "files": [
