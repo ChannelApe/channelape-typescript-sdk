@@ -6,11 +6,13 @@
   "typings": "dist/ChannelapeClient.d.ts",
   "scripts": {
     "postinstall": "npm run compile",
-    "start": "node dist/ChannelApeClient.js",
     "prepublishOnly": "npm run compile",
     "compile": "tsc -p . --declaration",
-    "dev": "tsc --watch & nodemon dist",
-    "test": "mocha test/**/*.spec.* --recursive --compilers ts:ts-node/register",
+    "watch": "tsc --watch",
+    "unit-test": "mocha test/**/*.spec.* --recursive --compilers ts:ts-node/register",
+    "pretest" : "npm run lint",
+    "test": "npm run unit-test",
+    "posttest" : "npm run cover && npm run mutate",
     "cover": "nyc npm t",
     "mutate": "stryker run",
     "lint": "tslint --project ."
