@@ -1,6 +1,5 @@
 import CredentialSessionRequest from './../model/CredentialSessionRequest';
 import * as Q from 'q';
-import response from '../../model/response';
 import * as log4js from 'log4js';
 import SessionResponse from './../model/SessionResponse';
 import { Client } from 'node-rest-client';
