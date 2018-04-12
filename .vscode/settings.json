@@ -6,6 +6,7 @@
         "**/coverage": true
     },
     "typescript.referencesCodeLens.enabled": true,
+    "typescript.reportStyleChecksAsWarnings": true,
     "tslint.ignoreDefinitionFiles": false,
     "tslint.autoFixOnSave": true,
     "tslint.exclude": "**/node_modules/**/*"

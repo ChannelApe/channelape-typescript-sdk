@@ -10,10 +10,10 @@ import { Endpoints } from '../../../src/model/Endpoints';
 describe('Session Retrieval Service', () => {
 
   describe('given some rest client and some given endpoint', () => {
-    const someEndpoint = 'https://some-api.channelape.com';
+    const someEndpoint : string = 'https://some-api.channelape.com';
     const someClient = new Client();
 
-    let sandbox;
+    let sandbox : sinon.SinonSandbox;
 
     beforeEach((done) => {
       sandbox = sinon.sandbox.create();
@@ -32,9 +32,11 @@ describe('Session Retrieval Service', () => {
         sessionId: 'some-session-id',
         userId: 'some-user-id'
       };
-      const someClientPostStub = sandbox.stub(someClient, 'post').callsFake(mockResponse(expectedResponse, 200));
 
-      const sessionRetrievalService = new SessionRetrievalService(someClient, someEndpoint);
+      const someClientPostStub : sinon.SinonStub = sandbox.stub(someClient, 'post')
+        .callsFake(mockResponse(expectedResponse, 200));
+
+      const sessionRetrievalService : SessionRetrievalService = new SessionRetrievalService(someClient, someEndpoint);
       return sessionRetrievalService.retrieveSession({
         email: 'some-email@email.com',
         password: 'some-crazy-long-password'
@@ -61,7 +63,7 @@ describe('Session Retrieval Service', () => {
         sessionId: someSessionId
       }).then((actualResponse) => {
         expect(someClientGetStub.args[0][0])
-        .to.equal(`${someEndpoint}/${Versions.V1}${Endpoints.SESSIONS}/${someSessionId}`);
+          .to.equal(`${someEndpoint}/${Versions.V1}${Endpoints.SESSIONS}/${someSessionId}`);
         expect(someClientGetStub.args[0][1]).to.deep.equal([]);
         expect(actualResponse.userId).to.equal(expectedResponse.userId);
         expect(actualResponse.sessionId).to.equal(expectedResponse.sessionId);

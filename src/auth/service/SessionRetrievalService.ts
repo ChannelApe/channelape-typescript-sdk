@@ -13,7 +13,7 @@ const FATAL_ERROR_MESSAGE = 'FATAL ERROR making restful request to retrieve: ';
 
 export default class SessionRetrievalService {
 
-  private logger = log4js.getLogger(LOGGER_ID);
+  private logger : log4js.Logger = log4js.getLogger(LOGGER_ID);
 
   constructor(private client: any, private endpoint: string) {}
 

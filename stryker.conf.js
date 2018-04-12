@@ -15,6 +15,7 @@ module.exports = function(config) {
     thresholds: { high: 80, low: 60, break: 65 },
     mutate: [
       "src/**/*.ts",
+      "!src/types/*d.ts",
       "!src/index.ts"
     ]
   });

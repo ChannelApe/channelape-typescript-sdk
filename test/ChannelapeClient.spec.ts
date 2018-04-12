@@ -10,7 +10,7 @@ const someEndpoint = 'some-api.channelape.com';
 describe('Channelape Client', () => {
 
   
-  let sandbox;
+  let sandbox : sinon.SinonSandbox;
   beforeEach((done) => {
     sandbox = sinon.sandbox.create();
     done();
@@ -22,14 +22,14 @@ describe('Channelape Client', () => {
   });
 
   describe('given some channelape client configuration, created with user credentials', () => {
-    const channelapeClient  = generateCredentialSessionClient();
+    const channelapeClient : ChannelapeClient  = generateCredentialSessionClient();
 
     it('when getting session for a valid user, then return resolved promise with session data', () => {
       const expectedSession: SessionResponse = {
         userId: 'someuserId',
         sessionId: 'some password'
       };
-      const retrieveSessionStub = sandbox.stub(SessionRetrievalService.prototype, 'retrieveSession')
+      const retrieveSessionStub : sinon.SinonStub = sandbox.stub(SessionRetrievalService.prototype, 'retrieveSession')
       .callsFake((sessionRequest: CredentialSessionRequest) => {
         return Promise.resolve(expectedSession);
       });
@@ -40,9 +40,9 @@ describe('Channelape Client', () => {
     });
 
     it('when getting session for a invalid session, then return reject promise with error', () => {
-      const expectedErrorMessage = 'There was an error';
+      const expectedErrorMessage : string = 'There was an error';
 
-      const retrieveSessionStub = sandbox.stub(SessionRetrievalService.prototype, 'retrieveSession')
+      const retrieveSessionStub : sinon.SinonStub = sandbox.stub(SessionRetrievalService.prototype, 'retrieveSession')
       .callsFake((sessionRequest: CredentialSessionRequest) => {
         return Promise.reject('There was an error');
       });
@@ -57,7 +57,7 @@ describe('Channelape Client', () => {
   });
 
   describe('given some channelape client configuration, created with user credentials', () => {
-    const channelapeClient = generateSessionIdClient();
+    const channelapeClient : ChannelapeClient = generateSessionIdClient();
 
     it('when getting session for a valid user, then return resolved promise with session data', () => {
       const expectedSession: SessionResponse = {
@@ -75,9 +75,9 @@ describe('Channelape Client', () => {
     });
 
     it('when getting session for a invalid session, then return reject promise with error', () => {
-      const expectedErrorMessage = 'There was an error';
+      const expectedErrorMessage : string = 'There was an error';
 
-      const retrieveSessionStub = sandbox.stub(SessionRetrievalService.prototype, 'retrieveSession')
+      const retrieveSessionStub : sinon.SinonStub = sandbox.stub(SessionRetrievalService.prototype, 'retrieveSession')
       .callsFake((sessionRequest: SessionIdSessionRequest) => {
         return Promise.reject('There was an error');
       });

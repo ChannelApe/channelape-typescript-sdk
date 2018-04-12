@@ -8,8 +8,6 @@ import SessionIdSessionRequest from './auth/model/SessionIdSessionRequest';
 
 export class ChannelapeClient {
 
-  private sessionRetrievalService: SessionRetrievalService;
-
   constructor(private config: ClientConfiguration) {  }
 
   public getSession() {
@@ -21,8 +19,20 @@ export class ChannelapeClient {
         password: this.config.password
       };
       const client = new Client({ user: sessionRequest.email, password: sessionRequest.password });
-      this.sessionRetrievalService = new SessionRetrievalService(client, this.config.endpoint);
-      this.sessionRetrievalService.retrieveSession(sessionRequest)
+      const sessionRetrievalService = new SessionRetrievalService(client, this.config.endpoint);
+      sessionRetrievalService.retrieveSession(sessionRequest)
+      .then((response: SessionResponse) => {
+        deferred.resolve(response);
+      })
+      .catch((e) => {
+        deferred.reject(e);
+      });
+    } else if (this.config.sessionId) {
+      const sessionRequest: SessionIdSessionRequest = {
+        sessionId: this.config.sessionId
+      };
+      const sessionRetrievalService = new SessionRetrievalService(Client, this.config.endpoint);
+      sessionRetrievalService.retrieveSession(sessionRequest)
       .then((response: SessionResponse) => {
         deferred.resolve(response);
       })
@@ -30,18 +40,7 @@ export class ChannelapeClient {
         deferred.reject(e);
       });
     } else {
-      const sessionRequest: SessionIdSessionRequest = {
-        sessionId: this.config.sessionId
-      };
-      const client = new Client();
-      this.sessionRetrievalService = new SessionRetrievalService(client, this.config.endpoint);
-      this.sessionRetrievalService.retrieveSession(sessionRequest)
-      .then((response: SessionResponse) => {
-        deferred.resolve(response);
-      })
-      .catch((e) => {
-        deferred.reject(e);
-      });
+      deferred.reject('Invalid configuration');
     }
 
     return deferred.promise;
