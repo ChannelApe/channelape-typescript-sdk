@@ -6,7 +6,7 @@ import SessionResponse from './../src/auth/model/SessionResponse';
 import CredentialSessionRequest from './../src/auth/model/CredentialSessionRequest';
 import SessionIdSessionRequest from './../src/auth/model/SessionIdSessionRequest';
 
-const someEndpoint = 'some-api.channelape.com';
+const someEndpoint = 'https://some-api.channelape.com';
 describe('Channelape Client', () => {
 
   
@@ -90,6 +90,21 @@ describe('Channelape Client', () => {
 
     
   });  
+
+  describe('given some channelape client configuration, created with empty user credentials and session ID', () => {
+    const channelapeClient : ChannelapeClient = new ChannelapeClient({
+      endpoint: someEndpoint
+    });
+
+    it('when getting session, then return reject promise with error', () => {
+      const expectedErrorMessage : string = 'Invalid configuration. email and password or session ID is required.';
+      return channelapeClient.getSession().catch((error) => {
+        expect(error).to.equal(expectedErrorMessage);
+      });
+    });
+
+    
+  });
 
   function generateCredentialSessionClient(): ChannelapeClient {
     const credentials = {
