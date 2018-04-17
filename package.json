@@ -10,7 +10,7 @@
     "compile": "tsc -p . --declaration",
     "watch": "tsc --watch",
     "unit-test": "mocha",
-    "watch-unit-test": "mocha --watch",
+    "watch-unit-test": "mocha --recursive --compilers ts:ts-node/register --watch test/**/*.spec.* ",
     "test": "npm run unit-test",
     "pretest": "npm run lint",
     "posttest": "npm run mutate && npm run cover",

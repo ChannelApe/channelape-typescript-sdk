@@ -1,11 +1,12 @@
 import ClientConfiguration from './ClientConfiguration';
+import Environment from './Environment';
 
 export default class ClientConfigurationBuilder {
 
   private sessionId: string;
   private email: string;
   private password: string;
-  private endpoint: string = 'https://api.channelape.com';
+  private endpoint: string = Environment.PRODUCTION;
   
   get SessionId() {
     return this.sessionId;

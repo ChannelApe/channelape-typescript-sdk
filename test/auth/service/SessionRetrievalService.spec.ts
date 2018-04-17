@@ -4,13 +4,14 @@ import { Client } from 'node-rest-client';
 import SessionRetrievalService from './../../../src/auth/service/SessionRetrievalService';
 import { mockResponse } from '../../helper/mockResponse';
 import { EventEmitter } from 'events';
-import { Versions } from '../../../src/model/Versions';
-import { Endpoints } from '../../../src/model/Endpoints';
+import Version from '../../../src/model/Version';
+import Endpoint from '../../../src/model/Endpoint';
+import Environment from '../../../src/model/Environment';
 
 describe('Session Retrieval Service', () => {
 
   describe('given some rest client and some given endpoint', () => {
-    const someEndpoint : string = 'https://some-api.channelape.com';
+    const someEndpoint : string = Environment.STAGING;
     const someClient = new Client();
 
     let sandbox : sinon.SinonSandbox;
@@ -41,7 +42,7 @@ describe('Session Retrieval Service', () => {
         email: 'some-email@email.com',
         password: 'some-crazy-long-password'
       }).then((actualResponse) => {
-        expect(someClientPostStub.args[0][0]).to.equal(`${someEndpoint}/${Versions.V1}${Endpoints.SESSIONS}`);
+        expect(someClientPostStub.args[0][0]).to.equal(`${someEndpoint}/${Version.V1}${Endpoint.SESSIONS}`);
         expect(someClientPostStub.args[0][1]).to.deep.equal([]);
         expect(actualResponse.userId).to.equal(expectedResponse.userId);
         expect(actualResponse.sessionId).to.equal(expectedResponse.sessionId);
@@ -63,7 +64,7 @@ describe('Session Retrieval Service', () => {
         sessionId: someSessionId
       }).then((actualResponse) => {
         expect(someClientGetStub.args[0][0])
-          .to.equal(`${someEndpoint}/${Versions.V1}${Endpoints.SESSIONS}/${someSessionId}`);
+          .to.equal(`${someEndpoint}/${Version.V1}${Endpoint.SESSIONS}/${someSessionId}`);
         expect(someClientGetStub.args[0][1]).to.deep.equal([]);
         expect(actualResponse.userId).to.equal(expectedResponse.userId);
         expect(actualResponse.sessionId).to.equal(expectedResponse.sessionId);
@@ -85,7 +86,7 @@ describe('Session Retrieval Service', () => {
       }).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
-        expect(someClientPostStub.args[0][0]).to.equal(`${someEndpoint}/${Versions.V1}${Endpoints.SESSIONS}`);
+        expect(someClientPostStub.args[0][0]).to.equal(`${someEndpoint}/${Version.V1}${Endpoint.SESSIONS}`);
         expect(someClientPostStub.args[0][1]).to.deep.equal([]);
         expect(e).to.be.equal(fatalExceptionMessage);
         done();
@@ -109,7 +110,7 @@ describe('Session Retrieval Service', () => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(someClientPostStub.args[0][0])
-        .to.equal(`${someEndpoint}/${Versions.V1}${Endpoints.SESSIONS}/${someSessionId}`);
+        .to.equal(`${someEndpoint}/${Version.V1}${Endpoint.SESSIONS}/${someSessionId}`);
         expect(someClientPostStub.args[0][1]).to.deep.equal([]);
         expect(e).to.be.equal(fatalExceptionMessage);
         done();

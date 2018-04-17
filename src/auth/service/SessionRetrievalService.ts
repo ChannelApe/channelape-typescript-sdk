@@ -3,8 +3,8 @@ import * as Q from 'q';
 import * as log4js from 'log4js';
 import SessionResponse from './../model/SessionResponse';
 import { Client } from 'node-rest-client';
-import { Endpoints } from '../../model/Endpoints';
-import { Versions } from '../../model/Versions';
+import Endpoint from '../../model/Endpoint';
+import Version from '../../model/Version';
 import SessionIdSessionRequest from './../model/SessionIdSessionRequest';
 
 const STARTING_TO_RETRIEVE_MESSAGE = 'Retrieving session';
@@ -31,7 +31,7 @@ export default class SessionRetrievalService {
 
     this.logger.info(STARTING_TO_RETRIEVE_MESSAGE);
     const deferred = Q.defer<SessionResponse>();
-    const requestUrl = `${this.endpoint}/${Versions.V1}${Endpoints.SESSIONS}`;
+    const requestUrl = `${this.endpoint}/${Version.V1}${Endpoint.SESSIONS}`;
     this.logger.debug(`HTTP Request: POST ${requestUrl}`);
     const req = this.client.post(requestUrl, [], (res: SessionResponse, data: any) => {
       deferred.resolve(res);
@@ -49,7 +49,7 @@ export default class SessionRetrievalService {
 
     this.logger.info(STARTING_TO_RETRIEVE_MESSAGE);
     const deferred = Q.defer<SessionResponse>();
-    const requestUrl = `${this.endpoint}/${Versions.V1}${Endpoints.SESSIONS}/${sessionRequest.sessionId}`;
+    const requestUrl = `${this.endpoint}/${Version.V1}${Endpoint.SESSIONS}/${sessionRequest.sessionId}`;
     this.logger.debug(`HTTP Request: GET ${requestUrl}`);
     const req = this.client.get(requestUrl, [], (res: SessionResponse, data: any) => {
       deferred.resolve(res);
