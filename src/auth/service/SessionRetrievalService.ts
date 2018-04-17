@@ -17,9 +17,9 @@ export default class SessionRetrievalService {
 
   constructor(private client: any, private endpoint: string) {}
 
-  public retrieveSession(
+  retrieveSession(
     sessionRequest: SessionIdSessionRequest | CredentialSessionRequest) {
-    if ((sessionRequest as SessionIdSessionRequest).sessionId) {
+    if ((sessionRequest as SessionIdSessionRequest).sessionId != null) {
       return this.retrieveSessionBySessionId((sessionRequest as SessionIdSessionRequest));
     }
 

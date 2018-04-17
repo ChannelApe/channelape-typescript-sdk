@@ -2,11 +2,11 @@ export default class Response {
 
   constructor(private response: any, private data: any) {}
 
-  public getBody() {
+  getBody() {
     return this.data;
   }
 
-  public getStatus() {
+  getStatus() {
     return this.response.statusCode;
   }
 }

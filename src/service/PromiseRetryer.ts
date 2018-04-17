@@ -15,32 +15,32 @@ export default class PromiseRetryer {
     return this;
   }
 
-  public setMinDelay(value: number) {
+  setMinDelay(value: number) {
     this.minDelay = value;
     return this;
   }
 
-  public setMaxAttempts(value: number) {
+  setMaxAttempts(value: number) {
     this.maxAttempts = value;
     return this;
   }
 
-  public setBase(value: number) {
+  setBase(value: number) {
     this.base = value;
     return this;
   }
 
-  public setRetryFunction(value: Function) {
+  setRetryFunction(value: Function) {
     this.retryFunction = value;
     return this;
   }
 
-  public setFinalResponseCodes(value: number[]) {
+  setFinalResponseCodes(value: number[]) {
     this.finalResponseCodes = value;
     return this;
   }
 
-  public run(attempt: number = 1): Q.Promise<{}> {
+  run(attempt: number = 1): Q.Promise<{}> {
     const deferred = Q.defer();
     const promise = this.retryFunction();
     promise
