@@ -93,9 +93,6 @@
       ".ts",
       ".tsx"
     ],
-    "include": [
-      "src/**/*"
-    ],
     "reporter": [
       "lcov",
       "text",
