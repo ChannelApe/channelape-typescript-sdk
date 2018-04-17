@@ -6,6 +6,7 @@
     "module": "commonjs",
     "target": "es6",
     "strict": true,
+    "noImplicitReturns" : true,
     "baseUrl": ".",
     "paths": {
       "*": [
@@ -16,6 +17,7 @@
   },
   "include": [
     "src/**/*",
-    "test/**/*"
+    "test/**/*",
+    "e2e/**/*"
   ]
 }

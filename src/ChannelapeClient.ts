@@ -7,7 +7,7 @@ import * as Q from 'q';
 import SessionIdSessionRequest from './auth/model/SessionIdSessionRequest';
 
 const INVALID_CONFIGURATION_ERROR_MESSAGE = 'Invalid configuration. email and password or session ID is required.';
-export class ChannelapeClient {
+export default class ChannelapeClient {
 
   constructor(private config: ClientConfiguration) {  }
 

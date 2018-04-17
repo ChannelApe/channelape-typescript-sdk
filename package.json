@@ -9,14 +9,15 @@
     "prepublishOnly": "npm run compile",
     "compile": "tsc -p . --declaration",
     "watch": "tsc --watch",
-    "unit-test": "mocha",
+    "unit-test": "mocha --require ts-node/register --require source-map-support/register --recursive test/**/*.spec.*",
     "watch-unit-test": "mocha --recursive --compilers ts:ts-node/register --watch test/**/*.spec.* ",
     "test": "npm run unit-test",
     "pretest": "npm run lint",
     "posttest": "npm run mutate && npm run cover",
     "cover": "nyc npm run unit-test",
     "mutate": "stryker run",
-    "lint": "tslint --project ."
+    "lint": "tslint --project .",
+    "e2e": "mocha --recursive --compilers ts:ts-node/register e2e/**/*.spec.*"
   },
   "files": [
     "dist"
@@ -98,6 +99,7 @@
       "dist/**",
       "reports/**",
       "test/**",
+      "e2e/**",
       "**/*.d.ts",
       "**/*.conf.js"
     ],

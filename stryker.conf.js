@@ -2,7 +2,8 @@ module.exports = function(config) {
   config.set({
     files: [
       "test/**/*.ts",
-      "src/**/*.ts"
+      "src/**/*.ts",
+      "!e2e/**/*.ts",
     ],
     testRunner: "mocha",
     mutator: "typescript",

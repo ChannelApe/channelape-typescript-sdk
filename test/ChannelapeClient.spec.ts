@@ -1,4 +1,4 @@
-import { ChannelapeClient } from './../src/ChannelapeClient';
+import ChannelapeClient from './../src/ChannelapeClient';
 import { expect } from 'chai';
 import SessionRetrievalService from './../src/auth/service/SessionRetrievalService';
 import * as sinon from 'sinon';

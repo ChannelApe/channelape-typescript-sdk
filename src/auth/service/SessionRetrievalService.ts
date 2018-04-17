@@ -39,6 +39,7 @@ export default class SessionRetrievalService {
 
     req.on('error', (err: any) => {
       this.logger.error(`${FATAL_ERROR_MESSAGE}${err}`);
+      console.log(`${FATAL_ERROR_MESSAGE}${err}`);
       deferred.reject(err);
     });
     return deferred.promise;
