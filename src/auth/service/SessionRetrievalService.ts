@@ -2,10 +2,10 @@ import CredentialSessionRequest from './../model/CredentialSessionRequest';
 import * as Q from 'q';
 import * as log4js from 'log4js';
 import SessionResponse from './../model/SessionResponse';
-import { Client } from 'node-rest-client';
 import Endpoint from '../../model/Endpoint';
 import Version from '../../model/Version';
 import SessionIdSessionRequest from './../model/SessionIdSessionRequest';
+import request = require('request');
 
 const STARTING_TO_RETRIEVE_MESSAGE = 'Retrieving session';
 const LOGGER_ID = 'SessionRetrievalService';
@@ -13,9 +13,10 @@ const FATAL_ERROR_MESSAGE = 'FATAL ERROR making restful request to retrieve: ';
 
 export default class SessionRetrievalService {
 
-  private logger : log4js.Logger = log4js.getLogger(LOGGER_ID);
+  private logger: log4js.Logger = log4js.getLogger(LOGGER_ID);
 
-  constructor(private client: any, private endpoint: string) {}
+  constructor(private client: request.RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>,
+    private endpoint: string) { }
 
   retrieveSession(
     sessionRequest: SessionIdSessionRequest | CredentialSessionRequest) {
@@ -33,18 +34,25 @@ export default class SessionRetrievalService {
     const deferred = Q.defer<SessionResponse>();
     const requestUrl = `${this.endpoint}/${Version.V1}${Endpoint.SESSIONS}`;
     this.logger.debug(`HTTP Request: POST ${requestUrl}`);
-    const req = this.client.post(requestUrl, [], (res: SessionResponse, data: any) => {
-      deferred.resolve(res);
+
+    const options: request.CoreOptions = {
+      auth: {
+        username: sessionRequest.email,
+        password: sessionRequest.password
+      },
+      json: true
+    };
+    this.client.post(requestUrl, options, (error, response, body: SessionResponse) => {
+      if (error) {
+        this.logger.error(`${FATAL_ERROR_MESSAGE}${error}`);
+        deferred.reject(error);
+      } else {
+        deferred.resolve(body);
+      }
     });
 
-    req.on('error', (err: any) => {
-      this.logger.error(`${FATAL_ERROR_MESSAGE}${err}`);
-      console.log(`${FATAL_ERROR_MESSAGE}${err}`);
-      deferred.reject(err);
-    });
     return deferred.promise;
   }
-
   private retrieveSessionBySessionId(
     sessionRequest: SessionIdSessionRequest): Q.Promise<SessionResponse> {
 
@@ -52,14 +60,19 @@ export default class SessionRetrievalService {
     const deferred = Q.defer<SessionResponse>();
     const requestUrl = `${this.endpoint}/${Version.V1}${Endpoint.SESSIONS}/${sessionRequest.sessionId}`;
     this.logger.debug(`HTTP Request: GET ${requestUrl}`);
-    const req = this.client.get(requestUrl, [], (res: SessionResponse, data: any) => {
-      deferred.resolve(res);
+
+    const options: request.CoreOptions = {
+      json: true
+    };
+    this.client.get(requestUrl, options, (error, response, body: SessionResponse) => {
+      if (error) {
+        this.logger.error(`${FATAL_ERROR_MESSAGE}${error}`);
+        deferred.reject(error);
+      } else {
+        deferred.resolve(body);
+      }
     });
 
-    req.on('error', (err: any) => {
-      this.logger.error(`${FATAL_ERROR_MESSAGE}${err}`);
-      deferred.reject(err);
-    });
     return deferred.promise;
   }
 }
