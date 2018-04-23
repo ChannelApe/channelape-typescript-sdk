@@ -132,7 +132,8 @@ describe('ChannelApe Client', () => {
       
     if (Array.isArray(actualChannelApeErrors)) {
       expect(expectedChannelApeErrors.length).to.equal(actualChannelApeErrors.length,
-        'expected and actual ChannelApeError arrays are different sizes');
+        'expected and actual ChannelApeError arrays are different sizes, expected: '
+        + JSON.stringify(expectedChannelApeErrors) + ', actual: ' + JSON.stringify(actualChannelApeErrors));
 
       expectedChannelApeErrors
         .sort((leftChannelApeError, rightChannelApeError) => leftChannelApeError.code - rightChannelApeError.code);

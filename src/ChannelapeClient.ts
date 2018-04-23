@@ -1,13 +1,18 @@
 import SessionRetrievalService from './auth/service/SessionRetrievalService';
 import CredentialSessionRequest from './auth/model/CredentialSessionRequest';
 import ClientConfiguration from './../src/model/ClientConfiguration';
-import { Client } from 'node-rest-client';
 import SessionResponse from './auth/model/SessionResponse';
+import request = require('request');
 import * as Q from 'q';
 import SessionIdSessionRequest from './auth/model/SessionIdSessionRequest';
 
 const INVALID_CONFIGURATION_ERROR_MESSAGE = 'Invalid configuration. email and password or session ID is required.';
 export default class ChannelapeClient {
+
+  private static readonly CLIENT = request.defaults({
+    timeout: 60000,
+    json: true
+  });
 
   constructor(private config: ClientConfiguration) {  }
 
@@ -19,8 +24,7 @@ export default class ChannelapeClient {
         email: this.config.Email,
         password: this.config.Password
       };
-      const client = new Client({ user: sessionRequest.email, password: sessionRequest.password });
-      const sessionRetrievalService = new SessionRetrievalService(client, this.config.Endpoint);
+      const sessionRetrievalService = new SessionRetrievalService(ChannelapeClient.CLIENT, this.config.Endpoint);
       sessionRetrievalService.retrieveSession(sessionRequest)
       .then((response: SessionResponse) => {
         deferred.resolve(response);
@@ -32,7 +36,7 @@ export default class ChannelapeClient {
       const sessionRequest: SessionIdSessionRequest = {
         sessionId: this.config.SessionId
       };
-      const sessionRetrievalService = new SessionRetrievalService(Client, this.config.Endpoint);
+      const sessionRetrievalService = new SessionRetrievalService(ChannelapeClient.CLIENT, this.config.Endpoint);
       sessionRetrievalService.retrieveSession(sessionRequest)
       .then((response: SessionResponse) => {
         deferred.resolve(response);
