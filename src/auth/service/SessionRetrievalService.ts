@@ -2,6 +2,7 @@ import CredentialSessionRequest from './../model/CredentialSessionRequest';
 import * as Q from 'q';
 import * as log4js from 'log4js';
 import SessionResponse from './../model/SessionResponse';
+import ChannelApeErrorResponse from './../../model/ChannelApeErrorResponse';
 import Endpoint from '../../model/Endpoint';
 import Version from '../../model/Version';
 import SessionIdSessionRequest from './../model/SessionIdSessionRequest';
@@ -42,12 +43,16 @@ export default class SessionRetrievalService {
       },
       json: true
     };
-    this.client.post(requestUrl, options, (error, response, body: SessionResponse) => {
+    this.client.post(requestUrl, options, (error, response, body) => {
       if (error) {
         this.logger.error(`${FATAL_ERROR_MESSAGE}${error}`);
         deferred.reject(error);
+      } else if (response.statusCode === 201) {
+        deferred.resolve(body as SessionResponse);
       } else {
-        deferred.resolve(body);
+        const channelApeErrorResponse = body as ChannelApeErrorResponse;
+        channelApeErrorResponse.statusCode = response.statusCode;
+        deferred.reject(channelApeErrorResponse);
       }
     });
 
@@ -64,15 +69,20 @@ export default class SessionRetrievalService {
     const options: request.CoreOptions = {
       json: true
     };
-    this.client.get(requestUrl, options, (error, response, body: SessionResponse) => {
+    this.client.get(requestUrl, options, (error, response, body) => {
       if (error) {
         this.logger.error(`${FATAL_ERROR_MESSAGE}${error}`);
         deferred.reject(error);
+      } else if (response.statusCode === 200) {
+        deferred.resolve(body as SessionResponse);
       } else {
-        deferred.resolve(body);
+        const channelApeErrorResponse = body as ChannelApeErrorResponse;
+        channelApeErrorResponse.statusCode = response.statusCode;
+        deferred.reject(channelApeErrorResponse);
       }
     });
 
     return deferred.promise;
   }
+
 }

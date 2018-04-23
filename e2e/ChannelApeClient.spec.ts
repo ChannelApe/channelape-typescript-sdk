@@ -1,7 +1,8 @@
 import ClientConfigurationBuilder from '../src/model/ClientConfigurationBuilder';
 import ClientConfiguration from '../src/model/ClientConfiguration';
 import SessionResponse from '../src/auth/model/SessionResponse';
-import ChannelApeError from '../src/auth/model/ChannelApeError';
+import ChannelApeError from '../src/model/ChannelApeError';
+import ChannelApeErrorResponse from '../src/model/ChannelApeErrorResponse';
 import ChannelapeClient from '../src/ChannelapeClient';
 import { expect } from 'chai';
 
@@ -16,16 +17,19 @@ describe('ChannelApe Client', () => {
     context('When retrieving session', () => {
       const actualSessionPromise = channelApeClient.getSession();
 
-      it('Then return invalid email or password error message', () => {
-        return actualSessionPromise.then((actualSession) => {
+      it('Then return invalid email or password error message', (done) => {
+        actualSessionPromise.then((actualSession) => {
           expect(actualSession.userId).to.equal(undefined);
           expect(actualSession.sessionId).to.equal(undefined);
-
+        }).catch((e) => {
+          const actualChannelApeErrorResponse = e as ChannelApeErrorResponse;
+          expect(actualChannelApeErrorResponse.statusCode).to.equal(401);
           const expectedChannelApeErrors = [{
             code: 2,
             message: 'Invalid email or password.'
           }];
-          assertChannelApeErrors(expectedChannelApeErrors, actualSession.errors);
+          assertChannelApeErrors(expectedChannelApeErrors, actualChannelApeErrorResponse.errors); 
+          done();
         });
       });
     });
@@ -40,17 +44,19 @@ describe('ChannelApe Client', () => {
     context('When retrieving session', () => {
       const actualSessionPromise = channelApeClient.getSession();
 
-      it('Then return invalid auth token error message', () => {
-        return actualSessionPromise.then((actualSession) => {
-
+      it('Then return 401 status code and invalid auth token error message', (done) => {
+        actualSessionPromise.then((actualSession) => {
           expect(actualSession.userId).to.equal(undefined);
           expect(actualSession.sessionId).to.equal(undefined);
-
-          const expectedChannelApeErrors = [{
-            code: 12,
-            message: 'Invalid authorization token. Please check the server logs and try again.'
-          }];
-          assertChannelApeErrors(expectedChannelApeErrors, actualSession.errors);
+        }).catch((e) => {
+          const actualChannelApeErrorResponse = e as ChannelApeErrorResponse;
+          expect(actualChannelApeErrorResponse.statusCode).to.equal(401);
+          const expectedChannelApeErrors = [{ 
+            code: 12, 
+            message: 'Invalid authorization token. Please check the server logs and try again.' 
+          }]; 
+          assertChannelApeErrors(expectedChannelApeErrors, actualChannelApeErrorResponse.errors); 
+          done();
         });
       });
     });
@@ -69,9 +75,6 @@ describe('ChannelApe Client', () => {
 
       it('Then return session ID and user ID', () => {
         return actualSessionPromise.then((actualSession) => {
-
-          assertChannelApeErrors([], actualSession.errors);
-
           expect(actualSession.userId).to.equal('addb5bac-d629-4179-a2a8-790763163fcb');
           expect(actualSession.sessionId).to.equal(sessionId);
         });
@@ -92,12 +95,8 @@ describe('ChannelApe Client', () => {
 
       it('Then return session ID and user ID', () => {
         return actualSessionPromise.then((actualSession) => {
-
-          assertChannelApeErrors([], actualSession.errors);
-
-          if (Array.isArray(actualSession.errors)) {
-            expect(actualSession.errors.length).to.equal(0);
-          }
+          expect(actualSession.userId).to.equal('addb5bac-d629-4179-a2a8-790763163fcb');
+          expect(actualSession.sessionId.length).to.be.greaterThan(0);
         });
       });
     });

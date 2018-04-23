@@ -12,7 +12,7 @@ module.exports = function(config) {
     testFramework: "mocha",
     coverageAnalysis: "off",
     tsconfigFile: "tsconfig.json",
-    thresholds: { high: 90, low: 70, break: 78 },
+    thresholds: { high: 90, low: 70, break: 79 },
     mutate: [
       "src/**/*.ts",
       "!src/types/*d.ts"
