@@ -1,7 +1,6 @@
 import { expect, assert } from 'chai';
 import PromiseRetryer from './../../src/service/PromiseRetryer';
 import * as Q from 'q';
-import { mockResponse } from '../helper/mockResponse';
 import Response from './../../src/model/Response';
 import * as sinon from 'sinon';
 

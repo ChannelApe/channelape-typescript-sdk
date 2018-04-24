@@ -1,51 +1,54 @@
 import SessionRetrievalService from './auth/service/SessionRetrievalService';
 import CredentialSessionRequest from './auth/model/CredentialSessionRequest';
-import ClientConfiguration from './model/ClientConfiguration';
-import { Client } from 'node-rest-client';
+import ClientConfiguration from './../src/model/ClientConfiguration';
 import SessionResponse from './auth/model/SessionResponse';
+import request = require('request');
 import * as Q from 'q';
 import SessionIdSessionRequest from './auth/model/SessionIdSessionRequest';
 
-export class ChannelapeClient{
+const INVALID_CONFIGURATION_ERROR_MESSAGE = 'Invalid configuration. email and password or session ID is required.';
+export default class ChannelapeClient {
 
-  private sessionRetrievalService: SessionRetrievalService;
-  
+  private static readonly CLIENT = request.defaults({
+    timeout: 60000,
+    json: true
+  });
+
   constructor(private config: ClientConfiguration) {  }
 
-  public getSession() {
+  getSession() {
     const deferred = Q.defer<SessionResponse>();
 
-    if (this.config.email && this.config.password) {
+    if (this.config.hasCredentials()) {
       const sessionRequest: CredentialSessionRequest = {
-        email: this.config.email,
-        password: this.config.password
+        email: this.config.Email,
+        password: this.config.Password
       };
-      const client = new Client({ user: sessionRequest.email, password: sessionRequest.password });
-      this.sessionRetrievalService = new SessionRetrievalService(client, this.config.endpoint);
-      this.sessionRetrievalService.retrieveSession(sessionRequest)
+      const sessionRetrievalService = new SessionRetrievalService(ChannelapeClient.CLIENT, this.config.Endpoint);
+      sessionRetrievalService.retrieveSession(sessionRequest)
       .then((response: SessionResponse) => {
         deferred.resolve(response);
       })
       .catch((e) => {
         deferred.reject(e);
       });
-    }else {
+    } else if (this.config.hasSession()) {
       const sessionRequest: SessionIdSessionRequest = {
-        sessionId: this.config.sessionId
+        sessionId: this.config.SessionId
       };
-      const client = new Client();
-      this.sessionRetrievalService = new SessionRetrievalService(client, this.config.endpoint);
-      this.sessionRetrievalService.retrieveSession(sessionRequest)
+      const sessionRetrievalService = new SessionRetrievalService(ChannelapeClient.CLIENT, this.config.Endpoint);
+      sessionRetrievalService.retrieveSession(sessionRequest)
       .then((response: SessionResponse) => {
         deferred.resolve(response);
       })
       .catch((e) => {
         deferred.reject(e);
       });
+    } else {
+      deferred.reject(INVALID_CONFIGURATION_ERROR_MESSAGE);
     }
-    
 
-    
     return deferred.promise;
   }
+  
 }
