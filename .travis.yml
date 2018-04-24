@@ -1,11 +1,23 @@
+dist: trusty
+sudo: required
+addons:
+  sonarcloud:
+    organization: channelape-github
+    token:
+      secure: eZ24Tm+uGJ52UBPNJrTgHaQxC8MCxGvcMCV9QRsSdUr1bO51ImqtyJK7Wb3FlwQjZRg41XO2jypvP3d9OlsS5evADBvGmq3E8NTaUyYzvX3DCO2RHKpA5rtcnYxG+DP2pHgKSGrPcD9W3W8vQE65xtmoSf0B7OagTGOiI/+xNmZvQIJJ+fIM01UAs2XjakFnD90mLkYkzFmhJ4p5BIb6x7EEptj+U6MznTRudfhkeMRge8F/Eezgeg27iYsSB1VfI+t5mPzckZvZXKdEacrKR0DLcOpVB8A81DwyNLiwN6yOY1fE92QSOnHTmv9ITRMVqfcJUJ3fsFQL/qWmCdjf1Kz3DN3g8QlyAiM2snvbkOd9W1RhxoZ6sEVfUOuIJsyTjCri8O850XZXTV1LVkmu7uwn7EOGFTbSZkBYb5AcEKCDKaLrQ8DLz3WvJ+1IR3wag6edZR7lLd2zI1Y+mmRuRYXa0sxgkiNgkx3ihaHgeBFP6GSwir/avLbX/AIkR2Y86zPRxc/9uIRzKHfD+KQwCLYYNrhMn6DK28yHDNiIgPjMVq0y/j0eOBojEDgqVYDiEZBFo0mBJ+x8SRleDdxj9gu0IWxtrWYDYQYLEkKn6y8S4k1u13L0UfNIrpildpPJpViYD3mTrhb+7sK4OkpNWYgv92W7E2BejTRwADqJ9po=
 language: node_js
 node_js:
-  - "8.10.0"
+- 8.10.0
+jdk:
+- oraclejdk8
 install:
-  - npm install
+- npm install
 script:
-  - npm test
-  - npm run e2e
+- npm test
+- npm run e2e
+- sonar-scanner
 cache:
   directories:
-    - "node_modules"
+  - node_modules
+  - "$HOME/.sonar/cache"
+    
