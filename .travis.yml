@@ -1,23 +1,29 @@
 dist: trusty
 sudo: required
+
 addons:
   sonarcloud:
-    organization: channelape-github
+    organization: "channelape-github"
     token:
-      secure: eZ24Tm+uGJ52UBPNJrTgHaQxC8MCxGvcMCV9QRsSdUr1bO51ImqtyJK7Wb3FlwQjZRg41XO2jypvP3d9OlsS5evADBvGmq3E8NTaUyYzvX3DCO2RHKpA5rtcnYxG+DP2pHgKSGrPcD9W3W8vQE65xtmoSf0B7OagTGOiI/+xNmZvQIJJ+fIM01UAs2XjakFnD90mLkYkzFmhJ4p5BIb6x7EEptj+U6MznTRudfhkeMRge8F/Eezgeg27iYsSB1VfI+t5mPzckZvZXKdEacrKR0DLcOpVB8A81DwyNLiwN6yOY1fE92QSOnHTmv9ITRMVqfcJUJ3fsFQL/qWmCdjf1Kz3DN3g8QlyAiM2snvbkOd9W1RhxoZ6sEVfUOuIJsyTjCri8O850XZXTV1LVkmu7uwn7EOGFTbSZkBYb5AcEKCDKaLrQ8DLz3WvJ+1IR3wag6edZR7lLd2zI1Y+mmRuRYXa0sxgkiNgkx3ihaHgeBFP6GSwir/avLbX/AIkR2Y86zPRxc/9uIRzKHfD+KQwCLYYNrhMn6DK28yHDNiIgPjMVq0y/j0eOBojEDgqVYDiEZBFo0mBJ+x8SRleDdxj9gu0IWxtrWYDYQYLEkKn6y8S4k1u13L0UfNIrpildpPJpViYD3mTrhb+7sK4OkpNWYgv92W7E2BejTRwADqJ9po=
+      secure: "EHyqb+NjwY29lysfyfyogVYjhnTU2BTx/oLvRjZ15tXcFx2jUj3cfY/97zQYjF8r9laqdBonlryrTAIdOyp4he3cdY4Xll3I14e+biT49bdhyMofSAFQbNuFpxpBNuVcg4sJBfmj5CB1qhcvTTq+oEKNpAjJV3QZfTVcvsE1dNgRWHWOq3mm7G97TGYOF58Rjm601KaBEqXNAMKO1fCp2D6lJ/VA9uGAlhkTWz+7SsdjuxE7FqHFBeIqNyoR8utuh6GVkWnJmaMPlFnZLwmuB3ojz2Y6h5PVINPCnz7ZeLbAldOp5QXJQIL5Rt+ZBhP8bGlZTEzYwp3O/77TkQhgvfkyHXoDMmkweCtKP+fj/NAlcQpa+iiFvalEOVz9CV+21WL3SRqqOZNEpEqaj3zPIlflsFpD79Wk4Zxa44QtmV6AOPVE5JsQfPq2cDhyv2KS4sU3cIjaZOKKXwMJKga7F+eGI/i/kCw9LJqlCNxLHJLI9/c7byn+rUHhu1DN3bz5TmR/K08M9JMGbVUGfpA1vAn0eW58H2qm/Ifi4oF5WaFVpXPvAA36BwOHl7wzSd8uQKyoXc6IQhxAn+awxAgibOImgsyavUN09rAO7+RKwQpqiLpfU68fLhaz+O5PMDe+727Bt6F5ILteL0xp2uyIY+Aau5FIAdTemRin4t4YUGM="
+
 language: node_js
+
 node_js:
-- 8.10.0
+  - 8.10.0
+
 jdk:
-- oraclejdk8
+  - oraclejdk8
+
 install:
-- npm install
+  - npm install
+
 script:
-- npm test
-- npm run e2e
-- sonar-scanner
+  - npm test
+  - npm run e2e
+  - sonar-scanner
+
 cache:
   directories:
-  - node_modules
-  - "$HOME/.sonar/cache"
-    
+    - node_modules
+    - "$HOME/.sonar/cache"
