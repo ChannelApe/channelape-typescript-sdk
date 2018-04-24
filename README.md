@@ -2,6 +2,10 @@
 
 TypeScript SDK for the [ChannelApe REST API](https://docs.channelape.io/)
 
+| Service   | Develop | Master |
+|-----------|---------|--------|
+| CI Status | [![Build Status](https://travis-ci.org/ChannelApe/channelape-typescript-sdk.svg?branch=develop)](https://travis-ci.org/ChannelApe/channelape-typescript-sdk) | [![Build Status](https://travis-ci.org/ChannelApe/channelape-typescript-sdk.svg?branch=master)](https://travis-ci.org/ChannelApe/channelape-typescript-sdk) |
+
 ## Features
 - [Getting Started](#getting-started)
 - [Sessions](#sessions)
@@ -10,20 +14,16 @@ TypeScript SDK for the [ChannelApe REST API](https://docs.channelape.io/)
 
 Create the channel api client with your credentials.
 
-```
-  const channelapeClient = new ChannelapeClient({
-    email: 'johndoe123@gmail.com',
-    password: 'mysecretpassword',
-    endpoint: 'https://api.channelape.com'
-  });
+```typescript
+const clientConfiguration = new ClientConfigurationBuilder()
+  .setEmail('johndoe123@test.com').setPassword('my_pass123#4').build();
+const channelApeClient = new ChannelapeClient(clientConfiguration);
 ```
 
 or if you have your sessionId:
-```
-  const channelapeClient = new ChannelapeClient({
-    sessionId: '123-456-789'
-    endpoint: 'https://api.channelape.com'
-  });
+```typescript
+const clientConfiguration = new ClientConfigurationBuilder()
+  .setSessionId('e7fecb82-61f7-498e-a358-aa21eb0cd5e8').build();
 ```
 The channelape sdk is asynchronous and all functions return promises.
 
@@ -31,9 +31,9 @@ The channelape sdk is asynchronous and all functions return promises.
 
 A session is created when instantiating the client. It can be retrieved for later use.
 
-```
-  channelapeClient.getSession()
-    .then((session: SessionResponse) => {
-      // do what you need to do with session data here
-    });
+```typescript
+channelapeClient.getSession()
+  .then((session: SessionResponse) => {
+    // do what you need to do with session data here
+  });
 ```
