@@ -16,8 +16,8 @@ export default class SessionRetrievalService {
 
   private static readonly LOGGER: log4js.Logger = log4js.getLogger(LOGGER_ID);
 
-  constructor(private readonly client: request.RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>,
-    private readonly endpoint: string) { }
+  constructor(private readonly client: request.RequestAPI<request.Request, 
+    request.CoreOptions, request.RequiredUriUrl>) { }
 
   retrieveSession(
     sessionRequest: SessionIdSessionRequest | CredentialSessionRequest) {
@@ -33,7 +33,7 @@ export default class SessionRetrievalService {
 
     SessionRetrievalService.LOGGER.info(STARTING_TO_RETRIEVE_MESSAGE);
     const deferred = Q.defer<Session>();
-    const requestUrl = `${this.endpoint}/${Version.V1}${Resource.SESSIONS}`;
+    const requestUrl = `/${Version.V1}${Resource.SESSIONS}`;
     SessionRetrievalService.LOGGER.debug(`HTTP Request: POST ${requestUrl}`);
 
     const options: request.CoreOptions = {
@@ -63,7 +63,7 @@ export default class SessionRetrievalService {
 
     SessionRetrievalService.LOGGER.info(STARTING_TO_RETRIEVE_MESSAGE);
     const deferred = Q.defer<Session>();
-    const requestUrl = `${this.endpoint}/${Version.V1}${Resource.SESSIONS}/${sessionRequest.sessionId}`;
+    const requestUrl = `/${Version.V1}${Resource.SESSIONS}/${sessionRequest.sessionId}`;
     SessionRetrievalService.LOGGER.debug(`HTTP Request: GET ${requestUrl}`);
 
     const options: request.CoreOptions = {

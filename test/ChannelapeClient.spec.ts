@@ -1,6 +1,7 @@
 import ChannelapeClient from './../src/ChannelapeClient';
 import { expect } from 'chai';
 import SessionRetrievalService from './../src/sessions/service/SessionRetrievalService';
+import ActionRetrievalService from './../src/actions/service/ActionRetrievalService';
 import * as sinon from 'sinon';
 import Session from './../src/sessions/model/Session';
 import CredentialSessionRequest from './../src/sessions/model/CredentialSessionRequest';
@@ -66,7 +67,7 @@ describe('Channelape Client', () => {
     it('when getting session for a valid user, then return resolved promise with session data', () => {
       const expectedSession: Session = {
         userId: 'someuserId',
-        sessionId: 'some password'
+        sessionId: 'somesessionid'
       };
       const retrieveSessionStub = sandbox.stub(SessionRetrievalService.prototype, 'retrieveSession')
       .callsFake((sessionRequest: SessionIdSessionRequest) => {
@@ -93,31 +94,85 @@ describe('Channelape Client', () => {
     });
 
     it('when retrieving valid action, then return resolved promise with action data', () => {
-      const expectedActionId = 'a85d7463-a2f2-46ae-95a1-549e70ecb2ca';
-      return channelapeClient.getAction(expectedActionId).then((actualAction) => {
-        expect(actualAction.action).to.equal('PRODUCT_PULL');
-        expect(actualAction.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
-        expect(actualAction.description).to.equal('Encountered error during product pull for Europa Sports');
-        expect(actualAction.healthCheckIntervalInSeconds).to.equal(300);
-        expect(actualAction.id).to.equal(expectedActionId);
-        expect(actualAction.lastHealthCheckTime).to.equal('2018-04-24T14:02:34.703Z');
-        expect(actualAction.processingStatus).to.equal('error');
-        expect(actualAction.startTime).to.equal('2018-04-24T14:02:34.703Z');
-        expect(actualAction.targetId).to.equal('1e4ebaa6-9796-4ccf-bd73-8765893a66bd');
-        expect(actualAction.targetType).to.equal('supplier');
+      const expectedAction: Action = {
+        action: 'PRODUCT_PULL',
+        businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4',
+        description: 'Encountered error during product pull for Europa Sports',
+        healthCheckIntervalInSeconds: 300,
+        id: 'a85d7463-a2f2-46ae-95a1-549e70ecb2ca',
+        lastHealthCheckTime: '2018-04-24T14:02:34.703Z',
+        processingStatus: 'error',
+        startTime: '2018-04-24T14:02:34.703Z',
+        targetId: '1e4ebaa6-9796-4ccf-bd73-8765893a66bd',
+        targetType: 'supplier'
+      };
+
+      const expectedSession: Session = {
+        userId: 'someuserId',
+        sessionId: 'somesessionid'
+      };
+
+      const retrieveSessionStub = sandbox.stub(SessionRetrievalService.prototype, 'retrieveSession')
+      .callsFake((sessionRequest: SessionIdSessionRequest) => {
+        return Promise.resolve(expectedSession);
+      });
+
+      const retrieveActionStub = sandbox.stub(ActionRetrievalService.prototype, 'retrieveAction')
+      .callsFake((expectedActionId) => {
+        return Promise.resolve(expectedAction);
+      });
+
+      return channelapeClient.getAction(expectedAction.id).then((actualAction) => {
+        expect(actualAction.action).to.equal(expectedAction.action);
+        expect(actualAction.businessId).to.equal(expectedAction.businessId);
+        expect(actualAction.description).to.equal(expectedAction.description);
+        expect(actualAction.healthCheckIntervalInSeconds).to.equal(expectedAction.healthCheckIntervalInSeconds);
+        expect(actualAction.id).to.equal(expectedAction.id);
+        expect(actualAction.lastHealthCheckTime).to.equal(expectedAction.lastHealthCheckTime);
+        expect(actualAction.processingStatus).to.equal(expectedAction.processingStatus);
+        expect(actualAction.startTime).to.equal(expectedAction.startTime);
+        expect(actualAction.targetId).to.equal(expectedAction.targetId);
+        expect(actualAction.targetType).to.equal(expectedAction.targetType);
       });
     });
 
     it('when retrieving invalid action, then return rejected promise with error', () => {
       const actionId = '676cb925-b603-4140-a3dd-2af160c257d1';
+
+      const expectedSession: Session = {
+        userId: 'someuserId',
+        sessionId: 'somesessionid'
+      };
+
+      const retrieveSessionStub = sandbox.stub(SessionRetrievalService.prototype, 'retrieveSession')
+      .callsFake((sessionRequest: SessionIdSessionRequest) => {
+        return Promise.resolve(expectedSession);
+      });
+
+      const expectedChannelApeErrorResponse : ChannelApeErrorResponse = {
+        statusCode: 404,
+        errors: [
+          {
+            code: 111,
+            message: 'Action could not be found.'
+          }
+        ]
+      };
+
+      const retrieveActionStub = sandbox.stub(ActionRetrievalService.prototype, 'retrieveAction')
+      .callsFake((actionId) => {
+        return Promise.reject(expectedChannelApeErrorResponse);
+      });
+
       return channelapeClient.getAction(actionId).then((actualAction) => {
         throw new Error('Expected rejected promise');
       }).catch((error) => {
         const actualChannelApeErrorResponse = error as ChannelApeErrorResponse;
         expect(actualChannelApeErrorResponse.statusCode).to.equal(404);
         expect(actualChannelApeErrorResponse.errors.length).to.equal(1);
-        expect(actualChannelApeErrorResponse.errors[0].code).to.equal(111);
-        expect(actualChannelApeErrorResponse.errors[0].message).to.equal('Action could not be found.');
+        expect(actualChannelApeErrorResponse.errors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
+        expect(actualChannelApeErrorResponse.errors[0].message)
+          .to.equal(expectedChannelApeErrorResponse.errors[0].message);
       });
     });
 

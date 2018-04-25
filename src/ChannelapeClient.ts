@@ -11,50 +11,38 @@ import Action from './actions/model/Action';
 const INVALID_CONFIGURATION_ERROR_MESSAGE = 'Invalid configuration. username and password or session ID is required.';
 export default class ChannelapeClient {
 
-  private static readonly CLIENT = request.defaults({
-    timeout: 60000,
-    json: true
-  });
-
+  private readonly client : request.RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>;
   private readonly sessionRetrievalService: SessionRetrievalService;
   private readonly actionRetrievalService: ActionRetrievalService;
 
   constructor(private readonly config: ClientConfiguration) { 
-    this.sessionRetrievalService = new SessionRetrievalService(ChannelapeClient.CLIENT, this.config.Endpoint);
-    this.actionRetrievalService = new ActionRetrievalService(ChannelapeClient.CLIENT, this.config.Endpoint);
+    this.client = request.defaults({
+      baseUrl: config.Endpoint,
+      timeout: 60000,
+      json: true
+    });
+    this.sessionRetrievalService = new SessionRetrievalService(this.client);
+    this.actionRetrievalService = new ActionRetrievalService(this.client);
   }
 
   getSession() {
-    const deferred = Q.defer<Session>();
-
     if (this.config.hasCredentials()) {
       const sessionRequest: CredentialSessionRequest = {
         username: this.config.Username,
         password: this.config.Password
       };
+      return this.sessionRetrievalService.retrieveSession(sessionRequest);
+    }
 
-      this.sessionRetrievalService.retrieveSession(sessionRequest)
-        .then((response: Session) => {
-          deferred.resolve(response);
-        })
-        .catch((e) => {
-          deferred.reject(e);
-        });
-    } else if (this.config.hasSession()) {
+    if (this.config.hasSession()) {
       const sessionRequest: SessionIdSessionRequest = {
         sessionId: this.config.SessionId
       };
-      this.sessionRetrievalService.retrieveSession(sessionRequest)
-        .then((response: Session) => {
-          deferred.resolve(response);
-        })
-        .catch((e) => {
-          deferred.reject(e);
-        });
-    } else {
-      deferred.reject(INVALID_CONFIGURATION_ERROR_MESSAGE);
-    }
-
+      return this.sessionRetrievalService.retrieveSession(sessionRequest);
+    } 
+      
+    const deferred = Q.defer<Session>();
+    deferred.reject(INVALID_CONFIGURATION_ERROR_MESSAGE);
     return deferred.promise;
   }
 
