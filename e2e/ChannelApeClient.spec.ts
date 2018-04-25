@@ -1,6 +1,6 @@
 import ClientConfigurationBuilder from '../src/model/ClientConfigurationBuilder';
 import ClientConfiguration from '../src/model/ClientConfiguration';
-import SessionResponse from '../src/auth/model/SessionResponse';
+import Session from '../src/sessions/model/Session';
 import ChannelApeError from '../src/model/ChannelApeError';
 import ChannelApeErrorResponse from '../src/model/ChannelApeErrorResponse';
 import ChannelapeClient from '../src/ChannelapeClient';
@@ -77,6 +77,28 @@ describe('ChannelApe Client', () => {
         return actualSessionPromise.then((actualSession) => {
           expect(actualSession.userId).to.equal('addb5bac-d629-4179-a2a8-790763163fcb');
           expect(actualSession.sessionId).to.equal(sessionId);
+        });
+      });
+    });
+
+    describe('And valid action ID', () => {
+      context('When retrieving action', () => {
+        const expectedActionId = 'a85d7463-a2f2-46ae-95a1-549e70ecb2ca';
+        const actualActionPromise = channelApeClient.getAction(expectedActionId);
+  
+        it('Then return action', () => {
+          return actualActionPromise.then((actualAction) => {
+            expect(actualAction.action).to.equal('PRODUCT_PULL');
+            expect(actualAction.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
+            expect(actualAction.description).to.equal('Encountered error during product pull for Europa Sports');
+            expect(actualAction.healthCheckIntervalInSeconds).to.equal(300);
+            expect(actualAction.id).to.equal(expectedActionId);
+            expect(actualAction.lastHealthCheckTime).to.equal('2018-04-24T14:02:34.703Z');
+            expect(actualAction.processingStatus).to.equal('error');
+            expect(actualAction.startTime).to.equal('2018-04-24T14:02:34.703Z');
+            expect(actualAction.targetId).to.equal('1e4ebaa6-9796-4ccf-bd73-8765893a66bd');
+            expect(actualAction.targetType).to.equal('supplier');
+          });
         });
       });
     });

@@ -1,7 +1,7 @@
 import CredentialSessionRequest from './../model/CredentialSessionRequest';
 import * as Q from 'q';
 import * as log4js from 'log4js';
-import SessionResponse from './../model/SessionResponse';
+import Session from './../model/Session';
 import ChannelApeErrorResponse from './../../model/ChannelApeErrorResponse';
 import Resource from '../../model/Resource';
 import Version from '../../model/Version';
@@ -29,10 +29,10 @@ export default class SessionRetrievalService {
   }
 
   private retrieveSessionByCredentials(
-    sessionRequest: CredentialSessionRequest): Q.Promise<SessionResponse> {
+    sessionRequest: CredentialSessionRequest): Q.Promise<Session> {
 
     SessionRetrievalService.LOGGER.info(STARTING_TO_RETRIEVE_MESSAGE);
-    const deferred = Q.defer<SessionResponse>();
+    const deferred = Q.defer<Session>();
     const requestUrl = `${this.endpoint}/${Version.V1}${Resource.SESSIONS}`;
     SessionRetrievalService.LOGGER.debug(`HTTP Request: POST ${requestUrl}`);
 
@@ -48,7 +48,7 @@ export default class SessionRetrievalService {
         SessionRetrievalService.LOGGER.error(`${FATAL_ERROR_MESSAGE}${error}`);
         deferred.reject(error);
       } else if (response.statusCode === 201) {
-        deferred.resolve(body as SessionResponse);
+        deferred.resolve(body as Session);
       } else {
         const channelApeErrorResponse = body as ChannelApeErrorResponse;
         channelApeErrorResponse.statusCode = response.statusCode;
@@ -59,10 +59,10 @@ export default class SessionRetrievalService {
     return deferred.promise;
   }
   private retrieveSessionBySessionId(
-    sessionRequest: SessionIdSessionRequest): Q.Promise<SessionResponse> {
+    sessionRequest: SessionIdSessionRequest): Q.Promise<Session> {
 
     SessionRetrievalService.LOGGER.info(STARTING_TO_RETRIEVE_MESSAGE);
-    const deferred = Q.defer<SessionResponse>();
+    const deferred = Q.defer<Session>();
     const requestUrl = `${this.endpoint}/${Version.V1}${Resource.SESSIONS}/${sessionRequest.sessionId}`;
     SessionRetrievalService.LOGGER.debug(`HTTP Request: GET ${requestUrl}`);
 
@@ -74,7 +74,7 @@ export default class SessionRetrievalService {
         SessionRetrievalService.LOGGER.error(`${FATAL_ERROR_MESSAGE}${error}`);
         deferred.reject(error);
       } else if (response.statusCode === 200) {
-        deferred.resolve(body as SessionResponse);
+        deferred.resolve(body as Session);
       } else {
         const channelApeErrorResponse = body as ChannelApeErrorResponse;
         channelApeErrorResponse.statusCode = response.statusCode;

@@ -34,7 +34,7 @@ A session is created when instantiating the client. It can be retrieved for late
 
 ```typescript
 channelapeClient.getSession()
-  .then((session: SessionResponse) => {
+  .then((session: Session) => {
     // do what you need to do with session data here
   });
 ```

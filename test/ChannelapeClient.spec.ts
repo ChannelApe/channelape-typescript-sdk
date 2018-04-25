@@ -1,12 +1,13 @@
 import ChannelapeClient from './../src/ChannelapeClient';
 import { expect } from 'chai';
-import SessionRetrievalService from './../src/auth/service/SessionRetrievalService';
+import SessionRetrievalService from './../src/sessions/service/SessionRetrievalService';
 import * as sinon from 'sinon';
-import SessionResponse from './../src/auth/model/SessionResponse';
-import CredentialSessionRequest from './../src/auth/model/CredentialSessionRequest';
-import SessionIdSessionRequest from './../src/auth/model/SessionIdSessionRequest';
+import Session from './../src/sessions/model/Session';
+import CredentialSessionRequest from './../src/sessions/model/CredentialSessionRequest';
+import SessionIdSessionRequest from './../src/sessions/model/SessionIdSessionRequest';
 import ClientConfiguration from './../src/model/ClientConfiguration';
 import ClientConfigurationBuilder from './../src/model/ClientConfigurationBuilder';
+import Action from './../src/actions/model/Action';
 
 const someEndpoint : string = 'https://some-api.channelape.com';
 describe('Channelape Client', () => {
@@ -27,7 +28,7 @@ describe('Channelape Client', () => {
     const channelapeClient : ChannelapeClient  = generateCredentialSessionClient();
 
     it('when getting session for a valid user, then return resolved promise with session data', () => {
-      const expectedSession: SessionResponse = {
+      const expectedSession: Session = {
         userId: 'someuserId',
         sessionId: 'some password'
       };
@@ -58,11 +59,11 @@ describe('Channelape Client', () => {
     
   });
 
-  describe('given some channelape client configuration, created with user credentials', () => {
+  describe('given some channelape client configuration, created with session ID', () => {
     const channelapeClient : ChannelapeClient = generateSessionIdClient();
 
     it('when getting session for a valid user, then return resolved promise with session data', () => {
-      const expectedSession: SessionResponse = {
+      const expectedSession: Session = {
         userId: 'someuserId',
         sessionId: 'some password'
       };
@@ -90,7 +91,22 @@ describe('Channelape Client', () => {
       });
     });
 
-    
+    it('when retrieving valid action, then return resolved promise with action data', () => {
+      const expectedActionId = 'a85d7463-a2f2-46ae-95a1-549e70ecb2ca';
+      return channelapeClient.getAction(expectedActionId).then((actualAction) => {
+        expect(actualAction.action).to.equal('PRODUCT_PULL');
+        expect(actualAction.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
+        expect(actualAction.description).to.equal('Encountered error during product pull for Europa Sports');
+        expect(actualAction.healthCheckIntervalInSeconds).to.equal(300);
+        expect(actualAction.id).to.equal(expectedActionId);
+        expect(actualAction.lastHealthCheckTime).to.equal('2018-04-24T14:02:34.703Z');
+        expect(actualAction.processingStatus).to.equal('error');
+        expect(actualAction.startTime).to.equal('2018-04-24T14:02:34.703Z');
+        expect(actualAction.targetId).to.equal('1e4ebaa6-9796-4ccf-bd73-8765893a66bd');
+        expect(actualAction.targetType).to.equal('supplier');
+      });
+    });
+
   });  
 
   describe('given some channelape client configuration, created with empty user credentials and session ID', () => {
@@ -106,7 +122,6 @@ describe('Channelape Client', () => {
       });
     });
 
-    
   });
 
   function generateCredentialSessionClient(): ChannelapeClient {

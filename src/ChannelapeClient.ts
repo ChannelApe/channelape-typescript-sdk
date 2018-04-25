@@ -1,10 +1,11 @@
-import SessionRetrievalService from './auth/service/SessionRetrievalService';
-import CredentialSessionRequest from './auth/model/CredentialSessionRequest';
-import ClientConfiguration from './../src/model/ClientConfiguration';
-import SessionResponse from './auth/model/SessionResponse';
 import request = require('request');
 import * as Q from 'q';
-import SessionIdSessionRequest from './auth/model/SessionIdSessionRequest';
+import ClientConfiguration from './../src/model/ClientConfiguration';
+import SessionRetrievalService from './sessions/service/SessionRetrievalService';
+import CredentialSessionRequest from './sessions/model/CredentialSessionRequest';
+import Session from './sessions/model/Session';
+import SessionIdSessionRequest from './sessions/model/SessionIdSessionRequest';
+import Action from './actions/model/Action';
 
 const INVALID_CONFIGURATION_ERROR_MESSAGE = 'Invalid configuration. username and password or session ID is required.';
 export default class ChannelapeClient {
@@ -17,7 +18,7 @@ export default class ChannelapeClient {
   constructor(private readonly config: ClientConfiguration) {  }
 
   getSession() {
-    const deferred = Q.defer<SessionResponse>();
+    const deferred = Q.defer<Session>();
 
     if (this.config.hasCredentials()) {
       const sessionRequest: CredentialSessionRequest = {
@@ -26,7 +27,7 @@ export default class ChannelapeClient {
       };
       const sessionRetrievalService = new SessionRetrievalService(ChannelapeClient.CLIENT, this.config.Endpoint);
       sessionRetrievalService.retrieveSession(sessionRequest)
-      .then((response: SessionResponse) => {
+      .then((response: Session) => {
         deferred.resolve(response);
       })
       .catch((e) => {
@@ -38,7 +39,7 @@ export default class ChannelapeClient {
       };
       const sessionRetrievalService = new SessionRetrievalService(ChannelapeClient.CLIENT, this.config.Endpoint);
       sessionRetrievalService.retrieveSession(sessionRequest)
-      .then((response: SessionResponse) => {
+      .then((response: Session) => {
         deferred.resolve(response);
       })
       .catch((e) => {
@@ -51,4 +52,24 @@ export default class ChannelapeClient {
     return deferred.promise;
   }
   
+  getAction(actionId: string) {
+    const deferred = Q.defer<Action>();
+
+    const action: Action = {
+      action: 'PRODUCT_PULL',
+      businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4',
+      description: 'Encountered error during product pull for Europa Sports',
+      healthCheckIntervalInSeconds: 300,
+      id: 'a85d7463-a2f2-46ae-95a1-549e70ecb2ca',
+      lastHealthCheckTime: '2018-04-24T14:02:34.703Z',
+      processingStatus: 'error',
+      startTime: '2018-04-24T14:02:34.703Z',
+      targetId: '1e4ebaa6-9796-4ccf-bd73-8765893a66bd',
+      targetType: 'supplier'
+    };
+    deferred.resolve(action);
+
+    return deferred.promise;
+  }
+
 }
