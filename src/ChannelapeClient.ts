@@ -2,6 +2,7 @@ import request = require('request');
 import * as Q from 'q';
 import ClientConfiguration from './../src/model/ClientConfiguration';
 import SessionRetrievalService from './sessions/service/SessionRetrievalService';
+import ActionRetrievalService from './actions/service/ActionRetrievalService';
 import CredentialSessionRequest from './sessions/model/CredentialSessionRequest';
 import Session from './sessions/model/Session';
 import SessionIdSessionRequest from './sessions/model/SessionIdSessionRequest';
@@ -15,7 +16,13 @@ export default class ChannelapeClient {
     json: true
   });
 
-  constructor(private readonly config: ClientConfiguration) {  }
+  private readonly sessionRetrievalService: SessionRetrievalService;
+  private readonly actionRetrievalService: ActionRetrievalService;
+
+  constructor(private readonly config: ClientConfiguration) { 
+    this.sessionRetrievalService = new SessionRetrievalService(ChannelapeClient.CLIENT, this.config.Endpoint);
+    this.actionRetrievalService = new ActionRetrievalService(ChannelapeClient.CLIENT, this.config.Endpoint);
+  }
 
   getSession() {
     const deferred = Q.defer<Session>();
@@ -25,51 +32,34 @@ export default class ChannelapeClient {
         username: this.config.Username,
         password: this.config.Password
       };
-      const sessionRetrievalService = new SessionRetrievalService(ChannelapeClient.CLIENT, this.config.Endpoint);
-      sessionRetrievalService.retrieveSession(sessionRequest)
-      .then((response: Session) => {
-        deferred.resolve(response);
-      })
-      .catch((e) => {
-        deferred.reject(e);
-      });
+
+      this.sessionRetrievalService.retrieveSession(sessionRequest)
+        .then((response: Session) => {
+          deferred.resolve(response);
+        })
+        .catch((e) => {
+          deferred.reject(e);
+        });
     } else if (this.config.hasSession()) {
       const sessionRequest: SessionIdSessionRequest = {
         sessionId: this.config.SessionId
       };
-      const sessionRetrievalService = new SessionRetrievalService(ChannelapeClient.CLIENT, this.config.Endpoint);
-      sessionRetrievalService.retrieveSession(sessionRequest)
-      .then((response: Session) => {
-        deferred.resolve(response);
-      })
-      .catch((e) => {
-        deferred.reject(e);
-      });
+      this.sessionRetrievalService.retrieveSession(sessionRequest)
+        .then((response: Session) => {
+          deferred.resolve(response);
+        })
+        .catch((e) => {
+          deferred.reject(e);
+        });
     } else {
       deferred.reject(INVALID_CONFIGURATION_ERROR_MESSAGE);
     }
 
     return deferred.promise;
   }
-  
+
   getAction(actionId: string) {
-    const deferred = Q.defer<Action>();
-
-    const action: Action = {
-      action: 'PRODUCT_PULL',
-      businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4',
-      description: 'Encountered error during product pull for Europa Sports',
-      healthCheckIntervalInSeconds: 300,
-      id: 'a85d7463-a2f2-46ae-95a1-549e70ecb2ca',
-      lastHealthCheckTime: '2018-04-24T14:02:34.703Z',
-      processingStatus: 'error',
-      startTime: '2018-04-24T14:02:34.703Z',
-      targetId: '1e4ebaa6-9796-4ccf-bd73-8765893a66bd',
-      targetType: 'supplier'
-    };
-    deferred.resolve(action);
-
-    return deferred.promise;
+    return this.getSession().then(session => this.actionRetrievalService.retrieveAction(session.sessionId, actionId));
   }
 
 }

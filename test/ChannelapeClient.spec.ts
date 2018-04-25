@@ -6,6 +6,7 @@ import Session from './../src/sessions/model/Session';
 import CredentialSessionRequest from './../src/sessions/model/CredentialSessionRequest';
 import SessionIdSessionRequest from './../src/sessions/model/SessionIdSessionRequest';
 import ClientConfiguration from './../src/model/ClientConfiguration';
+import ChannelApeErrorResponse from './../src/model/ChannelApeErrorResponse';
 import ClientConfigurationBuilder from './../src/model/ClientConfigurationBuilder';
 import Action from './../src/actions/model/Action';
 
@@ -104,6 +105,19 @@ describe('Channelape Client', () => {
         expect(actualAction.startTime).to.equal('2018-04-24T14:02:34.703Z');
         expect(actualAction.targetId).to.equal('1e4ebaa6-9796-4ccf-bd73-8765893a66bd');
         expect(actualAction.targetType).to.equal('supplier');
+      });
+    });
+
+    it('when retrieving invalid action, then return rejected promise with error', () => {
+      const actionId = '676cb925-b603-4140-a3dd-2af160c257d1';
+      return channelapeClient.getAction(actionId).then((actualAction) => {
+        throw new Error('Expected rejected promise');
+      }).catch((error) => {
+        const actualChannelApeErrorResponse = error as ChannelApeErrorResponse;
+        expect(actualChannelApeErrorResponse.statusCode).to.equal(404);
+        expect(actualChannelApeErrorResponse.errors.length).to.equal(1);
+        expect(actualChannelApeErrorResponse.errors[0].code).to.equal(111);
+        expect(actualChannelApeErrorResponse.errors[0].message).to.equal('Action could not be found.');
       });
     });
 

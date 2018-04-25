@@ -102,6 +102,27 @@ describe('ChannelApe Client', () => {
         });
       });
     });
+
+    describe('And invalid action ID', () => {
+      context('When retrieving action', () => {
+        const expectedActionId = '676cb925-b603-4140-a3dd-2af160c257d1';
+        const actualActionPromise = channelApeClient.getAction(expectedActionId);
+  
+        it('Then return 404 status code and action not found error message', () => {
+          return actualActionPromise.then((actualAction) => {
+            throw new Error('Expected rejected promise');
+          }).catch((e) => {
+            const actualChannelApeErrorResponse = e as ChannelApeErrorResponse;
+            expect(actualChannelApeErrorResponse.statusCode).to.equal(404);
+            const expectedChannelApeErrors = [{ 
+              code: 111, 
+              message: 'Action could not be found.' 
+            }]; 
+            assertChannelApeErrors(expectedChannelApeErrors, actualChannelApeErrorResponse.errors);
+          });
+        });
+      });
+    });
   });
 
   describe('Given valid username and password', () => {

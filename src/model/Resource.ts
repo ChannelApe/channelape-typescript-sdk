@@ -1,5 +1,6 @@
 enum Resource {
-  SESSIONS = '/sessions'
+  SESSIONS = '/sessions',
+  ACTIONS = '/actions'
 }
 
 export default Resource;
