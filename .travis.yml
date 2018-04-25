@@ -1,32 +1,33 @@
 dist: trusty
 sudo: required
-
 addons:
   sonarcloud:
-    organization: "channelape-github"
+    organization: channelape-github
     token:
-      secure: "EHyqb+NjwY29lysfyfyogVYjhnTU2BTx/oLvRjZ15tXcFx2jUj3cfY/97zQYjF8r9laqdBonlryrTAIdOyp4he3cdY4Xll3I14e+biT49bdhyMofSAFQbNuFpxpBNuVcg4sJBfmj5CB1qhcvTTq+oEKNpAjJV3QZfTVcvsE1dNgRWHWOq3mm7G97TGYOF58Rjm601KaBEqXNAMKO1fCp2D6lJ/VA9uGAlhkTWz+7SsdjuxE7FqHFBeIqNyoR8utuh6GVkWnJmaMPlFnZLwmuB3ojz2Y6h5PVINPCnz7ZeLbAldOp5QXJQIL5Rt+ZBhP8bGlZTEzYwp3O/77TkQhgvfkyHXoDMmkweCtKP+fj/NAlcQpa+iiFvalEOVz9CV+21WL3SRqqOZNEpEqaj3zPIlflsFpD79Wk4Zxa44QtmV6AOPVE5JsQfPq2cDhyv2KS4sU3cIjaZOKKXwMJKga7F+eGI/i/kCw9LJqlCNxLHJLI9/c7byn+rUHhu1DN3bz5TmR/K08M9JMGbVUGfpA1vAn0eW58H2qm/Ifi4oF5WaFVpXPvAA36BwOHl7wzSd8uQKyoXc6IQhxAn+awxAgibOImgsyavUN09rAO7+RKwQpqiLpfU68fLhaz+O5PMDe+727Bt6F5ILteL0xp2uyIY+Aau5FIAdTemRin4t4YUGM="
+      secure: EHyqb+NjwY29lysfyfyogVYjhnTU2BTx/oLvRjZ15tXcFx2jUj3cfY/97zQYjF8r9laqdBonlryrTAIdOyp4he3cdY4Xll3I14e+biT49bdhyMofSAFQbNuFpxpBNuVcg4sJBfmj5CB1qhcvTTq+oEKNpAjJV3QZfTVcvsE1dNgRWHWOq3mm7G97TGYOF58Rjm601KaBEqXNAMKO1fCp2D6lJ/VA9uGAlhkTWz+7SsdjuxE7FqHFBeIqNyoR8utuh6GVkWnJmaMPlFnZLwmuB3ojz2Y6h5PVINPCnz7ZeLbAldOp5QXJQIL5Rt+ZBhP8bGlZTEzYwp3O/77TkQhgvfkyHXoDMmkweCtKP+fj/NAlcQpa+iiFvalEOVz9CV+21WL3SRqqOZNEpEqaj3zPIlflsFpD79Wk4Zxa44QtmV6AOPVE5JsQfPq2cDhyv2KS4sU3cIjaZOKKXwMJKga7F+eGI/i/kCw9LJqlCNxLHJLI9/c7byn+rUHhu1DN3bz5TmR/K08M9JMGbVUGfpA1vAn0eW58H2qm/Ifi4oF5WaFVpXPvAA36BwOHl7wzSd8uQKyoXc6IQhxAn+awxAgibOImgsyavUN09rAO7+RKwQpqiLpfU68fLhaz+O5PMDe+727Bt6F5ILteL0xp2uyIY+Aau5FIAdTemRin4t4YUGM=
     branches:
-      - develop
-      - master
-
+    - develop
+    - master
 language: node_js
-
 node_js:
-  - 8.10.0
-
+- 8.10.0
 jdk:
-  - oraclejdk8
-
+- oraclejdk8
 install:
-  - npm install
-
+- npm install
 script:
-  - npm test
-  - npm run e2e
-  - sonar-scanner
-
+- npm test
+- npm run e2e
+- sonar-scanner
 cache:
   directories:
-    - node_modules
-    - "$HOME/.sonar/cache"
+  - node_modules
+  - "$HOME/.sonar/cache"
+deploy:
+  provider: npm
+  email:
+    secure: jrb+W/d/3WX725W3U5YPEDpqc64nW4KE71XQbwvra3dI35wUqchS0vHzj1lBmG7KyugPCQvF+pzFPlDb50/hSP8d9jqrCoc5XCyEIQBmH6os1mHzuqPnVGxm4rBEHLrJu6X31NW7lqgtRgwzDql0xtfr4MFpiiv/tOvsiNP1lg57ppv0p7g9LgRlZnsPZjn+ACter9cJzRMLlRGgTWur1dIwDA3Eo8fHWQYy4u2WfPK/TuKKxa0ZFEOlLzE9b9Y1Jk0Omxq/xmCrpU+9AyaMWRVFlUw0/p3kL3GULOG99GHiLiTC0c1S1ta8V9tgB7DtXi5nOwRJaq4RoeL7LD2rt1V/3xv54YzINKZrPMKthT38GopWhA6WgctEFM+N0C5QgxwlvL+JZ4NEOuzynKaC0/PnuPk6k43oZxiMQWa02wsgBoF2G3cnBZcbVGwk0OXcBbN68NCGLGJCyjTRsr6XNBhflsDf7H4ra7e4OaZo1b2aRNOu4PJVuQVTOAEXGzxW808sBVkDtoJ4ISOfo91vPWO95jzFX01aTZpDd+wxGn8H88yrrP76n9yG/2eUvMpBzZjGGz0FwpVeu3kXcYJqHqE1vNx7uE/UXPsuN1YmRkFiMux8WVT9CegySoEtLraU/zVGojFqhxPwU+qBoxyUJNq29FpruQgR+xIgG7T93Ec=
+  api_key:
+    secure: oV0l+5vFpuZqI3KB9+mUl1CDTON7JKuO3WDPplsaEzBf2qgJK88dmzEQzxCrq7ie4+ydUSFe6ouGuxqr7dTKXAa4m8Xfp1FrRXAYEQI7j5yI72e1q3LIwBssda6qtTyDANk3CR/W3XCOPl8HlEceV2D484JShl2wHLlV3EFW+RUM1jt0nvJTYGu32/Xx3nwfK4PXG20dF/Ricd2X13FlJTMeeB8xj04BhMg4y91523+0R5bdZQeifA/5i+2M7oUjtZZyli5cUr9RPOny8b85uoHjFs2DFWW24Gfpw+ZE9gaajLf3Tn5kJjmomqp/KC6VlrWjd87YccCV+nIP1ro+tectaBqqU28PsXGr0kV3+Ygu1FfdPfw+IQDgd9LlEuRNQtDH6di4zp8bQC2Bc/ukIHghQ1YD7SjKLOfmMHBVAv2PtYKH9kBJ3HlOJDA788EWZocLkXfVXeQcme30IV5TN2Hog2Q4vQKbGzQB9IZonB/v3xE41tRKaYR8Etri+xNfwhD54FnF0rZvCdu5gpoz9bZpxPMkmmjtANQDnh11xrkh6IEbY8Sa5r8ycOONbGTCPm7geBqTllB6bxyxAitiMrW1YmBcHBTJlAtrlwhh53qrWUG/y6wsG31BkKPtga3VJuEDvL5nt9iPLmDG7H+BVWco/schxUt08uODdOjyDxM=
+  on:
+    tags: true
