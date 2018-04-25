@@ -3,7 +3,7 @@ import * as Q from 'q';
 import * as log4js from 'log4js';
 import SessionResponse from './../model/SessionResponse';
 import ChannelApeErrorResponse from './../../model/ChannelApeErrorResponse';
-import Endpoint from '../../model/Endpoint';
+import Resource from '../../model/Resource';
 import Version from '../../model/Version';
 import SessionIdSessionRequest from './../model/SessionIdSessionRequest';
 import request = require('request');
@@ -33,12 +33,12 @@ export default class SessionRetrievalService {
 
     SessionRetrievalService.LOGGER.info(STARTING_TO_RETRIEVE_MESSAGE);
     const deferred = Q.defer<SessionResponse>();
-    const requestUrl = `${this.endpoint}/${Version.V1}${Endpoint.SESSIONS}`;
+    const requestUrl = `${this.endpoint}/${Version.V1}${Resource.SESSIONS}`;
     SessionRetrievalService.LOGGER.debug(`HTTP Request: POST ${requestUrl}`);
 
     const options: request.CoreOptions = {
       auth: {
-        username: sessionRequest.email,
+        username: sessionRequest.username,
         password: sessionRequest.password
       },
       json: true
@@ -63,7 +63,7 @@ export default class SessionRetrievalService {
 
     SessionRetrievalService.LOGGER.info(STARTING_TO_RETRIEVE_MESSAGE);
     const deferred = Q.defer<SessionResponse>();
-    const requestUrl = `${this.endpoint}/${Version.V1}${Endpoint.SESSIONS}/${sessionRequest.sessionId}`;
+    const requestUrl = `${this.endpoint}/${Version.V1}${Resource.SESSIONS}/${sessionRequest.sessionId}`;
     SessionRetrievalService.LOGGER.debug(`HTTP Request: GET ${requestUrl}`);
 
     const options: request.CoreOptions = {

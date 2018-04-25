@@ -17,7 +17,7 @@ Create the channel api client with your credentials.
 
 ```typescript
 const clientConfiguration = new ClientConfigurationBuilder()
-  .setEmail('johndoe123@test.com').setPassword('my_pass123#4').build();
+  .setUsername('johndoe123@test.com').setPassword('my_pass123#4').build();
 const channelApeClient = new ChannelapeClient(clientConfiguration);
 ```
 

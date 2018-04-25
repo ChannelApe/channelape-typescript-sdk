@@ -6,7 +6,7 @@ import request = require('request');
 import * as Q from 'q';
 import SessionIdSessionRequest from './auth/model/SessionIdSessionRequest';
 
-const INVALID_CONFIGURATION_ERROR_MESSAGE = 'Invalid configuration. email and password or session ID is required.';
+const INVALID_CONFIGURATION_ERROR_MESSAGE = 'Invalid configuration. username and password or session ID is required.';
 export default class ChannelapeClient {
 
   private static readonly CLIENT = request.defaults({
@@ -21,7 +21,7 @@ export default class ChannelapeClient {
 
     if (this.config.hasCredentials()) {
       const sessionRequest: CredentialSessionRequest = {
-        email: this.config.Email,
+        username: this.config.Username,
         password: this.config.Password
       };
       const sessionRetrievalService = new SessionRetrievalService(ChannelapeClient.CLIENT, this.config.Endpoint);

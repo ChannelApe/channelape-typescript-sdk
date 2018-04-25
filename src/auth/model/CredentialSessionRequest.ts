@@ -1,4 +1,4 @@
 export default interface CredentialSessionRequest {
-  email: string;
+  username: string;
   password: string;
 }

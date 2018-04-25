@@ -11,7 +11,7 @@ describe('ChannelApe Client', () => {
   describe('Given invalid username and password', () => {
 
     const clientConfiguration = new ClientConfigurationBuilder()
-      .setEmail('jim@test.com').setPassword('jim55#899').build();
+      .setUsername('jim@test.com').setPassword('jim55#899').build();
     const channelApeClient = new ChannelapeClient(clientConfiguration);
 
     context('When retrieving session', () => {
@@ -83,11 +83,11 @@ describe('ChannelApe Client', () => {
   });
 
   describe('Given valid username and password', () => {
-    const email = getEmail();
+    const username = getUsername();
     const password = getPassword();
 
     const clientConfiguration = new ClientConfigurationBuilder()
-      .setEmail(email).setPassword(password).build();
+      .setUsername(username).setPassword(password).build();
     const channelApeClient = new ChannelapeClient(clientConfiguration);
 
     context('When retrieving session', () => {
@@ -110,12 +110,12 @@ describe('ChannelApe Client', () => {
     return sessionIdEnvironmentVariable;
   }
 
-  function getEmail(): string {
-    const emailEnvironmentVariable = process.env.CHANNEL_APE_EMAIL;
-    if (emailEnvironmentVariable == null) {
-      throw new Error('CHANNEL_APE_EMAIL environment variable is required for');
+  function getUsername(): string {
+    const usernameEnvironmentVariable = process.env.CHANNEL_APE_USERNAME;
+    if (usernameEnvironmentVariable == null) {
+      throw new Error('CHANNEL_APE_USERNAME environment variable is required for');
     }
-    return emailEnvironmentVariable;
+    return usernameEnvironmentVariable;
   }
 
   function getPassword(): string {

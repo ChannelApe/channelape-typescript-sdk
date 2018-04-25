@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import request = require('request');
 import SessionRetrievalService from './../../../src/auth/service/SessionRetrievalService';
 import Version from '../../../src/model/Version';
-import Endpoint from '../../../src/model/Endpoint';
+import Resource from '../../../src/model/Resource';
 import Environment from '../../../src/model/Environment';
 import ChannelApeErrorResponse from '../../../src/model/ChannelApeErrorResponse';
 import SessionResponse from '../../../src/auth/model/SessionResponse';
@@ -43,15 +43,15 @@ describe('Session Retrieval Service', () => {
           .yields(null, response, expectedResponse);
 
 
-      const expectedEmail: string = 'some-email@email.com';
+      const expectedUsername: string = 'some-username@username.com';
       const expectedPassword: string = 'some-crazy-long-password';
 
       const sessionRetrievalService: SessionRetrievalService = new SessionRetrievalService(client, someEndpoint);
       return sessionRetrievalService.retrieveSession({
-        email: expectedEmail,
+        username: expectedUsername,
         password: expectedPassword
       }).then((actualResponse) => {
-        expect(clientPostStub.args[0][0]).to.equal(`${someEndpoint}/${Version.V1}${Endpoint.SESSIONS}`);
+        expect(clientPostStub.args[0][0]).to.equal(`${someEndpoint}/${Version.V1}${Resource.SESSIONS}`);
 
         const actualOptions: request.CoreOptions = clientPostStub.args[0][1];
         expect(actualOptions.json).to.equal(true);
@@ -59,7 +59,7 @@ describe('Session Retrieval Service', () => {
         if (actualAuth == null) {
           expect(actualAuth).to.not.be.undefined;
         } else {
-          expect(actualAuth.username).to.equal(expectedEmail);
+          expect(actualAuth.username).to.equal(expectedUsername);
           expect(actualAuth.password).to.equal(expectedPassword);
         }
 
@@ -89,7 +89,7 @@ describe('Session Retrieval Service', () => {
         sessionId: someSessionId
       }).then((actualResponse) => {
         expect(clientGetStub.args[0][0])
-            .to.equal(`${someEndpoint}/${Version.V1}${Endpoint.SESSIONS}/${someSessionId}`);
+            .to.equal(`${someEndpoint}/${Version.V1}${Resource.SESSIONS}/${someSessionId}`);
         
         const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
         expect(actualOptions.json).to.equal(true);
@@ -109,17 +109,17 @@ describe('Session Retrieval Service', () => {
       const clientPostStub = sandbox.stub(client, 'post')
         .yields(expectedError, null, null);
         
-      const expectedEmail: string = 'some-email@email.com';
+      const expectedUsername: string = 'some-username@username.com';
       const expectedPassword: string = 'some-crazy-long-password';
 
       const sessionRetrievalService: SessionRetrievalService = new SessionRetrievalService(client, someEndpoint);
       sessionRetrievalService.retrieveSession({
-        email: expectedEmail,
+        username: expectedUsername,
         password: expectedPassword
       }).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
-        expect(clientPostStub.args[0][0]).to.equal(`${someEndpoint}/${Version.V1}${Endpoint.SESSIONS}`);
+        expect(clientPostStub.args[0][0]).to.equal(`${someEndpoint}/${Version.V1}${Resource.SESSIONS}`);
         
         const actualOptions: request.CoreOptions = clientPostStub.args[0][1];
         expect(actualOptions.json).to.equal(true);
@@ -128,7 +128,7 @@ describe('Session Retrieval Service', () => {
         if (actualAuth == null) {
           expect(actualAuth).to.not.be.undefined;
         } else {
-          expect(actualAuth.username).to.equal(expectedEmail);
+          expect(actualAuth.username).to.equal(expectedUsername);
           expect(actualAuth.password).to.equal(expectedPassword);
         }
 
@@ -139,7 +139,7 @@ describe('Session Retrieval Service', () => {
 
     it('given credential session request with invalid password' +
     'when retrieving session, then return a rejected promise with 401 status code ' +
-    'and invalid email or password error message', (done) => {
+    'and invalid username or password error message', (done) => {
 
       const response = {
         statusCode: 401
@@ -156,17 +156,17 @@ describe('Session Retrieval Service', () => {
       const clientPostStub = sandbox.stub(client, 'post')
         .yields(null, response, expectedChannelApeErrorResponse);
         
-      const expectedEmail: string = 'some-email@email.com';
+      const expectedUsername: string = 'some-username@username.com';
       const expectedPassword: string = 'some-crazy-long-password';
 
       const sessionRetrievalService: SessionRetrievalService = new SessionRetrievalService(client, someEndpoint);
       sessionRetrievalService.retrieveSession({
-        email: expectedEmail,
+        username: expectedUsername,
         password: expectedPassword
       }).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
-        expect(clientPostStub.args[0][0]).to.equal(`${someEndpoint}/${Version.V1}${Endpoint.SESSIONS}`);
+        expect(clientPostStub.args[0][0]).to.equal(`${someEndpoint}/${Version.V1}${Resource.SESSIONS}`);
         
         const actualOptions: request.CoreOptions = clientPostStub.args[0][1];
         expect(actualOptions.json).to.equal(true);
@@ -175,7 +175,7 @@ describe('Session Retrieval Service', () => {
         if (actualAuth == null) {
           expect(actualAuth).to.not.be.undefined;
         } else {
-          expect(actualAuth.username).to.equal(expectedEmail);
+          expect(actualAuth.username).to.equal(expectedUsername);
           expect(actualAuth.password).to.equal(expectedPassword);
         }
         
@@ -205,7 +205,7 @@ describe('Session Retrieval Service', () => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0])
-            .to.equal(`${someEndpoint}/${Version.V1}${Endpoint.SESSIONS}/${someSessionId}`);
+            .to.equal(`${someEndpoint}/${Version.V1}${Resource.SESSIONS}/${someSessionId}`);
 
         const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
         expect(actualOptions.json).to.equal(true);
@@ -242,7 +242,7 @@ describe('Session Retrieval Service', () => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0])
-            .to.equal(`${someEndpoint}/${Version.V1}${Endpoint.SESSIONS}/${someSessionId}`);
+            .to.equal(`${someEndpoint}/${Version.V1}${Resource.SESSIONS}/${someSessionId}`);
 
         const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
         expect(actualOptions.json).to.equal(true);

@@ -100,7 +100,7 @@ describe('Channelape Client', () => {
     const channelapeClient : ChannelapeClient = new ChannelapeClient(clientConfiguration);
 
     it('when getting session, then return reject promise with error', () => {
-      const expectedErrorMessage : string = 'Invalid configuration. email and password or session ID is required.';
+      const expectedErrorMessage : string = 'Invalid configuration. username and password or session ID is required.';
       return channelapeClient.getSession().catch((error) => {
         expect(error).to.equal(expectedErrorMessage);
       });
@@ -111,7 +111,7 @@ describe('Channelape Client', () => {
 
   function generateCredentialSessionClient(): ChannelapeClient {
     const clientConfiguration : ClientConfiguration
-      = new ClientConfigurationBuilder().setEmail('someemail@channelape.com')
+      = new ClientConfigurationBuilder().setUsername('someusername@channelape.com')
       .setPassword('somepassword').setEndpoint(someEndpoint).build();
     return  new ChannelapeClient(clientConfiguration);
   }

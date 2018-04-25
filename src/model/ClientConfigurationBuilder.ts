@@ -4,7 +4,7 @@ import Environment from './Environment';
 export default class ClientConfigurationBuilder {
 
   private sessionId: string;
-  private email: string;
+  private username: string;
   private password: string;
   private endpoint: string = Environment.PRODUCTION;
   
@@ -17,12 +17,12 @@ export default class ClientConfigurationBuilder {
     return this;
   }
   
-  get Email() {
-    return this.email;
+  get Username() {
+    return this.username;
   }
   
-  setEmail(email: string): ClientConfigurationBuilder {
-    this.email = email;
+  setUsername(username: string): ClientConfigurationBuilder {
+    this.username = username;
     return this;
   }
   
