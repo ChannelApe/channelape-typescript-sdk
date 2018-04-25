@@ -3,14 +3,14 @@ import * as log4js from 'log4js';
 import Response from './../model/Response';
 
 export default class PromiseRetryer {
-  private logger: log4js.Logger;
+  private readonly logger: log4js.Logger;
   private minDelay = 1000;
   private maxAttempts = 30;
   private base = 1000;
   private retryFunction: Function = () => {};
   private finalResponseCodes: number[] = [];
 
-  constructor(private logName: string) {
+  constructor(private readonly logName: string) {
     this.logger = log4js.getLogger(logName);
     return this;
   }
@@ -40,7 +40,7 @@ export default class PromiseRetryer {
     return this;
   }
 
-  run(attempt: number = 1): Q.Promise<{}> {
+  run(attempt = 1): Q.Promise<{}> {
     const deferred = Q.defer();
     const promise = this.retryFunction();
     promise

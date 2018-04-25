@@ -14,10 +14,10 @@ const FATAL_ERROR_MESSAGE = 'FATAL ERROR making restful request to retrieve: ';
 
 export default class SessionRetrievalService {
 
-  private logger: log4js.Logger = log4js.getLogger(LOGGER_ID);
+  private static readonly LOGGER: log4js.Logger = log4js.getLogger(LOGGER_ID);
 
-  constructor(private client: request.RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>,
-    private endpoint: string) { }
+  constructor(private readonly client: request.RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>,
+    private readonly endpoint: string) { }
 
   retrieveSession(
     sessionRequest: SessionIdSessionRequest | CredentialSessionRequest) {
@@ -31,10 +31,10 @@ export default class SessionRetrievalService {
   private retrieveSessionByCredentials(
     sessionRequest: CredentialSessionRequest): Q.Promise<SessionResponse> {
 
-    this.logger.info(STARTING_TO_RETRIEVE_MESSAGE);
+    SessionRetrievalService.LOGGER.info(STARTING_TO_RETRIEVE_MESSAGE);
     const deferred = Q.defer<SessionResponse>();
     const requestUrl = `${this.endpoint}/${Version.V1}${Endpoint.SESSIONS}`;
-    this.logger.debug(`HTTP Request: POST ${requestUrl}`);
+    SessionRetrievalService.LOGGER.debug(`HTTP Request: POST ${requestUrl}`);
 
     const options: request.CoreOptions = {
       auth: {
@@ -45,7 +45,7 @@ export default class SessionRetrievalService {
     };
     this.client.post(requestUrl, options, (error, response, body) => {
       if (error) {
-        this.logger.error(`${FATAL_ERROR_MESSAGE}${error}`);
+        SessionRetrievalService.LOGGER.error(`${FATAL_ERROR_MESSAGE}${error}`);
         deferred.reject(error);
       } else if (response.statusCode === 201) {
         deferred.resolve(body as SessionResponse);
@@ -61,17 +61,17 @@ export default class SessionRetrievalService {
   private retrieveSessionBySessionId(
     sessionRequest: SessionIdSessionRequest): Q.Promise<SessionResponse> {
 
-    this.logger.info(STARTING_TO_RETRIEVE_MESSAGE);
+    SessionRetrievalService.LOGGER.info(STARTING_TO_RETRIEVE_MESSAGE);
     const deferred = Q.defer<SessionResponse>();
     const requestUrl = `${this.endpoint}/${Version.V1}${Endpoint.SESSIONS}/${sessionRequest.sessionId}`;
-    this.logger.debug(`HTTP Request: GET ${requestUrl}`);
+    SessionRetrievalService.LOGGER.debug(`HTTP Request: GET ${requestUrl}`);
 
     const options: request.CoreOptions = {
       json: true
     };
     this.client.get(requestUrl, options, (error, response, body) => {
       if (error) {
-        this.logger.error(`${FATAL_ERROR_MESSAGE}${error}`);
+        SessionRetrievalService.LOGGER.error(`${FATAL_ERROR_MESSAGE}${error}`);
         deferred.reject(error);
       } else if (response.statusCode === 200) {
         deferred.resolve(body as SessionResponse);

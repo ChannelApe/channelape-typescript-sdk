@@ -2,10 +2,10 @@ import ClientConfigurationBuilder from './ClientConfigurationBuilder';
 
 export default class ClientConfiguration {
 
-  private sessionId: string;
-  private email: string;
-  private password: string;
-  private endpoint: string;
+  private readonly sessionId: string;
+  private readonly email: string;
+  private readonly password: string;
+  private readonly endpoint: string;
 
   constructor(builder: ClientConfigurationBuilder) {
     this.sessionId = builder.SessionId;

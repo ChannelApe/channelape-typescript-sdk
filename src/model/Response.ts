@@ -1,6 +1,6 @@
 export default class Response {
 
-  constructor(private response: any, private data: any) {}
+  constructor(private readonly response: any, private readonly data: any) {}
 
   getBody() {
     return this.data;

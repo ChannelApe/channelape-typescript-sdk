@@ -14,7 +14,7 @@ export default class ChannelapeClient {
     json: true
   });
 
-  constructor(private config: ClientConfiguration) {  }
+  constructor(private readonly config: ClientConfiguration) {  }
 
   getSession() {
     const deferred = Q.defer<SessionResponse>();
