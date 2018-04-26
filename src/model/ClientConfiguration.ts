@@ -19,7 +19,7 @@ export default class ClientConfiguration {
   }
 
   hasSession() : boolean {
-    return this.sessionId != null;
+    return this.sessionId.length > 0;
   }
 
   get Username() {
@@ -31,7 +31,7 @@ export default class ClientConfiguration {
   }
 
   hasCredentials() : boolean {
-    return this.username != null && this.password != null; 
+    return this.username.length > 0 && this.password.length > 0; 
   }
 
   get Endpoint() {

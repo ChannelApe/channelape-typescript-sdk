@@ -3,9 +3,9 @@ import Environment from './Environment';
 
 export default class ClientConfigurationBuilder {
 
-  private sessionId: string;
-  private username: string;
-  private password: string;
+  private sessionId: string = '';
+  private username: string = '';
+  private password: string = '';
   private endpoint: string = Environment.PRODUCTION;
   
   get SessionId() {

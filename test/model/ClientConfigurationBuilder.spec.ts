@@ -16,6 +16,8 @@ describe('ClientConfigurationBuilder', () => {
         const actualClientConfiguration = clientConfigurationBuilder.build();
         expect(actualClientConfiguration.SessionId).to.equal(expectedSessionId);
         expect(actualClientConfiguration.hasSession()).to.equal(true);
+        expect(actualClientConfiguration.Username).to.equal('');
+        expect(actualClientConfiguration.Password).to.equal('');
         expect(actualClientConfiguration.Endpoint).to.equal(Environment.PRODUCTION);
         expect(actualClientConfiguration.hasCredentials()).to.equal(false);
       });
@@ -37,6 +39,7 @@ describe('ClientConfigurationBuilder', () => {
         const actualClientConfiguration = clientConfigurationBuilder.build();
         expect(actualClientConfiguration.Username).to.equal(expectedUsername);
         expect(actualClientConfiguration.Password).to.equal(expectedPassword);
+        expect(actualClientConfiguration.SessionId).to.equal('');
         expect(actualClientConfiguration.hasCredentials()).to.equal(true);
 
         expect(actualClientConfiguration.Endpoint).to.equal(expectedEndpoint);
@@ -57,6 +60,8 @@ describe('ClientConfigurationBuilder', () => {
       it('Then expect ClientConfiguration without credentials and default endpoint', () => {
         const actualClientConfiguration = clientConfigurationBuilder.build();
         expect(actualClientConfiguration.Username).to.equal(expectedUsername);
+        expect(actualClientConfiguration.Password).to.equal('');
+        expect(actualClientConfiguration.SessionId).to.equal('');
         expect(actualClientConfiguration.hasCredentials()).to.equal(false);
 
         expect(actualClientConfiguration.Endpoint).to.equal(Environment.PRODUCTION);
