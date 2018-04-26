@@ -1,6 +1,6 @@
 {
   "name": "@channelape-inc/channelape-typescript-sdk",
-  "version": "1.0.0",
+  "version": "0.1.0-alpha",
   "description": "A client for interacting with ChannelApe's API",
   "main": "dist/ChannelapeClient.js",
   "typings": "dist/ChannelapeClient.d.ts",
@@ -34,6 +34,9 @@
     "ecommerce",
     "rest-client"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "ChannelApe",
   "license": "Apache-2.0",
   "bugs": {
@@ -52,6 +55,10 @@
     {
       "name": "Frank Mazzarella",
       "email": "fmazzarella@channelape.com"
+    },
+    {
+      "name": "Craig Simko",
+      "email": "csimko@channelape.com"
     }
   ],
   "dependencies": {
