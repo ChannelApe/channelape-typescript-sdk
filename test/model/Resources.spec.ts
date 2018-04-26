@@ -5,4 +5,7 @@ describe('Resources', () => {
   it('SESSIONS', () => {
     expect(Resource.SESSIONS).to.equal('/sessions');
   });
+  it('ACTIONS', () => {
+    expect(Resource.ACTIONS).to.equal('/actions');
+  });
 });
