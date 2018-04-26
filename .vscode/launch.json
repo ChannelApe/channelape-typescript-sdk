@@ -7,23 +7,12 @@
       "request": "launch",
       "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
       "args": [
-        "--recursive",
-        "--compilers ts-node/register",
+        "-r",
+        "ts-node/register",
         "${relativeFile}",
         "--colors"
       ],
       "cwd": "${workspaceRoot}",
-      "protocol": "inspector",
-      "sourceMaps": true,
-      "outFiles": [
-        "${workspaceRoot}/dist/**/*.js"
-      ]
-    },
-    {
-      "type": "node",
-      "request": "attach",
-      "name": "Attach by Process ID",
-      "processId": "${command:PickProcess}",
       "protocol": "inspector"
     }
   ]
