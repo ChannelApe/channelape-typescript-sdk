@@ -14,7 +14,7 @@ TypeScript SDK for the [ChannelApe REST API](https://docs.channelape.io/)
 
 ### Getting Started
 
-Create the channel api client with your credentials.
+Create the ChannelApe api client with your credentials.
 
 ```typescript
 const clientConfiguration = new ClientConfigurationBuilder()
