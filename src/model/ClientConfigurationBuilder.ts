@@ -1,5 +1,7 @@
 import ClientConfiguration from './ClientConfiguration';
 import Environment from './Environment';
+import { LogLevel, getLogLevelName } from './LogLevel';
+import * as winston from 'winston';
 
 export default class ClientConfigurationBuilder {
 
@@ -7,6 +9,7 @@ export default class ClientConfigurationBuilder {
   private username = '';
   private password = '';
   private endpoint: string = Environment.PRODUCTION;
+  private logLevel: LogLevel = LogLevel.OFF;
   
   get SessionId() {
     return this.sessionId;
@@ -42,6 +45,10 @@ export default class ClientConfigurationBuilder {
   setEndpoint(endpoint: string): ClientConfigurationBuilder {
     this.endpoint = endpoint;
     return this;
+  }
+
+  get LogLevel(): string {
+    return getLogLevelName(this.logLevel);
   }
   
   build(): ClientConfiguration {
