@@ -1,6 +1,6 @@
 {
-  "name": "channelape-typescript-sdk",
-  "version": "0.1.0-alpha.1",
+  "name": "channelape-sdk",
+  "version": "0.1.0-develop",
   "description": "A client for interacting with ChannelApe's API",
   "main": "dist/ChannelapeClient.js",
   "typings": "dist/ChannelapeClient.d.ts",
