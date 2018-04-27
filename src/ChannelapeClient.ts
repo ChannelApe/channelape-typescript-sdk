@@ -1,8 +1,8 @@
 import request = require('request');
 import * as Q from 'q';
-import ClientConfiguration from './../src/model/ClientConfiguration';
-import SessionRetrievalService from './sessions/service/SessionRetrievalService';
-import ActionRetrievalService from './actions/service/ActionRetrievalService';
+import ClientConfiguration from './model/ClientConfiguration';
+import SessionsService from './sessions/service/SessionsService';
+import ActionsService from './actions/service/ActionsService';
 import CredentialSessionRequest from './sessions/model/CredentialSessionRequest';
 import Session from './sessions/model/Session';
 import SessionIdSessionRequest from './sessions/model/SessionIdSessionRequest';
@@ -12,8 +12,8 @@ const INVALID_CONFIGURATION_ERROR_MESSAGE = 'Invalid configuration. username and
 export default class ChannelapeClient {
 
   private readonly client : request.RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>;
-  private readonly sessionRetrievalService: SessionRetrievalService;
-  private readonly actionRetrievalService: ActionRetrievalService;
+  private readonly sessionsService: SessionsService;
+  private readonly actionsService: ActionsService;
 
   constructor(private readonly config: ClientConfiguration) { 
     this.client = request.defaults({
@@ -21,8 +21,8 @@ export default class ChannelapeClient {
       timeout: 60000,
       json: true
     });
-    this.sessionRetrievalService = new SessionRetrievalService(this.client);
-    this.actionRetrievalService = new ActionRetrievalService(this.client);
+    this.sessionsService = new SessionsService(this.client);
+    this.actionsService = new ActionsService(this.client);
   }
 
   getSession() {
@@ -31,14 +31,14 @@ export default class ChannelapeClient {
         username: this.config.Username,
         password: this.config.Password
       };
-      return this.sessionRetrievalService.retrieveSession(sessionRequest);
+      return this.sessionsService.retrieveSession(sessionRequest);
     }
 
     if (this.config.hasSession()) {
       const sessionRequest: SessionIdSessionRequest = {
         sessionId: this.config.SessionId
       };
-      return this.sessionRetrievalService.retrieveSession(sessionRequest);
+      return this.sessionsService.retrieveSession(sessionRequest);
     } 
       
     const deferred = Q.defer<Session>();
@@ -47,7 +47,7 @@ export default class ChannelapeClient {
   }
 
   getAction(actionId: string) {
-    return this.getSession().then(session => this.actionRetrievalService.retrieveAction(session.sessionId, actionId));
+    return this.getSession().then(session => this.actionsService.retrieveAction(session.sessionId, actionId));
   }
 
 }

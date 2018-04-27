@@ -7,7 +7,7 @@ import Version from '../../model/Version';
 import SessionIdSessionRequest from './../model/SessionIdSessionRequest';
 import request = require('request');
 
-export default class SessionRetrievalService {
+export default class SessionsService {
 
   constructor(private readonly client: request.RequestAPI<request.Request, 
     request.CoreOptions, request.RequiredUriUrl>) { }

@@ -1,14 +1,14 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import request = require('request');
-import SessionRetrievalService from './../../../src/sessions/service/SessionRetrievalService';
+import SessionsService from './../../../src/sessions/service/SessionsService';
 import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
 import Environment from '../../../src/model/Environment';
 import ChannelApeErrorResponse from '../../../src/model/ChannelApeErrorResponse';
 import Session from '../../../src/sessions/model/Session';
 
-describe('Session Retrieval Service', () => {
+describe('Sessions Service', () => {
 
   describe('Given some rest client', () => {
     const client = request.defaults({
@@ -47,8 +47,8 @@ describe('Session Retrieval Service', () => {
       const expectedUsername: string = 'some-username@username.com';
       const expectedPassword: string = 'some-crazy-long-password';
 
-      const sessionRetrievalService: SessionRetrievalService = new SessionRetrievalService(client);
-      return sessionRetrievalService.retrieveSession({
+      const sessionsService: SessionsService = new SessionsService(client);
+      return sessionsService.retrieveSession({
         username: expectedUsername,
         password: expectedPassword
       }).then((actualResponse) => {
@@ -84,9 +84,9 @@ describe('Session Retrieval Service', () => {
       const clientGetStub = sandbox.stub(client, 'get')
         .yields(null, response, expectedResponse);
 
-      const sessionRetrievalService = new SessionRetrievalService(client);
+      const sessionsService = new SessionsService(client);
       const someSessionId = '123';
-      return sessionRetrievalService.retrieveSession({
+      return sessionsService.retrieveSession({
         sessionId: someSessionId
       }).then((actualResponse) => {
         expect(clientGetStub.args[0][0])
@@ -113,8 +113,8 @@ describe('Session Retrieval Service', () => {
       const expectedUsername: string = 'some-username@username.com';
       const expectedPassword: string = 'some-crazy-long-password';
 
-      const sessionRetrievalService: SessionRetrievalService = new SessionRetrievalService(client);
-      sessionRetrievalService.retrieveSession({
+      const sessionsService: SessionsService = new SessionsService(client);
+      sessionsService.retrieveSession({
         username: expectedUsername,
         password: expectedPassword
       }).then((actualResponse) => {
@@ -160,8 +160,8 @@ describe('Session Retrieval Service', () => {
       const expectedUsername: string = 'some-username@username.com';
       const expectedPassword: string = 'some-crazy-long-password';
 
-      const sessionRetrievalService: SessionRetrievalService = new SessionRetrievalService(client);
-      sessionRetrievalService.retrieveSession({
+      const sessionsService: SessionsService = new SessionsService(client);
+      sessionsService.retrieveSession({
         username: expectedUsername,
         password: expectedPassword
       }).then((actualResponse) => {
@@ -198,9 +198,9 @@ describe('Session Retrieval Service', () => {
       const clientGetStub = sandbox.stub(client, 'get')
         .yields(expectedError, null, null);
 
-      const sessionRetrievalService = new SessionRetrievalService(client);
+      const sessionsService = new SessionsService(client);
       const someSessionId = '123';
-      sessionRetrievalService.retrieveSession({
+      sessionsService.retrieveSession({
         sessionId: someSessionId
       }).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
@@ -235,9 +235,9 @@ describe('Session Retrieval Service', () => {
       const clientGetStub = sandbox.stub(client, 'get')
         .yields(null, response, expectedChannelApeErrorResponse);
 
-      const sessionRetrievalService = new SessionRetrievalService(client);
+      const sessionsService = new SessionsService(client);
       const someSessionId = '123';
-      sessionRetrievalService.retrieveSession({
+      sessionsService.retrieveSession({
         sessionId: someSessionId
       }).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;

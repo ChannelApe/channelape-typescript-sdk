@@ -6,7 +6,7 @@ import Resource from '../../model/Resource';
 import Version from '../../model/Version';
 import ChannelApeErrorResponse from './../../model/ChannelApeErrorResponse';
 import * as Q from 'q';
-export default class ActionRetrievalService {
+export default class ActionsService {
 
   constructor(private readonly client: request.RequestAPI<request.Request, 
     request.CoreOptions, request.RequiredUriUrl>) { }

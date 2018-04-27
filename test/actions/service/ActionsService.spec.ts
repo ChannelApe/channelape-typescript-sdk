@@ -1,14 +1,14 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import request = require('request');
-import ActionRetrievalService from './../../../src/actions/service/ActionRetrievalService';
+import ActionsService from './../../../src/actions/service/ActionsService';
 import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
 import Environment from '../../../src/model/Environment';
 import ChannelApeErrorResponse from '../../../src/model/ChannelApeErrorResponse';
 import Action from '../../../src/actions/model/Action';
 
-describe('Action Retrieval Service', () => {
+describe('Actions Service', () => {
 
   describe('Given some rest client', () => {
     const client = request.defaults({
@@ -53,8 +53,8 @@ describe('Action Retrieval Service', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
           .yields(null, response, expectedAction);
 
-      const actionRetrievalService: ActionRetrievalService = new ActionRetrievalService(client);
-      return actionRetrievalService.retrieveAction(expectedSessionId, expectedAction.id).then((actualAction) => {
+      const actionsService: ActionsService = new ActionsService(client);
+      return actionsService.retrieveAction(expectedSessionId, expectedAction.id).then((actualAction) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedAction.id}`);
         const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
         const actualHeaders = actualOptions.headers;
@@ -86,8 +86,8 @@ describe('Action Retrieval Service', () => {
       const clientGetStub = sandbox.stub(client, 'get')
         .yields(expectedError, null, null);
 
-      const actionRetrievalService: ActionRetrievalService = new ActionRetrievalService(client);
-      return actionRetrievalService.retrieveAction(expectedSessionId, expectedAction.id).then((actualResponse) => {
+      const actionsService: ActionsService = new ActionsService(client);
+      return actionsService.retrieveAction(expectedSessionId, expectedAction.id).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedAction.id}`);
@@ -122,8 +122,8 @@ describe('Action Retrieval Service', () => {
       const clientGetStub = sandbox.stub(client, 'get')
         .yields(null, response, expectedChannelApeErrorResponse);
 
-      const actionRetrievalService: ActionRetrievalService = new ActionRetrievalService(client);
-      return actionRetrievalService.retrieveAction(expectedSessionId, expectedAction.id).then((actualResponse) => {
+      const actionsService: ActionsService = new ActionsService(client);
+      return actionsService.retrieveAction(expectedSessionId, expectedAction.id).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedAction.id}`);
