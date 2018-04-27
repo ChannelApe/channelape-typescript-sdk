@@ -11,7 +11,7 @@ export default class ActionsService {
   constructor(private readonly client: request.RequestAPI<request.Request, 
     request.CoreOptions, request.RequiredUriUrl>) { }
 
-  public retrieveAction(sessionId: string, id: string): Q.Promise<Action> {
+  public get(sessionId: string, id: string): Q.Promise<Action> {
 
     const deferred = Q.defer<Action>();
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}/${id}`;

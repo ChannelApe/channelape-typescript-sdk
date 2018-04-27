@@ -3,9 +3,7 @@ import * as Q from 'q';
 import ClientConfiguration from './model/ClientConfiguration';
 import SessionsService from './sessions/service/SessionsService';
 import ActionsService from './actions/service/ActionsService';
-import CredentialSessionRequest from './sessions/model/CredentialSessionRequest';
 import Session from './sessions/model/Session';
-import SessionIdSessionRequest from './sessions/model/SessionIdSessionRequest';
 import Action from './actions/model/Action';
 
 const INVALID_CONFIGURATION_ERROR_MESSAGE = 'Invalid configuration. username and password or session ID is required.';
@@ -27,18 +25,11 @@ export default class ChannelapeClient {
 
   getSession() {
     if (this.config.hasCredentials()) {
-      const sessionRequest: CredentialSessionRequest = {
-        username: this.config.Username,
-        password: this.config.Password
-      };
-      return this.sessionsService.retrieveSession(sessionRequest);
+      return this.sessionsService.create(this.config.Username, this.config.Password);
     }
 
     if (this.config.hasSession()) {
-      const sessionRequest: SessionIdSessionRequest = {
-        sessionId: this.config.SessionId
-      };
-      return this.sessionsService.retrieveSession(sessionRequest);
+      return this.sessionsService.get(this.config.SessionId);
     } 
       
     const deferred = Q.defer<Session>();
@@ -47,7 +38,7 @@ export default class ChannelapeClient {
   }
 
   getAction(actionId: string) {
-    return this.getSession().then(session => this.actionsService.retrieveAction(session.sessionId, actionId));
+    return this.getSession().then(session => this.actionsService.get(session.sessionId, actionId));
   }
 
 }

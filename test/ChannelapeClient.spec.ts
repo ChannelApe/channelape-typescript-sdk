@@ -4,8 +4,7 @@ import SessionsService from './../src/sessions/service/SessionsService';
 import ActionsService from './../src/actions/service/ActionsService';
 import * as sinon from 'sinon';
 import Session from './../src/sessions/model/Session';
-import CredentialSessionRequest from './../src/sessions/model/CredentialSessionRequest';
-import SessionIdSessionRequest from './../src/sessions/model/SessionIdSessionRequest';
+
 import ClientConfiguration from './../src/model/ClientConfiguration';
 import ChannelApeErrorResponse from './../src/model/ChannelApeErrorResponse';
 import ClientConfigurationBuilder from './../src/model/ClientConfigurationBuilder';
@@ -34,8 +33,8 @@ describe('Channelape Client', () => {
         userId: 'someuserId',
         sessionId: 'some password'
       };
-      const retrieveSessionStub : sinon.SinonStub = sandbox.stub(SessionsService.prototype, 'retrieveSession')
-      .callsFake((sessionRequest: CredentialSessionRequest) => {
+      const retrieveSessionStub : sinon.SinonStub = sandbox.stub(SessionsService.prototype, 'create')
+      .callsFake((username: string, password: string) => {
         return Promise.resolve(expectedSession);
       });
       return channelapeClient.getSession().then((session) => {
@@ -47,8 +46,8 @@ describe('Channelape Client', () => {
     it('when getting session for a invalid session, then return reject promise with error', () => {
       const expectedErrorMessage : string = 'There was an error';
 
-      const retrieveSessionStub : sinon.SinonStub = sandbox.stub(SessionsService.prototype, 'retrieveSession')
-      .callsFake((sessionRequest: CredentialSessionRequest) => {
+      const retrieveSessionStub : sinon.SinonStub = sandbox.stub(SessionsService.prototype, 'create')
+      .callsFake((username: string, password: string) => {
         return Promise.reject('There was an error');
       });
 
@@ -69,8 +68,8 @@ describe('Channelape Client', () => {
         userId: 'someuserId',
         sessionId: 'somesessionid'
       };
-      const retrieveSessionStub = sandbox.stub(SessionsService.prototype, 'retrieveSession')
-      .callsFake((sessionRequest: SessionIdSessionRequest) => {
+      const retrieveSessionStub = sandbox.stub(SessionsService.prototype, 'get')
+      .callsFake((sessionId: string) => {
         return Promise.resolve(expectedSession);
       });
       return channelapeClient.getSession().then((session) => {
@@ -82,8 +81,8 @@ describe('Channelape Client', () => {
     it('when getting session for a invalid session, then return reject promise with error', () => {
       const expectedErrorMessage : string = 'There was an error';
 
-      const retrieveSessionStub : sinon.SinonStub = sandbox.stub(SessionsService.prototype, 'retrieveSession')
-      .callsFake((sessionRequest: SessionIdSessionRequest) => {
+      const retrieveSessionStub : sinon.SinonStub = sandbox.stub(SessionsService.prototype, 'get')
+      .callsFake((sessionId: string) => {
         return Promise.reject('There was an error');
       });
 
@@ -112,12 +111,12 @@ describe('Channelape Client', () => {
         sessionId: 'somesessionid'
       };
 
-      const retrieveSessionStub = sandbox.stub(SessionsService.prototype, 'retrieveSession')
-      .callsFake((sessionRequest: SessionIdSessionRequest) => {
+      const retrieveSessionStub = sandbox.stub(SessionsService.prototype, 'get')
+      .callsFake((sessionId: string) => {
         return Promise.resolve(expectedSession);
       });
 
-      const retrieveActionStub = sandbox.stub(ActionsService.prototype, 'retrieveAction')
+      const retrieveActionStub = sandbox.stub(ActionsService.prototype, 'get')
       .callsFake((expectedActionId) => {
         return Promise.resolve(expectedAction);
       });
@@ -144,8 +143,8 @@ describe('Channelape Client', () => {
         sessionId: 'somesessionid'
       };
 
-      const retrieveSessionStub = sandbox.stub(SessionsService.prototype, 'retrieveSession')
-      .callsFake((sessionRequest: SessionIdSessionRequest) => {
+      const retrieveSessionStub = sandbox.stub(SessionsService.prototype, 'get')
+      .callsFake((sessionId: string) => {
         return Promise.resolve(expectedSession);
       });
 
@@ -159,7 +158,7 @@ describe('Channelape Client', () => {
         ]
       };
 
-      const retrieveActionStub = sandbox.stub(ActionsService.prototype, 'retrieveAction')
+      const retrieveActionStub = sandbox.stub(ActionsService.prototype, 'get')
       .callsFake((actionId) => {
         return Promise.reject(expectedChannelApeErrorResponse);
       });

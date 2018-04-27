@@ -54,7 +54,7 @@ describe('Actions Service', () => {
           .yields(null, response, expectedAction);
 
       const actionsService: ActionsService = new ActionsService(client);
-      return actionsService.retrieveAction(expectedSessionId, expectedAction.id).then((actualAction) => {
+      return actionsService.get(expectedSessionId, expectedAction.id).then((actualAction) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedAction.id}`);
         const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
         const actualHeaders = actualOptions.headers;
@@ -87,7 +87,7 @@ describe('Actions Service', () => {
         .yields(expectedError, null, null);
 
       const actionsService: ActionsService = new ActionsService(client);
-      return actionsService.retrieveAction(expectedSessionId, expectedAction.id).then((actualResponse) => {
+      return actionsService.get(expectedSessionId, expectedAction.id).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedAction.id}`);
@@ -123,7 +123,7 @@ describe('Actions Service', () => {
         .yields(null, response, expectedChannelApeErrorResponse);
 
       const actionsService: ActionsService = new ActionsService(client);
-      return actionsService.retrieveAction(expectedSessionId, expectedAction.id).then((actualResponse) => {
+      return actionsService.get(expectedSessionId, expectedAction.id).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedAction.id}`);

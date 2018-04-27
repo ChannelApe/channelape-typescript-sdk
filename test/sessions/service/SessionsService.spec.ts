@@ -29,8 +29,8 @@ describe('Sessions Service', () => {
       done();
     });
 
-    it('And valid credential session request ' +
-      'When retrieving session request Then return resolved promise with session data', () => {
+    it('And valid username and password ' +
+      'When creating session Then return resolved promise with session data', () => {
 
       const expectedResponse: Session = {
         sessionId: 'some-session-id',
@@ -48,14 +48,10 @@ describe('Sessions Service', () => {
       const expectedPassword: string = 'some-crazy-long-password';
 
       const sessionsService: SessionsService = new SessionsService(client);
-      return sessionsService.retrieveSession({
-        username: expectedUsername,
-        password: expectedPassword
-      }).then((actualResponse) => {
+      return sessionsService.create(expectedUsername, expectedPassword).then((actualResponse) => {
         expect(clientPostStub.args[0][0]).to.equal(`/${Version.V1}${Resource.SESSIONS}`);
 
         const actualOptions: request.CoreOptions = clientPostStub.args[0][1];
-        expect(actualOptions.json).to.equal(true);
         const actualAuth = actualOptions.auth;
         if (actualAuth == null) {
           expect(actualAuth).to.not.be.undefined;
@@ -69,8 +65,8 @@ describe('Sessions Service', () => {
       });
     });
 
-    it('And valid sessionId session request' +
-      'When retrieving session request Then return resolved promise with session data', () => {
+    it('And valid sessionId' +
+      'When retrieving session Then return resolved promise with session data', () => {
 
       const expectedResponse = {
         sessionId: 'some-session-id',
@@ -86,14 +82,11 @@ describe('Sessions Service', () => {
 
       const sessionsService = new SessionsService(client);
       const someSessionId = '123';
-      return sessionsService.retrieveSession({
-        sessionId: someSessionId
-      }).then((actualResponse) => {
+      return sessionsService.get(someSessionId).then((actualResponse) => {
         expect(clientGetStub.args[0][0])
             .to.equal(`/${Version.V1}${Resource.SESSIONS}/${someSessionId}`);
         
         const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
-        expect(actualOptions.json).to.equal(true);
 
         expect(actualResponse.userId).to.equal(expectedResponse.userId);
         expect(actualResponse.sessionId).to.equal(expectedResponse.sessionId);
@@ -101,8 +94,8 @@ describe('Sessions Service', () => {
     });
 
 
-    it('And valid credential session request ' +
-      'When request connect errors, Then return a rejected promise with an error', (done) => {
+    it('And valid username and password And request connect errors ' +
+      'When creating session Then return a rejected promise with an error', (done) => {
 
       const expectedError = {
         stack: 'oh no an error'
@@ -114,16 +107,13 @@ describe('Sessions Service', () => {
       const expectedPassword: string = 'some-crazy-long-password';
 
       const sessionsService: SessionsService = new SessionsService(client);
-      sessionsService.retrieveSession({
-        username: expectedUsername,
-        password: expectedPassword
-      }).then((actualResponse) => {
+      sessionsService.create(expectedUsername, expectedPassword).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientPostStub.args[0][0]).to.equal(`/${Version.V1}${Resource.SESSIONS}`);
         
         const actualOptions: request.CoreOptions = clientPostStub.args[0][1];
-        expect(actualOptions.json).to.equal(true);
+        
         const actualAuth = actualOptions.auth;
 
         if (actualAuth == null) {
@@ -138,8 +128,8 @@ describe('Sessions Service', () => {
       });
     });
 
-    it('And credential session request with invalid password' +
-    ' When retrieving session, Then return a rejected promise with 401 status code ' +
+    it('And valid username and invalid password' +
+    ' When creating session Then return a rejected promise with 401 status code ' +
     'And invalid username or password error message', (done) => {
 
       const response = {
@@ -161,16 +151,13 @@ describe('Sessions Service', () => {
       const expectedPassword: string = 'some-crazy-long-password';
 
       const sessionsService: SessionsService = new SessionsService(client);
-      sessionsService.retrieveSession({
-        username: expectedUsername,
-        password: expectedPassword
-      }).then((actualResponse) => {
+      sessionsService.create(expectedUsername, expectedPassword).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientPostStub.args[0][0]).to.equal(`/${Version.V1}${Resource.SESSIONS}`);
         
         const actualOptions: request.CoreOptions = clientPostStub.args[0][1];
-        expect(actualOptions.json).to.equal(true);
+        
         const actualAuth = actualOptions.auth;
 
         if (actualAuth == null) {
@@ -189,8 +176,8 @@ describe('Sessions Service', () => {
       });
     });
 
-    it('And valid sessionId session request ' +
-      'When request connect errors, Then return a rejected promise with an error', (done) => {
+    it('And valid session ID session request And request connect errors' +
+      'When retrieving session Then return a rejected promise with an error', (done) => {
 
       const expectedError = {
         stack: 'oh no an error'
@@ -200,23 +187,21 @@ describe('Sessions Service', () => {
 
       const sessionsService = new SessionsService(client);
       const someSessionId = '123';
-      sessionsService.retrieveSession({
-        sessionId: someSessionId
-      }).then((actualResponse) => {
+      sessionsService.get(someSessionId).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0])
             .to.equal(`/${Version.V1}${Resource.SESSIONS}/${someSessionId}`);
 
         const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
-        expect(actualOptions.json).to.equal(true);
+        
 
         expect(e).to.be.equal(expectedError);
         done();
       });
     });
 
-    it('And invalid sessionId session request ' +
+    it('And invalid sessionId ' +
       'When retrieving session Then return rejected promise with 401 ' +
       'status code and invalid auth error message', (done) => {
 
@@ -237,16 +222,13 @@ describe('Sessions Service', () => {
 
       const sessionsService = new SessionsService(client);
       const someSessionId = '123';
-      sessionsService.retrieveSession({
-        sessionId: someSessionId
-      }).then((actualResponse) => {
+      sessionsService.get(someSessionId).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0])
             .to.equal(`/${Version.V1}${Resource.SESSIONS}/${someSessionId}`);
 
         const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
-        expect(actualOptions.json).to.equal(true);
 
         const actualChannelApeErrorResponse = e as ChannelApeErrorResponse;
         expect(actualChannelApeErrorResponse.statusCode).to.equal(401);
