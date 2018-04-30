@@ -8,31 +8,10 @@ export enum LogLevel {
 }
 
 export function getLogLevelName(level: LogLevel): string {
-  let levelName: string = '';
-  switch (level) {
-    case (LogLevel.OFF):
-      levelName = 'OFF';
-      break;
-    case (LogLevel.ERROR):
-      levelName = 'ERROR';
-      break;
-    case (LogLevel.WARN):
-      levelName = 'WARN';
-      break;
-    case (LogLevel.INFO):
-      levelName = 'INFO';
-      break;
-    case (LogLevel.VERBOSE):
-      levelName = 'VERBOSE';
-      break;
-    case (LogLevel.DEBUG):
-      levelName = 'DEBUG';
-      break;
-    default:
-      levelName = 'OFF';
-      break;
+  if (!LogLevel.hasOwnProperty(level)) {
+    return 'OFF';
   }
-  return levelName;
+  return LogLevel[level];
 }
 
 export default LogLevel;
