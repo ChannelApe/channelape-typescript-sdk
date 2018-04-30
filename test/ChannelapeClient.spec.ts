@@ -1,14 +1,14 @@
-import ChannelApeClient from './../src/ChannelApeClient';
 import { expect } from 'chai';
-import SessionsService from './../src/sessions/service/SessionsService';
-import ActionsService from './../src/actions/service/ActionsService';
+import ChannelApeClient from '../src/ChannelApeClient';
+import SessionsService from '../src/sessions/service/SessionsService';
+import ActionsService from '../src/actions/service/ActionsService';
 import * as sinon from 'sinon';
-import Session from './../src/sessions/model/Session';
+import Session from '../src/sessions/model/Session';
 
-import ClientConfiguration from './../src/model/ClientConfiguration';
-import ChannelApeErrorResponse from './../src/model/ChannelApeErrorResponse';
-import ClientConfigurationBuilder from './../src/model/ClientConfigurationBuilder';
-import Action from './../src/actions/model/Action';
+import ClientConfiguration from '../src/model/ClientConfiguration';
+import ChannelApeErrorResponse from '../src/model/ChannelApeErrorResponse';
+import ClientConfigurationBuilder from '../src/model/ClientConfigurationBuilder';
+import Action from '../src/actions/model/Action';
 
 const someEndpoint : string = 'https://some-api.channelape.com';
 describe('Channelape Client', () => {
