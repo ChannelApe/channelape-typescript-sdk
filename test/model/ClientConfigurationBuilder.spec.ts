@@ -78,4 +78,26 @@ describe('ClientConfigurationBuilder', () => {
     });
 
   });
+
+  describe('Given some password', () => {
+
+    const expectedPassword: string = 'jim';
+
+    const clientConfigurationBuilder = new ClientConfigurationBuilder()
+      .setPassword(expectedPassword);
+
+    describe('When building ClientConfiguration', () => {
+      it('Then expect ClientConfiguration without credentials and default endpoint', () => {
+        const actualClientConfiguration = clientConfigurationBuilder.build();
+        expect(actualClientConfiguration.Username).to.equal('');
+        expect(actualClientConfiguration.Password).to.equal(expectedPassword);
+        expect(actualClientConfiguration.SessionId).to.equal('');
+        expect(actualClientConfiguration.hasCredentials()).to.equal(false);
+
+        expect(actualClientConfiguration.Endpoint).to.equal(Environment.PRODUCTION);
+        expect(actualClientConfiguration.hasSession()).to.equal(false);
+      });
+    });
+
+  });
 });
