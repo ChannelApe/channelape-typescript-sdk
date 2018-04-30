@@ -1,21 +1,21 @@
 {
   "name": "channelape-sdk",
-  "version": "0.1.0-develop",
+  "version": "0.1.0-develop.1",
   "description": "A client for interacting with ChannelApe's API",
-  "main": "dist/ChannelapeClient.js",
-  "typings": "dist/ChannelapeClient.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc -p . --declaration",
-    "watch": "tsc --watch",
+    "compile": "tsc -p tsconfig.json --declaration",
+    "watch": "tsc -p tsconfig-develop.json --watch",
     "unit-test": "mocha --opts ./test/mocha.opts",
     "watch-unit-test": "mocha --recursive --compilers ts:ts-node/register --watch test/**/*.spec.* ",
     "test": "npm run unit-test",
-    "pretest": "npm run compile && npm run lint",
+    "pretest": "tsc -p tsconfig-develop.json --declaration && npm run lint",
     "posttest": "npm run mutate && npm run cover",
     "cover": "nyc npm run unit-test",
     "mutate": "stryker run",
-    "lint": "tslint --project .",
+    "lint": "tslint -p tsconfig-develop.json",
     "e2e": "mocha --opts ./e2e/mocha.opts"
   },
   "files": [

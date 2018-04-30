@@ -1,4 +1,4 @@
-import ChannelapeClient from './../src/ChannelapeClient';
+import ChannelApeClient from './../src/ChannelApeClient';
 import { expect } from 'chai';
 import SessionsService from './../src/sessions/service/SessionsService';
 import ActionsService from './../src/actions/service/ActionsService';
@@ -26,7 +26,7 @@ describe('Channelape Client', () => {
   });
 
   describe('given some channelape client configuration, created with user credentials', () => {
-    const channelapeClient : ChannelapeClient  = generateCredentialSessionClient();
+    const channelapeClient : ChannelApeClient  = generateCredentialSessionClient();
 
     it('when getting session for a valid user, then return resolved promise with session data', () => {
       const expectedSession: Session = {
@@ -61,7 +61,7 @@ describe('Channelape Client', () => {
   });
 
   describe('given some channelape client configuration, created with session ID', () => {
-    const channelapeClient : ChannelapeClient = generateSessionIdClient();
+    const channelapeClient : ChannelApeClient = generateSessionIdClient();
 
     it('when getting session for a valid user, then return resolved promise with session data', () => {
       const expectedSession: Session = {
@@ -181,7 +181,7 @@ describe('Channelape Client', () => {
 
     const clientConfiguration : ClientConfiguration
       = new ClientConfigurationBuilder().setEndpoint(someEndpoint).build();
-    const channelapeClient : ChannelapeClient = new ChannelapeClient(clientConfiguration);
+    const channelapeClient : ChannelApeClient = new ChannelApeClient(clientConfiguration);
 
     it('when getting session, then return reject promise with error', () => {
       const expectedErrorMessage : string = 'Invalid configuration. username and password or session ID is required.';
@@ -192,17 +192,17 @@ describe('Channelape Client', () => {
 
   });
 
-  function generateCredentialSessionClient(): ChannelapeClient {
+  function generateCredentialSessionClient(): ChannelApeClient {
     const clientConfiguration : ClientConfiguration
       = new ClientConfigurationBuilder().setUsername('someusername@channelape.com')
       .setPassword('somepassword').setEndpoint(someEndpoint).build();
-    return  new ChannelapeClient(clientConfiguration);
+    return  new ChannelApeClient(clientConfiguration);
   }
 
-  function generateSessionIdClient(): ChannelapeClient {
+  function generateSessionIdClient(): ChannelApeClient {
     const clientConfiguration : ClientConfiguration
       = new ClientConfigurationBuilder().setSessionId('123')
       .setEndpoint(someEndpoint).build();
-    return  new ChannelapeClient(clientConfiguration);
+    return  new ChannelApeClient(clientConfiguration);
   }
 });

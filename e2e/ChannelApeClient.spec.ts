@@ -3,7 +3,7 @@ import ClientConfiguration from '../src/model/ClientConfiguration';
 import Session from '../src/sessions/model/Session';
 import ChannelApeError from '../src/model/ChannelApeError';
 import ChannelApeErrorResponse from '../src/model/ChannelApeErrorResponse';
-import ChannelapeClient from '../src/ChannelapeClient';
+import ChannelApeClient from '../src/ChannelApeClient';
 import { expect } from 'chai';
 
 describe('ChannelApe Client', () => {
@@ -12,7 +12,7 @@ describe('ChannelApe Client', () => {
 
     const clientConfiguration = new ClientConfigurationBuilder()
       .setUsername('jim@test.com').setPassword('jim55#899').build();
-    const channelApeClient = new ChannelapeClient(clientConfiguration);
+    const channelApeClient = new ChannelApeClient(clientConfiguration);
 
     context('When retrieving session', () => {
       const actualSessionPromise = channelApeClient.getSession();
@@ -39,7 +39,7 @@ describe('ChannelApe Client', () => {
 
     const clientConfiguration = new ClientConfigurationBuilder()
       .setSessionId('c14fefcf-2594-4d39-b927-71fde1210bd4').build();
-    const channelApeClient = new ChannelapeClient(clientConfiguration);
+    const channelApeClient = new ChannelApeClient(clientConfiguration);
 
     context('When retrieving session', () => {
       const actualSessionPromise = channelApeClient.getSession();
@@ -68,7 +68,7 @@ describe('ChannelApe Client', () => {
     const clientConfiguration = new ClientConfigurationBuilder()
       .setSessionId(sessionId).build();
 
-    const channelApeClient = new ChannelapeClient(clientConfiguration);
+    const channelApeClient = new ChannelApeClient(clientConfiguration);
 
     context('When retrieving session', () => {
       const actualSessionPromise = channelApeClient.getSession();
@@ -131,7 +131,7 @@ describe('ChannelApe Client', () => {
 
     const clientConfiguration = new ClientConfigurationBuilder()
       .setUsername(username).setPassword(password).build();
-    const channelApeClient = new ChannelapeClient(clientConfiguration);
+    const channelApeClient = new ChannelApeClient(clientConfiguration);
 
     context('When retrieving session', () => {
       const actualSessionPromise = channelApeClient.getSession();

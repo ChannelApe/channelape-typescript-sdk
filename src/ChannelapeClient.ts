@@ -7,7 +7,7 @@ import Session from './sessions/model/Session';
 import Action from './actions/model/Action';
 
 const INVALID_CONFIGURATION_ERROR_MESSAGE = 'Invalid configuration. username and password or session ID is required.';
-export default class ChannelapeClient {
+export default class ChannelApeClient {
 
   private readonly client : request.RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>;
   private readonly sessionsService: SessionsService;
