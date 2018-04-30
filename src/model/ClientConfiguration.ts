@@ -1,4 +1,5 @@
 import ClientConfigurationBuilder from './ClientConfigurationBuilder';
+import LogLevel, { getLogLevelName } from './LogLevel';
 
 export default class ClientConfiguration {
 
@@ -6,12 +7,14 @@ export default class ClientConfiguration {
   private readonly username: string;
   private readonly password: string;
   private readonly endpoint: string;
+  private readonly logLevel: LogLevel;
 
   constructor(builder: ClientConfigurationBuilder) {
     this.sessionId = builder.SessionId;
     this.username = builder.Username;
     this.password = builder.Password;
     this.endpoint = builder.Endpoint;
+    this.logLevel = builder.LogLevel;
   }
 
   get SessionId() {
@@ -36,6 +39,14 @@ export default class ClientConfiguration {
 
   get Endpoint() {
     return this.endpoint;
+  }
+
+  get LogLevel() : LogLevel {
+    return this.logLevel;
+  }
+
+  get LogLevelName() : string {
+    return getLogLevelName(this.logLevel);
   }
 
 }

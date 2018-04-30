@@ -1,6 +1,6 @@
 import ClientConfiguration from './ClientConfiguration';
 import Environment from './Environment';
-import { LogLevel, getLogLevelName } from './LogLevel';
+import { LogLevel } from './LogLevel';
 import * as winston from 'winston';
 
 export default class ClientConfigurationBuilder {
@@ -47,10 +47,15 @@ export default class ClientConfigurationBuilder {
     return this;
   }
 
-  get LogLevel(): string {
-    return getLogLevelName(this.logLevel);
+  setLogLevel(logLevel: LogLevel): ClientConfigurationBuilder {
+    this.logLevel = logLevel;
+    return this;
   }
-  
+
+  get LogLevel(): LogLevel {
+    return this.logLevel;
+  }
+
   build(): ClientConfiguration {
     return new ClientConfiguration(this);
   }
