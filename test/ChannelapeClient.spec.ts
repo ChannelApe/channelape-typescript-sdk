@@ -3,6 +3,7 @@ import ChannelApeClient from '../src/ChannelApeClient';
 import SessionsService from '../src/sessions/service/SessionsService';
 import ActionsService from '../src/actions/service/ActionsService';
 import * as sinon from 'sinon';
+import request = require('request');
 import Session from '../src/sessions/model/Session';
 
 import ClientConfiguration from '../src/model/ClientConfiguration';
@@ -57,7 +58,12 @@ describe('Channelape Client', () => {
       });
     });
 
-    
+    it('then expect client to be built with json set to true', () => {
+      const requestSpy : sinon.SinonSpy = sandbox.spy(request, 'defaults');
+      const channelapeClientDefaultTest : ChannelApeClient  = generateCredentialSessionClient();
+      expect(requestSpy.args[0][0].json).to.equal(true);
+    });
+
   });
 
   describe('given some channelape client configuration, created with session ID', () => {
