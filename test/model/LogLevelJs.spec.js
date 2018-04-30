@@ -4,9 +4,14 @@ const chai = require('chai');
 
 describe('LogLevel JS', () => {
   describe('getLogLevelName()', () => {
-    describe('Given null or \'\' as a parameter', () => {
-      it('Then expect "OFF"', () => {
+    describe('Given null as a parameter', () => {
+      it('Then expect "OFF" to be returned', () => {
         chai.expect(getLogLevelName()).to.equal('OFF');
+      });
+    });
+    describe('Given an empty string as a parameter', () => {
+      it('Then expect "OFF" to be returned', () => {
+        chai.expect(getLogLevelName('')).to.equal('OFF');
       });
     });
   });
