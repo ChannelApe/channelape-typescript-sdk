@@ -11,7 +11,7 @@ import ClientConfigurationBuilder from '../src/model/ClientConfigurationBuilder'
 import Action from '../src/actions/model/Action';
 
 const someEndpoint : string = 'https://some-api.channelape.com';
-describe('Channelape Client', () => {
+describe('ChannelApe Client', () => {
 
   
   let sandbox : sinon.SinonSandbox;

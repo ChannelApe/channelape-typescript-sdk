@@ -6,16 +6,16 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc -p tsconfig.json",
-    "watch": "tsc -p tsconfig-develop.json --watch",
+    "compile": "tsc && tsc -p test/tsconfig.json && tsc -p e2e/tsconfig.json",
+    "watch": "concurrently -k -p \"[{name}]\" -n \"src,test,e2e\" -c \"yellow.bold,cyan.bold,green.bold\" \"tsc --watch\" \"tsc -p test/tsconfig.json --watch\" \"tsc -p e2e/tsconfig.json --watch\"",
     "unit-test": "mocha --opts ./test/mocha.opts",
     "watch-unit-test": "mocha --recursive --compilers ts:ts-node/register --watch test/**/*.spec.* ",
     "test": "npm run unit-test",
-    "pretest": "tsc -p tsconfig-develop.json && npm run lint",
+    "pretest": "npm run compile && npm run lint",
     "posttest": "npm run mutate && npm run cover",
     "cover": "nyc npm run unit-test",
     "mutate": "stryker run",
-    "lint": "tslint -p tsconfig-develop.json",
+    "lint": "tslint -p tsconfig.json && tslint -p test/tsconfig.json && tslint -p e2e/tsconfig.json",
     "e2e": "mocha --opts ./e2e/mocha.opts"
   },
   "files": [
@@ -86,7 +86,8 @@
     "ts-node": "6.0.1",
     "tslint": "5.9.1",
     "tslint-config-airbnb": "5.8.0",
-    "typescript": "2.7.2"
+    "typescript": "2.7.2",
+    "concurrently": "3.5.1"
   },
   "nyc": {
     "extension": [

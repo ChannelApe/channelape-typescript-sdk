@@ -19,14 +19,14 @@ Create the channel api client with your credentials.
 ```typescript
 const clientConfiguration = new ClientConfigurationBuilder()
   .setUsername('johndoe123@test.com').setPassword('my_pass123#4').build();
-const channelApeClient = new ChannelapeClient(clientConfiguration);
+const channelApeClient = new ChannelApeClient(clientConfiguration);
 ```
 
 or if you have your sessionId:
 ```typescript
 const clientConfiguration = new ClientConfigurationBuilder()
   .setSessionId('e7fecb82-61f7-498e-a358-aa21eb0cd5e8').build();
-const channelApeClient = new ChannelapeClient(clientConfiguration);
+const channelApeClient = new ChannelApeClient(clientConfiguration);
 ```
 The channelape sdk is asynchronous and all functions return promises.
 
