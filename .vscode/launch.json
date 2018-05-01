@@ -12,6 +12,7 @@
         "${relativeFile}",
         "--colors"
       ],
+      "envFile": "${workspaceFolder}/.env",
       "cwd": "${workspaceRoot}",
       "protocol": "inspector"
     }

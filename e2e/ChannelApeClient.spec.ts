@@ -1,4 +1,3 @@
-import ClientConfigurationBuilder from '../src/model/ClientConfigurationBuilder';
 import ClientConfiguration from '../src/model/ClientConfiguration';
 import Session from '../src/sessions/model/Session';
 import ChannelApeError from '../src/model/ChannelApeError';
@@ -7,84 +6,17 @@ import ChannelApeClient from '../src/ChannelApeClient';
 import { expect } from 'chai';
 
 describe('ChannelApe Client', () => {
-
-  describe('Given invalid username and password', () => {
-
-    const clientConfiguration = new ClientConfigurationBuilder()
-      .setUsername('jim@test.com').setPassword('jim55#899').build();
-    const channelApeClient = new ChannelApeClient(clientConfiguration);
-
-    context('When retrieving session', () => {
-      const actualSessionPromise = channelApeClient.getSession();
-
-      it('Then return invalid email or password error message', (done) => {
-        actualSessionPromise.then((actualSession) => {
-          expect(actualSession.userId).to.equal(undefined);
-          expect(actualSession.sessionId).to.equal(undefined);
-        }).catch((e) => {
-          const actualChannelApeErrorResponse = e as ChannelApeErrorResponse;
-          expect(actualChannelApeErrorResponse.statusCode).to.equal(401);
-          const expectedChannelApeErrors = [{
-            code: 2,
-            message: 'Invalid email or password.'
-          }];
-          assertChannelApeErrors(expectedChannelApeErrors, actualChannelApeErrorResponse.errors); 
-          done();
-        });
-      });
-    });
-  });
-
-  describe('Given invalid session ID', () => {
-
-    const clientConfiguration = new ClientConfigurationBuilder()
-      .setSessionId('c14fefcf-2594-4d39-b927-71fde1210bd4').build();
-    const channelApeClient = new ChannelApeClient(clientConfiguration);
-
-    context('When retrieving session', () => {
-      const actualSessionPromise = channelApeClient.getSession();
-
-      it('Then return 401 status code and invalid auth token error message', (done) => {
-        actualSessionPromise.then((actualSession) => {
-          expect(actualSession.userId).to.equal(undefined);
-          expect(actualSession.sessionId).to.equal(undefined);
-        }).catch((e) => {
-          const actualChannelApeErrorResponse = e as ChannelApeErrorResponse;
-          expect(actualChannelApeErrorResponse.statusCode).to.equal(401);
-          const expectedChannelApeErrors = [{ 
-            code: 12, 
-            message: 'Invalid authorization token. Please check the server logs and try again.' 
-          }]; 
-          assertChannelApeErrors(expectedChannelApeErrors, actualChannelApeErrorResponse.errors); 
-          done();
-        });
-      });
-    });
-  });
-
   describe('Given valid session ID', () => {
     const sessionId = getSessionId();
 
-    const clientConfiguration = new ClientConfigurationBuilder()
-      .setSessionId(sessionId).build();
-
-    const channelApeClient = new ChannelApeClient(clientConfiguration);
-
-    context('When retrieving session', () => {
-      const actualSessionPromise = channelApeClient.getSession();
-
-      it('Then return session ID and user ID', () => {
-        return actualSessionPromise.then((actualSession) => {
-          expect(actualSession.userId).to.equal('addb5bac-d629-4179-a2a8-790763163fcb');
-          expect(actualSession.sessionId).to.equal(sessionId);
-        });
-      });
+    const channelApeClient = new ChannelApeClient({
+      sessionId
     });
 
     describe('And valid action ID', () => {
       context('When retrieving action', () => {
         const expectedActionId = 'a85d7463-a2f2-46ae-95a1-549e70ecb2ca';
-        const actualActionPromise = channelApeClient.getAction(expectedActionId);
+        const actualActionPromise = channelApeClient.actions().get(expectedActionId);
   
         it('Then return action', () => {
           return actualActionPromise.then((actualAction) => {
@@ -106,7 +38,7 @@ describe('ChannelApe Client', () => {
     describe('And invalid action ID', () => {
       context('When retrieving action', () => {
         const expectedActionId = '676cb925-b603-4140-a3dd-2af160c257d1';
-        const actualActionPromise = channelApeClient.getAction(expectedActionId);
+        const actualActionPromise = channelApeClient.actions().get(expectedActionId);
   
         it('Then return 404 status code and action not found error message', () => {
           return actualActionPromise.then((actualAction) => {
@@ -125,48 +57,12 @@ describe('ChannelApe Client', () => {
     });
   });
 
-  describe('Given valid username and password', () => {
-    const username = getUsername();
-    const password = getPassword();
-
-    const clientConfiguration = new ClientConfigurationBuilder()
-      .setUsername(username).setPassword(password).build();
-    const channelApeClient = new ChannelApeClient(clientConfiguration);
-
-    context('When retrieving session', () => {
-      const actualSessionPromise = channelApeClient.getSession();
-
-      it('Then return session ID and user ID', () => {
-        return actualSessionPromise.then((actualSession) => {
-          expect(actualSession.userId).to.equal('addb5bac-d629-4179-a2a8-790763163fcb');
-          expect(actualSession.sessionId.length).to.be.greaterThan(0);
-        });
-      });
-    });
-  });
-
   function getSessionId(): string {
     const sessionIdEnvironmentVariable = process.env.CHANNEL_APE_SESSION_ID;
     if (sessionIdEnvironmentVariable == null) {
-      throw new Error('CHANNEL_APE_SESSION_ID environment variable is required for');
+      throw new Error('CHANNEL_APE_SESSION_ID environment variable is required.');
     }
     return sessionIdEnvironmentVariable;
-  }
-
-  function getUsername(): string {
-    const usernameEnvironmentVariable = process.env.CHANNEL_APE_USERNAME;
-    if (usernameEnvironmentVariable == null) {
-      throw new Error('CHANNEL_APE_USERNAME environment variable is required for');
-    }
-    return usernameEnvironmentVariable;
-  }
-
-  function getPassword(): string {
-    const passwordEnvironmentVariable = process.env.CHANNEL_APE_PASSWORD;
-    if (passwordEnvironmentVariable == null) {
-      throw new Error('CHANNEL_APE_PASSWORD environment variable is required for');
-    }
-    return passwordEnvironmentVariable;
   }
 
   function assertChannelApeErrors(expectedChannelApeErrors: ChannelApeError[],

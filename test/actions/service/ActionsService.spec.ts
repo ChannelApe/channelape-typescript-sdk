@@ -20,8 +20,6 @@ describe('Actions Service', () => {
 
     let sandbox: sinon.SinonSandbox;
 
-    const expectedSessionId: string = '404040404';
-
     const expectedAction: Action = {
       action: 'PRODUCT_PULL',
       businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4',
@@ -59,7 +57,7 @@ describe('Actions Service', () => {
       done();
     });
 
-    it('And valid session ID And valid action ID ' +
+    it('And valid action ID ' +
       'When retrieving action Then return resolved promise with action', () => {
 
       const response = {
@@ -69,33 +67,29 @@ describe('Actions Service', () => {
           .yields(null, response, expectedAction);
 
       const actionsService: ActionsService = new ActionsService(client);
-      return actionsService.get(expectedSessionId, expectedAction.id).then((actualAction) => {
+      return actionsService.get(expectedAction.id).then((actualAction) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedAction.id}`);
-        const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
-        expectOptions(actualOptions);
         expectAction(expectedAction);
       });
     });
 
-    it('And valid session ID And valid action ID And request connect errors ' +
+    it('And valid action ID And request connect errors ' +
       'When retrieving action Then return a rejected promise with an error', () => {
 
       const clientGetStub = sandbox.stub(client, 'get')
         .yields(expectedError, null, null);
 
       const actionsService: ActionsService = new ActionsService(client);
-      return actionsService.get(expectedSessionId, expectedAction.id).then((actualResponse) => {
+      return actionsService.get(expectedAction.id).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedAction.id}`);
-        const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
-        expectOptions(actualOptions);
         expect(e).to.equal(expectedError);
       });
     });
 
-    it('And valid session ID And invalid action ID ' +
-    'When retrieving session Then return a rejected promise with 404 status code ' +
+    it('And invalid action ID ' +
+    'When retrieving action Then return a rejected promise with 404 status code ' +
     'And action not found error message', () => {
 
       const response = {
@@ -105,17 +99,15 @@ describe('Actions Service', () => {
         .yields(null, response, expectedChannelApeErrorResponse);
 
       const actionsService: ActionsService = new ActionsService(client);
-      return actionsService.get(expectedSessionId, expectedAction.id).then((actualResponse) => {
+      return actionsService.get(expectedAction.id).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedAction.id}`);
-        const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
-        expectOptions(actualOptions);
         expectChannelApeErrorResponse(e);
       });
     });
 
-    it('And valid session ID And valid action ID ' +
+    it('And valid action ID ' +
     'When updating action health check Then return resolved promise with action', () => {
 
       const response = {
@@ -125,16 +117,14 @@ describe('Actions Service', () => {
           .yields(null, response, expectedAction);
 
       const actionsService: ActionsService = new ActionsService(client);
-      return actionsService.updateHealthCheck(expectedSessionId, expectedAction.id).then((actualAction) => {
+      return actionsService.updateHealthCheck(expectedAction.id).then((actualAction) => {
         expect(clientGetStub.args[0][0])
           .to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedAction.id}/${Subresource.HEALTH_CHECK}`);
-        const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
-        expectOptions(actualOptions);
         expectAction(expectedAction);
       });
     });
 
-    it('And valid session ID And valid action ID And request connect errors ' +
+    it('And valid action ID And request connect errors ' +
     'When updating action health check Then return a rejected promise with an error', () => {
 
       const expectedError = {
@@ -144,18 +134,16 @@ describe('Actions Service', () => {
         .yields(expectedError, null, null);
 
       const actionsService: ActionsService = new ActionsService(client);
-      return actionsService.updateHealthCheck(expectedSessionId, expectedAction.id).then((actualResponse) => {
+      return actionsService.updateHealthCheck(expectedAction.id).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0])
           .to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedAction.id}/${Subresource.HEALTH_CHECK}`);
-        const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
-        expectOptions(actualOptions);
         expect(e).to.equal(expectedError);
       });
     });
 
-    it('And valid session ID And invalid action ID ' +
+    it('And invalid action ID ' +
     'When updating action health check Then return a rejected promise with 404 status code ' +
     'And action not found error message', () => {
 
@@ -167,18 +155,16 @@ describe('Actions Service', () => {
         .yields(null, response, expectedChannelApeErrorResponse);
 
       const actionsService: ActionsService = new ActionsService(client);
-      return actionsService.updateHealthCheck(expectedSessionId, expectedAction.id).then((actualResponse) => {
+      return actionsService.updateHealthCheck(expectedAction.id).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0])
           .to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedAction.id}/${Subresource.HEALTH_CHECK}`);
-        const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
-        expectOptions(actualOptions);
         expectChannelApeErrorResponse(e);
       });
     });
 
-    it('And valid session ID And valid action ID ' +
+    it('And valid action ID ' +
     'When completing action Then return resolved promise with action', () => {
 
       const response = {
@@ -188,16 +174,14 @@ describe('Actions Service', () => {
           .yields(null, response, expectedAction);
 
       const actionsService: ActionsService = new ActionsService(client);
-      return actionsService.complete(expectedSessionId, expectedAction.id).then((actualAction) => {
+      return actionsService.complete(expectedAction.id).then((actualAction) => {
         expect(clientGetStub.args[0][0])
           .to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedAction.id}/${Subresource.COMPLETE}`);
-        const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
-        expectOptions(actualOptions);
         expectAction(expectedAction);
       });
     });
 
-    it('And valid session ID And valid action ID And request connect errors ' +
+    it('And valid action ID And request connect errors ' +
     'When completing action Then return a rejected promise with an error', () => {
 
       const expectedError = {
@@ -207,18 +191,16 @@ describe('Actions Service', () => {
         .yields(expectedError, null, null);
 
       const actionsService: ActionsService = new ActionsService(client);
-      return actionsService.complete(expectedSessionId, expectedAction.id).then((actualResponse) => {
+      return actionsService.complete(expectedAction.id).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0])
           .to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedAction.id}/${Subresource.COMPLETE}`);
-        const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
-        expectOptions(actualOptions);
         expect(e).to.equal(expectedError);
       });
     });
 
-    it('And valid session ID And invalid action ID ' +
+    it('And invalid action ID ' +
     'When completing action Then return a rejected promise with 404 status code ' +
     'And action not found error message', () => {
 
@@ -230,18 +212,16 @@ describe('Actions Service', () => {
         .yields(null, response, expectedChannelApeErrorResponse);
 
       const actionsService: ActionsService = new ActionsService(client);
-      return actionsService.complete(expectedSessionId, expectedAction.id).then((actualResponse) => {
+      return actionsService.complete(expectedAction.id).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0])
           .to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedAction.id}/${Subresource.COMPLETE}`);
-        const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
-        expectOptions(actualOptions);
         expectChannelApeErrorResponse(e);
       });
     });
 
-    it('And valid session ID And valid action ID ' +
+    it('And valid action ID ' +
     'When updating action with error Then return resolved promise with action', () => {
 
       const response = {
@@ -251,16 +231,14 @@ describe('Actions Service', () => {
           .yields(null, response, expectedAction);
 
       const actionsService: ActionsService = new ActionsService(client);
-      return actionsService.error(expectedSessionId, expectedAction.id).then((actualAction) => {
+      return actionsService.error(expectedAction.id).then((actualAction) => {
         expect(clientGetStub.args[0][0])
           .to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedAction.id}/${Subresource.ERROR}`);
-        const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
-        expectOptions(actualOptions);
         expectAction(expectedAction);
       });
     });
 
-    it('And valid session ID And valid action ID And request connect errors ' +
+    it('And valid action ID And request connect errors ' +
     'When updating action with error Then return a rejected promise with an error', () => {
 
       const expectedError = {
@@ -270,18 +248,16 @@ describe('Actions Service', () => {
         .yields(expectedError, null, null);
 
       const actionsService: ActionsService = new ActionsService(client);
-      return actionsService.error(expectedSessionId, expectedAction.id).then((actualResponse) => {
+      return actionsService.error(expectedAction.id).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0])
           .to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedAction.id}/${Subresource.ERROR}`);
-        const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
-        expectOptions(actualOptions);
         expect(e).to.equal(expectedError);
       });
     });
 
-    it('And valid session ID And invalid action ID ' +
+    it('And invalid action ID ' +
     'When updating action with error Then return a rejected promise with 404 status code ' +
     'And action not found error message', () => {
 
@@ -293,25 +269,14 @@ describe('Actions Service', () => {
         .yields(null, response, expectedChannelApeErrorResponse);
 
       const actionsService: ActionsService = new ActionsService(client);
-      return actionsService.error(expectedSessionId, expectedAction.id).then((actualResponse) => {
+      return actionsService.error(expectedAction.id).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0])
           .to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedAction.id}/${Subresource.ERROR}`);
-        const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
-        expectOptions(actualOptions);
         expectChannelApeErrorResponse(e);
       });
     });
-
-    function expectOptions(actualOptions: request.CoreOptions) {
-      const actualHeaders = actualOptions.headers;
-      if (actualHeaders == null) {
-        expect(actualHeaders).to.not.be.undefined;
-      } else {
-        expect(actualHeaders['X-Channel-Ape-Authorization-Token']).to.equal(expectedSessionId);
-      }
-    }
 
     function expectAction(actualAction: Action) {
       expect(actualAction.action).to.equal(expectedAction.action);
