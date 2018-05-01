@@ -5,40 +5,59 @@ import SessionsService from './sessions/service/SessionsService';
 import ActionsService from './actions/service/ActionsService';
 import Session from './sessions/model/Session';
 import Action from './actions/model/Action';
+import { Environment } from '.';
 
-const INVALID_CONFIGURATION_ERROR_MESSAGE = 'Invalid configuration. username and password or session ID is required.';
+const INVALID_CONFIGURATION_ERROR_MESSAGE = 'Invalid configuration. sessionId is required.';
 export default class ChannelApeClient {
 
-  private readonly client : request.RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>;
   private readonly sessionsService: SessionsService;
   private readonly actionsService: ActionsService;
+  private readonly sessionId: string;
+  private readonly timeout: number;
+  private readonly endpoint: string;
 
-  constructor(private readonly config: ClientConfiguration) { 
-    this.client = request.defaults({
-      baseUrl: config.Endpoint,
-      timeout: 60000,
-      json: true
-    });
-    this.sessionsService = new SessionsService(this.client);
-    this.actionsService = new ActionsService(this.client);
-  }
 
-  getSession() {
-    if (this.config.hasCredentials()) {
-      return this.sessionsService.create(this.config.Username, this.config.Password);
+  constructor(clientConfiguration: ClientConfiguration) {
+    if (clientConfiguration.sessionId.length === 0) {
+      throw new Error(INVALID_CONFIGURATION_ERROR_MESSAGE);
     }
 
-    if (this.config.hasSession()) {
-      return this.sessionsService.get(this.config.SessionId);
-    } 
-      
-    const deferred = Q.defer<Session>();
-    deferred.reject(INVALID_CONFIGURATION_ERROR_MESSAGE);
-    return deferred.promise;
+    this.sessionId = clientConfiguration.sessionId;
+    this.endpoint = (clientConfiguration.endpoint == null) ? Environment.PRODUCTION : clientConfiguration.endpoint;
+    this.timeout = (clientConfiguration.timeout == null || clientConfiguration.timeout < 300)
+      ? 180000 : clientConfiguration.timeout;
+
+    const client = request.defaults({
+      baseUrl: this.endpoint,
+      timeout: this.timeout,
+      json: true,
+      headers: {
+        'X-Channel-Ape-Authorization-Token': this.sessionId
+      }
+    });
+
+    this.sessionsService = new SessionsService(client, this.sessionId);
+    this.actionsService = new ActionsService(client);
   }
 
-  getAction(actionId: string) {
-    return this.getSession().then(session => this.actionsService.get(session.sessionId, actionId));
+  get SessionId(): string {
+    return this.sessionId;
+  }
+
+  get Timeout(): number {
+    return this.timeout;
+  }
+
+  get Endpoint(): string {
+    return this.endpoint;
+  }
+
+  actions(): ActionsService {
+    return this.actionsService;
+  }
+
+  sessions(): SessionsService {
+    return this.sessionsService;
   }
 
 }
