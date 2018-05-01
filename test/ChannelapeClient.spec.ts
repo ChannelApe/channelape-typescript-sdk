@@ -7,6 +7,7 @@ import ActionsService from '../src/actions/service/ActionsService';
 import request = require('request');
 import Session from '../src/sessions/model/Session';
 import ChannelApeErrorResponse from '../src/model/ChannelApeErrorResponse';
+import LogLevel from '../src/model/LogLevel';
 import Action from '../src/actions/model/Action';
 import Environment from '../src/model/Environment';
 
@@ -40,6 +41,27 @@ describe('ChannelApe Client', () => {
       });
       expect(requestSpy.args[0][0]
         .headers['X-Channel-Ape-Authorization-Token']).to.equal('c478c897-dc1c-4171-a207-9e3af9b23579');
+    });
+  });
+
+  describe('Given client configuration with no LogLevel set', () => {
+    it('Then expect default LogLevel of "OFF"', () => {
+      const channelApeClient = new ChannelApeClient({
+        sessionId: 'c478c897-dc1c-4171-a207-9e3af9b23579'
+      });
+      expect(channelApeClient.LogLevel).to.equal(LogLevel.OFF);
+      expect(channelApeClient.LogLevelName).to.equal('OFF');
+    });
+  });
+
+  describe('Given client configuration with specific LogLevel set to "VERBOSE"', () => {
+    it('Then expect LogLevel of "VERBOSE"', () => {
+      const channelApeClient = new ChannelApeClient({
+        sessionId: 'c478c897-dc1c-4171-a207-9e3af9b23579',
+        logLevel: LogLevel.VERBOSE
+      });
+      expect(channelApeClient.LogLevel).to.equal(LogLevel.VERBOSE);
+      expect(channelApeClient.LogLevelName).to.equal('VERBOSE');
     });
   });
 
