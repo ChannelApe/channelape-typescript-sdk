@@ -24,7 +24,7 @@ export default class ChannelApeClient {
 
     this.sessionId = clientConfiguration.sessionId;
     this.endpoint = (clientConfiguration.endpoint == null) ? Environment.PRODUCTION : clientConfiguration.endpoint;
-    this.timeout = (clientConfiguration.timeout == null || clientConfiguration.timeout < 300)
+    this.timeout = (clientConfiguration.timeout == null || clientConfiguration.timeout < 2000)
       ? 180000 : clientConfiguration.timeout;
 
     const client = request.defaults({

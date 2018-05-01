@@ -23,11 +23,11 @@ describe('ChannelApe Client', () => {
     done();
   });
 
-  describe('Given client configuration with valid session ID And 300 millisecond timeout And Staging endpoint', () => {
+  describe('Given client configuration with valid session ID And 2000 millisecond timeout And Staging endpoint', () => {
     const expectedSessionId = 'c478c897-dc1c-4171-a207-9e3af9b23579';
     const channelApeClient = new ChannelApeClient({
       sessionId: expectedSessionId,
-      timeout: 300,
+      timeout: 2000,
       endpoint: Environment.STAGING
     });
 
@@ -38,8 +38,8 @@ describe('ChannelApe Client', () => {
     });
 
     context('When retrieving timeout', () => {
-      it('Then expect timeout of 300 milliseconds', () => {
-        expect(channelApeClient.Timeout).to.equal(300);
+      it('Then expect timeout of 2000 milliseconds', () => {
+        expect(channelApeClient.Timeout).to.equal(2000);
       });
     });
 
@@ -65,11 +65,11 @@ describe('ChannelApe Client', () => {
     });
   });
 
-  describe('Given client configuration with valid session ID And 299 millisecond timeout And Staging endpoint', () => {
+  describe('Given client configuration with valid session ID And 1999 millisecond timeout And Staging endpoint', () => {
     const expectedSessionId = 'c478c897-dc1c-4171-a207-9e3af9b23579';
     const channelApeClient = new ChannelApeClient({
       sessionId: expectedSessionId,
-      timeout: 299,
+      timeout: 1999,
       endpoint: Environment.STAGING
     });
 
