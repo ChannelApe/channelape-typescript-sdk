@@ -24,6 +24,25 @@ describe('ChannelApe Client', () => {
     done();
   });
 
+  describe('Given client configuration', () => {
+    it('Then expect client to be built with json set to true', () => {
+      const requestSpy : sinon.SinonSpy = sandbox.spy(request, 'defaults');
+      const channelApeClient = new ChannelApeClient({
+        sessionId: 'c478c897-dc1c-4171-a207-9e3af9b23579'
+      });
+      expect(requestSpy.args[0][0].json).to.equal(true);
+    });
+
+    it('Then expect client to be built with the "X-Channel-Ape-Authorization-Token" set to supplied session id', () => {
+      const requestSpy : sinon.SinonSpy = sandbox.spy(request, 'defaults');
+      const channelApeClient = new ChannelApeClient({
+        sessionId: 'c478c897-dc1c-4171-a207-9e3af9b23579'
+      });
+      expect(requestSpy.args[0][0]
+        .headers['X-Channel-Ape-Authorization-Token']).to.equal('c478c897-dc1c-4171-a207-9e3af9b23579');
+    });
+  });
+
   describe('Given client configuration with valid session ID And 2000 millisecond timeout And Staging endpoint', () => {
     const expectedSessionId = 'c478c897-dc1c-4171-a207-9e3af9b23579';
     const channelApeClient = new ChannelApeClient({
@@ -78,14 +97,6 @@ describe('ChannelApe Client', () => {
       it('Then expect default timeout of 3 minutes in milliseconds', () => {
         expect(channelApeClient.Timeout).to.equal(180000);
       });
-    });
-
-    it('then expect client to be built with json set to true', () => {
-      const requestSpy : sinon.SinonSpy = sandbox.spy(request, 'defaults');
-      const channelApeClient = new ChannelApeClient({
-        sessionId: 'c478c897-dc1c-4171-a207-9e3af9b23579'
-      });
-      expect(requestSpy.args[0][0].json).to.equal(true);
     });
   });
 
