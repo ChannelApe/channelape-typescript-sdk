@@ -1,6 +1,6 @@
-# ChannelApe TypeScript SDK
+# ChannelApe SDK
 
-TypeScript SDK for the [ChannelApe REST API](https://docs.channelape.io/)
+TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channelape.io/)
 
 | Service   | Develop | Master |
 |-----------|---------|--------|
