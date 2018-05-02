@@ -72,7 +72,7 @@ channelapeClient.actions().error(actionId)
 
 #### Update action health check
 ```typescript
-channelapeClient.actions().updateHealthcheck(actionId)
+channelapeClient.actions().updateHealthCheck(actionId)
   .then((action: Action) => {
     // do what you need to do with action data here
   });
