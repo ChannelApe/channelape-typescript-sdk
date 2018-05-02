@@ -1,0 +1,6 @@
+dist/
+.nyc_output/
+.sonarlint/
+node_modules/
+reports/
+\.env
