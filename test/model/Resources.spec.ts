@@ -8,4 +8,7 @@ describe('Resources', () => {
   it('ACTIONS', () => {
     expect(Resource.ACTIONS).to.equal('/actions');
   });
+  it('CHANNELS', () => {
+    expect(Resource.CHANNELS).to.equal('/channels');
+  });
 });

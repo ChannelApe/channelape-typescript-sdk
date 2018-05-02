@@ -6,16 +6,17 @@ import ActionsService from './actions/service/ActionsService';
 import Session from './sessions/model/Session';
 import Action from './actions/model/Action';
 import { Environment } from '.';
+import ChannelsService from './channels/service/ChannelsService';
 
 const INVALID_CONFIGURATION_ERROR_MESSAGE = 'Invalid configuration. sessionId is required.';
 export default class ChannelApeClient {
 
-  private readonly sessionsService: SessionsService;
-  private readonly actionsService: ActionsService;
   private readonly sessionId: string;
   private readonly timeout: number;
   private readonly endpoint: string;
-
+  private readonly sessionsService: SessionsService;
+  private readonly actionsService: ActionsService;
+  private readonly channelsService: ChannelsService;
 
   constructor(clientConfiguration: ClientConfiguration) {
     if (clientConfiguration.sessionId.length === 0) {
@@ -38,6 +39,7 @@ export default class ChannelApeClient {
 
     this.sessionsService = new SessionsService(client, this.sessionId);
     this.actionsService = new ActionsService(client);
+    this.channelsService = new ChannelsService(client);
   }
 
   get SessionId(): string {
@@ -51,13 +53,16 @@ export default class ChannelApeClient {
   get Endpoint(): string {
     return this.endpoint;
   }
-
+  
+  sessions(): SessionsService {
+    return this.sessionsService;
+  }
   actions(): ActionsService {
     return this.actionsService;
   }
 
-  sessions(): SessionsService {
-    return this.sessionsService;
+  channels(): ChannelsService {
+    return this.channelsService;
   }
 
 }

@@ -7,6 +7,7 @@ export default interface Action {
   businessId: string;
   description: string;
   healthCheckIntervalInSeconds: number;
-  lastHealthCheckTime: string;
-  startTime: string;
+  lastHealthCheckTime: Date;
+  startTime: Date;
+  endTime?: Date;
 }

@@ -11,32 +11,79 @@ TypeScript SDK for the [ChannelApe REST API](https://docs.channelape.io/)
 ## Features
 - [Getting Started](#getting-started)
 - [Sessions](#sessions)
+- [Actions](#actions)
+- [Channels](#channels)
 
 ### Getting Started
 
-Create the channel api client with your credentials.
+The ChannelApe SDK is asynchronous and all functions return promises.
+
+#### Creating a client
+
+Create a new instance of the ChannelApeClient with your sessionId.
 
 ```typescript
-const clientConfiguration = new ClientConfigurationBuilder()
-  .setUsername('johndoe123@test.com').setPassword('my_pass123#4').build();
-const channelApeClient = new ChannelApeClient(clientConfiguration);
+const channelApeClient = new ChannelApeClient({
+  sessionId: '4674b668-c4d2-4270-bf9b-ebaab78c378d'
+});
 ```
 
-or if you have your sessionId:
-```typescript
-const clientConfiguration = new ClientConfigurationBuilder()
-  .setSessionId('e7fecb82-61f7-498e-a358-aa21eb0cd5e8').build();
-const channelApeClient = new ChannelApeClient(clientConfiguration);
-```
-The channelape sdk is asynchronous and all functions return promises.
+#### Optional client configurations
+
+* timeout - Number of milliseconds to wait for the API to send response headers. Defaults to 180000 (3 minutes). Cannot be set lower than 2000 (2 seconds).
+* endpoint - Envrionment endpoint you would like to hit. Defaults to https://api.channelape.com
 
 ### Sessions
 
-A session is created when instantiating the client. It can be retrieved for later use.
+Retrieve session using sessionId passed into ChannelApeClient.
 
 ```typescript
-channelapeClient.getSession()
+channelapeClient.sessions().get()
   .then((session: Session) => {
     // do what you need to do with session data here
+  });
+```
+
+### Actions
+
+#### Get action
+```typescript
+channelapeClient.actions().get(actionId)
+  .then((action: Action) => {
+    // do what you need to do with action data here
+  });
+```
+
+#### Complete action
+```typescript
+channelapeClient.actions().complete(actionId)
+  .then((action: Action) => {
+    // do what you need to do with action data here
+  });
+```
+
+#### Update action with error
+```typescript
+channelapeClient.actions().error(actionId)
+  .then((action: Action) => {
+    // do what you need to do with action data here
+  });
+```
+
+#### Update action health check
+```typescript
+channelapeClient.actions().updateHealthcheck(actionId)
+  .then((action: Action) => {
+    // do what you need to do with action data here
+  });
+```
+
+### Channels
+
+#### Get channel
+```typescript
+channelapeClient.channels().get(channelId)
+  .then((channel: Channel) => {
+    // do what you need to do with channel data here
   });
 ```
