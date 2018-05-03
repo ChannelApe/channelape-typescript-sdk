@@ -16,7 +16,6 @@ export default class ChannelApeClient {
   private readonly timeout: number;
   private readonly endpoint: string;
   private readonly logLevel: LogLevel;
-  private readonly sessionsService: SessionsService;
   private readonly actionsService: ActionsService;
   private readonly channelsService: ChannelsService;
 
@@ -55,20 +54,16 @@ export default class ChannelApeClient {
     return this.endpoint;
   }
   
-  sessions(): SessionsService {
-    return this.sessionsService;
-
   get LogLevel(): LogLevel {
     return this.logLevel;
   }
-  actions(): ActionsService {
-    return this.actionsService;
+
+  get LogLevelName(): string {
+    return getLogLevelName(this.logLevel);
   }
 
   channels(): ChannelsService {
     return this.channelsService;
-  get LogLevelName(): string {
-    return getLogLevelName(this.logLevel);
   }
 
   actions(): ActionsService {
