@@ -1,20 +1,28 @@
 import LineItem from './LineItem';
 import Fulfillment from './Fulfillment';
+import AdditionalField from '../../model/AdditionalField';
+import OrderStatus from './OrderStatus';
+import Customer from './Customer';
+import ChannelApeError from '../../model/ChannelApeError';
 
 export default interface Order {
+  additionalFields: AdditionalField[];
   id: string;
   channelOrderId: string;
   channelId: string;
   businessId: string;
-  purchasedAt: string;
-  canceledAt: string;
-  canceledReason: string;
-  updatedAt: string;
-  createdAt: string;
-  status: string;
+  purchasedAt: Date;
+  canceledAt?: Date;
+  canceledReason?: string;
+  updatedAt: Date;
+  createdAt: Date;
+  customer: Customer;
+  errors: ChannelApeError[];
+  status: OrderStatus;
   totalPrice: number;
   subtotalPrice: number;
-  totalShippingTax: number;
+  totalShippingPrice: number;
+  totalShippingTax?: number;
   totalTax: number;
   totalGrams: number;
   alphabeticCurrencyCode: string;
