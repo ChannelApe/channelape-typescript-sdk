@@ -5,7 +5,6 @@
         "**/dist": true,
         "**/coverage": true
     },
-    "typescript.referencesCodeLens.enabled": true,
     "typescript.autoImportSuggestions.enabled": true,
     "typescript.reportStyleChecksAsWarnings": true,
     "tslint.ignoreDefinitionFiles": false,
