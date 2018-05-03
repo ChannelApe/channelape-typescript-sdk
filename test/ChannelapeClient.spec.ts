@@ -4,6 +4,7 @@ import ChannelApeClient from '../src/ChannelApeClient';
 import ClientConfiguration from '../src/model/ClientConfiguration';
 import SessionsService from '../src/sessions/service/SessionsService';
 import ActionsService from '../src/actions/service/ActionsService';
+import ChannelsService from '../src/channels/service/ChannelsService';
 import request = require('request');
 import Session from '../src/sessions/model/Session';
 import ChannelApeErrorResponse from '../src/model/ChannelApeErrorResponse';
@@ -11,7 +12,6 @@ import LogLevel from '../src/model/LogLevel';
 import Action from '../src/actions/model/Action';
 import Environment from '../src/model/Environment';
 
-const someEndpoint: string = 'https://some-api.channelape.com';
 describe('ChannelApe Client', () => {
 
   let sandbox: sinon.SinonSandbox;
@@ -146,9 +146,9 @@ describe('ChannelApe Client', () => {
         description: 'Encountered error during product pull for Europa Sports',
         healthCheckIntervalInSeconds: 300,
         id: 'a85d7463-a2f2-46ae-95a1-549e70ecb2ca',
-        lastHealthCheckTime: '2018-04-24T14:02:34.703Z',
+        lastHealthCheckTime: new Date('2018-04-24T14:02:34.703Z'),
         processingStatus: 'error',
-        startTime: '2018-04-24T14:02:34.703Z',
+        startTime: new Date('2018-04-24T14:02:34.703Z'),
         targetId: '1e4ebaa6-9796-4ccf-bd73-8765893a66bd',
         targetType: 'supplier'
       };
@@ -169,6 +169,34 @@ describe('ChannelApe Client', () => {
         expect(actualAction.startTime).to.equal(expectedAction.startTime);
         expect(actualAction.targetId).to.equal(expectedAction.targetId);
         expect(actualAction.targetType).to.equal(expectedAction.targetType);
+      });
+    });
+
+    it('When retrieving invalid channel Then return resolved promise with channel data', () => {
+      const channelId = 'c0eb01a0-bcd5-4dba-98fb-fd7f7993ecb2';
+      const expectedChannelApeErrorResponse : ChannelApeErrorResponse = {
+        statusCode: 404,
+        errors: [
+          { 
+            code: 70, 
+            message: 'Channel could not be found for business.' 
+          }
+        ]
+      };
+
+      const retrieveActionStub = sandbox.stub(ChannelsService.prototype, 'get')
+        .callsFake((channelId) => {
+          return Promise.reject(expectedChannelApeErrorResponse);
+        });
+
+      return channelApeClient.channels().get(channelId).then((actualResponse) => {
+        expect(actualResponse).to.be.undefined;
+      }).catch((error) => {
+        const actualChannelApeErrorResponse = error as ChannelApeErrorResponse;
+        expect(actualChannelApeErrorResponse.statusCode).to.equal(404);
+        expect(actualChannelApeErrorResponse.errors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
+        expect(actualChannelApeErrorResponse.errors[0].message)
+          .to.equal(expectedChannelApeErrorResponse.errors[0].message);
       });
     });
   });
