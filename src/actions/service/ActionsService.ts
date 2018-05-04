@@ -1,5 +1,3 @@
-
-
 import Action from '../model/Action';
 import request = require('request');
 import Resource from '../../model/Resource';
