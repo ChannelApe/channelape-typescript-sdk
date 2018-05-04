@@ -20,31 +20,31 @@ describe('Actions Service', () => {
 
     let sandbox: sinon.SinonSandbox;
 
-    const expectedErrorAction: Action = {
+    const expectedErrorAction = {
       action: 'PRODUCT_PULL',
       businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4',
       description: 'Encountered error during product pull for Europa Sports',
       healthCheckIntervalInSeconds: 300,
       id: 'a85d7463-a2f2-46ae-95a1-549e70ecb2ca',
-      lastHealthCheckTime: new Date('2018-04-24T14:02:34.703Z'),
+      lastHealthCheckTime: '2018-04-24T14:02:34.703Z',
       processingStatus: 'error',
-      startTime: new Date('2018-04-24T14:02:34.703Z'),
+      startTime: '2018-04-24T14:02:34.703Z',
       targetId: '1e4ebaa6-9796-4ccf-bd73-8765893a66bd',
       targetType: 'supplier'
     };
 
-    const expectedCompletedAction: Action = {
+    const expectedCompletedAction = {
       action: 'PRODUCT_PUSH',
       businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4',
       description: 'Completed product push for Custom Column Export',
       healthCheckIntervalInSeconds: 300,
       id: '4da63571-a4c5-4774-ae20-4fee24ab98e5',
-      lastHealthCheckTime: new Date('2018-05-01T14:47:58.018Z'),
+      lastHealthCheckTime: '2018-05-01T14:47:58.018Z',
       processingStatus: 'completed',
-      startTime: new Date('2018-05-01T14:47:55.905Z'),
+      startTime: '2018-05-01T14:47:55.905Z',
       targetId: '9c728601-0286-457d-b0d6-ec19292d4485',
       targetType: 'channel',
-      endTime: new Date('2018-05-01T14:47:58.018Z')
+      endTime: '2018-05-01T14:47:58.018Z'
     };
 
     const expectedChannelApeErrorResponse : ChannelApeErrorResponse = {
@@ -84,6 +84,7 @@ describe('Actions Service', () => {
       return actionsService.get(expectedErrorAction.id).then((actualAction) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedErrorAction.id}`);
         expectErrorAction(expectedErrorAction);
+        expect(actualAction.endTime).to.be.undefined;
       });
     });
 
@@ -135,6 +136,10 @@ describe('Actions Service', () => {
         expect(clientGetStub.args[0][0])
           .to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedCompletedAction.id}/${Subresource.HEALTH_CHECK}`);
         expectCompletedAction(actualAction);
+        expect(actualAction.endTime).not.to.be.undefined;
+        if (typeof actualAction.endTime === 'object') {
+          expect(actualAction.endTime.toISOString()).to.equal(actualAction.endTime.toISOString());
+        }
       });
     });
 
@@ -292,12 +297,12 @@ describe('Actions Service', () => {
       });
     });
 
-    function expectErrorAction(actualAction: Action) {
+    function expectErrorAction(actualAction: any) {
       expectAction(expectedErrorAction, actualAction);
       expect(actualAction.endTime).to.equal(undefined);
     }
 
-    function expectCompletedAction(actualAction: Action) {
+    function expectCompletedAction(actualAction: any) {
       expectAction(expectedCompletedAction, actualAction);
       if (actualAction.endTime == null) {
         expect(actualAction.endTime).to.not.equal(undefined);
@@ -307,7 +312,7 @@ describe('Actions Service', () => {
       }
     }
 
-    function expectAction(expectedAction: Action, actualAction: Action) {
+    function expectAction(expectedAction: any, actualAction: any) {
       expect(actualAction.action).to.equal(expectedAction.action);
       expect(actualAction.businessId).to.equal(expectedAction.businessId);
       expect(actualAction.description).to.equal(expectedAction.description);
