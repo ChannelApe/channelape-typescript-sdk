@@ -1,4 +1,5 @@
 import Order from '../model/Order';
+import OrdersResponse from '../model/OrdersResponse';
 import OrdersRequest from '../model/OrdersRequest';
 import OrdersRequestByBusinessId from '../model/OrdersRequestByBusinessId';
 import OrdersRequestByChannel from '../model/OrdersRequestByChannel';
@@ -23,7 +24,9 @@ export default class OrdersService {
     if (typeof orderIdOrRequest === 'string') {
       return this.getByOrderId(orderIdOrRequest);
     }
-    return this.getOrdersByRequest(orderIdOrRequest);
+    const deferred = Q.defer<Order[]>();
+    this.getOrdersByRequest(orderIdOrRequest, [], deferred);
+    return deferred.promise;
   }
 
   private getByOrderId(orderId: string): Q.Promise<Order> {
@@ -35,14 +38,14 @@ export default class OrdersService {
     return deferred.promise;
   }
 
-  private getOrdersByRequest(orderRequest: OrdersRequestByBusinessId | OrdersRequestByChannel): Q.Promise<Order[]> {
-    const deferred = Q.defer<Order[]>();
+  private getOrdersByRequest(ordersRequest: OrdersRequestByBusinessId | OrdersRequestByChannel |
+    OrdersRequestByChannelOrderId, orders: Order[], deferred: Q.Deferred<Order[]>): Q.Promise<Order[]> {
     const requestUrl = `/${Version.V1}${Resource.ORDERS}`;
     const options: request.CoreOptions = {
-      qs: orderRequest
+      qs: ordersRequest
     };
     this.client.get(requestUrl, options, (error, response, body) => {
-      this.mapOrdersPromise(deferred, error, response, body);
+      this.mapOrdersPromise(deferred, error, response, body, orders, ordersRequest);
     });
     return deferred.promise;
   }
@@ -60,12 +63,21 @@ export default class OrdersService {
     }
   }
 
-  private mapOrdersPromise(deferred: Q.Deferred<Order[]>, error: any, response: request.Response, body: any) {
+  private mapOrdersPromise(deferred: Q.Deferred<Order[]>, error: any, response: request.Response,
+    body: OrdersResponse | ChannelApeErrorResponse, orders: Order[], ordersRequest: OrdersRequestByBusinessId |
+      OrdersRequestByChannel | OrdersRequestByChannelOrderId) {
     if (error) {
       deferred.reject(error);
     } else if (response.statusCode === 200) {
-      const orders: Order[] = body.orders;
-      deferred.resolve(orders);
+      const data: OrdersResponse = body as OrdersResponse;
+      const ordersFromThisCall: Order[] = data.orders;
+      const mergedOrders: Order[] = orders.concat(ordersFromThisCall);
+      if (data.pagination.lastPage) {
+        deferred.resolve(mergedOrders);
+      } else {
+        ordersRequest.lastKey = data.pagination.lastKey;
+        this.getOrdersByRequest(ordersRequest, mergedOrders, deferred);
+      }
     } else {
       const channelApeErrorResponse = body as ChannelApeErrorResponse;
       channelApeErrorResponse.statusCode = response.statusCode;

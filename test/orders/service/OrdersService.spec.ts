@@ -90,7 +90,12 @@ describe('OrdersService', () => {
         statusCode: 200
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
-          .yields(null, response, { orders: [singleOrder] });
+          .yields(null, response, {
+            orders: [singleOrder],
+            pagination: {
+              lastPage: true
+            }
+          });
 
       const ordersService: OrdersService = new OrdersService(client);
       const channelOrderId = '314980073478';
@@ -108,13 +113,18 @@ describe('OrdersService', () => {
     });
 
     it(`And valid businessId 
-            When retrieving order Then return resolved promise with orders`, () => {
+            When retrieving orders Then return resolved promise with orders`, () => {
 
       const response = {
         statusCode: 200
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
-          .yields(null, response, { orders: multipleOrders });
+          .yields(null, response, { 
+            orders: multipleOrders,
+            pagination: {
+              lastPage: true
+            }
+          });
 
       const ordersService: OrdersService = new OrdersService(client);
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
@@ -124,6 +134,40 @@ describe('OrdersService', () => {
       return ordersService.get(requestOptions).then((actualOrders) => {
         expect(actualOrders).to.be.an('array');
         expect(actualOrders.length).to.equal(2);
+        expect(actualOrders[0].businessId).to.equal(businessId);
+      });
+    });
+
+    it(`And valid businessId with multiple pages of orders
+            When retrieving orders Then return resolved promise with all orders`, () => {
+
+      const response = {
+        statusCode: 200
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
+      clientGetStub.onFirstCall()
+        .yields(null, response, { 
+          orders: multipleOrders,
+          pagination: {
+            lastPage: false
+          }
+        });
+      clientGetStub.onSecondCall()
+        .yields(null, response, { 
+          orders: multipleOrders,
+          pagination: {
+            lastPage: true
+          }
+        });
+
+      const ordersService: OrdersService = new OrdersService(client);
+      const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
+      const requestOptions: OrdersRequestByBusinessId = {
+        businessId
+      };
+      return ordersService.get(requestOptions).then((actualOrders) => {
+        expect(actualOrders).to.be.an('array');
+        expect(actualOrders.length).to.equal(4);
         expect(actualOrders[0].businessId).to.equal(businessId);
       });
     });
