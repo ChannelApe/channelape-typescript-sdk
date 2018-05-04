@@ -10,7 +10,11 @@ import Session from '../src/sessions/model/Session';
 import ChannelApeErrorResponse from '../src/model/ChannelApeErrorResponse';
 import LogLevel from '../src/model/LogLevel';
 import Action from '../src/actions/model/Action';
+import Order from '../src/orders/model/Order';
 import Environment from '../src/model/Environment';
+import OrdersService from '../src/orders/service/OrdersService';
+
+import singleOrder from '../test/orders/resources/singleOrder';
 
 describe('ChannelApe Client', () => {
 
@@ -197,6 +201,20 @@ describe('ChannelApe Client', () => {
         expect(actualChannelApeErrorResponse.errors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
         expect(actualChannelApeErrorResponse.errors[0].message)
           .to.equal(expectedChannelApeErrorResponse.errors[0].message);
+      });
+    });
+
+    it('When retrieving order by valid orderId', () => {
+      const expectedOrder: Order = singleOrder;
+      const expectedOrderId = expectedOrder.id;
+
+      const retrieveActionStub = sandbox.stub(OrdersService.prototype, 'get')
+        .callsFake((expectedOrderId) => {
+          return Promise.resolve(expectedOrder);
+        });
+
+      return channelApeClient.orders().get(expectedOrder.id).then((actualOrder) => {
+        expect(actualOrder.id).to.equal(expectedOrderId);
       });
     });
   });

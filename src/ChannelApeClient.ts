@@ -8,6 +8,7 @@ import Action from './actions/model/Action';
 import LogLevel, { getLogLevelName } from './model/LogLevel';
 import { Environment } from '.';
 import ChannelsService from './channels/service/ChannelsService';
+import OrdersService from './orders/service/OrdersService';
 
 const INVALID_CONFIGURATION_ERROR_MESSAGE = 'Invalid configuration. sessionId is required.';
 export default class ChannelApeClient {
@@ -18,6 +19,7 @@ export default class ChannelApeClient {
   private readonly logLevel: LogLevel;
   private readonly actionsService: ActionsService;
   private readonly channelsService: ChannelsService;
+  private readonly ordersService: OrdersService;
 
   constructor(clientConfiguration: ClientConfiguration) {
     if (clientConfiguration.sessionId.length === 0) {
@@ -40,6 +42,7 @@ export default class ChannelApeClient {
     });
     this.actionsService = new ActionsService(client);
     this.channelsService = new ChannelsService(client);
+    this.ordersService = new OrdersService(client);
   }
 
   get SessionId(): string {
@@ -68,5 +71,9 @@ export default class ChannelApeClient {
 
   actions(): ActionsService {
     return this.actionsService;
+  }
+
+  orders(): OrdersService {
+    return this.ordersService;
   }
 }
