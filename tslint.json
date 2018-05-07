@@ -4,6 +4,7 @@
     "trailing-comma": false,
     "align": false,
     "max-line-length": [true, 120],
-    "strict": true
+    "strict": true,
+    "no-increment-decrement": false
   }
 }
