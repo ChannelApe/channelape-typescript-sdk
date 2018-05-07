@@ -14,6 +14,8 @@ import singleOrder from '../resources/singleOrder';
 import singleCancelledOrder from '../resources/singleCancelledOrder';
 import singleOrderWithNoLineItems from '../resources/singleOrderWithNoLineItems';
 import singleClosedOrderWithFulfillments from '../resources/singleClosedOrderWithFulfillments';
+import singleOrderToUpdate from '../resources/singleOrderToUpdate';
+import singleOrderToUpdateResponse from '../resources/singleOrderToUpdateResponse';
 import multipleOrders from '../resources/multipleOrders';
 import FulfillmentStatus from '../../../src/orders/model/FulfillmentStatus';
 
@@ -266,6 +268,36 @@ describe('OrdersService', () => {
       })
       .catch((e: ChannelApeErrorResponse) => {
         expect(e.errors).to.be.an('array');
+      });
+    });
+
+    it(`And valid order when updating said order
+          Then return updated order`, () => {
+      const order: Order = singleOrderToUpdate;
+      order.id = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      order.fulfillments.push({
+        additionalFields: [
+          {
+            name: 'some-addtl-field',
+            value: 'some-value'
+          }
+        ],
+        id: 'fulfillment-id',
+        lineItems: order.lineItems,
+        status: FulfillmentStatus.OPEN
+      });
+      const response = {
+        statusCode: 202
+      };
+      const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put')
+          .yields(null, response, singleOrderToUpdateResponse);
+      const ordersService: OrdersService = new OrdersService(client);
+      return ordersService.update(order).then((actualOrder) => {
+        expect(actualOrder.id).to.equal(order.id);
+        expect(actualOrder.fulfillments.length).to.equal(1);
+        expect(actualOrder.fulfillments[0].lineItems.length).to.equal(2);
+        expect(actualOrder.fulfillments[0].lineItems[0].sku).to.equal('b4809155-1c5d-4b3b-affc-491ad5503007');
+        expect(clientPutStub.args[0][0]).to.equal(`v1/orders/${order.id}`);
       });
     });
   });

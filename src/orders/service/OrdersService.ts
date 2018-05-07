@@ -40,6 +40,18 @@ export default class OrdersService {
     return deferred.promise;
   }
 
+  public update(order: Order): Q.Promise<Order> {
+    const deferred = Q.defer<Order>();
+    const requestUrl = `${Version.V1}${Resource.ORDERS}/${order.id}`;
+    const options: request.CoreOptions = {
+      body: order
+    };
+    this.client.put(requestUrl, options, (error, response, body) => {
+      this.mapOrderPromise(deferred, error, response, body, EXPECTED_UPDATE_STATUS);
+    });
+    return deferred.promise;
+  }
+
   private getByOrderId(orderId: string): Q.Promise<Order> {
     const deferred = Q.defer<Order>();
     const requestUrl = `/${Version.V1}${Resource.ORDERS}/${orderId}`;
