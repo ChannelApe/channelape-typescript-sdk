@@ -1,7 +1,8 @@
 enum FulfillmentStatus {
   OPEN = 'OPEN',
-  IN_PROGRESS = 'IN_PROGRESS',
-  CLOSED = 'CLOSED'
+  SUCCESS = 'SUCCESS',
+  CANCELED = 'CANCELED',
+  PENDING = 'PENDING'
 }
 
 export default FulfillmentStatus;

@@ -21,7 +21,7 @@ export default interface Order {
   status: OrderStatus;
   totalPrice: number;
   subtotalPrice: number;
-  totalShippingPrice: number;
+  totalShippingPrice?: number;
   totalShippingTax?: number;
   totalTax: number;
   totalGrams: number;

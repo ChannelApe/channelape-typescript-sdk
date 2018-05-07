@@ -5,9 +5,12 @@ export default interface LineItem {
   grams: number;
   id: string;
   price: number;
+  shippingPrice?: number;
+  shippingtax?: number;
   quantity: number;
   shippingMethod: string;
   sku: string;
+  upc?: string;
   title: string;
   vendor: string;
 }

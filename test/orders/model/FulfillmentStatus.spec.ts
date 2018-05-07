@@ -2,15 +2,19 @@ import FulfillmentStatus from '../../../src/orders/model/FulfillmentStatus';
 import { expect } from 'chai';
 
 describe('FulfillmentStatus', () => {
+  it('PENDING', () => {
+    expect(FulfillmentStatus.PENDING).to.equal('PENDING');
+  });
+
   it('OPEN', () => {
     expect(FulfillmentStatus.OPEN).to.equal('OPEN');
   });
 
-  it('IN_PROGRESS', () => {
-    expect(FulfillmentStatus.IN_PROGRESS).to.equal('IN_PROGRESS');
+  it('SUCCESS', () => {
+    expect(FulfillmentStatus.SUCCESS).to.equal('SUCCESS');
   });
 
-  it('CLOSED', () => {
-    expect(FulfillmentStatus.CLOSED).to.equal('CLOSED');
+  it('CANCELED', () => {
+    expect(FulfillmentStatus.CANCELED).to.equal('CANCELED');
   });
 });
