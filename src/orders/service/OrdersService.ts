@@ -5,6 +5,7 @@ import OrdersRequest from '../model/OrdersRequest';
 import OrdersRequestByBusinessId from '../model/OrdersRequestByBusinessId';
 import OrdersRequestByChannel from '../model/OrdersRequestByChannel';
 import OrdersRequestByChannelOrderId from '../model/OrdersRequestByChannelOrderId';
+import QueryUtils from '../../utils/QueryUtils';
 import Address from '../model/Address';
 import Customer from '../model/Customer';
 import LineItem from '../model/LineItem';
@@ -16,6 +17,9 @@ import Resource from '../../model/Resource';
 import Version from '../../model/Version';
 import ChannelApeErrorResponse from './../../model/ChannelApeErrorResponse';
 import * as Q from 'q';
+
+const EXPECTED_GET_STATUS: number = 200;
+const EXPECTED_UPDATE_STATUS: number = 202;
 
 export default class OrdersService {
 
@@ -40,7 +44,7 @@ export default class OrdersService {
     const deferred = Q.defer<Order>();
     const requestUrl = `/${Version.V1}${Resource.ORDERS}/${orderId}`;
     this.client.get(requestUrl, (error, response, body) => {
-      this.mapOrderPromise(deferred, error, response, body);
+      this.mapOrderPromise(deferred, error, response, body, EXPECTED_GET_STATUS);
     });
     return deferred.promise;
   }
@@ -48,19 +52,27 @@ export default class OrdersService {
   private getOrdersByRequest(ordersRequest: OrdersRequestByBusinessId | OrdersRequestByChannel |
     OrdersRequestByChannelOrderId, orders: Order[], deferred: Q.Deferred<Order[]>): Q.Promise<Order[]> {
     const requestUrl = `/${Version.V1}${Resource.ORDERS}`;
+    const ordersQueryParams = ordersRequest as any;
+    if (ordersRequest.startDate != null) {
+      ordersQueryParams.startDate = QueryUtils.getDateQueryParameter(ordersRequest.startDate);
+    }
+    if (ordersRequest.endDate != null) {
+      ordersQueryParams.endDate = QueryUtils.getDateQueryParameter(ordersRequest.endDate);
+    }
     const options: request.CoreOptions = {
       qs: ordersRequest
     };
     this.client.get(requestUrl, options, (error, response, body) => {
-      this.mapOrdersPromise(deferred, error, response, body, orders, ordersRequest);
+      this.mapOrdersPromise(deferred, error, response, body, orders, ordersRequest, EXPECTED_GET_STATUS);
     });
     return deferred.promise;
   }
 
-  private mapOrderPromise(deferred: Q.Deferred<Order>, error: any, response: request.Response, body: any) {
+  private mapOrderPromise(deferred: Q.Deferred<Order>, error: any, response: request.Response,
+    body: any, expectedStatusCode: number) {
     if (error) {
       deferred.reject(error);
-    } else if (response.statusCode === 200) {
+    } else if (response.statusCode === expectedStatusCode) {
       const order: Order = this.formatOrder(body);
       deferred.resolve(order);
     } else {
@@ -72,10 +84,10 @@ export default class OrdersService {
 
   private mapOrdersPromise(deferred: Q.Deferred<Order[]>, error: any, response: request.Response,
     body: OrdersResponse | ChannelApeErrorResponse, orders: Order[], ordersRequest: OrdersRequestByBusinessId |
-      OrdersRequestByChannel | OrdersRequestByChannelOrderId) {
+      OrdersRequestByChannel | OrdersRequestByChannelOrderId, expectedStatusCode: number) {
     if (error) {
       deferred.reject(error);
-    } else if (response.statusCode === 200) {
+    } else if (response.statusCode === expectedStatusCode) {
       const data: OrdersResponse = body as OrdersResponse;
       const ordersFromThisCall: Order[] = data.orders;
       const mergedOrders: Order[] = orders.concat(ordersFromThisCall);

@@ -15,6 +15,7 @@ import singleCancelledOrder from '../resources/singleCancelledOrder';
 import singleOrderWithNoLineItems from '../resources/singleOrderWithNoLineItems';
 import singleClosedOrderWithFulfillments from '../resources/singleClosedOrderWithFulfillments';
 import multipleOrders from '../resources/multipleOrders';
+import FulfillmentStatus from '../../../src/orders/model/FulfillmentStatus';
 
 describe('OrdersService', () => {
 
@@ -172,7 +173,7 @@ describe('OrdersService', () => {
       });
     });
 
-    it(`And valid businessId 
+    it(`And valid businessId, start date, and end date
             When retrieving orders Then return resolved promise with orders`, () => {
 
       const response = {
@@ -189,12 +190,16 @@ describe('OrdersService', () => {
       const ordersService: OrdersService = new OrdersService(client);
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestOptions: OrdersRequestByBusinessId = {
-        businessId
+        businessId,
+        startDate: new Date('2018-05-01T18:07:58.009Z'),
+        endDate: new Date('2018-05-07T18:07:58.009Z')
       };
       return ordersService.get(requestOptions).then((actualOrders) => {
         expect(actualOrders).to.be.an('array');
         expect(actualOrders.length).to.equal(2);
         expect(actualOrders[0].businessId).to.equal(businessId);
+        expect(clientGetStub.args[0][1].qs.startDate).to.equal('2018-05-01T18:07:58.009Z');
+        expect(clientGetStub.args[0][1].qs.endDate).to.equal('2018-05-07T18:07:58.009Z');
       });
     });
 
@@ -229,6 +234,8 @@ describe('OrdersService', () => {
         expect(actualOrders).to.be.an('array');
         expect(actualOrders.length).to.equal(4);
         expect(actualOrders[0].businessId).to.equal(businessId);
+        expect(typeof clientGetStub.args[0][1].qs.startDate).to.equal('undefined');
+        expect(typeof clientGetStub.args[0][1].qs.endDate).to.equal('undefined');
       });
     });
 

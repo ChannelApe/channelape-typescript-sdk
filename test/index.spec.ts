@@ -134,7 +134,7 @@ describe('Index', () => {
       additionalFields: [],
       id: 'id',
       lineItems: [],
-      status: ChannelApe.FulfillmentStatus.CLOSED
+      status: ChannelApe.FulfillmentStatus.SUCCESS
     };
     expect(fulfillment.id).to.equal('id');
   });
