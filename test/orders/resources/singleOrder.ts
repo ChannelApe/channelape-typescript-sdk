@@ -213,9 +213,9 @@ const singleOrder: Order = {
           value: 'manual'
         }
       ],
-      grams: '371',
+      grams: 371,
       id: '646495567878',
-      price: '12.99',
+      price: 12.99,
       quantity: 1,
       shippingMethod: 'Standard',
       sku: 'e67f1d90-824a-4941-8497-08d632763c93',
@@ -265,9 +265,9 @@ const singleOrder: Order = {
           value: 'manual'
         }
       ],
-      grams: '369',
+      grams: 369,
       id: '646495600646',
-      price: '12.99',
+      price: 12.99,
       quantity: 1,
       shippingMethod: 'Standard',
       sku: '27464759-a723-47bf-8d31-332cec285ead',

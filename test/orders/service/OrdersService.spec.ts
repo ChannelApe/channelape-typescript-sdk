@@ -11,6 +11,9 @@ import OrdersRequestByChannel from '../../../src/orders/model/OrdersRequestByCha
 import OrdersRequestByChannelOrderId from '../../../src/orders/model/OrdersRequestByChannelOrderId';
 
 import singleOrder from '../resources/singleOrder';
+import singleCancelledOrder from '../resources/singleCancelledOrder';
+import singleOrderWithNoLineItems from '../resources/singleOrderWithNoLineItems';
+import singleClosedOrderWithFulfillments from '../resources/singleClosedOrderWithFulfillments';
 import multipleOrders from '../resources/multipleOrders';
 
 describe('OrdersService', () => {
@@ -63,6 +66,63 @@ describe('OrdersService', () => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       return ordersService.get(orderId).then((actualOrder) => {
         expect(actualOrder.id).to.equal(orderId);
+        expect(typeof actualOrder.totalShippingTax).to.equal('undefined');
+        expect(typeof actualOrder.canceledAt).to.equal('undefined');
+      });
+    });
+
+    it(`And valid orderId for cancelled order
+          When retrieving order then return resolved promise with order and correct dates`, () => {
+      const response = {
+        statusCode: 200
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+        .yields(null, response, singleCancelledOrder);
+
+      const ordersService: OrdersService = new OrdersService(client);
+      const orderId = '06b70c49-a13e-42ca-a490-404d29c7fa46';
+      return ordersService.get(orderId).then((actualOrder) => {
+        expect(actualOrder.id).to.equal(orderId);
+        expect(actualOrder.totalShippingTax).to.equal(2);
+        expect(actualOrder.lineItems.length).to.equal(3);
+        expect(actualOrder.lineItems[0].price).to.equal(15.99);
+        if (typeof actualOrder.canceledAt !== 'undefined') {
+          expect(actualOrder.canceledAt.getDate()).to.equal(5);
+        }
+        expect(actualOrder.fulfillments.length).to.equal(0);
+      });
+    });
+
+    it(`And valid orderId for order with no line items or fulfillments
+          When retrieving order then return resolved promise with order and no line items or fulfillments`, () => {
+      const response = {
+        statusCode: 200
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+        .yields(null, response, singleOrderWithNoLineItems);
+
+      const ordersService: OrdersService = new OrdersService(client);
+      const orderId = '06b70c49-a13e-42ca-a490-404d29c7fa46';
+      return ordersService.get(orderId).then((actualOrder) => {
+        expect(actualOrder.lineItems.length).to.equal(0);
+        expect(actualOrder.fulfillments.length).to.equal(0);
+      });
+    });
+
+    it(`And valid orderId for closed order with fulfillment
+          When retrieving order then return resolved promise with closed order with fulfillment`, () => {
+      const response = {
+        statusCode: 200
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+        .yields(null, response, singleClosedOrderWithFulfillments);
+
+      const ordersService: OrdersService = new OrdersService(client);
+      const orderId = '9dc34b92-70d1-42d8-8b4e-ae7fb3deca70';
+      return ordersService.get(orderId).then((actualOrder) => {
+        expect(actualOrder.fulfillments.length).to.equal(1);
+        expect(actualOrder.fulfillments[0].lineItems.length).to.equal(6);
+        expect(actualOrder.fulfillments[0].lineItems[0].price).to.equal(15.91);
       });
     });
 

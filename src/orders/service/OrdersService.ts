@@ -1,9 +1,16 @@
 import Order from '../model/Order';
+import OrderStatus from '../model/OrderStatus';
 import OrdersResponse from '../model/OrdersResponse';
 import OrdersRequest from '../model/OrdersRequest';
 import OrdersRequestByBusinessId from '../model/OrdersRequestByBusinessId';
 import OrdersRequestByChannel from '../model/OrdersRequestByChannel';
 import OrdersRequestByChannelOrderId from '../model/OrdersRequestByChannelOrderId';
+import Address from '../model/Address';
+import Customer from '../model/Customer';
+import LineItem from '../model/LineItem';
+import Fulfillment from '../model/Fulfillment';
+import FulfillmentStatus from '../model/FulfillmentStatus';
+import AdditionalField from '../../model/AdditionalField';
 import request = require('request');
 import Resource from '../../model/Resource';
 import Version from '../../model/Version';
@@ -54,7 +61,7 @@ export default class OrdersService {
     if (error) {
       deferred.reject(error);
     } else if (response.statusCode === 200) {
-      const order: Order = body;
+      const order: Order = this.formatOrder(body);
       deferred.resolve(order);
     } else {
       const channelApeErrorResponse = body as ChannelApeErrorResponse;
@@ -73,7 +80,8 @@ export default class OrdersService {
       const ordersFromThisCall: Order[] = data.orders;
       const mergedOrders: Order[] = orders.concat(ordersFromThisCall);
       if (data.pagination.lastPage) {
-        deferred.resolve(mergedOrders);
+        const ordersToReturn = mergedOrders.map(o => this.formatOrder(o));
+        deferred.resolve(ordersToReturn);
       } else {
         ordersRequest.lastKey = data.pagination.lastKey;
         this.getOrdersByRequest(ordersRequest, mergedOrders, deferred);
@@ -83,5 +91,37 @@ export default class OrdersService {
       channelApeErrorResponse.statusCode = response.statusCode;
       deferred.reject(channelApeErrorResponse);
     }
+  }
+
+  private formatOrder(order: any): Order {
+    order.purchasedAt = new Date(order.purchasedAt);
+    if (typeof order.canceledAt !== 'undefined') {
+      order.canceledAt = new Date(order.canceledAt);
+    }
+    order.updatedAt = new Date(order.updatedAt);
+    order.createdAt = new Date(order.createdAt);
+    order.status = order.status as OrderStatus;
+    order.totalPrice = Number(order.totalPrice);
+    order.subtotalPrice = Number(order.subtotalPrice);
+    order.totalShippingPrice = Number(order.totalShippingPrice);
+    if (typeof order.totalShippingTax !== 'undefined') {
+      order.totalShippingTax = Number(order.totalShippingTax);
+    }
+    order.totalTax = Number(order.totalTax);
+    order.totalGrams = Number(order.totalGrams);
+    order.lineItems = order.lineItems.map(this.formatLineItem);
+    order.fulfillments = order.fulfillments.map((f: any) => this.formatFulfillment(f));
+    return order as Order;
+  }
+
+  private formatFulfillment(fulfillment: any): Fulfillment {
+    fulfillment.lineItems = fulfillment.lineItems.map(this.formatLineItem);
+    return fulfillment as Fulfillment;
+  }
+
+  private formatLineItem(lineItem: any): LineItem {
+    lineItem.grams = Number(lineItem.grams);
+    lineItem.price = Number(lineItem.price);
+    return lineItem as LineItem;
   }
 }

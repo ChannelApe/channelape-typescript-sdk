@@ -146,9 +146,9 @@ describe('Index', () => {
   it('Expect LineItem to be exported', () => {
     const lineItem: ChannelApe.LineItem = {
       additionalFields: [],
-      grams: '1',
+      grams: 1,
       id: 'id',
-      price: '100.44',
+      price: 100.44,
       quantity: 3,
       shippingMethod: 'some shipping method',
       sku: 'abc-123',
@@ -298,9 +298,9 @@ describe('Index', () => {
               value: 'manual'
             }
           ],
-          grams: '371',
+          grams: 371,
           id: '646495567878',
-          price: '12.99',
+          price: 12.99,
           quantity: 1,
           shippingMethod: 'Standard',
           sku: 'e67f1d90-824a-4941-8497-08d632763c93',

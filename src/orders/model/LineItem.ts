@@ -2,9 +2,9 @@ import AdditionalField from '../../model/AdditionalField';
 
 export default interface LineItem {
   additionalFields: AdditionalField[];
-  grams: string;
+  grams: number;
   id: string;
-  price: string;
+  price: number;
   quantity: number;
   shippingMethod: string;
   sku: string;

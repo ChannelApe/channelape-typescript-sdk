@@ -214,9 +214,9 @@ const multipleOrders: Order[] = [
             value: 'manual'
           }
         ],
-        grams: '371',
+        grams: 371,
         id: '646495567878',
-        price: '12.99',
+        price: 12.99,
         quantity: 1,
         shippingMethod: 'Standard',
         sku: 'e67f1d90-824a-4941-8497-08d632763c93',
@@ -266,9 +266,9 @@ const multipleOrders: Order[] = [
             value: 'manual'
           }
         ],
-        grams: '369',
+        grams: 369,
         id: '646495600646',
-        price: '12.99',
+        price: 12.99,
         quantity: 1,
         shippingMethod: 'Standard',
         sku: '27464759-a723-47bf-8d31-332cec285ead',
@@ -493,9 +493,9 @@ const multipleOrders: Order[] = [
             value: 'manual'
           }
         ],
-        grams: '371',
+        grams: 371,
         id: '646494846982',
-        price: '13.99',
+        price: 13.99,
         quantity: 1,
         shippingMethod: 'Standard',
         sku: 'f7a7674e-2469-4ef9-ad7c-597bd5493975',
@@ -549,9 +549,9 @@ const multipleOrders: Order[] = [
             value: 'manual'
           }
         ],
-        grams: '1474',
+        grams: 1474,
         id: '646494879750',
-        price: '48.00',
+        price: 48.00,
         quantity: 1,
         shippingMethod: 'Standard',
         sku: 'f57887b9-d113-4f64-921e-a938e17e41ec',
