@@ -13,4 +13,5 @@ export default interface Address {
   postalCode: string;
   provinceCode: string;
   province: string;
+  phone?: string;
 }
