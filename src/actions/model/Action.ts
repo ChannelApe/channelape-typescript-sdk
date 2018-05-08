@@ -1,7 +1,9 @@
+import ActionStatus from './ActionStatus';
+
 export default interface Action {
   id: string;
   action: string;
-  processingStatus: string;
+  processingStatus: ActionStatus;
   targetId: string;
   targetType: string;
   businessId: string;
