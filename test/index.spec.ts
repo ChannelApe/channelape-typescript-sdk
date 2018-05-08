@@ -29,12 +29,16 @@ describe('Index', () => {
       healthCheckIntervalInSeconds: 3000,
       id: 'id',
       lastHealthCheckTime: new Date(),
-      processingStatus: 'IN_PROGRESS',
+      processingStatus: ChannelApe.ActionStatus.IN_PROGRESS,
       startTime: new Date(),
       targetId: 'targetId',
       targetType: 'channel'
     };
     expect(action.id).to.equal('id');
+  });
+
+  it('Expect ActionStatus to be exported', () => {
+    expect(ChannelApe.ActionStatus).to.equal(ChannelApe.ActionStatus);
   });
 
   it('Expect ActionsRequest to be exported', () => {

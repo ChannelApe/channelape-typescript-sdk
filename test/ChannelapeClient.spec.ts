@@ -4,6 +4,7 @@ import ChannelApeClient from '../src/ChannelApeClient';
 import ClientConfiguration from '../src/model/ClientConfiguration';
 import SessionsService from '../src/sessions/service/SessionsService';
 import ActionsService from '../src/actions/service/ActionsService';
+import ActionStatus from '../src/actions/model/ActionStatus';
 import ChannelsService from '../src/channels/service/ChannelsService';
 import request = require('request');
 import Session from '../src/sessions/model/Session';
@@ -151,7 +152,7 @@ describe('ChannelApe Client', () => {
         healthCheckIntervalInSeconds: 300,
         id: 'a85d7463-a2f2-46ae-95a1-549e70ecb2ca',
         lastHealthCheckTime: new Date('2018-04-24T14:02:34.703Z'),
-        processingStatus: 'error',
+        processingStatus: ActionStatus.ERROR,
         startTime: new Date('2018-04-24T14:02:34.703Z'),
         targetId: '1e4ebaa6-9796-4ccf-bd73-8765893a66bd',
         targetType: 'supplier'
