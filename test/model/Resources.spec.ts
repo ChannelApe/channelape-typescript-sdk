@@ -11,4 +11,7 @@ describe('Resources', () => {
   it('CHANNELS', () => {
     expect(Resource.CHANNELS).to.equal('/channels');
   });
+  it('ORDERS', () => {
+    expect(Resource.ORDERS).to.equal('/orders');
+  });
 });
