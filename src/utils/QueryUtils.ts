@@ -1,5 +1,3 @@
-const pad = require('pad');
-
 export default class QueryUtils {
   public static getDateQueryParameter(date: Date): string {
     const year = date.getUTCFullYear();
@@ -13,6 +11,8 @@ export default class QueryUtils {
   }
 
   private static leftPad(value: string, length: number): string {
-    return pad(length, value, '0');
+    const str = '' + value;
+    const pad = [...Array(length)].map(v => '0').join('');
+    return pad.substring(0, pad.length - str.length) + str;
   }
 }
