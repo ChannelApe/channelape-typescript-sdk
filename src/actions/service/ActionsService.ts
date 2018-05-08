@@ -5,6 +5,7 @@ import Resource from '../../model/Resource';
 import Subresource from '../model/Subresource';
 import Version from '../../model/Version';
 import ChannelApeErrorResponse from './../../model/ChannelApeErrorResponse';
+import QueryUtils from '../../utils/QueryUtils';
 import * as Q from 'q';
 
 export default class ActionsService {
@@ -35,8 +36,15 @@ export default class ActionsService {
   private getByRequest(actionsRequest: ActionsRequest, actions: Action[],
     deferred: Q.Deferred<Action[]>): Q.Promise<Action[]> {
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}`;
+    const queryParams = actionsRequest as any;
+    if (typeof actionsRequest.startDate !== 'undefined' && typeof actionsRequest.startDate !== 'string') {
+      queryParams.startDate = QueryUtils.getDateQueryParameter(actionsRequest.startDate);
+    }
+    if (typeof actionsRequest.endDate !== 'undefined' && typeof actionsRequest.endDate !== 'string') {
+      queryParams.endDate = QueryUtils.getDateQueryParameter(actionsRequest.endDate);
+    }
     const options: request.CoreOptions = {
-      qs: actionsRequest
+      qs: queryParams
     };
     this.client.get(requestUrl, options, (error, response, body) => {
       this.mapActionsPromise(deferred, error, response, body, actions, actionsRequest);

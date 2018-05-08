@@ -301,7 +301,7 @@ describe('Actions Service', () => {
       });
     });
 
-    it(`And valid Business ID when calling getByBusinessId() Then expect multiple actions to be returned`, () => {
+    it(`And valid Business ID when calling get() Then expect multiple actions to be returned`, () => {
       const clientGetStub = sandbox.stub(client, 'get');
       const response = {
         statusCode: 200
@@ -311,13 +311,22 @@ describe('Actions Service', () => {
       clientGetStub.onSecondCall()
         .yields(null, response, actionsFinalPageResponse);
       const actionsRequest: ActionsRequest = {
-        businessId: '4d688534-d82e-4111-940c-322ba9aec108'
+        businessId: '4d688534-d82e-4111-940c-322ba9aec108',
+        startDate: new Date('2018-05-01T18:07:58.009Z'),
+        endDate: new Date('2018-05-07T18:07:58.009Z'),
+        size: 50
       };
       const actionsService: ActionsService = new ActionsService(client);
       return actionsService.get(actionsRequest).then((actualResponse) => {
         expect(actualResponse).to.be.an('array');
         expect(actualResponse.length).to.equal(73);
         expect(clientGetStub.args[0][0]).to.equal('/v1/actions');
+        expect(clientGetStub.args[0][1].qs.startDate).to.equal('2018-05-01T18:07:58.009Z');
+        expect(clientGetStub.args[0][1].qs.endDate).to.equal('2018-05-07T18:07:58.009Z');
+        expect(clientGetStub.args[0][1].qs.size).to.equal(50);
+        expect(clientGetStub.args[1][1].qs.startDate).to.equal('2018-05-01T18:07:58.009Z');
+        expect(clientGetStub.args[1][1].qs.endDate).to.equal('2018-05-07T18:07:58.009Z');
+        expect(clientGetStub.args[1][1].qs.size).to.equal(50);
       });
     });
 
