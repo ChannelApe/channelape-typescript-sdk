@@ -1,6 +1,6 @@
 import Action from '../model/Action';
 import ActionsRequest from '../model/ActionsRequest';
-import request = require('request');
+import * as request from 'request';
 import Resource from '../../model/Resource';
 import Subresource from '../model/Subresource';
 import Version from '../../model/Version';

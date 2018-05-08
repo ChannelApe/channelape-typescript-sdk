@@ -12,14 +12,14 @@ import LineItem from '../model/LineItem';
 import Fulfillment from '../model/Fulfillment';
 import FulfillmentStatus from '../model/FulfillmentStatus';
 import AdditionalField from '../../model/AdditionalField';
-import request = require('request');
+import * as request from 'request';
 import Resource from '../../model/Resource';
 import Version from '../../model/Version';
 import ChannelApeErrorResponse from './../../model/ChannelApeErrorResponse';
 import * as Q from 'q';
 
-const EXPECTED_GET_STATUS: number = 200;
-const EXPECTED_UPDATE_STATUS: number = 202;
+const EXPECTED_GET_STATUS = 200;
+const EXPECTED_UPDATE_STATUS = 202;
 
 export default class OrdersService {
 

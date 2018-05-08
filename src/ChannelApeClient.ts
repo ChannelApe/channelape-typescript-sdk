@@ -1,4 +1,4 @@
-import request = require('request');
+import * as request from 'request';
 import * as Q from 'q';
 import ClientConfiguration from './model/ClientConfiguration';
 import SessionsService from './sessions/service/SessionsService';
