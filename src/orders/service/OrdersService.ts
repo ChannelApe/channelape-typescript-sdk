@@ -65,10 +65,10 @@ export default class OrdersService {
     OrdersRequestByChannelOrderId, orders: Order[], deferred: Q.Deferred<Order[]>): Q.Promise<Order[]> {
     const requestUrl = `/${Version.V1}${Resource.ORDERS}`;
     const ordersQueryParams = ordersRequest as any;
-    if (ordersRequest.startDate != null) {
+    if (ordersRequest.startDate != null && typeof ordersRequest.startDate !== 'string') {
       ordersQueryParams.startDate = QueryUtils.getDateQueryParameter(ordersRequest.startDate);
     }
-    if (ordersRequest.endDate != null) {
+    if (ordersRequest.endDate != null && typeof ordersRequest.endDate !== 'string') {
       ordersQueryParams.endDate = QueryUtils.getDateQueryParameter(ordersRequest.endDate);
     }
     const options: request.CoreOptions = {
