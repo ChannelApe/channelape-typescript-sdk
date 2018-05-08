@@ -37,6 +37,17 @@ describe('Index', () => {
     expect(action.id).to.equal('id');
   });
 
+  it('Expect ActionsRequest to be exported', () => {
+    const actionsRequest: ChannelApe.ActionsRequest = {
+      businessId: 'businessId',
+      endDate: new Date(),
+      startDate: new Date(),
+      lastKey: 'lastKey',
+      size: 10
+    };
+    expect(actionsRequest.businessId).to.equal('businessId');
+  });
+
   it('Expect Channel to be exported', () => {
     const channel: ChannelApe.Channel = {
       businessId: 'businessId',

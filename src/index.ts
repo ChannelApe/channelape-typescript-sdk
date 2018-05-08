@@ -1,6 +1,7 @@
 export { default as ClientConfiguration } from './model/ClientConfiguration';
 export { default as Session } from './sessions/model/Session';
 export { default as Action } from './actions/model/Action';
+export { default as ActionsRequest } from './actions/model/ActionsRequest';
 export { default as Channel } from './channels/model/Channel';
 export { default as ChannelSettings } from './channels/model/ChannelSettings';
 export { default as Address } from './orders/model/Address';
