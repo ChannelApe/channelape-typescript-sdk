@@ -1,4 +1,5 @@
 import Action from '../model/Action';
+import ActionsRequest from '../model/ActionsRequest';
 import request = require('request');
 import Resource from '../../model/Resource';
 import Subresource from '../model/Subresource';
@@ -11,11 +12,34 @@ export default class ActionsService {
   constructor(private readonly client: request.RequestAPI<request.Request,
     request.CoreOptions, request.RequiredUriUrl>) { }
 
-  public get(actionId: string): Q.Promise<Action> {
+  public get(actionId: string): Q.Promise<Action>;
+  public get(actionsRequest: ActionsRequest): Q.Promise<Action[]>;
+  public get(actionIdOrRequest: string | ActionsRequest): Q.Promise<Action> | Q.Promise<Action[]> {
+    if (typeof actionIdOrRequest === 'string') {
+      return this.getByActionId(actionIdOrRequest);
+    }
+    const deferred = Q.defer<Action[]>();
+    this.getByRequest(actionIdOrRequest, [], deferred);
+    return deferred.promise;
+  }
+
+  private getByActionId(actionId: string): Q.Promise<Action> {
     const deferred = Q.defer<Action>();
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}/${actionId}`;
     this.client.get(requestUrl, (error, response, body) => {
-      this.mapPromise(deferred, error, response, body);
+      this.mapActionPromise(deferred, error, response, body);
+    });
+    return deferred.promise;
+  }
+
+  private getByRequest(actionsRequest: ActionsRequest, actions: Action[],
+    deferred: Q.Deferred<Action[]>): Q.Promise<Action[]> {
+    const requestUrl = `/${Version.V1}${Resource.ACTIONS}`;
+    const options: request.CoreOptions = {
+      qs: actionsRequest
+    };
+    this.client.get(requestUrl, options, (error, response, body) => {
+      this.mapActionsPromise(deferred, error, response, body, actions, actionsRequest);
     });
     return deferred.promise;
   }
@@ -24,7 +48,7 @@ export default class ActionsService {
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}/${actionId}/${Subresource.HEALTH_CHECK}`;
     const deferred = Q.defer<Action>();
     this.client.put(requestUrl, (error, response, body) => {
-      this.mapPromise(deferred, error, response, body);
+      this.mapActionPromise(deferred, error, response, body);
     });
     return deferred.promise;
   }
@@ -33,7 +57,7 @@ export default class ActionsService {
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}/${actionId}/${Subresource.COMPLETE}`;
     const deferred = Q.defer<Action>();
     this.client.put(requestUrl, (error, response, body) => {
-      this.mapPromise(deferred, error, response, body);
+      this.mapActionPromise(deferred, error, response, body);
     });
     return deferred.promise;
   }
@@ -42,26 +66,51 @@ export default class ActionsService {
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}/${actionId}/${Subresource.ERROR}`;
     const deferred = Q.defer<Action>();
     this.client.put(requestUrl, (error, response, body) => {
-      this.mapPromise(deferred, error, response, body);
+      this.mapActionPromise(deferred, error, response, body);
     });
     return deferred.promise;
   }
 
-  private mapPromise(deferred: Q.Deferred<Action>, error: any, response: request.Response, body: any) {
+  private mapActionPromise(deferred: Q.Deferred<Action>, error: any, response: request.Response, body: any) {
     if (error) {
       deferred.reject(error);
     } else if (response.statusCode === 200) {
-      const action = body as Action;
-      action.lastHealthCheckTime = new Date(body.lastHealthCheckTime);
-      action.startTime = new Date(body.startTime);
-      if (action.endTime != null) {
-        action.endTime = new Date(body.endTime);
-      }
+      const action = this.formatAction(body);
       deferred.resolve(action);
     } else {
       const channelApeErrorResponse = body as ChannelApeErrorResponse;
       channelApeErrorResponse.statusCode = response.statusCode;
       deferred.reject(channelApeErrorResponse);
     }
+  }
+
+  private mapActionsPromise(deferred: Q.Deferred<Action[]>, error: any, response: request.Response, body: any,
+    actions: Action[], actionsRequest: ActionsRequest) {
+    if (error) {
+      deferred.reject(error);
+    } else if (response.statusCode === 200) {
+      const actionsFromThisCall: Action[] = body.actions.map(this.formatAction);
+      const mergedActions: Action[] = actions.concat(actionsFromThisCall);
+      if (body.pagination.lastPage) {
+        deferred.resolve(mergedActions);
+      } else {
+        actionsRequest.lastKey = body.pagination.lastKey;
+        this.getByRequest(actionsRequest, mergedActions, deferred);
+      }
+    } else {
+      const channelApeErrorResponse = body as ChannelApeErrorResponse;
+      channelApeErrorResponse.statusCode = response.statusCode;
+      deferred.reject(channelApeErrorResponse);
+    }
+  }
+
+  private formatAction(actionBody: any): Action {
+    const action: Action = actionBody as Action;
+    action.lastHealthCheckTime = new Date(actionBody.lastHealthCheckTime);
+    action.startTime = new Date(actionBody.startTime);
+    if (action.endTime != null) {
+      action.endTime = new Date(actionBody.endTime);
+    }
+    return action;
   }
 }

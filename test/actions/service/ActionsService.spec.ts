@@ -2,12 +2,16 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 import request = require('request');
 import ActionsService from './../../../src/actions/service/ActionsService';
+import ActionsRequest from '../../../src/actions/model/ActionsRequest';
 import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
 import Subresource from '../../../src/actions/model/Subresource';
 import Environment from '../../../src/model/Environment';
 import ChannelApeErrorResponse from '../../../src/model/ChannelApeErrorResponse';
 import Action from '../../../src/actions/model/Action';
+
+import actionsFirstPageResponse from '../resources/actionsFirstPageResponse';
+import actionsFinalPageResponse from '../resources/actionsFinalPageResponse';
 
 describe('Actions Service', () => {
 
@@ -294,6 +298,68 @@ describe('Actions Service', () => {
         expect(clientGetStub.args[0][0])
           .to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedErrorAction.id}/${Subresource.ERROR}`);
         expectChannelApeErrorResponse(e);
+      });
+    });
+
+    it(`And valid Business ID when calling getByBusinessId() Then expect multiple actions to be returned`, () => {
+      const clientGetStub = sandbox.stub(client, 'get');
+      const response = {
+        statusCode: 200
+      };
+      clientGetStub.onFirstCall()
+        .yields(null, response, actionsFirstPageResponse);
+      clientGetStub.onSecondCall()
+        .yields(null, response, actionsFinalPageResponse);
+      const actionsRequest: ActionsRequest = {
+        businessId: '4d688534-d82e-4111-940c-322ba9aec108'
+      };
+      const actionsService: ActionsService = new ActionsService(client);
+      return actionsService.get(actionsRequest).then((actualResponse) => {
+        expect(actualResponse).to.be.an('array');
+        expect(actualResponse.length).to.equal(73);
+        expect(clientGetStub.args[0][0]).to.equal('/v1/actions');
+      });
+    });
+
+    it(`And invalid Business ID when calling getByBusinessId() Then expect ChannelApeError to be returned`, () => {
+      const clientGetStub = sandbox.stub(client, 'get');
+      const response = {
+        statusCode: 404
+      };
+      clientGetStub.yields(null, response, {
+        errors: [{
+          code: 15,
+          message: 'Requested business cannot be found.'
+        }]
+      });
+      const actionsRequest: ActionsRequest = {
+        businessId: 'not-a-real-business-id'
+      };
+      const actionsService: ActionsService = new ActionsService(client);
+      return actionsService.get(actionsRequest).then((actualResponse) => {
+        throw new Error('Expected ChannelApeError');
+      })
+      .catch((e: ChannelApeErrorResponse) => {
+        expect(e.errors[0].code).to.equal(15);
+        expect(e.errors[0].message).to.equal('Requested business cannot be found.');
+      });
+    });
+
+    it(`And there is a request error Then expect an error to be returned`, () => {
+      const clientGetStub = sandbox.stub(client, 'get');
+      const response = {
+        statusCode: 500
+      };
+      clientGetStub.yields(new Error('server went away'), response, null);
+      const actionsRequest: ActionsRequest = {
+        businessId: 'real-business-id'
+      };
+      const actionsService: ActionsService = new ActionsService(client);
+      return actionsService.get(actionsRequest).then((actualResponse) => {
+        throw new Error('Expected ChannelApeError');
+      })
+      .catch((e) => {
+        expect(e.message).to.equal('server went away');
       });
     });
 
