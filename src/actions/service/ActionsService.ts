@@ -13,28 +13,28 @@ export default class ActionsService {
   constructor(private readonly client: request.RequestAPI<request.Request,
     request.CoreOptions, request.RequiredUriUrl>) { }
 
-  public get(actionId: string): Q.Promise<Action>;
-  public get(actionsRequest: ActionsRequest): Q.Promise<Action[]>;
-  public get(actionIdOrRequest: string | ActionsRequest): Q.Promise<Action> | Q.Promise<Action[]> {
+  public get(actionId: string): Promise<Action>;
+  public get(actionsRequest: ActionsRequest): Promise<Action[]>;
+  public get(actionIdOrRequest: string | ActionsRequest): Promise<Action> | Promise<Action[]> {
     if (typeof actionIdOrRequest === 'string') {
       return this.getByActionId(actionIdOrRequest);
     }
     const deferred = Q.defer<Action[]>();
     this.getByRequest(actionIdOrRequest, [], deferred);
-    return deferred.promise;
+    return deferred.promise as any;
   }
 
-  private getByActionId(actionId: string): Q.Promise<Action> {
+  private getByActionId(actionId: string): Promise<Action> {
     const deferred = Q.defer<Action>();
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}/${actionId}`;
     this.client.get(requestUrl, (error, response, body) => {
       this.mapActionPromise(deferred, error, response, body);
     });
-    return deferred.promise;
+    return deferred.promise as any;
   }
 
   private getByRequest(actionsRequest: ActionsRequest, actions: Action[],
-    deferred: Q.Deferred<Action[]>): Q.Promise<Action[]> {
+    deferred: Q.Deferred<Action[]>): Promise<Action[]> {
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}`;
     const queryParams = actionsRequest as any;
     if (typeof actionsRequest.startDate !== 'undefined' && typeof actionsRequest.startDate !== 'string') {
@@ -49,34 +49,34 @@ export default class ActionsService {
     this.client.get(requestUrl, options, (error, response, body) => {
       this.mapActionsPromise(deferred, error, response, body, actions, actionsRequest);
     });
-    return deferred.promise;
+    return deferred.promise as any;
   }
 
-  public updateHealthCheck(actionId: string): Q.Promise<Action> {
+  public updateHealthCheck(actionId: string): Promise<Action> {
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}/${actionId}/${Subresource.HEALTH_CHECK}`;
     const deferred = Q.defer<Action>();
     this.client.put(requestUrl, (error, response, body) => {
       this.mapActionPromise(deferred, error, response, body);
     });
-    return deferred.promise;
+    return deferred.promise as any;
   }
 
-  public complete(actionId: string): Q.Promise<Action> {
+  public complete(actionId: string): Promise<Action> {
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}/${actionId}/${Subresource.COMPLETE}`;
     const deferred = Q.defer<Action>();
     this.client.put(requestUrl, (error, response, body) => {
       this.mapActionPromise(deferred, error, response, body);
     });
-    return deferred.promise;
+    return deferred.promise as any;
   }
 
-  public error(actionId: string): Q.Promise<Action> {
+  public error(actionId: string): Promise<Action> {
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}/${actionId}/${Subresource.ERROR}`;
     const deferred = Q.defer<Action>();
     this.client.put(requestUrl, (error, response, body) => {
       this.mapActionPromise(deferred, error, response, body);
     });
-    return deferred.promise;
+    return deferred.promise as any;
   }
 
   private mapActionPromise(deferred: Q.Deferred<Action>, error: any, response: request.Response, body: any) {

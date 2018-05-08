@@ -26,21 +26,21 @@ export default class OrdersService {
   constructor(private readonly client: request.RequestAPI<request.Request,
     request.CoreOptions, request.RequiredUriUrl>) { }
 
-  public get(orderId: string): Q.Promise<Order>;
-  public get(ordersRequestByBusinessId: OrdersRequestByBusinessId): Q.Promise<Order[]>;
-  public get(ordersRequestByChannel: OrdersRequestByChannel): Q.Promise<Order[]>;
-  public get(ordersRequestByChannelOrderId: OrdersRequestByChannelOrderId): Q.Promise<Order[]>;
+  public get(orderId: string): Promise<Order>;
+  public get(ordersRequestByBusinessId: OrdersRequestByBusinessId): Promise<Order[]>;
+  public get(ordersRequestByChannel: OrdersRequestByChannel): Promise<Order[]>;
+  public get(ordersRequestByChannelOrderId: OrdersRequestByChannelOrderId): Promise<Order[]>;
   public get(orderIdOrRequest: string | OrdersRequestByBusinessId | OrdersRequestByChannel |
-    OrdersRequestByChannelOrderId): Q.Promise<Order> | Q.Promise<Order[]> {
+    OrdersRequestByChannelOrderId): Promise<Order> | Promise<Order[]> {
     if (typeof orderIdOrRequest === 'string') {
       return this.getByOrderId(orderIdOrRequest);
     }
     const deferred = Q.defer<Order[]>();
     this.getOrdersByRequest(orderIdOrRequest, [], deferred);
-    return deferred.promise;
+    return deferred.promise as any;
   }
 
-  public update(order: Order): Q.Promise<Order> {
+  public update(order: Order): Promise<Order> {
     const deferred = Q.defer<Order>();
     const requestUrl = `${Version.V1}${Resource.ORDERS}/${order.id}`;
     const options: request.CoreOptions = {
@@ -49,20 +49,20 @@ export default class OrdersService {
     this.client.put(requestUrl, options, (error, response, body) => {
       this.mapOrderPromise(deferred, error, response, body, EXPECTED_UPDATE_STATUS);
     });
-    return deferred.promise;
+    return deferred.promise as any;
   }
 
-  private getByOrderId(orderId: string): Q.Promise<Order> {
+  private getByOrderId(orderId: string): Promise<Order> {
     const deferred = Q.defer<Order>();
     const requestUrl = `/${Version.V1}${Resource.ORDERS}/${orderId}`;
     this.client.get(requestUrl, (error, response, body) => {
       this.mapOrderPromise(deferred, error, response, body, EXPECTED_GET_STATUS);
     });
-    return deferred.promise;
+    return deferred.promise as any;
   }
 
   private getOrdersByRequest(ordersRequest: OrdersRequestByBusinessId | OrdersRequestByChannel |
-    OrdersRequestByChannelOrderId, orders: Order[], deferred: Q.Deferred<Order[]>): Q.Promise<Order[]> {
+    OrdersRequestByChannelOrderId, orders: Order[], deferred: Q.Deferred<Order[]>): Promise<Order[]> {
     const requestUrl = `/${Version.V1}${Resource.ORDERS}`;
     const ordersQueryParams = ordersRequest as any;
     if (ordersRequest.startDate != null && typeof ordersRequest.startDate !== 'string') {
@@ -77,7 +77,7 @@ export default class OrdersService {
     this.client.get(requestUrl, options, (error, response, body) => {
       this.mapOrdersPromise(deferred, error, response, body, orders, ordersRequest, EXPECTED_GET_STATUS);
     });
-    return deferred.promise;
+    return deferred.promise as any;
   }
 
   private mapOrderPromise(deferred: Q.Deferred<Order>, error: any, response: request.Response,
