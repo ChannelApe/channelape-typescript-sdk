@@ -9,6 +9,8 @@ import OrdersRequest from '../../../src/orders/model/OrdersRequest';
 import OrdersRequestByBusinessId from '../../../src/orders/model/OrdersRequestByBusinessId';
 import OrdersRequestByChannel from '../../../src/orders/model/OrdersRequestByChannel';
 import OrdersRequestByChannelOrderId from '../../../src/orders/model/OrdersRequestByChannelOrderId';
+import FulfillmentStatus from '../../../src/orders/model/FulfillmentStatus';
+import RequestClientWrapper from '../../../src/RequestClientWrapper';
 
 import singleOrder from '../resources/singleOrder';
 import singleCancelledOrder from '../resources/singleCancelledOrder';
@@ -17,19 +19,21 @@ import singleClosedOrderWithFulfillments from '../resources/singleClosedOrderWit
 import singleOrderToUpdate from '../resources/singleOrderToUpdate';
 import singleOrderToUpdateResponse from '../resources/singleOrderToUpdateResponse';
 import multipleOrders from '../resources/multipleOrders';
-import FulfillmentStatus from '../../../src/orders/model/FulfillmentStatus';
 
 describe('OrdersService', () => {
 
   describe('Given some rest client', () => {
-    const client = request.defaults({
-      baseUrl: Environment.STAGING,
-      timeout: 60000,
-      json: true,
-      headers: {
-        'X-Channel-Ape-Authorization-Token': 'valid-session-id'
-      }
-    });
+    const client: RequestClientWrapper =
+      new RequestClientWrapper(
+        request.defaults({
+          baseUrl: Environment.STAGING,
+          timeout: 60000, 
+          json: true,
+          headers: {
+            'X-Channel-Ape-Authorization-Token': 'valid-session-id'
+          }
+        })
+      );
 
     let sandbox: sinon.SinonSandbox;
 
@@ -303,14 +307,17 @@ describe('OrdersService', () => {
   });
 
   describe('Given some invalid rest client', () => {
-    const client = request.defaults({
-      baseUrl: 'this-is-not-a-real-base-url',
-      timeout: 60000,
-      json: true,
-      headers: {
-        'X-Channel-Ape-Authorization-Token': 'some-session-id'
-      }
-    });
+    const client: RequestClientWrapper =
+    new RequestClientWrapper(
+      request.defaults({
+        baseUrl: 'this-is-not-a-real-base-url',
+        timeout: 60000, 
+        json: true,
+        headers: {
+          'X-Channel-Ape-Authorization-Token': 'valid-session-id'
+        }
+      })
+    );
 
     it(`And invalid orderId 
             When retrieving order Then return rejected promise with ChannelApeError`, () => {

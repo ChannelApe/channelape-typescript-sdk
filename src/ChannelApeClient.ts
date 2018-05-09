@@ -1,5 +1,6 @@
 import * as request from 'request';
 import * as Q from 'q';
+import RequestClientWrapper from './RequestClientWrapper';
 import ClientConfiguration from './model/ClientConfiguration';
 import SessionsService from './sessions/service/SessionsService';
 import ActionsService from './actions/service/ActionsService';
@@ -17,6 +18,7 @@ export default class ChannelApeClient {
   private readonly timeout: number;
   private readonly endpoint: string;
   private readonly logLevel: LogLevel;
+  private readonly requestClientWrapper: RequestClientWrapper;
   private readonly actionsService: ActionsService;
   private readonly channelsService: ChannelsService;
   private readonly ordersService: OrdersService;
@@ -40,9 +42,10 @@ export default class ChannelApeClient {
         'X-Channel-Ape-Authorization-Token': this.sessionId
       }
     });
-    this.actionsService = new ActionsService(client);
-    this.channelsService = new ChannelsService(client);
-    this.ordersService = new OrdersService(client);
+    this.requestClientWrapper = new RequestClientWrapper(client);
+    this.actionsService = new ActionsService(this.requestClientWrapper);
+    this.channelsService = new ChannelsService(this.requestClientWrapper);
+    this.ordersService = new OrdersService(this.requestClientWrapper);
   }
 
   get SessionId(): string {

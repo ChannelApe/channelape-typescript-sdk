@@ -9,6 +9,7 @@ import Subresource from '../../../src/actions/model/Subresource';
 import Environment from '../../../src/model/Environment';
 import ChannelApeErrorResponse from '../../../src/model/ChannelApeErrorResponse';
 import Action from '../../../src/actions/model/Action';
+import RequestClientWrapper from '../../../src/RequestClientWrapper';
 
 import actionsFirstPageResponse from '../resources/actionsFirstPageResponse';
 import actionsFinalPageResponse from '../resources/actionsFinalPageResponse';
@@ -16,11 +17,14 @@ import actionsFinalPageResponse from '../resources/actionsFinalPageResponse';
 describe('Actions Service', () => {
 
   describe('Given some rest client', () => {
-    const client = request.defaults({
-      baseUrl: Environment.STAGING,
-      timeout: 60000,
-      json: true
-    });
+    const client: RequestClientWrapper =
+      new RequestClientWrapper(
+        request.defaults({
+          baseUrl: Environment.STAGING,
+          timeout: 60000, 
+          json: true
+        })
+      );
 
     let sandbox: sinon.SinonSandbox;
 

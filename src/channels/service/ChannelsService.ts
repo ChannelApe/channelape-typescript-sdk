@@ -3,12 +3,12 @@ import Resource from '../../model/Resource';
 import Channel from '../model/Channel';
 import Version from '../../model/Version';
 import ChannelApeErrorResponse from './../../model/ChannelApeErrorResponse';
+import RequestClientWrapper from '../../RequestClientWrapper';
 import * as Q from 'q';
 
 export default class ChannelsService {
 
-  constructor(private readonly client: request.RequestAPI<request.Request, 
-    request.CoreOptions, request.RequiredUriUrl>) { }
+  constructor(private readonly client: RequestClientWrapper) { }
 
   public get(channelId: string): Q.Promise<Channel> {
     const deferred = Q.defer<Channel>();

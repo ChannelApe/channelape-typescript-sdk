@@ -12,6 +12,7 @@ import LineItem from '../model/LineItem';
 import Fulfillment from '../model/Fulfillment';
 import FulfillmentStatus from '../model/FulfillmentStatus';
 import AdditionalField from '../../model/AdditionalField';
+import RequestClientWrapper from '../../RequestClientWrapper';
 import * as request from 'request';
 import Resource from '../../model/Resource';
 import Version from '../../model/Version';
@@ -23,8 +24,7 @@ const EXPECTED_UPDATE_STATUS = 202;
 
 export default class OrdersService {
 
-  constructor(private readonly client: request.RequestAPI<request.Request,
-    request.CoreOptions, request.RequiredUriUrl>) { }
+  constructor(private readonly client: RequestClientWrapper) { }
 
   public get(orderId: string): Promise<Order>;
   public get(ordersRequestByBusinessId: OrdersRequestByBusinessId): Promise<Order[]>;

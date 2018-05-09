@@ -6,12 +6,12 @@ import Subresource from '../model/Subresource';
 import Version from '../../model/Version';
 import ChannelApeErrorResponse from './../../model/ChannelApeErrorResponse';
 import QueryUtils from '../../utils/QueryUtils';
+import RequestClientWrapper from '../../RequestClientWrapper';
 import * as Q from 'q';
 
 export default class ActionsService {
 
-  constructor(private readonly client: request.RequestAPI<request.Request,
-    request.CoreOptions, request.RequiredUriUrl>) { }
+  constructor(private readonly client: RequestClientWrapper) { }
 
   public get(actionId: string): Promise<Action>;
   public get(actionsRequest: ActionsRequest): Promise<Action[]>;

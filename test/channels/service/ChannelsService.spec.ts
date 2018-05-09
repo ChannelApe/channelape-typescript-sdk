@@ -8,15 +8,19 @@ import Subresource from '../../../src/actions/model/Subresource';
 import Environment from '../../../src/model/Environment';
 import ChannelApeErrorResponse from '../../../src/model/ChannelApeErrorResponse';
 import Channel from '../../../src/channels/model/Channel';
+import RequestClientWrapper from '../../../src/RequestClientWrapper';
 
 describe('Channels Service', () => {
 
   describe('Given some rest client', () => {
-    const client = request.defaults({
-      baseUrl: Environment.STAGING,
-      timeout: 60000,
-      json: true
-    });
+    const client: RequestClientWrapper =
+      new RequestClientWrapper(
+        request.defaults({
+          baseUrl: Environment.STAGING,
+          timeout: 60000, 
+          json: true
+        })
+      );
 
     let sandbox: sinon.SinonSandbox;
 
