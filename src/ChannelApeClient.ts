@@ -6,7 +6,7 @@ import SessionsService from './sessions/service/SessionsService';
 import ActionsService from './actions/service/ActionsService';
 import Session from './sessions/model/Session';
 import Action from './actions/model/Action';
-import LogLevel, { getLogLevelName } from './model/LogLevel';
+import LogLevel from './model/LogLevel';
 import { Environment } from '.';
 import ChannelsService from './channels/service/ChannelsService';
 import OrdersService from './orders/service/OrdersService';
@@ -42,7 +42,7 @@ export default class ChannelApeClient {
         'X-Channel-Ape-Authorization-Token': this.sessionId
       }
     });
-    this.requestClientWrapper = new RequestClientWrapper(client);
+    this.requestClientWrapper = new RequestClientWrapper(client, this.logLevel);
     this.actionsService = new ActionsService(this.requestClientWrapper);
     this.channelsService = new ChannelsService(this.requestClientWrapper);
     this.ordersService = new OrdersService(this.requestClientWrapper);
@@ -62,10 +62,6 @@ export default class ChannelApeClient {
   
   get LogLevel(): LogLevel {
     return this.logLevel;
-  }
-
-  get LogLevelName(): string {
-    return getLogLevelName(this.logLevel);
   }
 
   channels(): ChannelsService {
