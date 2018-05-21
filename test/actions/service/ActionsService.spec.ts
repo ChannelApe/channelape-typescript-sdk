@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import request = require('request');
+import * as request from 'request';
+import LogLevel from '../../../src/model/LogLevel';
 import ActionsService from './../../../src/actions/service/ActionsService';
 import ActionsRequest from '../../../src/actions/model/ActionsRequest';
 import Version from '../../../src/model/Version';
@@ -23,7 +24,8 @@ describe('Actions Service', () => {
           baseUrl: Environment.STAGING,
           timeout: 60000, 
           json: true
-        })
+        }),
+        LogLevel.OFF
       );
 
     let sandbox: sinon.SinonSandbox;

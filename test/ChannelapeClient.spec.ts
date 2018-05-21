@@ -55,7 +55,7 @@ describe('ChannelApe Client', () => {
         sessionId: 'c478c897-dc1c-4171-a207-9e3af9b23579'
       });
       expect(channelApeClient.LogLevel).to.equal(LogLevel.OFF);
-      expect(channelApeClient.LogLevelName).to.equal('OFF');
+      expect(channelApeClient.LogLevel).to.equal('off');
     });
   });
 
@@ -66,7 +66,7 @@ describe('ChannelApe Client', () => {
         logLevel: LogLevel.VERBOSE
       });
       expect(channelApeClient.LogLevel).to.equal(LogLevel.VERBOSE);
-      expect(channelApeClient.LogLevelName).to.equal('VERBOSE');
+      expect(channelApeClient.LogLevel).to.equal('verbose');
     });
   });
 

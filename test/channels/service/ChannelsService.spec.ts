@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import request = require('request');
+import * as request from 'request';
+import LogLevel from '../../../src/model/LogLevel';
 import ChannelsService from './../../../src/channels/service/ChannelsService';
 import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
@@ -19,7 +20,8 @@ describe('Channels Service', () => {
           baseUrl: Environment.STAGING,
           timeout: 60000, 
           json: true
-        })
+        }),
+        LogLevel.OFF
       );
 
     let sandbox: sinon.SinonSandbox;

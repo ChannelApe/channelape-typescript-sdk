@@ -2,7 +2,8 @@ import OrdersService from './../../../src/orders/service/OrdersService';
 import * as sinon from 'sinon';
 import Order from '../../../src/orders/model/Order';
 import { expect } from 'chai';
-import request = require('request');
+import * as request from 'request';
+import LogLevel from '../../../src/model/LogLevel';
 import Environment from '../../../src/model/Environment';
 import ChannelApeErrorResponse from '../../../src/model/ChannelApeErrorResponse';
 import OrdersRequest from '../../../src/orders/model/OrdersRequest';
@@ -23,17 +24,16 @@ import multipleOrders from '../resources/multipleOrders';
 describe('OrdersService', () => {
 
   describe('Given some rest client', () => {
-    const client: RequestClientWrapper =
-      new RequestClientWrapper(
-        request.defaults({
-          baseUrl: Environment.STAGING,
-          timeout: 60000, 
-          json: true,
-          headers: {
-            'X-Channel-Ape-Authorization-Token': 'valid-session-id'
-          }
-        })
-      );
+    const client = request.defaults({
+      baseUrl: Environment.STAGING,
+      timeout: 60000, 
+      json: true,
+      headers: {
+        'X-Channel-Ape-Authorization-Token': 'valid-session-id'
+      }
+    });
+    const clientWrapper: RequestClientWrapper =
+      new RequestClientWrapper(client, LogLevel.OFF);
 
     let sandbox: sinon.SinonSandbox;
 
@@ -69,7 +69,7 @@ describe('OrdersService', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
           .yields(null, response, singleOrder);
 
-      const ordersService: OrdersService = new OrdersService(client);
+      const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       return ordersService.get(orderId).then((actualOrder) => {
         expect(actualOrder.id).to.equal(orderId);
@@ -86,7 +86,7 @@ describe('OrdersService', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
         .yields(null, response, singleCancelledOrder);
 
-      const ordersService: OrdersService = new OrdersService(client);
+      const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = '06b70c49-a13e-42ca-a490-404d29c7fa46';
       return ordersService.get(orderId).then((actualOrder) => {
         expect(actualOrder.id).to.equal(orderId);
@@ -108,7 +108,7 @@ describe('OrdersService', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
         .yields(null, response, singleOrderWithNoLineItems);
 
-      const ordersService: OrdersService = new OrdersService(client);
+      const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = '06b70c49-a13e-42ca-a490-404d29c7fa46';
       return ordersService.get(orderId).then((actualOrder) => {
         expect(actualOrder.lineItems.length).to.equal(0);
@@ -124,7 +124,7 @@ describe('OrdersService', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
         .yields(null, response, singleClosedOrderWithFulfillments);
 
-      const ordersService: OrdersService = new OrdersService(client);
+      const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = '9dc34b92-70d1-42d8-8b4e-ae7fb3deca70';
       return ordersService.get(orderId).then((actualOrder) => {
         expect(actualOrder.fulfillments.length).to.equal(1);
@@ -141,7 +141,7 @@ describe('OrdersService', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
           .yields(null, response, expectedChannelApeErrorResponse);
 
-      const ordersService: OrdersService = new OrdersService(client);
+      const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = 'not-a-real-order-id';
       return ordersService.get(orderId).then((actualOrder) => {
         throw new Error('Test failed!');
@@ -164,7 +164,7 @@ describe('OrdersService', () => {
             }
           });
 
-      const ordersService: OrdersService = new OrdersService(client);
+      const ordersService: OrdersService = new OrdersService(clientWrapper);
       const channelOrderId = '314980073478';
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestOptions: OrdersRequestByChannelOrderId = {
@@ -193,7 +193,7 @@ describe('OrdersService', () => {
             }
           });
 
-      const ordersService: OrdersService = new OrdersService(client);
+      const ordersService: OrdersService = new OrdersService(clientWrapper);
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestOptions: OrdersRequestByBusinessId = {
         businessId,
@@ -231,7 +231,7 @@ describe('OrdersService', () => {
           }
         });
 
-      const ordersService: OrdersService = new OrdersService(client);
+      const ordersService: OrdersService = new OrdersService(clientWrapper);
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestOptions: OrdersRequestByBusinessId = {
         businessId
@@ -262,7 +262,7 @@ describe('OrdersService', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
           .yields(null, response, expectedChannelApeBusinessNotFoundError);
 
-      const ordersService: OrdersService = new OrdersService(client);
+      const ordersService: OrdersService = new OrdersService(clientWrapper);
       const businessId = 'not-a-real-business-id';
       const requestOptions: OrdersRequestByBusinessId = {
         businessId
@@ -295,7 +295,7 @@ describe('OrdersService', () => {
       };
       const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put')
           .yields(null, response, singleOrderToUpdateResponse);
-      const ordersService: OrdersService = new OrdersService(client);
+      const ordersService: OrdersService = new OrdersService(clientWrapper);
       return ordersService.update(order).then((actualOrder) => {
         expect(actualOrder.id).to.equal(order.id);
         expect(actualOrder.fulfillments.length).to.equal(1);
@@ -316,7 +316,8 @@ describe('OrdersService', () => {
         headers: {
           'X-Channel-Ape-Authorization-Token': 'valid-session-id'
         }
-      })
+      }),
+      LogLevel.OFF
     );
 
     it(`And invalid orderId 
