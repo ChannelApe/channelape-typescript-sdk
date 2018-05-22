@@ -113,6 +113,7 @@ describe('OrdersService', () => {
       return ordersService.get(orderId).then((actualOrder) => {
         expect(actualOrder.lineItems.length).to.equal(1);
         expect(actualOrder.fulfillments.length).to.equal(1);
+        expect(clientGetStub.args[0][0]).to.equal(`/v1/orders/${orderId}`);
       });
     });
 
