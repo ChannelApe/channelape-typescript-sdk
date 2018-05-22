@@ -101,8 +101,7 @@ export default class OrdersService {
       deferred.reject(error);
     } else if (response.statusCode === expectedStatusCode) {
       const data: OrdersResponse = body as OrdersResponse;
-      const ordersFromThisCall: Order[] = data.orders;
-      const mergedOrders: Order[] = orders.concat(ordersFromThisCall);
+      const mergedOrders: Order[] = orders.concat(data.orders);
       if (data.pagination.lastPage) {
         const ordersToReturn = mergedOrders.map(o => this.formatOrder(o));
         deferred.resolve(ordersToReturn);
