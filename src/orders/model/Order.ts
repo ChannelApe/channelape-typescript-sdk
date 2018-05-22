@@ -17,7 +17,6 @@ export default interface Order {
   updatedAt: Date;
   createdAt: Date;
   customer: Customer;
-  errors: ChannelApeError[];
   status: OrderStatus;
   totalPrice: number;
   subtotalPrice: number;
