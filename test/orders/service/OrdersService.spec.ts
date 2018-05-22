@@ -16,7 +16,7 @@ import Resource from '../../../src/model/Resource';
 import Version from '../../../src/model/Version';
 
 import singleOrder from '../resources/singleOrder';
-import singleCancelledOrder from '../resources/singleCancelledOrder';
+import singleCanceledOrder from '../resources/singleCanceledOrder';
 import singleOrderWithOneLineItemAndOneFulfillment from '../resources/singleOrderWithOneLineItemAndOneFulfillment';
 import singleClosedOrderWithFulfillments from '../resources/singleClosedOrderWithFulfillments';
 import singleOrderToUpdate from '../resources/singleOrderToUpdate';
@@ -87,7 +87,7 @@ describe('OrdersService', () => {
         statusCode: 200
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
-        .yields(null, response, singleCancelledOrder);
+        .yields(null, response, singleCanceledOrder);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = '06b70c49-a13e-42ca-a490-404d29c7fa46';
