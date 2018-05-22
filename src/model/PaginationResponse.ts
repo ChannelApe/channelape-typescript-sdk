@@ -1,6 +1,6 @@
 export default interface PaginationResponse {
-  lastKey: string;
+  lastKey?: string;
   lastPage: boolean;
-  nextPageRef: string;
+  nextPageRef?: string;
   pageSize: number;
 }
