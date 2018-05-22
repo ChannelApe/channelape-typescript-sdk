@@ -162,7 +162,6 @@ const singleOrder: Order = {
       provinceCode: 'KS'
     }
   },
-  errors: [],
   fulfillments: [],
   id: 'c0f45529-cbed-4e90-9a38-c208d409ef2a',
   lineItems: [
