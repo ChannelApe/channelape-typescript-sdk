@@ -17,11 +17,14 @@ import OrdersService from '../src/orders/service/OrdersService';
 
 import singleOrder from '../test/orders/resources/singleOrder';
 
+let requestSpy: sinon.SinonSpy;
+
 describe('ChannelApe Client', () => {
 
   let sandbox: sinon.SinonSandbox;
   beforeEach((done) => {
     sandbox = sinon.sandbox.create();
+    requestSpy = sandbox.spy(request, 'defaults');
     done();
   });
 
@@ -32,20 +35,18 @@ describe('ChannelApe Client', () => {
 
   describe('Given client configuration', () => {
     it('Then expect client to be built with json set to true', () => {
-      const requestSpy : sinon.SinonSpy = sandbox.spy(request, 'defaults');
       const channelApeClient = new ChannelApeClient({
         sessionId: 'c478c897-dc1c-4171-a207-9e3af9b23579'
       });
       expect(requestSpy.args[0][0].json).to.equal(true);
+      expectRequestDefaults(requestSpy);
     });
 
     it('Then expect client to be built with the "X-Channel-Ape-Authorization-Token" set to supplied session id', () => {
-      const requestSpy : sinon.SinonSpy = sandbox.spy(request, 'defaults');
       const channelApeClient = new ChannelApeClient({
         sessionId: 'c478c897-dc1c-4171-a207-9e3af9b23579'
       });
-      expect(requestSpy.args[0][0]
-        .headers['X-Channel-Ape-Authorization-Token']).to.equal('c478c897-dc1c-4171-a207-9e3af9b23579');
+      expectRequestDefaults(requestSpy);
     });
   });
 
@@ -56,6 +57,7 @@ describe('ChannelApe Client', () => {
       });
       expect(channelApeClient.LogLevel).to.equal(LogLevel.OFF);
       expect(channelApeClient.LogLevel).to.equal('off');
+      expectRequestDefaults(requestSpy);
     });
   });
 
@@ -67,6 +69,7 @@ describe('ChannelApe Client', () => {
       });
       expect(channelApeClient.LogLevel).to.equal(LogLevel.VERBOSE);
       expect(channelApeClient.LogLevel).to.equal('verbose');
+      expectRequestDefaults(requestSpy);
     });
   });
 
@@ -209,7 +212,7 @@ describe('ChannelApe Client', () => {
       const expectedOrder: Order = singleOrder;
       const expectedOrderId = expectedOrder.id;
 
-      const retrieveActionStub = sandbox.stub(OrdersService.prototype, 'get')
+      const retrieveOrderStub = sandbox.stub(OrdersService.prototype, 'get')
         .callsFake((expectedOrderId) => {
           return Promise.resolve(expectedOrder);
         });
@@ -234,3 +237,8 @@ describe('ChannelApe Client', () => {
   });
 
 });
+
+function expectRequestDefaults(requestSpy: sinon.SinonSpy) {
+  expect(requestSpy.args[0][0]
+    .headers['X-Channel-Ape-Authorization-Token']).to.equal('c478c897-dc1c-4171-a207-9e3af9b23579');
+}
