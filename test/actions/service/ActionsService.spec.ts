@@ -307,7 +307,7 @@ describe('Actions Service', () => {
       });
     });
 
-    it(`And valid Business ID when calling get() Then expect multiple actions to be returned`, () => {
+    it(`And valid Business ID When retrieving actions Then expect multiple actions to be returned`, () => {
       const clientGetStub = sandbox.stub(client, 'get');
       const response = {
         statusCode: 200
