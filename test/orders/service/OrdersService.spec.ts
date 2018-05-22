@@ -6,10 +6,10 @@ import * as request from 'request';
 import LogLevel from '../../../src/model/LogLevel';
 import Environment from '../../../src/model/Environment';
 import ChannelApeErrorResponse from '../../../src/model/ChannelApeErrorResponse';
-import OrdersRequest from '../../../src/orders/model/OrdersRequest';
-import OrdersRequestByBusinessId from '../../../src/orders/model/OrdersRequestByBusinessId';
-import OrdersRequestByChannel from '../../../src/orders/model/OrdersRequestByChannel';
-import OrdersRequestByChannelOrderId from '../../../src/orders/model/OrdersRequestByChannelOrderId';
+import OrdersQueryRequest from '../../../src/orders/model/OrdersQueryRequest';
+import OrdersQueryRequestByBusinessId from '../../../src/orders/model/OrdersQueryRequestByBusinessId';
+import OrdersQueryRequestByChannel from '../../../src/orders/model/OrdersQueryRequestByChannel';
+import OrdersQueryRequestByChannelOrderId from '../../../src/orders/model/OrdersQueryRequestByChannelOrderId';
 import FulfillmentStatus from '../../../src/orders/model/FulfillmentStatus';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import Orders from '../../../src/orders/model/Orders';
@@ -175,7 +175,7 @@ describe('OrdersService', () => {
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const channelOrderId = '314980073478';
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
-      const requestOptions: OrdersRequestByChannelOrderId = {
+      const requestOptions: OrdersQueryRequestByChannelOrderId = {
         businessId,
         channelOrderId
       };
@@ -204,7 +204,7 @@ describe('OrdersService', () => {
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
-      const requestOptions: OrdersRequestByBusinessId = {
+      const requestOptions: OrdersQueryRequestByBusinessId = {
         businessId,
         startDate: new Date('2018-05-01T18:07:58.009Z'),
         endDate: new Date('2018-05-07T18:07:58.009Z')
@@ -243,7 +243,7 @@ describe('OrdersService', () => {
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
-      const requestOptions: OrdersRequestByBusinessId = {
+      const requestOptions: OrdersQueryRequestByBusinessId = {
         businessId
       };
       return ordersService.get(requestOptions).then((actualOrders) => {
@@ -314,7 +314,7 @@ describe('OrdersService', () => {
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const businessId = 'not-a-real-business-id';
-      const requestOptions: OrdersRequestByBusinessId = {
+      const requestOptions: OrdersQueryRequestByBusinessId = {
         businessId
       };
       return ordersService.get(requestOptions).then((actualOrders) => {
@@ -390,7 +390,7 @@ describe('OrdersService', () => {
       
       const ordersService: OrdersService = new OrdersService(client);
       const businessId = 'not-a-real-business-id';
-      const requestOptions: OrdersRequestByBusinessId = {
+      const requestOptions: OrdersQueryRequestByBusinessId = {
         businessId
       };
       return ordersService.get(requestOptions).then((actualOrders) => {

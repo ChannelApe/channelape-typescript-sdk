@@ -174,7 +174,7 @@ describe('Index', () => {
   });
 
   it('Expect OrdersRequestByBusinessId to be exported', () => {
-    const ordersRequestByBusinessId: ChannelApe.OrdersRequestByBusinessId = {
+    const ordersRequestByBusinessId: ChannelApe.OrdersQueryRequestByBusinessId = {
       businessId: 'businessId',
       endDate: new Date(),
       lastKey: 'some last key',
@@ -186,7 +186,7 @@ describe('Index', () => {
   });
 
   it('Expect OrdersRequestByChannel to be exported', () => {
-    const ordersRequestByChannel: ChannelApe.OrdersRequestByChannel = {
+    const ordersRequestByChannel: ChannelApe.OrdersQueryRequestByChannel = {
       channelId: 'channelId',
       endDate: new Date(),
       lastKey: 'some last key',
@@ -198,14 +198,9 @@ describe('Index', () => {
   });
 
   it('Expect OrdersRequestByChannelOrderId to be exported', () => {
-    const ordersRequestByChannelOrderId: ChannelApe.OrdersRequestByChannelOrderId = {
+    const ordersRequestByChannelOrderId: ChannelApe.OrdersQueryRequestByChannelOrderId = {
       businessId: 'businessId',
-      channelOrderId: 'channelOrderId',
-      endDate: new Date(),
-      lastKey: 'some last key',
-      size: 100,
-      startDate: new Date(),
-      status: ChannelApe.OrderStatus.OPEN
+      channelOrderId: 'channelOrderId'
     };
     expect(ordersRequestByChannelOrderId.channelOrderId).to.equal('channelOrderId');
   });

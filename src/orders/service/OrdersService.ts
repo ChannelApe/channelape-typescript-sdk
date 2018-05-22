@@ -1,10 +1,10 @@
 import Order from '../model/Order';
 import OrderStatus from '../model/OrderStatus';
 import Orders from '../model/Orders';
-import OrdersRequest from '../model/OrdersRequest';
-import OrdersRequestByBusinessId from '../model/OrdersRequestByBusinessId';
-import OrdersRequestByChannel from '../model/OrdersRequestByChannel';
-import OrdersRequestByChannelOrderId from '../model/OrdersRequestByChannelOrderId';
+import OrdersQueryRequest from '../model/OrdersQueryRequest';
+import OrdersQueryRequestByBusinessId from '../model/OrdersQueryRequestByBusinessId';
+import OrdersQueryRequestByChannel from '../model/OrdersQueryRequestByChannel';
+import OrdersQueryRequestByChannelOrderId from '../model/OrdersQueryRequestByChannelOrderId';
 import SinglePageRequest from '../../../src/model/SinglePageRequest';
 import Address from '../model/Address';
 import Customer from '../model/Customer';
@@ -28,21 +28,21 @@ export default class OrdersService {
 
   public get(orderId: string):
     Promise<Order>;
-  public get(ordersRequestByBusinessId: OrdersRequestByBusinessId):
+  public get(ordersRequestByBusinessId: OrdersQueryRequestByBusinessId):
     Promise<Order[]>;
-  public get(ordersRequestByChannel: OrdersRequestByChannel):
+  public get(ordersRequestByChannel: OrdersQueryRequestByChannel):
     Promise<Order[]>;
-  public get(ordersRequestByChannelOrderId: OrdersRequestByChannelOrderId):
+  public get(ordersRequestByChannelOrderId: OrdersQueryRequestByChannelOrderId):
     Promise<Order[]>;
-  public get(ordersPageRequestByBusinessId: OrdersRequestByBusinessId & SinglePageRequest):
+  public get(ordersPageRequestByBusinessId: OrdersQueryRequestByBusinessId & SinglePageRequest):
     Promise<Orders>;
-  public get(ordersPageRequestByChannel: OrdersRequestByChannel & SinglePageRequest):
+  public get(ordersPageRequestByChannel: OrdersQueryRequestByChannel & SinglePageRequest):
     Promise<Orders>;
-  public get(ordersPageRequestByChannelOrderId: OrdersRequestByChannelOrderId & SinglePageRequest):
+  public get(ordersPageRequestByChannelOrderId: OrdersQueryRequestByChannelOrderId & SinglePageRequest):
     Promise<Orders>;
-  public get(orderIdOrRequest: string | OrdersRequestByBusinessId | OrdersRequestByChannel |
-    OrdersRequestByChannelOrderId | OrdersRequestByBusinessId & SinglePageRequest |
-    OrdersRequestByChannel & SinglePageRequest | OrdersRequestByChannelOrderId & SinglePageRequest
+  public get(orderIdOrRequest: string | OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel |
+    OrdersQueryRequestByChannelOrderId | OrdersQueryRequestByBusinessId & SinglePageRequest |
+    OrdersQueryRequestByChannel & SinglePageRequest | OrdersQueryRequestByChannelOrderId & SinglePageRequest
   ): Promise<Order> | Promise<Order[]> | Promise<Orders> {
     if (typeof orderIdOrRequest === 'string') {
       return this.getByOrderId(orderIdOrRequest);
@@ -73,8 +73,8 @@ export default class OrdersService {
     return deferred.promise as any;
   }
 
-  private getOrdersByRequest(ordersRequest: OrdersRequestByBusinessId | OrdersRequestByChannel |
-    OrdersRequestByChannelOrderId, orders: Order[],
+  private getOrdersByRequest(ordersRequest: OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel |
+    OrdersQueryRequestByChannelOrderId, orders: Order[],
     deferred: Q.Deferred<Order[] | Orders>): Promise<Order[]> {
     const requestUrl = `/${Version.V1}${Resource.ORDERS}`;
     const ordersQueryParams = ordersRequest as any;
@@ -109,10 +109,10 @@ export default class OrdersService {
 
   private mapOrdersPromise(deferred: Q.Deferred<Order[] | Orders>,
     error: any, response: request.Response,
-    body: Orders | ChannelApeErrorResponse, orders: Order[], ordersRequest: OrdersRequestByBusinessId |
-      OrdersRequestByChannel | OrdersRequestByChannelOrderId | (OrdersRequestByBusinessId & SinglePageRequest) |
-      (OrdersRequestByChannel & SinglePageRequest) |
-      (OrdersRequestByChannelOrderId & SinglePageRequest), expectedStatusCode: number) {
+    body: Orders | ChannelApeErrorResponse, orders: Order[], ordersRequest: OrdersQueryRequestByBusinessId |
+      OrdersQueryRequestByChannel | OrdersQueryRequestByChannelOrderId |
+      (OrdersQueryRequestByBusinessId & SinglePageRequest) | (OrdersQueryRequestByChannel & SinglePageRequest) |
+      (OrdersQueryRequestByChannelOrderId & SinglePageRequest), expectedStatusCode: number) {
     if (error) {
       deferred.reject(error);
     } else if (response.statusCode === expectedStatusCode) {
@@ -127,7 +127,6 @@ export default class OrdersService {
         const ordersToReturn = mergedOrders.map(o => this.formatOrder(o));
         deferred.resolve(ordersToReturn);
       } else {
-        ordersRequest.lastKey = data.pagination.lastKey;
         this.getOrdersByRequest(ordersRequest, mergedOrders, deferred);
       }
     } else {

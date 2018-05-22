@@ -1,4 +1,4 @@
-export default interface PaginationRequest {
+export default interface PaginationQueryRequest {
   size?: number;
   startDate?: Date;
   endDate?: Date;
