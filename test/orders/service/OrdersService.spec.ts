@@ -12,6 +12,8 @@ import OrdersRequestByChannel from '../../../src/orders/model/OrdersRequestByCha
 import OrdersRequestByChannelOrderId from '../../../src/orders/model/OrdersRequestByChannelOrderId';
 import FulfillmentStatus from '../../../src/orders/model/FulfillmentStatus';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
+import OrdersResponse from '../../../src/orders/model/OrdersResponse';
+import SinglePageRequest from '../../../src/model/SinglePageRequest';
 import Resource from '../../../src/model/Resource';
 import Version from '../../../src/model/Version';
 
@@ -251,6 +253,44 @@ describe('OrdersService', () => {
         expect(typeof clientGetStub.args[0][1].qs.startDate).to.equal('undefined');
         expect(typeof clientGetStub.args[0][1].qs.endDate).to.equal('undefined');
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}/orders`);
+      });
+    });
+
+    it(`And valid businessId with multiple pages of orders
+        and the singlePage option set to true
+            When retrieving orders 
+            Then return resolved promise with a single page of orders`, () => {
+
+      const response = {
+        statusCode: 200
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
+      clientGetStub.onFirstCall()
+        .yields(null, response, { 
+          orders: multipleOrders,
+          pagination: {
+            lastPage: false
+          }
+        });
+
+      const ordersService: OrdersService = new OrdersService(clientWrapper);
+      const expectedBusinessId = '4d688534-d82e-4111-940c-322ba9aec108';
+      // TODO: Uncomment the following and replace the parameter in the following get with the requestOptions
+      // variable. You will see that TS complains. It is calling the wrong overload.
+      // const requestOptions: OrdersRequestByBusinessId & SinglePageRequest = {
+      //   businessId: expectedBusinessId,
+      //   singlePage: true
+      // };
+      return ordersService.get({
+        businessId: expectedBusinessId,
+        singlePage: true
+      }).then((actualOrdersResponse) => {
+        expect(actualOrdersResponse.orders.length).to.equal(2);
+        expect(actualOrdersResponse.orders[0].businessId).to.equal(expectedBusinessId);
+        expect(typeof clientGetStub.args[0][1].qs.startDate).to.equal('undefined');
+        expect(typeof clientGetStub.args[0][1].qs.endDate).to.equal('undefined');
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}/orders`);
+        expect(clientGetStub.calledOnce).to.be.true;
       });
     });
 
