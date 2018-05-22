@@ -1,6 +1,6 @@
 import Order from '../model/Order';
 import OrderStatus from '../model/OrderStatus';
-import OrdersResponse from '../model/OrdersResponse';
+import Orders from '../model/Orders';
 import OrdersRequest from '../model/OrdersRequest';
 import OrdersRequestByBusinessId from '../model/OrdersRequestByBusinessId';
 import OrdersRequestByChannel from '../model/OrdersRequestByChannel';
@@ -35,19 +35,19 @@ export default class OrdersService {
   public get(ordersRequestByChannelOrderId: OrdersRequestByChannelOrderId):
     Promise<Order[]>;
   public get(ordersPageRequestByBusinessId: OrdersRequestByBusinessId & SinglePageRequest):
-    Promise<OrdersResponse>;
+    Promise<Orders>;
   public get(ordersPageRequestByChannel: OrdersRequestByChannel & SinglePageRequest):
-    Promise<OrdersResponse>;
+    Promise<Orders>;
   public get(ordersPageRequestByChannelOrderId: OrdersRequestByChannelOrderId & SinglePageRequest):
-    Promise<OrdersResponse>;
+    Promise<Orders>;
   public get(orderIdOrRequest: string | OrdersRequestByBusinessId | OrdersRequestByChannel |
     OrdersRequestByChannelOrderId | OrdersRequestByBusinessId & SinglePageRequest |
     OrdersRequestByChannel & SinglePageRequest | OrdersRequestByChannelOrderId & SinglePageRequest
-  ): Promise<Order> | Promise<Order[]> | Promise<OrdersResponse> {
+  ): Promise<Order> | Promise<Order[]> | Promise<Orders> {
     if (typeof orderIdOrRequest === 'string') {
       return this.getByOrderId(orderIdOrRequest);
     }
-    const deferred = Q.defer<Order[] | OrdersResponse>();
+    const deferred = Q.defer<Order[] | Orders>();
     this.getOrdersByRequest(orderIdOrRequest, [], deferred);
     return deferred.promise as any;
   }
@@ -75,7 +75,7 @@ export default class OrdersService {
 
   private getOrdersByRequest(ordersRequest: OrdersRequestByBusinessId | OrdersRequestByChannel |
     OrdersRequestByChannelOrderId, orders: Order[],
-    deferred: Q.Deferred<Order[] | OrdersResponse>): Promise<Order[]> {
+    deferred: Q.Deferred<Order[] | Orders>): Promise<Order[]> {
     const requestUrl = `/${Version.V1}${Resource.ORDERS}`;
     const ordersQueryParams = ordersRequest as any;
     if (ordersRequest.startDate != null && typeof ordersRequest.startDate !== 'string') {
@@ -107,20 +107,19 @@ export default class OrdersService {
     }
   }
 
-  private mapOrdersPromise(deferred: Q.Deferred<Order[] | OrdersResponse>,
+  private mapOrdersPromise(deferred: Q.Deferred<Order[] | Orders>,
     error: any, response: request.Response,
-    body: OrdersResponse | ChannelApeErrorResponse, orders: Order[], ordersRequest: OrdersRequestByBusinessId |
+    body: Orders | ChannelApeErrorResponse, orders: Order[], ordersRequest: OrdersRequestByBusinessId |
       OrdersRequestByChannel | OrdersRequestByChannelOrderId | (OrdersRequestByBusinessId & SinglePageRequest) |
       (OrdersRequestByChannel & SinglePageRequest) |
       (OrdersRequestByChannelOrderId & SinglePageRequest), expectedStatusCode: number) {
     if (error) {
       deferred.reject(error);
     } else if (response.statusCode === expectedStatusCode) {
-      const data: OrdersResponse = body as OrdersResponse;
+      const data: Orders = body as Orders;
       const mergedOrders: Order[] = orders.concat(data.orders);
       if (ordersRequest.hasOwnProperty('singlePage')) {
         deferred.resolve({
-          errors: data.errors,
           orders: mergedOrders.map(o => this.formatOrder(o)),
           pagination: data.pagination
         });

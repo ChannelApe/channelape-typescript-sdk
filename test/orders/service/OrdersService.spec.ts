@@ -12,7 +12,7 @@ import OrdersRequestByChannel from '../../../src/orders/model/OrdersRequestByCha
 import OrdersRequestByChannelOrderId from '../../../src/orders/model/OrdersRequestByChannelOrderId';
 import FulfillmentStatus from '../../../src/orders/model/FulfillmentStatus';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
-import OrdersResponse from '../../../src/orders/model/OrdersResponse';
+import Orders from '../../../src/orders/model/Orders';
 import SinglePageRequest from '../../../src/model/SinglePageRequest';
 import Resource from '../../../src/model/Resource';
 import Version from '../../../src/model/Version';
