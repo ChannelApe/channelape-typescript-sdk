@@ -3,8 +3,8 @@ import LineItem from './LineItem';
 import FulfillmentStatus from './FulfillmentStatus';
 
 export default interface Fulfillment {
-  additionalFields: AdditionalField[];
-  id: string;
+  additionalFields?: AdditionalField[];
+  id?: string;
   supplierId?: string;
   lineItems: LineItem[];
   status: FulfillmentStatus;
