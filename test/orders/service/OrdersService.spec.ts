@@ -12,6 +12,8 @@ import OrdersRequestByChannel from '../../../src/orders/model/OrdersRequestByCha
 import OrdersRequestByChannelOrderId from '../../../src/orders/model/OrdersRequestByChannelOrderId';
 import FulfillmentStatus from '../../../src/orders/model/FulfillmentStatus';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
+import Resource from '../../../src/model/Resource';
+import Version from '../../../src/model/Version';
 
 import singleOrder from '../resources/singleOrder';
 import singleCancelledOrder from '../resources/singleCancelledOrder';
@@ -75,6 +77,7 @@ describe('OrdersService', () => {
         expect(actualOrder.id).to.equal(orderId);
         expect(typeof actualOrder.totalShippingTax).to.equal('undefined');
         expect(typeof actualOrder.canceledAt).to.equal('undefined');
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ORDERS}/${orderId}`);
       });
     });
 
@@ -97,6 +100,7 @@ describe('OrdersService', () => {
           expect(actualOrder.canceledAt.getDate()).to.equal(5);
         }
         expect(actualOrder.fulfillments.length).to.equal(0);
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ORDERS}/${orderId}`);
       });
     });
 
@@ -113,7 +117,7 @@ describe('OrdersService', () => {
       return ordersService.get(orderId).then((actualOrder) => {
         expect(actualOrder.lineItems.length).to.equal(1);
         expect(actualOrder.fulfillments.length).to.equal(1);
-        expect(clientGetStub.args[0][0]).to.equal(`/v1/orders/${orderId}`);
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ORDERS}/${orderId}`);
       });
     });
 
@@ -131,6 +135,7 @@ describe('OrdersService', () => {
         expect(actualOrder.fulfillments.length).to.equal(1);
         expect(actualOrder.fulfillments[0].lineItems.length).to.equal(6);
         expect(actualOrder.fulfillments[0].lineItems[0].price).to.equal(15.91);
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ORDERS}/${orderId}`);
       });
     });
 
@@ -177,6 +182,7 @@ describe('OrdersService', () => {
         expect(actualOrders.length).to.equal(1);
         expect(actualOrders[0].channelOrderId).to.equal(channelOrderId);
         expect(actualOrders[0].businessId).to.equal(businessId);
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}/orders`);
       });
     });
 
@@ -207,6 +213,7 @@ describe('OrdersService', () => {
         expect(actualOrders[0].businessId).to.equal(businessId);
         expect(clientGetStub.args[0][1].qs.startDate).to.equal('2018-05-01T18:07:58.009Z');
         expect(clientGetStub.args[0][1].qs.endDate).to.equal('2018-05-07T18:07:58.009Z');
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}/orders`);
       });
     });
 
@@ -243,6 +250,7 @@ describe('OrdersService', () => {
         expect(actualOrders[0].businessId).to.equal(businessId);
         expect(typeof clientGetStub.args[0][1].qs.startDate).to.equal('undefined');
         expect(typeof clientGetStub.args[0][1].qs.endDate).to.equal('undefined');
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}/orders`);
       });
     });
 
@@ -302,7 +310,7 @@ describe('OrdersService', () => {
         expect(actualOrder.fulfillments.length).to.equal(1);
         expect(actualOrder.fulfillments[0].lineItems.length).to.equal(2);
         expect(actualOrder.fulfillments[0].lineItems[0].sku).to.equal('b4809155-1c5d-4b3b-affc-491ad5503007');
-        expect(clientPutStub.args[0][0]).to.equal(`v1/orders/${order.id}`);
+        expect(clientPutStub.args[0][0]).to.equal(`${Version.V1}${Resource.ORDERS}/${order.id}`);
       });
     });
   });
