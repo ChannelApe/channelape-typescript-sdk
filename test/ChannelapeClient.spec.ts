@@ -33,52 +33,25 @@ describe('ChannelApe Client', () => {
     done();
   });
 
-  describe('Given client configuration', () => {
-    it('Then expect client to be built with json set to true', () => {
-      const channelApeClient = new ChannelApeClient({
-        sessionId: 'c478c897-dc1c-4171-a207-9e3af9b23579'
-      });
-      expect(requestSpy.args[0][0].json).to.equal(true);
-      expectRequestDefaults(requestSpy);
-    });
-
-    it('Then expect client to be built with the "X-Channel-Ape-Authorization-Token" set to supplied session id', () => {
-      const channelApeClient = new ChannelApeClient({
-        sessionId: 'c478c897-dc1c-4171-a207-9e3af9b23579'
-      });
-      expectRequestDefaults(requestSpy);
-    });
-  });
-
-  describe('Given client configuration with no LogLevel set', () => {
-    it('Then expect default LogLevel of "OFF"', () => {
-      const channelApeClient = new ChannelApeClient({
-        sessionId: 'c478c897-dc1c-4171-a207-9e3af9b23579'
-      });
-      expect(channelApeClient.LogLevel).to.equal(LogLevel.OFF);
-      expect(channelApeClient.LogLevel).to.equal('off');
-      expectRequestDefaults(requestSpy);
-    });
-  });
-
-  describe('Given client configuration with specific LogLevel set to "VERBOSE"', () => {
-    it('Then expect LogLevel of "VERBOSE"', () => {
-      const channelApeClient = new ChannelApeClient({
-        sessionId: 'c478c897-dc1c-4171-a207-9e3af9b23579',
-        logLevel: LogLevel.VERBOSE
-      });
-      expect(channelApeClient.LogLevel).to.equal(LogLevel.VERBOSE);
-      expect(channelApeClient.LogLevel).to.equal('verbose');
-      expectRequestDefaults(requestSpy);
-    });
-  });
-
-  describe('Given client configuration with valid session ID And 2000 millisecond timeout And Staging endpoint', () => {
+  describe(`Given client configuration with valid session ID, 2000 millisecond timeout,
+             Staging endpoint, and logLevel of VERBOSE`, () => {
     const expectedSessionId = 'c478c897-dc1c-4171-a207-9e3af9b23579';
     const channelApeClient = new ChannelApeClient({
       sessionId: expectedSessionId,
       timeout: 2000,
       endpoint: Environment.STAGING
+    });
+
+    context('When retrieving LogLevel', () => {
+      it('Then expect LogLevel of "VERBOSE"', () => {
+        const channelApeClient = new ChannelApeClient({
+          sessionId: 'c478c897-dc1c-4171-a207-9e3af9b23579',
+          logLevel: LogLevel.VERBOSE
+        });
+        expect(channelApeClient.LogLevel).to.equal(LogLevel.VERBOSE);
+        expect(channelApeClient.LogLevel).to.equal('verbose');
+        expectRequestDefaults(requestSpy);
+      });
     });
 
     context('When retrieving sessionId', () => {
@@ -239,6 +212,7 @@ describe('ChannelApe Client', () => {
 });
 
 function expectRequestDefaults(requestSpy: sinon.SinonSpy) {
-  expect(requestSpy.args[0][0]
-    .headers['X-Channel-Ape-Authorization-Token']).to.equal('c478c897-dc1c-4171-a207-9e3af9b23579');
+  expect(requestSpy.args[0][0].headers['X-Channel-Ape-Authorization-Token'])
+    .to.equal('c478c897-dc1c-4171-a207-9e3af9b23579');
+  expect(requestSpy.args[0][0].json).to.equal(true);
 }
