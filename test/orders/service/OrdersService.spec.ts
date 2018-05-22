@@ -100,6 +100,11 @@ describe('OrdersService', () => {
         expect(actualOrder.lineItems[0].price).to.equal(15.99);
         if (typeof actualOrder.canceledAt !== 'undefined') {
           expect(actualOrder.canceledAt.getDate()).to.equal(5);
+        } else {
+          throw new Error('canceled at should not be undefined');
+        }
+        if (typeof actualOrder.fulfillments === 'undefined') {
+          throw new Error('fulfillments length should be 0');
         }
         expect(actualOrder.fulfillments.length).to.equal(0);
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ORDERS}/${orderId}`);
@@ -118,6 +123,9 @@ describe('OrdersService', () => {
       const orderId = '06b70c49-a13e-42ca-a490-404d29c7fa46';
       return ordersService.get(orderId).then((actualOrder) => {
         expect(actualOrder.lineItems.length).to.equal(1);
+        if (typeof actualOrder.fulfillments === 'undefined') {
+          throw new Error('fulfillments length should be 0');
+        }
         expect(actualOrder.fulfillments.length).to.equal(1);
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ORDERS}/${orderId}`);
       });
@@ -134,6 +142,9 @@ describe('OrdersService', () => {
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = '9dc34b92-70d1-42d8-8b4e-ae7fb3deca70';
       return ordersService.get(orderId).then((actualOrder) => {
+        if (typeof actualOrder.fulfillments === 'undefined') {
+          throw new Error('fulfillments length should be 0');
+        }
         expect(actualOrder.fulfillments.length).to.equal(1);
         expect(actualOrder.fulfillments[0].lineItems.length).to.equal(6);
         expect(actualOrder.fulfillments[0].lineItems[0].price).to.equal(15.91);
@@ -329,6 +340,9 @@ describe('OrdersService', () => {
           Then return updated order`, () => {
       const order: Order = singleOrderToUpdate;
       order.id = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      if (typeof order.fulfillments === 'undefined') {
+        throw new Error('fulfillments length should be 0');
+      }
       order.fulfillments.push({
         additionalFields: [
           {
@@ -348,6 +362,9 @@ describe('OrdersService', () => {
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       return ordersService.update(order).then((actualOrder) => {
         expect(actualOrder.id).to.equal(order.id);
+        if (typeof actualOrder.fulfillments === 'undefined') {
+          throw new Error('fulfillments length should be 0');
+        }
         expect(actualOrder.fulfillments.length).to.equal(1);
         expect(actualOrder.fulfillments[0].lineItems.length).to.equal(2);
         expect(actualOrder.fulfillments[0].lineItems[0].sku).to.equal('b4809155-1c5d-4b3b-affc-491ad5503007');

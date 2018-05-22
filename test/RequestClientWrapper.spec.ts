@@ -206,6 +206,9 @@ describe('RequestClientWrapper', () => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders/${orderId}`;
+      if (typeof singleOrderToUpdate.additionalFields === 'undefined') {
+        throw new Error('additionalFields should be defined');
+      }
       singleOrderToUpdate.additionalFields[0].value = 'RRR';
       const options: request.CoreOptions = {
         body: singleOrderToUpdate
@@ -229,6 +232,9 @@ describe('RequestClientWrapper', () => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders/${orderId}`;
+      if (typeof singleOrderToUpdate.additionalFields === 'undefined') {
+        throw new Error('additionalFields should be defined');
+      }
       singleOrderToUpdate.additionalFields[0].value = 'RRR';
       const options: request.CoreOptions & request.UriOptions = {
         uri: requestUrl,
@@ -253,6 +259,9 @@ describe('RequestClientWrapper', () => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders/${orderId}`;
+      if (typeof singleOrderToUpdate.additionalFields === 'undefined') {
+        throw new Error('additionalFields should be defined');
+      }
       singleOrderToUpdate.additionalFields[0].value = 'RRR';
       const options: request.CoreOptions & request.UriOptions = {
         uri: requestUrl,
