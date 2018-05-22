@@ -118,7 +118,7 @@ export default class OrdersService {
 
   private formatOrder(order: any): Order {
     order.purchasedAt = new Date(order.purchasedAt);
-    if (typeof order.canceledAt !== 'undefined') {
+    if (order.canceledAt != null) {
       order.canceledAt = new Date(order.canceledAt);
     }
     order.updatedAt = new Date(order.updatedAt);
