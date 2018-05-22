@@ -291,6 +291,7 @@ describe('OrdersService', () => {
         expect(typeof clientGetStub.args[0][1].qs.endDate).to.equal('undefined');
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}/orders`);
         expect(clientGetStub.calledOnce).to.be.true;
+        expect(actualOrdersResponse.pagination.lastPage).to.be.false;
       });
     });
 
