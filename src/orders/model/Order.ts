@@ -6,7 +6,7 @@ import Customer from './Customer';
 import ChannelApeError from '../../model/ChannelApeError';
 
 export default interface Order {
-  additionalFields: AdditionalField[];
+  additionalFields?: AdditionalField[];
   id: string;
   channelOrderId: string;
   channelId: string;
@@ -16,15 +16,15 @@ export default interface Order {
   canceledReason?: string;
   updatedAt: Date;
   createdAt: Date;
-  customer: Customer;
+  customer?: Customer;
   status: OrderStatus;
-  totalPrice: number;
-  subtotalPrice: number;
+  totalPrice?: number;
+  subtotalPrice?: number;
   totalShippingPrice?: number;
   totalShippingTax?: number;
-  totalTax: number;
-  totalGrams: number;
+  totalTax?: number;
+  totalGrams?: number;
   alphabeticCurrencyCode: string;
   lineItems: LineItem[];
-  fulfillments: Fulfillment[];
+  fulfillments?: Fulfillment[];
 }
