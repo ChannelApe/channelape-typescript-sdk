@@ -1,5 +1,5 @@
 import PaginationQueryRequest from '../../model/PaginationQueryRequest';
 
-export default interface ActionsRequest extends PaginationQueryRequest {
+export default interface ActionsQueryRequest extends PaginationQueryRequest {
   businessId: string;
 }

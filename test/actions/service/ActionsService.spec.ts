@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import * as request from 'request';
 import LogLevel from '../../../src/model/LogLevel';
 import ActionsService from './../../../src/actions/service/ActionsService';
-import ActionsRequest from '../../../src/actions/model/ActionsRequest';
+import ActionsQueryRequest from '../../../src/actions/model/ActionsQueryRequest';
 import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
 import Subresource from '../../../src/actions/model/Subresource';
@@ -316,7 +316,7 @@ describe('Actions Service', () => {
         .yields(null, response, actionsFirstPageResponse);
       clientGetStub.onSecondCall()
         .yields(null, response, actionsFinalPageResponse);
-      const actionsRequest: ActionsRequest = {
+      const actionsRequest: ActionsQueryRequest = {
         businessId: '4d688534-d82e-4111-940c-322ba9aec108',
         startDate: new Date('2018-05-01T18:07:58.009Z'),
         endDate: new Date('2018-05-07T18:07:58.009Z'),
@@ -347,7 +347,7 @@ describe('Actions Service', () => {
           message: 'Requested business cannot be found.'
         }]
       });
-      const actionsRequest: ActionsRequest = {
+      const actionsRequest: ActionsQueryRequest = {
         businessId: 'not-a-real-business-id'
       };
       const actionsService: ActionsService = new ActionsService(client);
@@ -366,7 +366,7 @@ describe('Actions Service', () => {
         statusCode: 500
       };
       clientGetStub.yields(new Error('server went away'), response, null);
-      const actionsRequest: ActionsRequest = {
+      const actionsRequest: ActionsQueryRequest = {
         businessId: 'real-business-id'
       };
       const actionsService: ActionsService = new ActionsService(client);

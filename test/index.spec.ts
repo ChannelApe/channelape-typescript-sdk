@@ -42,7 +42,7 @@ describe('Index', () => {
   });
 
   it('Expect ActionsRequest to be exported', () => {
-    const actionsRequest: ChannelApe.ActionsRequest = {
+    const actionsRequest: ChannelApe.ActionsQueryRequest = {
       businessId: 'businessId',
       endDate: new Date(),
       startDate: new Date(),

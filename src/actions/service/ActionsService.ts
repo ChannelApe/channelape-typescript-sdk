@@ -1,5 +1,5 @@
 import Action from '../model/Action';
-import ActionsRequest from '../model/ActionsRequest';
+import ActionsQueryRequest from '../model/ActionsQueryRequest';
 import * as request from 'request';
 import Resource from '../../model/Resource';
 import Subresource from '../model/Subresource';
@@ -13,8 +13,8 @@ export default class ActionsService {
   constructor(private readonly client: RequestClientWrapper) { }
 
   public get(actionId: string): Promise<Action>;
-  public get(actionsRequest: ActionsRequest): Promise<Action[]>;
-  public get(actionIdOrRequest: string | ActionsRequest): Promise<Action> | Promise<Action[]> {
+  public get(actionsRequest: ActionsQueryRequest): Promise<Action[]>;
+  public get(actionIdOrRequest: string | ActionsQueryRequest): Promise<Action> | Promise<Action[]> {
     if (typeof actionIdOrRequest === 'string') {
       return this.getByActionId(actionIdOrRequest);
     }
@@ -32,7 +32,7 @@ export default class ActionsService {
     return deferred.promise as any;
   }
 
-  private getByRequest(actionsRequest: ActionsRequest, actions: Action[],
+  private getByRequest(actionsRequest: ActionsQueryRequest, actions: Action[],
     deferred: Q.Deferred<Action[]>): Promise<Action[]> {
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}`;
     const queryParams = actionsRequest as any;
@@ -92,7 +92,7 @@ export default class ActionsService {
   }
 
   private mapActionsPromise(deferred: Q.Deferred<Action[]>, error: any, response: request.Response, body: any,
-    actions: Action[], actionsRequest: ActionsRequest) {
+    actions: Action[], actionsRequest: ActionsQueryRequest) {
     if (error) {
       deferred.reject(error);
     } else if (response.statusCode === 200) {
