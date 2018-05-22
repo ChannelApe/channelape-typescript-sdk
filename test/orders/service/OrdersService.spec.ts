@@ -15,7 +15,7 @@ import RequestClientWrapper from '../../../src/RequestClientWrapper';
 
 import singleOrder from '../resources/singleOrder';
 import singleCancelledOrder from '../resources/singleCancelledOrder';
-import singleOrderWithNoLineItems from '../resources/singleOrderWithNoLineItems';
+import singleOrderWithOneLineItemAndOneFulfillment from '../resources/singleOrderWithOneLineItemAndOneFulfillment';
 import singleClosedOrderWithFulfillments from '../resources/singleClosedOrderWithFulfillments';
 import singleOrderToUpdate from '../resources/singleOrderToUpdate';
 import singleOrderToUpdateResponse from '../resources/singleOrderToUpdateResponse';
@@ -100,19 +100,19 @@ describe('OrdersService', () => {
       });
     });
 
-    it(`And valid orderId for order with no line items or fulfillments
-          When retrieving order then return resolved promise with order and no line items or fulfillments`, () => {
+    it(`And valid orderId for order with one line item and fulfillment
+          When retrieving order then return resolved promise with order with line item and one fulfillment`, () => {
       const response = {
         statusCode: 200
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
-        .yields(null, response, singleOrderWithNoLineItems);
+        .yields(null, response, singleOrderWithOneLineItemAndOneFulfillment);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = '06b70c49-a13e-42ca-a490-404d29c7fa46';
       return ordersService.get(orderId).then((actualOrder) => {
-        expect(actualOrder.lineItems.length).to.equal(0);
-        expect(actualOrder.fulfillments.length).to.equal(0);
+        expect(actualOrder.lineItems.length).to.equal(1);
+        expect(actualOrder.fulfillments.length).to.equal(1);
       });
     });
 
