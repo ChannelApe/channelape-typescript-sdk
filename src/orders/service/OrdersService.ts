@@ -6,7 +6,6 @@ import OrdersRequestByBusinessId from '../model/OrdersRequestByBusinessId';
 import OrdersRequestByChannel from '../model/OrdersRequestByChannel';
 import OrdersRequestByChannelOrderId from '../model/OrdersRequestByChannelOrderId';
 import SinglePageRequest from '../../../src/model/SinglePageRequest';
-import QueryUtils from '../../utils/QueryUtils';
 import Address from '../model/Address';
 import Customer from '../model/Customer';
 import LineItem from '../model/LineItem';
@@ -80,13 +79,13 @@ export default class OrdersService {
     const requestUrl = `/${Version.V1}${Resource.ORDERS}`;
     const ordersQueryParams = ordersRequest as any;
     if (ordersRequest.startDate != null && typeof ordersRequest.startDate !== 'string') {
-      ordersQueryParams.startDate = QueryUtils.getDateQueryParameter(ordersRequest.startDate);
+      ordersQueryParams.startDate = ordersRequest.startDate.toISOString();
     }
     if (ordersRequest.endDate != null && typeof ordersRequest.endDate !== 'string') {
-      ordersQueryParams.endDate = QueryUtils.getDateQueryParameter(ordersRequest.endDate);
+      ordersQueryParams.endDate = ordersRequest.endDate.toISOString();
     }
     const options: request.CoreOptions = {
-      qs: ordersRequest
+      qs: ordersQueryParams
     };
     this.client.get(requestUrl, options, (error, response, body) => {
       this.mapOrdersPromise(deferred, error, response, body, orders, ordersRequest, EXPECTED_GET_STATUS);

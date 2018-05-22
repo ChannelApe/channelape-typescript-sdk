@@ -5,7 +5,6 @@ import Resource from '../../model/Resource';
 import Subresource from '../model/Subresource';
 import Version from '../../model/Version';
 import ChannelApeErrorResponse from './../../model/ChannelApeErrorResponse';
-import QueryUtils from '../../utils/QueryUtils';
 import RequestClientWrapper from '../../RequestClientWrapper';
 import * as Q from 'q';
 
@@ -38,10 +37,10 @@ export default class ActionsService {
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}`;
     const queryParams = actionsRequest as any;
     if (typeof actionsRequest.startDate !== 'undefined' && typeof actionsRequest.startDate !== 'string') {
-      queryParams.startDate = QueryUtils.getDateQueryParameter(actionsRequest.startDate);
+      queryParams.startDate = actionsRequest.startDate.toISOString();
     }
     if (typeof actionsRequest.endDate !== 'undefined' && typeof actionsRequest.endDate !== 'string') {
-      queryParams.endDate = QueryUtils.getDateQueryParameter(actionsRequest.endDate);
+      queryParams.endDate = actionsRequest.endDate.toISOString();
     }
     const options: request.CoreOptions = {
       qs: queryParams
