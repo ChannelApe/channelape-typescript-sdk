@@ -3,4 +3,5 @@ export default interface PaginationRequest {
   startDate?: Date;
   endDate?: Date;
   lastKey?: string;
+  singlePage?: boolean;
 }
