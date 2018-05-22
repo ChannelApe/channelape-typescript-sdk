@@ -158,14 +158,14 @@ export default class OrdersService {
     return order as Order;
   }
 
-  private formatFulfillment(fulfillment: any): Fulfillment {
+  private formatFulfillment(fulfillment: Fulfillment): Fulfillment {
     fulfillment.lineItems = fulfillment.lineItems.map(this.formatLineItem);
-    return fulfillment as Fulfillment;
+    return fulfillment;
   }
 
-  private formatLineItem(lineItem: any): LineItem {
+  private formatLineItem(lineItem: LineItem): LineItem {
     lineItem.grams = Number(lineItem.grams);
     lineItem.price = Number(lineItem.price);
-    return lineItem as LineItem;
+    return lineItem;
   }
 }
