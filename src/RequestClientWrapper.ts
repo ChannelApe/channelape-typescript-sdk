@@ -35,21 +35,16 @@ export default class RequestClientWrapper {
     if (typeof uriOrOptions === 'string') {
       if (typeof callbackOrOptionsOrUndefined === 'function') {
         return this.client.get(uriOrOptions, (error, response, body) => {
-          this.requestLogger.logResponse(error, response, body);
-          callbackOrOptionsOrUndefined(error, response, body);
+          this.responseHandler(error, response, body, callbackOrOptionsOrUndefined);
         });
       }
       return this.client.get(uriOrOptions, callbackOrOptionsOrUndefined, (error, response, body) => {
-        this.requestLogger.logResponse(error, response, body);
-        if (typeof callBackOrUndefined === 'function') {
-          callBackOrUndefined(error, response, body);
-        }
+        this.responseHandler(error, response, body, callBackOrUndefined);
       });
     }
     if (typeof callbackOrOptionsOrUndefined === 'function') {
       return this.client.get(uriOrOptions, (error, response, body) => {
-        this.requestLogger.logResponse(error, response, body);
-        callbackOrOptionsOrUndefined(error, response, body);
+        this.responseHandler(error, response, body, callbackOrOptionsOrUndefined);
       });
     }
     return this.client.get(uriOrOptions);
@@ -77,23 +72,30 @@ export default class RequestClientWrapper {
     if (typeof uriOrOptions === 'string') {
       if (typeof callbackOrOptionsOrUndefined === 'function') {
         return this.client.put(uriOrOptions, (error, response, body) => {
-          this.requestLogger.logResponse(error, response, body);
-          callbackOrOptionsOrUndefined(error, response, body);
+          this.responseHandler(error, response, body, callbackOrOptionsOrUndefined);
         });
       }
       return this.client.put(uriOrOptions, callbackOrOptionsOrUndefined, (error, response, body) => {
-        this.requestLogger.logResponse(error, response, body);
-        if (typeof callBackOrUndefined === 'function') {
-          callBackOrUndefined(error, response, body);
-        }
+        this.responseHandler(error, response, body, callBackOrUndefined);
       });
     }
     if (typeof callbackOrOptionsOrUndefined === 'function') {
       return this.client.put(uriOrOptions, (error, response, body) => {
-        this.requestLogger.logResponse(error, response, body);
-        callbackOrOptionsOrUndefined(error, response, body);
+        this.responseHandler(error, response, body, callbackOrOptionsOrUndefined);
       });
     }
     return this.client.put(uriOrOptions);
+  }
+
+  private responseHandler(
+    error: Error,
+    response: request.Response,
+    body: any,
+    callBackOrUndefined: Function | undefined
+  ): void {
+    this.requestLogger.logResponse(error, response, body);
+    if (typeof callBackOrUndefined === 'function') {
+      callBackOrUndefined(error, response, body);
+    }
   }
 }
