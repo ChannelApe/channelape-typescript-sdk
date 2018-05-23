@@ -5,7 +5,6 @@ import OrdersQueryRequest from '../model/OrdersQueryRequest';
 import OrdersQueryRequestByBusinessId from '../model/OrdersQueryRequestByBusinessId';
 import OrdersQueryRequestByChannel from '../model/OrdersQueryRequestByChannel';
 import OrdersQueryRequestByChannelOrderId from '../model/OrdersQueryRequestByChannelOrderId';
-import SinglePageRequest from '../../../src/model/SinglePageRequest';
 import Address from '../model/Address';
 import Customer from '../model/Customer';
 import LineItem from '../model/LineItem';
@@ -26,29 +25,29 @@ export default class OrdersService {
 
   constructor(private readonly client: RequestClientWrapper) { }
 
-  public get(orderId: string):
-    Promise<Order>;
-  public get(ordersRequestByBusinessId: OrdersQueryRequestByBusinessId):
-    Promise<Order[]>;
-  public get(ordersRequestByChannel: OrdersQueryRequestByChannel):
-    Promise<Order[]>;
-  public get(ordersRequestByChannelOrderId: OrdersQueryRequestByChannelOrderId):
-    Promise<Order[]>;
-  public get(ordersPageRequestByBusinessId: OrdersQueryRequestByBusinessId & SinglePageRequest):
-    Promise<Orders>;
-  public get(ordersPageRequestByChannel: OrdersQueryRequestByChannel & SinglePageRequest):
-    Promise<Orders>;
-  public get(ordersPageRequestByChannelOrderId: OrdersQueryRequestByChannelOrderId & SinglePageRequest):
-    Promise<Orders>;
+  public get(orderId: string): Promise<Order>;
+  public get(ordersRequestByBusinessId: OrdersQueryRequestByBusinessId): Promise<Order[]>;
+  public get(ordersRequestByChannel: OrdersQueryRequestByChannel): Promise<Order[]>;
+  public get(ordersRequestByChannelOrderId: OrdersQueryRequestByChannelOrderId): Promise<Order[]>;
   public get(orderIdOrRequest: string | OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel |
-    OrdersQueryRequestByChannelOrderId | OrdersQueryRequestByBusinessId & SinglePageRequest |
-    OrdersQueryRequestByChannel & SinglePageRequest | OrdersQueryRequestByChannelOrderId & SinglePageRequest
-  ): Promise<Order> | Promise<Order[]> | Promise<Orders> {
+    OrdersQueryRequestByChannelOrderId): Promise<Order> | Promise<Order[]> {
     if (typeof orderIdOrRequest === 'string') {
       return this.getByOrderId(orderIdOrRequest);
     }
-    const deferred = Q.defer<Order[] | Orders>();
-    this.getOrdersByRequest(orderIdOrRequest, [], deferred);
+    const deferred: Q.Deferred<Order[]> = Q.defer<Order[]>();
+    const getSinglePage = false;
+    this.getOrdersByRequest(orderIdOrRequest, [], deferred, getSinglePage);
+    return deferred.promise as any;
+  }
+
+  public getPage(ordersRequestByBusinessId: OrdersQueryRequestByBusinessId): Promise<Orders>;
+  public getPage(ordersRequestByChannel: OrdersQueryRequestByChannel): Promise<Orders>;
+  public getPage(ordersRequestByChannelOrderId: OrdersQueryRequestByChannelOrderId): Promise<Orders>;
+  public getPage(orderRequest: OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel |
+    OrdersQueryRequestByChannelOrderId): Promise<Orders> {
+    const deferred = Q.defer<Orders>();
+    const getSinglePage = true;
+    this.getOrdersByRequest(orderRequest, [], deferred, getSinglePage);
     return deferred.promise as any;
   }
 
@@ -74,8 +73,7 @@ export default class OrdersService {
   }
 
   private getOrdersByRequest(ordersRequest: OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel |
-    OrdersQueryRequestByChannelOrderId, orders: Order[],
-    deferred: Q.Deferred<Order[] | Orders>): Promise<Order[]> {
+    OrdersQueryRequestByChannelOrderId, orders: Order[], deferred: Q.Deferred<any>, getSinglePage: boolean): void {
     const requestUrl = `/${Version.V1}${Resource.ORDERS}`;
     const ordersQueryParams = ordersRequest as any;
     if (ordersRequest.startDate != null && typeof ordersRequest.startDate !== 'string') {
@@ -88,9 +86,8 @@ export default class OrdersService {
       qs: ordersQueryParams
     };
     this.client.get(requestUrl, options, (error, response, body) => {
-      this.mapOrdersPromise(deferred, error, response, body, orders, ordersRequest, EXPECTED_GET_STATUS);
+      this.mapOrdersPromise(deferred, error, response, body, orders, ordersRequest, EXPECTED_GET_STATUS, getSinglePage);
     });
-    return deferred.promise as any;
   }
 
   private mapOrderPromise(deferred: Q.Deferred<Order>, error: any, response: request.Response,
@@ -107,18 +104,16 @@ export default class OrdersService {
     }
   }
 
-  private mapOrdersPromise(deferred: Q.Deferred<Order[] | Orders>,
-    error: any, response: request.Response,
+  private mapOrdersPromise(deferred: Q.Deferred<any>, error: any, response: request.Response,
     body: Orders | ChannelApeErrorResponse, orders: Order[], ordersRequest: OrdersQueryRequestByBusinessId |
-      OrdersQueryRequestByChannel | OrdersQueryRequestByChannelOrderId |
-      (OrdersQueryRequestByBusinessId & SinglePageRequest) | (OrdersQueryRequestByChannel & SinglePageRequest) |
-      (OrdersQueryRequestByChannelOrderId & SinglePageRequest), expectedStatusCode: number) {
+      OrdersQueryRequestByChannel | OrdersQueryRequestByChannelOrderId, expectedStatusCode: number,
+      getSinglePage: boolean): void {
     if (error) {
       deferred.reject(error);
     } else if (response.statusCode === expectedStatusCode) {
       const data: Orders = body as Orders;
       const mergedOrders: Order[] = orders.concat(data.orders);
-      if (ordersRequest.hasOwnProperty('singlePage')) {
+      if (getSinglePage) {
         deferred.resolve({
           orders: mergedOrders.map(o => this.formatOrder(o)),
           pagination: data.pagination
@@ -127,7 +122,7 @@ export default class OrdersService {
         const ordersToReturn = mergedOrders.map(o => this.formatOrder(o));
         deferred.resolve(ordersToReturn);
       } else {
-        this.getOrdersByRequest(ordersRequest, mergedOrders, deferred);
+        this.getOrdersByRequest(ordersRequest, mergedOrders, deferred, getSinglePage);
       }
     } else {
       const channelApeErrorResponse = body as ChannelApeErrorResponse;

@@ -336,6 +336,32 @@ describe('Actions Service', () => {
       });
     });
 
+    it(`And valid Business ID And singlePage set to true And the business has multiple pages worth of actions
+        When retrieving actions
+        Then expect a single page of actions to be returned`, () => {
+      const clientGetStub = sandbox.stub(client, 'get');
+      const response = {
+        statusCode: 200
+      };
+      clientGetStub.onFirstCall()
+        .yields(null, response, actionsFirstPageResponse);
+      const actionsRequest: ActionsQueryRequest = {
+        businessId: '4d688534-d82e-4111-940c-322ba9aec108',
+        startDate: new Date('2018-05-01T18:07:58.009Z'),
+        endDate: new Date('2018-05-07T18:07:58.009Z'),
+        size: 50
+      };
+      const actionsService: ActionsService = new ActionsService(client);
+      return actionsService.getPage(actionsRequest).then((actualResponse) => {
+        expect(actualResponse.actions).to.be.an('array');
+        expect(actualResponse.actions.length).to.equal(50);
+        expect(clientGetStub.args[0][0]).to.equal('/v1/actions');
+        expect(clientGetStub.args[0][1].qs.startDate).to.equal('2018-05-01T18:07:58.009Z');
+        expect(clientGetStub.args[0][1].qs.endDate).to.equal('2018-05-07T18:07:58.009Z');
+        expect(clientGetStub.args[0][1].qs.size).to.equal(50);
+      });
+    });
+
     it(`And invalid Business ID when calling getByBusinessId() Then expect ChannelApeError to be returned`, () => {
       const clientGetStub = sandbox.stub(client, 'get');
       const response = {

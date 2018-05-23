@@ -13,7 +13,6 @@ import OrdersQueryRequestByChannelOrderId from '../../../src/orders/model/Orders
 import FulfillmentStatus from '../../../src/orders/model/FulfillmentStatus';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import Orders from '../../../src/orders/model/Orders';
-import SinglePageRequest from '../../../src/model/SinglePageRequest';
 import Resource from '../../../src/model/Resource';
 import Version from '../../../src/model/Version';
 
@@ -288,14 +287,10 @@ describe('OrdersService', () => {
       const expectedBusinessId = '4d688534-d82e-4111-940c-322ba9aec108';
       // TODO: Uncomment the following and replace the parameter in the following get with the requestOptions
       // variable. You will see that TS complains. It is calling the wrong overload.
-      // const requestOptions: OrdersRequestByBusinessId & SinglePageRequest = {
-      //   businessId: expectedBusinessId,
-      //   singlePage: true
-      // };
-      return ordersService.get({
-        businessId: expectedBusinessId,
-        singlePage: true
-      }).then((actualOrdersResponse) => {
+      const requestOptions: (OrdersQueryRequestByBusinessId) = {
+        businessId: 'something'
+      };
+      return ordersService.getPage(requestOptions).then((actualOrdersResponse) => {
         expect(actualOrdersResponse.orders.length).to.equal(2);
         expect(actualOrdersResponse.orders[0].businessId).to.equal(expectedBusinessId);
         expect(typeof clientGetStub.args[0][1].qs.startDate).to.equal('undefined');
