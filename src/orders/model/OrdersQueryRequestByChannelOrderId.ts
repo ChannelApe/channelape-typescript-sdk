@@ -1,5 +1,4 @@
-import OrdersQueryRequestByBusinessId from './OrdersQueryRequestByBusinessId';
-
-export default interface OrdersRequestByChannelOrderId extends OrdersQueryRequestByBusinessId {
+export default interface OrdersRequestByChannelOrderId {
+  businessId: string;
   channelOrderId: string;
 }
