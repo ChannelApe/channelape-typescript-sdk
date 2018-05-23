@@ -123,9 +123,8 @@ export default class OrdersService {
         const ordersToReturn = mergedOrders.map(o => this.formatOrder(o));
         deferred.resolve(ordersToReturn);
       } else {
-        const newOrdersRequest: OrdersQueryRequestByBusinessId |
-        OrdersQueryRequestByChannel | OrdersQueryRequestByChannelOrderId |
-        (OrdersQueryRequestByChannelOrderId & OrdersQueryRequest) = {
+        const newOrdersRequest: OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel |
+        OrdersQueryRequestByChannelOrderId | (OrdersQueryRequestByChannelOrderId & OrdersQueryRequest) = {
           ...ordersRequest,
           lastKey: data.pagination.lastKey
         };
