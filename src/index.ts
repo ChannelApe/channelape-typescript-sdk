@@ -1,7 +1,7 @@
 export { default as ClientConfiguration } from './model/ClientConfiguration';
 export { default as Session } from './sessions/model/Session';
 export { default as Action } from './actions/model/Action';
-export { default as ActionStatus } from './actions/model/ActionStatus';
+export { default as ActionProcessingStatus } from './actions/model/ActionProcessingStatus';
 export { default as ActionsQueryRequest } from './actions/model/ActionsQueryRequest';
 export { default as Channel } from './channels/model/Channel';
 export { default as ChannelSettings } from './channels/model/ChannelSettings';
