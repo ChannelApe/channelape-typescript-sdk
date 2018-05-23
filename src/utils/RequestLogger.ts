@@ -18,6 +18,9 @@ export default class RequestLogger {
     let queryParams = '';
     if (typeof uriOrOptions === 'string') {
       uri = `${this.endpoint}${uriOrOptions}`;
+      if (typeof callbackOrOptionsOrUndefined !== 'undefined' && typeof callbackOrOptionsOrUndefined !== 'function') {
+        queryParams = this.getQueryParamString(callbackOrOptionsOrUndefined.qs);
+      }
     } else {
       uri = `${this.endpoint}${uriOrOptions.uri.toString()}`;
       queryParams = this.getQueryParamString(uriOrOptions.qs);
