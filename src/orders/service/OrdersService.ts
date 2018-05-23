@@ -106,7 +106,8 @@ export default class OrdersService {
 
   private mapOrdersPromise(deferred: Q.Deferred<any>, error: any, response: request.Response,
     body: Orders | ChannelApeErrorResponse, orders: Order[], ordersRequest: OrdersQueryRequestByBusinessId |
-      OrdersQueryRequestByChannel | OrdersQueryRequestByChannelOrderId, expectedStatusCode: number,
+      OrdersQueryRequestByChannel | OrdersQueryRequestByChannelOrderId |
+      (OrdersQueryRequestByChannelOrderId & OrdersQueryRequest), expectedStatusCode: number,
       getSinglePage: boolean): void {
     if (error) {
       deferred.reject(error);
@@ -122,7 +123,13 @@ export default class OrdersService {
         const ordersToReturn = mergedOrders.map(o => this.formatOrder(o));
         deferred.resolve(ordersToReturn);
       } else {
-        this.getOrdersByRequest(ordersRequest, mergedOrders, deferred, getSinglePage);
+        const newOrdersRequest: OrdersQueryRequestByBusinessId |
+        OrdersQueryRequestByChannel | OrdersQueryRequestByChannelOrderId |
+        (OrdersQueryRequestByChannelOrderId & OrdersQueryRequest) = {
+          ...ordersRequest,
+          lastKey: data.pagination.lastKey
+        };
+        this.getOrdersByRequest(newOrdersRequest, mergedOrders, deferred, getSinglePage);
       }
     } else {
       const channelApeErrorResponse = body as ChannelApeErrorResponse;
