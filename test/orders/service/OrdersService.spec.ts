@@ -36,7 +36,7 @@ describe('OrdersService', () => {
       }
     });
     const clientWrapper: RequestClientWrapper =
-      new RequestClientWrapper(client, LogLevel.OFF);
+      new RequestClientWrapper(client, LogLevel.OFF, Environment.STAGING);
 
     let sandbox: sinon.SinonSandbox;
 
@@ -379,7 +379,8 @@ describe('OrdersService', () => {
           'X-Channel-Ape-Authorization-Token': 'valid-session-id'
         }
       }),
-      LogLevel.OFF
+      LogLevel.OFF,
+      Environment.STAGING
     );
 
     it(`And invalid orderId 

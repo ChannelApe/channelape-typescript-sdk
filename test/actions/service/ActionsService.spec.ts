@@ -25,7 +25,8 @@ describe('Actions Service', () => {
           timeout: 60000, 
           json: true
         }),
-        LogLevel.OFF
+        LogLevel.OFF,
+        Environment.STAGING
       );
 
     let sandbox: sinon.SinonSandbox;

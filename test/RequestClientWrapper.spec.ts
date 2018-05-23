@@ -23,7 +23,7 @@ describe('RequestClientWrapper', () => {
     beforeEach((done) => {
       sandbox = sinon.sandbox.create();
       infoLogSpy = sandbox.spy(Logger.prototype, 'info');
-      requestClientWrapper = new RequestClientWrapper(client, LogLevel.INFO);      
+      requestClientWrapper = new RequestClientWrapper(client, LogLevel.INFO, Environment.STAGING);      
       done();
     });
 
@@ -140,7 +140,8 @@ describe('RequestClientWrapper', () => {
       };
       const r = requestClientWrapper.get(options);
       expect(infoLogSpy.called).to.be.true;
-      expect(infoLogSpy.args[0][0]).to.equal(`GET ${requestUrl}?param=true&anotherParam=false -- STARTED`);
+      expect(infoLogSpy.args[0][0])
+        .to.equal(`GET ${Environment.STAGING}${requestUrl}?param=true&anotherParam=false -- STARTED`);
     });
 
     it('When doing a get() with a single query param, expect the query param to be logged', () => {
@@ -155,7 +156,7 @@ describe('RequestClientWrapper', () => {
       };
       const r = requestClientWrapper.get(options);
       expect(infoLogSpy.called).to.be.true;
-      expect(infoLogSpy.args[0][0]).to.equal(`GET ${requestUrl}?param=true -- STARTED`);
+      expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl}?param=true -- STARTED`);
     });
 
     it('When doing a get() with no query params, expect no query params to be logged', () => {
@@ -168,7 +169,7 @@ describe('RequestClientWrapper', () => {
       };
       const r = requestClientWrapper.get(options);
       expect(infoLogSpy.called).to.be.true;
-      expect(infoLogSpy.args[0][0]).to.equal(`GET ${requestUrl} -- STARTED`);
+      expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`);
     });
 
     it('When doing a get() with no options, expect just the url to be logged', () => {
@@ -177,7 +178,7 @@ describe('RequestClientWrapper', () => {
       const requestUrl = `/v1/orders/${orderId}`;
       const r = requestClientWrapper.get(requestUrl);
       expect(infoLogSpy.called).to.be.true;
-      expect(infoLogSpy.args[0][0]).to.equal(`GET ${requestUrl} -- STARTED`);
+      expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`);
     });
 
     it('When doing a put() with just a URI and call back expect ChannelApe error to be returned', (done) => {
@@ -281,7 +282,7 @@ describe('RequestClientWrapper', () => {
       };
       const r = requestClientWrapper.put(options);
       expect(infoLogSpy.called).to.be.true;
-      expect(infoLogSpy.args[0][0]).to.equal(`PUT ${requestUrl} -- STARTED`);
+      expect(infoLogSpy.args[0][0]).to.equal(`PUT ${Environment.STAGING}${requestUrl} -- STARTED`);
     });
   });
 });

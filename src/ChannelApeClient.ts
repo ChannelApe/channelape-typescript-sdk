@@ -42,7 +42,7 @@ export default class ChannelApeClient {
         'X-Channel-Ape-Authorization-Token': this.sessionId
       }
     });
-    this.requestClientWrapper = new RequestClientWrapper(client, this.logLevel);
+    this.requestClientWrapper = new RequestClientWrapper(client, this.logLevel, this.endpoint);
     this.actionsService = new ActionsService(this.requestClientWrapper);
     this.channelsService = new ChannelsService(this.requestClientWrapper);
     this.ordersService = new OrdersService(this.requestClientWrapper);

@@ -8,9 +8,9 @@ export default class RequestClientWrapper {
 
   constructor(
     private readonly client: request.RequestAPI<request.Request,
-    request.CoreOptions, request.RequiredUriUrl>, private logLevel: LogLevel
+    request.CoreOptions, request.RequiredUriUrl>, private logLevel: LogLevel, endpoint: string
   ) {
-    this.requestLogger = new RequestLogger(this.logLevel);
+    this.requestLogger = new RequestLogger(this.logLevel, endpoint);
   }
 
   public get(

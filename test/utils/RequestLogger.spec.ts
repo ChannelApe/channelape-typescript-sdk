@@ -4,6 +4,7 @@ import * as Logger from '../../src/utils/Logger';
 import LogLevel from '../../src/model/LogLevel';
 import RequestLogger from '../../src/utils/RequestLogger';
 import { Response } from 'request';
+import Environment from '../../src/model/Environment';
 
 describe('Logger', () => {
 
@@ -21,7 +22,7 @@ describe('Logger', () => {
       debug: sinon.spy()
     };
     loggerStub = sandbox.stub(Logger, 'default').returns(fakeLogger);
-    requestLogger = new RequestLogger(LogLevel.VERBOSE);
+    requestLogger = new RequestLogger(LogLevel.VERBOSE, Environment.STAGING);
     done();
   });
 

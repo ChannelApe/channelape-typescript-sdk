@@ -5,7 +5,7 @@ import { Response, Request, UriOptions, CoreOptions, RequestCallback } from 'req
 export default class RequestLogger {
   private logger: Logger;
 
-  constructor (private logLevel: LogLevel) {
+  constructor (private logLevel: LogLevel, private endpoint: string) {
     this.logger = new Logger('ChannelApe API', logLevel);
   }
 
@@ -17,9 +17,9 @@ export default class RequestLogger {
     let uri: string;
     let queryParams = '';
     if (typeof uriOrOptions === 'string') {
-      uri = uriOrOptions;
+      uri = `${this.endpoint}${uriOrOptions}`;
     } else {
-      uri = uriOrOptions.uri.toString();
+      uri = `${this.endpoint}${uriOrOptions.uri.toString()}`;
       queryParams = this.getQueryParamString(uriOrOptions.qs);
     }
     this.logger.info(`${method} ${uri}${queryParams} -- STARTED`);
