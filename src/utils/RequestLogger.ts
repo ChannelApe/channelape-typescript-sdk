@@ -32,7 +32,7 @@ export default class RequestLogger {
     let errorMessage: string;
     let infoMessage = '';
     if (typeof response !== 'undefined') {
-      infoMessage = `${response.method} ${response.url} -- COMPLETED`;
+      infoMessage = `${response.request.method} ${response.request.href} -- COMPLETED`;
     }
     if (infoMessage !== '') {
       this.logger.info(infoMessage);
