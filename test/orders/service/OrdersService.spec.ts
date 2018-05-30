@@ -285,8 +285,6 @@ describe('OrdersService', () => {
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const expectedBusinessId = '4d688534-d82e-4111-940c-322ba9aec108';
-      // TODO: Uncomment the following and replace the parameter in the following get with the requestOptions
-      // variable. You will see that TS complains. It is calling the wrong overload.
       const requestOptions: (OrdersQueryRequestByBusinessId) = {
         businessId: 'something'
       };
