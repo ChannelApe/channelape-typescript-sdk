@@ -1,7 +1,6 @@
 import * as sinon from 'sinon';
 import { expect } from 'chai';
-import * as Logger from '../../src/utils/Logger';
-import LogLevel from '../../src/model/LogLevel';
+import * as Logger from 'channelape-logger';
 import RequestLogger from '../../src/utils/RequestLogger';
 import { Response } from 'request';
 import Environment from '../../src/model/Environment';
@@ -21,8 +20,8 @@ describe('RequestLogger', () => {
       error: sinon.spy(),
       debug: sinon.spy()
     };
-    loggerStub = sandbox.stub(Logger, 'default').returns(fakeLogger);
-    requestLogger = new RequestLogger(LogLevel.VERBOSE, Environment.STAGING);
+    loggerStub = sandbox.stub(Logger, 'Logger').returns(fakeLogger);
+    requestLogger = new RequestLogger(Logger.LogLevel.VERBOSE, Environment.STAGING);
     done();
   });
 

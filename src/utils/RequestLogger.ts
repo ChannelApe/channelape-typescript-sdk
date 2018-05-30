@@ -1,5 +1,4 @@
-import Logger from './Logger';
-import LogLevel from '../model/LogLevel';
+import { Logger, LogLevel } from 'channelape-logger';
 import { Response, Request, UriOptions, CoreOptions, RequestCallback } from 'request';
 
 export default class RequestLogger {

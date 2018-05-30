@@ -3,8 +3,7 @@ import { expect } from 'chai';
 import * as request from 'request';
 import Environment from '../src/model/Environment';
 import RequestClientWrapper from '../src/RequestClientWrapper';
-import LogLevel from '../src/model/LogLevel';
-import Logger from '../src/utils/Logger';
+import { Logger, LogLevel } from 'channelape-logger';
 import * as winston from 'winston';
 
 import singleOrder from './orders/resources/singleOrder';

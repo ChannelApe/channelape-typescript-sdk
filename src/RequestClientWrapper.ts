@@ -1,5 +1,5 @@
 import * as request from 'request';
-import LogLevel from './model/LogLevel';
+import { LogLevel } from 'channelape-logger';
 import RequestLogger from './utils/RequestLogger';
 
 export default class RequestClientWrapper {
