@@ -31,7 +31,7 @@ export default class RequestLogger {
   public logResponse(error: any, response: Response | undefined, body: any | undefined): void {
     let errorMessage: string;
     let infoMessage = '';
-    if (typeof response !== 'undefined') {
+    if (typeof response !== 'undefined' && typeof response.request !== 'undefined') {
       infoMessage = `${response.request.method} ${response.request.href} -- COMPLETED`;
     }
     if (infoMessage !== '') {

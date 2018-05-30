@@ -64,7 +64,11 @@ describe('RequestLogger', () => {
           httpVersionMajor: '5',
           httpVersionMinor: '5',
           statusCode: 200,
-          method: 'GET'
+          method: 'GET',
+          request: {
+            href: 'www.endpoint.com',
+            method: 'GET'
+          }
         };
         requestLogger.logResponse(undefined, response, undefined);
         expect(fakeLogger.info.called).to.be.true;
