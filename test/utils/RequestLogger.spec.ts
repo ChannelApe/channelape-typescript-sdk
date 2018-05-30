@@ -6,7 +6,7 @@ import RequestLogger from '../../src/utils/RequestLogger';
 import { Response } from 'request';
 import Environment from '../../src/model/Environment';
 
-describe('Logger', () => {
+describe('RequestLogger', () => {
 
   let requestLogger: RequestLogger;
   let sandbox: sinon.SinonSandbox;
