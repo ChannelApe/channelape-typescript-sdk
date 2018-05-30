@@ -1,4 +1,3 @@
-import ChannelApeErrorResponse from '../../model/ChannelApeErrorResponse';
 import Action from './Action';
 import PaginationResponse from '../../model/PaginationResponse';
 

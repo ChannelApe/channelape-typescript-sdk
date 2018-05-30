@@ -3,7 +3,6 @@ import Fulfillment from './Fulfillment';
 import AdditionalField from '../../model/AdditionalField';
 import OrderStatus from './OrderStatus';
 import Customer from './Customer';
-import ChannelApeError from '../../model/ChannelApeError';
 
 export default interface Order {
   additionalFields?: AdditionalField[];
