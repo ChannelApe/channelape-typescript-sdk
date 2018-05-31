@@ -287,26 +287,35 @@ describe('RequestClientWrapper', () => {
     it('When handling a GET response expect the call to be retried on 500 level status codes and 429s', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
+      const fakeRequest = {
+        method: 'PUT',
+        href: `${Environment.STAGING}${requestUrl}`
+      };
       const responses = [{
         statusCode: 500,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
       }, {
         statusCode: 502,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
       }, {
         statusCode: 599,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
       }, {
         statusCode: 429,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
       }, {
         statusCode: 200,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
       }];
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
       clientGetStub.onCall(0).yields(null, responses[0], 'Im');
@@ -324,29 +333,38 @@ describe('RequestClientWrapper', () => {
       });
     });
 
-    it('When handling a PUT response expect the call to be retried on 500 level status codes and 429s', (done) => {
+    it.only('When handling a PUT response expect the call to be retried on 500 level status codes and 429s', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
+      const fakeRequest = {
+        method: 'PUT',
+        href: `${Environment.STAGING}${requestUrl}`
+      };
       const responses = [{
         statusCode: 500,
         method: 'PUT',
-        url: `${Environment.STAGING}${requestUrl}`
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
       }, {
         statusCode: 502,
         method: 'PUT',
-        url: `${Environment.STAGING}${requestUrl}`
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
       }, {
         statusCode: 599,
         method: 'PUT',
-        url: `${Environment.STAGING}${requestUrl}`
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
       }, {
         statusCode: 429,
         method: 'PUT',
-        url: `${Environment.STAGING}${requestUrl}`
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
       }, {
         statusCode: 202,
         method: 'PUT',
-        url: `${Environment.STAGING}${requestUrl}`
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
       }];
       const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put');
       clientPutStub.onCall(0).yields(null, responses[0], 'Im');

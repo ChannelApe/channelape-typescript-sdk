@@ -31,7 +31,13 @@ export default class RequestLogger {
     let errorMessage: string;
     let infoMessage = '';
     if (typeof response !== 'undefined' && typeof response.request !== 'undefined') {
-      infoMessage = `${response.request.method} ${response.request.href} -- COMPLETED`;
+      if (!this.responseIsLevel200(response.statusCode)) {
+        const errorMessage =
+          `${response.request.method} ${response.request.href} -- FAILED WITH STATUS: ${response.statusCode}`;
+        this.logger.error(errorMessage);
+      } else {
+        infoMessage = `${response.request.method} ${response.request.href} -- COMPLETED`;
+      }
     }
     if (infoMessage !== '') {
       this.logger.info(infoMessage);
@@ -39,8 +45,11 @@ export default class RequestLogger {
     if (error != null) {
       errorMessage = error.message;
       this.logger.error(errorMessage);
-      return;
     }
+  }
+
+  private responseIsLevel200(statusCode: number): boolean {
+    return (statusCode >= 200 && statusCode <= 299);
   }
 
   private getQueryParamString(params: any): string {
