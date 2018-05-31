@@ -2,7 +2,7 @@ import * as sinon from 'sinon';
 import { expect } from 'chai';
 import * as Logger from 'channelape-logger';
 import RequestLogger from '../../src/utils/RequestLogger';
-import { Response } from 'request';
+import { Response, CoreOptions, UriOptions } from 'request';
 import Environment from '../../src/model/Environment';
 
 describe('RequestLogger', () => {
@@ -32,6 +32,23 @@ describe('RequestLogger', () => {
 
   it('constructor should create Logger with correct name', () => {
     expect(loggerStub.args[0][0]).to.equal('ChannelApe API');
+  });
+
+  describe('logCall', () => {    
+    describe('given no error', () => {
+      it('expect info to be called', () => {
+        const requestCoreOptions: UriOptions & CoreOptions = {
+          uri: '/v1/orders',
+          qs: {
+            size: 100
+          }
+        };
+        requestLogger.logCall('GET', '/v1/orders', requestCoreOptions);
+        expect(fakeLogger.info.called).to.be.true;
+        expect(fakeLogger.info.args[0][0])
+          .to.equal('GET https://staging-api.channelape.com/v1/orders?size=100 -- STARTED');
+      });
+    });
   });
 
   describe('logResponse', () => {    

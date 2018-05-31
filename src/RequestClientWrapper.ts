@@ -35,16 +35,19 @@ export default class RequestClientWrapper {
     if (typeof uriOrOptions === 'string') {
       if (typeof callbackOrOptionsOrUndefined === 'function') {
         return this.client.get(uriOrOptions, (error, response, body) => {
-          this.responseHandler(error, response, body, callbackOrOptionsOrUndefined);
+          this.responseHandler(error, response, body, callbackOrOptionsOrUndefined,
+            uriOrOptions, undefined);
         });
       }
       return this.client.get(uriOrOptions, callbackOrOptionsOrUndefined, (error, response, body) => {
-        this.responseHandler(error, response, body, callBackOrUndefined);
+        this.responseHandler(error, response, body, callBackOrUndefined,
+          uriOrOptions, callbackOrOptionsOrUndefined);
       });
     }
     if (typeof callbackOrOptionsOrUndefined === 'function') {
       return this.client.get(uriOrOptions, (error, response, body) => {
-        this.responseHandler(error, response, body, callbackOrOptionsOrUndefined);
+        this.responseHandler(error, response, body, callbackOrOptionsOrUndefined,
+          uriOrOptions.uri.toString(), undefined);
       });
     }
     return this.client.get(uriOrOptions);
@@ -72,16 +75,19 @@ export default class RequestClientWrapper {
     if (typeof uriOrOptions === 'string') {
       if (typeof callbackOrOptionsOrUndefined === 'function') {
         return this.client.put(uriOrOptions, (error, response, body) => {
-          this.responseHandler(error, response, body, callbackOrOptionsOrUndefined);
+          this.responseHandler(error, response, body, callbackOrOptionsOrUndefined,
+            uriOrOptions, undefined);
         });
       }
       return this.client.put(uriOrOptions, callbackOrOptionsOrUndefined, (error, response, body) => {
-        this.responseHandler(error, response, body, callBackOrUndefined);
+        this.responseHandler(error, response, body, callBackOrUndefined,
+          uriOrOptions, callbackOrOptionsOrUndefined);
       });
     }
     if (typeof callbackOrOptionsOrUndefined === 'function') {
       return this.client.put(uriOrOptions, (error, response, body) => {
-        this.responseHandler(error, response, body, callbackOrOptionsOrUndefined);
+        this.responseHandler(error, response, body, callbackOrOptionsOrUndefined,
+          uriOrOptions.uri.toString(), undefined);
       });
     }
     return this.client.put(uriOrOptions);
@@ -91,9 +97,28 @@ export default class RequestClientWrapper {
     error: Error,
     response: request.Response,
     body: any,
-    callBackOrUndefined: Function | undefined
+    callBackOrUndefined: request.RequestCallback | undefined,
+    uri: string,
+    options: (request.UriOptions & request.CoreOptions) | request.CoreOptions | undefined
   ): void {
     this.requestLogger.logResponse(error, response, body);
+    if (!error && ((response.statusCode >= 500 && response.statusCode <= 599) || response.statusCode === 429)) {
+      switch (response.method) {
+        case ('GET'):
+          this.get(uri, options, callBackOrUndefined);
+          break;
+        case ('PUT'):
+          this.put(uri, options, callBackOrUndefined);
+          break;
+        case ('POST'):
+          // TODO
+          break;
+        default:
+          this.get(uri, options, callBackOrUndefined);
+          break;
+      }
+      return;
+    }
     if (typeof callBackOrUndefined === 'function') {
       callBackOrUndefined(error, response, body);
     }

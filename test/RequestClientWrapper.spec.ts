@@ -283,5 +283,85 @@ describe('RequestClientWrapper', () => {
       expect(infoLogSpy.called).to.be.true;
       expect(infoLogSpy.args[0][0]).to.equal(`PUT ${Environment.STAGING}${requestUrl} -- STARTED`);
     });
+
+    it('When handling a GET response expect the call to be retried on 500 level status codes and 429s', (done) => {
+      const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      const requestUrl = `/v1/orders/${orderId}`;
+      const responses = [{
+        statusCode: 500,
+        method: 'GET',
+        url: `${Environment.STAGING}${requestUrl}`
+      }, {
+        statusCode: 502,
+        method: 'GET',
+        url: `${Environment.STAGING}${requestUrl}`
+      }, {
+        statusCode: 599,
+        method: 'GET',
+        url: `${Environment.STAGING}${requestUrl}`
+      }, {
+        statusCode: 429,
+        method: 'GET',
+        url: `${Environment.STAGING}${requestUrl}`
+      }, {
+        statusCode: 200,
+        method: 'GET',
+        url: `${Environment.STAGING}${requestUrl}`
+      }];
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
+      clientGetStub.onCall(0).yields(null, responses[0], 'Im');
+      clientGetStub.onCall(1).yields(null, responses[1], 'a');
+      clientGetStub.onCall(2).yields(null, responses[2], 'little');
+      clientGetStub.onCall(3).yields(null, responses[3], 'teapot');
+      clientGetStub.onCall(4).yields(null, responses[4], singleOrder);
+
+      requestClientWrapper.get(requestUrl, (error, response, body) => {
+        expect(error).to.be.null;
+        expect(body.id).to.equal(orderId);
+        expect(infoLogSpy.args[0][0])
+          .to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`, 'should log correctly');
+        done();
+      });
+    });
+
+    it('When handling a PUT response expect the call to be retried on 500 level status codes and 429s', (done) => {
+      const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      const requestUrl = `/v1/orders/${orderId}`;
+      const responses = [{
+        statusCode: 500,
+        method: 'PUT',
+        url: `${Environment.STAGING}${requestUrl}`
+      }, {
+        statusCode: 502,
+        method: 'PUT',
+        url: `${Environment.STAGING}${requestUrl}`
+      }, {
+        statusCode: 599,
+        method: 'PUT',
+        url: `${Environment.STAGING}${requestUrl}`
+      }, {
+        statusCode: 429,
+        method: 'PUT',
+        url: `${Environment.STAGING}${requestUrl}`
+      }, {
+        statusCode: 202,
+        method: 'PUT',
+        url: `${Environment.STAGING}${requestUrl}`
+      }];
+      const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put');
+      clientPutStub.onCall(0).yields(null, responses[0], 'Im');
+      clientPutStub.onCall(1).yields(null, responses[1], 'a');
+      clientPutStub.onCall(2).yields(null, responses[2], 'little');
+      clientPutStub.onCall(3).yields(null, responses[3], 'teapot');
+      clientPutStub.onCall(4).yields(null, responses[4], singleOrder);
+
+      requestClientWrapper.put(requestUrl, { body: singleOrder }, (error, response, body) => {
+        expect(error).to.be.null;
+        expect(body.id).to.equal(orderId);
+        expect(infoLogSpy.args[0][0])
+          .to.equal(`PUT ${Environment.STAGING}${requestUrl} -- STARTED`, 'should log correctly');
+        done();
+      });
+    });
   });
 });
