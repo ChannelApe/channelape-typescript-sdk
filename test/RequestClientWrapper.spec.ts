@@ -288,7 +288,7 @@ describe('RequestClientWrapper', () => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
       const fakeRequest = {
-        method: 'PUT',
+        method: 'GET',
         href: `${Environment.STAGING}${requestUrl}`
       };
       const responses = [{
