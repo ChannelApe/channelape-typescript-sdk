@@ -102,25 +102,38 @@ export default class RequestClientWrapper {
     options: (request.UriOptions & request.CoreOptions) | request.CoreOptions | undefined
   ): void {
     this.requestLogger.logResponse(error, response, body);
-    if (!error && ((response.statusCode >= 500 && response.statusCode <= 599) || response.statusCode === 429)) {
-      switch (response.method) {
-        case ('GET'):
-          this.get(uri, options, callBackOrUndefined);
-          break;
-        case ('PUT'):
-          this.put(uri, options, callBackOrUndefined);
-          break;
-        case ('POST'):
-          // TODO
-          break;
-        default:
-          this.get(uri, options, callBackOrUndefined);
-          break;
-      }
+    if (this.requestShouldBeRetried(error, response)) {
+      this.retryRequest(response.method, uri, options, callBackOrUndefined);
       return;
     }
     if (typeof callBackOrUndefined === 'function') {
       callBackOrUndefined(error, response, body);
+    }
+  }
+
+  private requestShouldBeRetried(error: Error, response: request.Response): boolean {
+    return (!error && ((response.statusCode >= 500 && response.statusCode <= 599) || response.statusCode === 429));
+  }
+
+  private retryRequest(
+    method: string | undefined,
+    uri: string,
+    options: (request.UriOptions & request.CoreOptions) | request.CoreOptions | undefined,
+    callBackOrUndefined: request.RequestCallback | undefined
+  ) {
+    switch (method) {
+      case ('GET'):
+        this.get(uri, options, callBackOrUndefined);
+        break;
+      case ('PUT'):
+        this.put(uri, options, callBackOrUndefined);
+        break;
+      case ('POST'):
+        // TODO
+        break;
+      default:
+        this.get(uri, options, callBackOrUndefined);
+        break;
     }
   }
 }
