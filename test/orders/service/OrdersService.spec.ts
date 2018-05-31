@@ -26,7 +26,7 @@ import multipleOrders from '../resources/multipleOrders';
 
 describe('OrdersService', () => {
 
-  describe('Given some rest client', () => {
+  describe('Given some valid rest client', () => {
     const client = request.defaults({
       baseUrl: Environment.STAGING,
       timeout: 60000, 
