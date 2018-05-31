@@ -2,6 +2,9 @@ import { Response } from 'request';
 import ChannelApeApiError from '../model/ChannelApeApiError';
 
 export default class ChannelApeError extends Error {
+  private response: Response;
+  private apiErrors: ChannelApeApiError[];
+
   constructor(
     message: string,
     response: Response,
@@ -9,6 +12,8 @@ export default class ChannelApeError extends Error {
     apiErrors: ChannelApeApiError[]
   ) {
     super(getMessage());
+    this.response = response;
+    this.apiErrors = apiErrors;
 
     function getMessage(): string {
       let ret = message;
@@ -39,5 +44,13 @@ export default class ChannelApeError extends Error {
     function getApiError(apiError: ChannelApeApiError, index: number): string {
       return `Code: ${apiError.code} Message: ${apiError.message}`;
     }
+  }
+
+  public get Response(): Response {
+    return this.response;
+  }
+
+  public get ApiErrors(): ChannelApeApiError[] {
+    return this.apiErrors;
   }
 }
