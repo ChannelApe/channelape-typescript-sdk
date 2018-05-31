@@ -1,11 +1,11 @@
 import * as sinon from 'sinon';
 import { expect } from 'chai';
-import * as Logger from '../../src/utils/Logger';
-import LogLevel from '../../src/model/LogLevel';
+import * as Logger from 'channelape-logger';
 import RequestLogger from '../../src/utils/RequestLogger';
-import { Response } from 'request';
+import { Response, CoreOptions, UriOptions } from 'request';
+import Environment from '../../src/model/Environment';
 
-describe('Logger', () => {
+describe('RequestLogger', () => {
 
   let requestLogger: RequestLogger;
   let sandbox: sinon.SinonSandbox;
@@ -20,8 +20,8 @@ describe('Logger', () => {
       error: sinon.spy(),
       debug: sinon.spy()
     };
-    loggerStub = sandbox.stub(Logger, 'default').returns(fakeLogger);
-    requestLogger = new RequestLogger(LogLevel.VERBOSE);
+    loggerStub = sandbox.stub(Logger, 'Logger').returns(fakeLogger);
+    requestLogger = new RequestLogger(Logger.LogLevel.VERBOSE, Environment.STAGING);
     done();
   });
 
@@ -32,6 +32,23 @@ describe('Logger', () => {
 
   it('constructor should create Logger with correct name', () => {
     expect(loggerStub.args[0][0]).to.equal('ChannelApe API');
+  });
+
+  describe('logCall', () => {    
+    describe('given no error', () => {
+      it('expect info to be called', () => {
+        const requestCoreOptions: UriOptions & CoreOptions = {
+          uri: '/v1/orders',
+          qs: {
+            size: 100
+          }
+        };
+        requestLogger.logCall('GET', '/v1/orders', requestCoreOptions);
+        expect(fakeLogger.info.called).to.be.true;
+        expect(fakeLogger.info.args[0][0])
+          .to.equal('GET https://staging-api.channelape.com/v1/orders?size=100 -- STARTED');
+      });
+    });
   });
 
   describe('logResponse', () => {    
@@ -63,7 +80,11 @@ describe('Logger', () => {
           httpVersionMajor: '5',
           httpVersionMinor: '5',
           statusCode: 200,
-          method: 'GET'
+          method: 'GET',
+          request: {
+            href: 'www.endpoint.com',
+            method: 'GET'
+          }
         };
         requestLogger.logResponse(undefined, response, undefined);
         expect(fakeLogger.info.called).to.be.true;

@@ -3,14 +3,13 @@ import { expect } from 'chai';
 import * as request from 'request';
 import Environment from '../src/model/Environment';
 import RequestClientWrapper from '../src/RequestClientWrapper';
-import LogLevel from '../src/model/LogLevel';
-import Logger from '../src/utils/Logger';
+import { Logger, LogLevel } from 'channelape-logger';
 import * as winston from 'winston';
 
 import singleOrder from './orders/resources/singleOrder';
 import singleOrderToUpdate from './orders/resources/singleOrderToUpdate';
 import multipleOrders from './orders/resources/multipleOrders';
-import ChannelApeError from '../src/model/ChannelApeError';
+import ChannelApeApiError from '../src/model/ChannelApeApiError';
 
 describe('RequestClientWrapper', () => {
 
@@ -23,7 +22,7 @@ describe('RequestClientWrapper', () => {
     beforeEach((done) => {
       sandbox = sinon.sandbox.create();
       infoLogSpy = sandbox.spy(Logger.prototype, 'info');
-      requestClientWrapper = new RequestClientWrapper(client, LogLevel.INFO);      
+      requestClientWrapper = new RequestClientWrapper(client, LogLevel.INFO, Environment.STAGING);      
       done();
     });
 
@@ -140,7 +139,8 @@ describe('RequestClientWrapper', () => {
       };
       const r = requestClientWrapper.get(options);
       expect(infoLogSpy.called).to.be.true;
-      expect(infoLogSpy.args[0][0]).to.equal(`GET ${requestUrl}?param=true&anotherParam=false -- STARTED`);
+      expect(infoLogSpy.args[0][0])
+        .to.equal(`GET ${Environment.STAGING}${requestUrl}?param=true&anotherParam=false -- STARTED`);
     });
 
     it('When doing a get() with a single query param, expect the query param to be logged', () => {
@@ -155,7 +155,7 @@ describe('RequestClientWrapper', () => {
       };
       const r = requestClientWrapper.get(options);
       expect(infoLogSpy.called).to.be.true;
-      expect(infoLogSpy.args[0][0]).to.equal(`GET ${requestUrl}?param=true -- STARTED`);
+      expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl}?param=true -- STARTED`);
     });
 
     it('When doing a get() with no query params, expect no query params to be logged', () => {
@@ -168,7 +168,7 @@ describe('RequestClientWrapper', () => {
       };
       const r = requestClientWrapper.get(options);
       expect(infoLogSpy.called).to.be.true;
-      expect(infoLogSpy.args[0][0]).to.equal(`GET ${requestUrl} -- STARTED`);
+      expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`);
     });
 
     it('When doing a get() with no options, expect just the url to be logged', () => {
@@ -177,7 +177,7 @@ describe('RequestClientWrapper', () => {
       const requestUrl = `/v1/orders/${orderId}`;
       const r = requestClientWrapper.get(requestUrl);
       expect(infoLogSpy.called).to.be.true;
-      expect(infoLogSpy.args[0][0]).to.equal(`GET ${requestUrl} -- STARTED`);
+      expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`);
     });
 
     it('When doing a put() with just a URI and call back expect ChannelApe error to be returned', (done) => {
@@ -188,16 +188,22 @@ describe('RequestClientWrapper', () => {
         method: 'PUT',
         url: `${Environment.STAGING}${requestUrl}`
       };
-      const channelApeError: ChannelApeError = {
+      const channelApeApiError: ChannelApeApiError = {
         code: 0,
         message: 'You didnt pass any body'
       };
+      const expectedErrorMessage =
+`PUT /v1/orders/c0f45529-cbed-4e90-9a38-c208d409ef2a
+  Status: 404 
+  Response Body:
+  404 undefined
+Code: 0 Message: You didnt pass any body`;
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'put')
-        .yields(null, response, { errors: [channelApeError] });
+        .yields(null, response, { errors: [channelApeApiError] });
 
       requestClientWrapper.put(requestUrl, (error, response, body) => {
-        expect(error).to.be.null;
-        expect(body.errors[0].code).to.equal(0);
+        expect(error).not.to.be.null;
+        expect(error.message).to.equal(expectedErrorMessage);
         done();
       });
     });
@@ -206,6 +212,9 @@ describe('RequestClientWrapper', () => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders/${orderId}`;
+      if (typeof singleOrderToUpdate.additionalFields === 'undefined') {
+        throw new Error('additionalFields should be defined');
+      }
       singleOrderToUpdate.additionalFields[0].value = 'RRR';
       const options: request.CoreOptions = {
         body: singleOrderToUpdate
@@ -229,6 +238,9 @@ describe('RequestClientWrapper', () => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders/${orderId}`;
+      if (typeof singleOrderToUpdate.additionalFields === 'undefined') {
+        throw new Error('additionalFields should be defined');
+      }
       singleOrderToUpdate.additionalFields[0].value = 'RRR';
       const options: request.CoreOptions & request.UriOptions = {
         uri: requestUrl,
@@ -253,6 +265,9 @@ describe('RequestClientWrapper', () => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders/${orderId}`;
+      if (typeof singleOrderToUpdate.additionalFields === 'undefined') {
+        throw new Error('additionalFields should be defined');
+      }
       singleOrderToUpdate.additionalFields[0].value = 'RRR';
       const options: request.CoreOptions & request.UriOptions = {
         uri: requestUrl,
@@ -272,7 +287,105 @@ describe('RequestClientWrapper', () => {
       };
       const r = requestClientWrapper.put(options);
       expect(infoLogSpy.called).to.be.true;
-      expect(infoLogSpy.args[0][0]).to.equal(`PUT ${requestUrl} -- STARTED`);
+      expect(infoLogSpy.args[0][0]).to.equal(`PUT ${Environment.STAGING}${requestUrl} -- STARTED`);
+    });
+
+    it('When handling a GET response expect the call to be retried on 500 level status codes and 429s', (done) => {
+      const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      const requestUrl = `/v1/orders/${orderId}`;
+      const fakeRequest = {
+        method: 'GET',
+        href: `${Environment.STAGING}${requestUrl}`
+      };
+      const responses = [{
+        statusCode: 500,
+        method: 'GET',
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
+      }, {
+        statusCode: 502,
+        method: 'GET',
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
+      }, {
+        statusCode: 599,
+        method: 'GET',
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
+      }, {
+        statusCode: 429,
+        method: 'GET',
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
+      }, {
+        statusCode: 200,
+        method: 'GET',
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
+      }];
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
+      clientGetStub.onCall(0).yields(null, responses[0], 'Im');
+      clientGetStub.onCall(1).yields(null, responses[1], 'a');
+      clientGetStub.onCall(2).yields(null, responses[2], 'little');
+      clientGetStub.onCall(3).yields(null, responses[3], 'teapot');
+      clientGetStub.onCall(4).yields(null, responses[4], singleOrder);
+
+      requestClientWrapper.get(requestUrl, (error, response, body) => {
+        expect(error).to.be.null;
+        expect(body.id).to.equal(orderId);
+        expect(infoLogSpy.args[0][0])
+          .to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`, 'should log correctly');
+        done();
+      });
+    });
+
+    it('When handling a PUT response expect the call to be retried on 500 level status codes and 429s', (done) => {
+      const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      const requestUrl = `/v1/orders/${orderId}`;
+      const fakeRequest = {
+        method: 'PUT',
+        href: `${Environment.STAGING}${requestUrl}`
+      };
+      const responses = [{
+        statusCode: 500,
+        method: 'PUT',
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
+      }, {
+        statusCode: 502,
+        method: 'PUT',
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
+      }, {
+        statusCode: 599,
+        method: 'PUT',
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
+      }, {
+        statusCode: 429,
+        method: 'PUT',
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
+      }, {
+        statusCode: 202,
+        method: 'PUT',
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
+      }];
+      const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put');
+      clientPutStub.onCall(0).yields(null, responses[0], 'Im');
+      clientPutStub.onCall(1).yields(null, responses[1], 'a');
+      clientPutStub.onCall(2).yields(null, responses[2], 'little');
+      clientPutStub.onCall(3).yields(null, responses[3], 'teapot');
+      clientPutStub.onCall(4).yields(null, responses[4], singleOrder);
+
+      requestClientWrapper.put(requestUrl, { body: singleOrder }, (error, response, body) => {
+        expect(error).to.be.null;
+        expect(body.id).to.equal(orderId);
+        expect(infoLogSpy.args[0][0])
+          .to.equal(`PUT ${Environment.STAGING}${requestUrl} -- STARTED`, 'should log correctly');
+        done();
+      });
     });
   });
 });

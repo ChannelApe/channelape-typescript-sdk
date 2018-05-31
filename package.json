@@ -1,6 +1,6 @@
 {
   "name": "channelape-sdk",
-  "version": "0.1.2-native-promises.3",
+  "version": "0.2.0-dev",
   "description": "A client for interacting with ChannelApe's API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -63,6 +63,7 @@
   "dependencies": {
     "@types/q": "1.5.0",
     "@types/request": "2.47.0",
+    "channelape-logger": "^0.1.1",
     "q": "1.5.1",
     "request": "2.85.0",
     "winston": "2.4.2"

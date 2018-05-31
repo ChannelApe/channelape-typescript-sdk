@@ -5,17 +5,21 @@ import { expect } from 'chai';
 import * as request from 'request';
 import LogLevel from '../../../src/model/LogLevel';
 import Environment from '../../../src/model/Environment';
-import ChannelApeErrorResponse from '../../../src/model/ChannelApeErrorResponse';
-import OrdersRequest from '../../../src/orders/model/OrdersRequest';
-import OrdersRequestByBusinessId from '../../../src/orders/model/OrdersRequestByBusinessId';
-import OrdersRequestByChannel from '../../../src/orders/model/OrdersRequestByChannel';
-import OrdersRequestByChannelOrderId from '../../../src/orders/model/OrdersRequestByChannelOrderId';
+import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
+import ChannelApeError from '../../../src/model/ChannelApeError';
+import OrdersQueryRequest from '../../../src/orders/model/OrdersQueryRequest';
+import OrdersQueryRequestByBusinessId from '../../../src/orders/model/OrdersQueryRequestByBusinessId';
+import OrdersQueryRequestByChannel from '../../../src/orders/model/OrdersQueryRequestByChannel';
+import OrdersQueryRequestByChannelOrderId from '../../../src/orders/model/OrdersQueryRequestByChannelOrderId';
 import FulfillmentStatus from '../../../src/orders/model/FulfillmentStatus';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
+import Orders from '../../../src/orders/model/Orders';
+import Resource from '../../../src/model/Resource';
+import Version from '../../../src/model/Version';
 
 import singleOrder from '../resources/singleOrder';
-import singleCancelledOrder from '../resources/singleCancelledOrder';
-import singleOrderWithNoLineItems from '../resources/singleOrderWithNoLineItems';
+import singleCanceledOrder from '../resources/singleCanceledOrder';
+import singleOrderWithOneLineItemAndOneFulfillment from '../resources/singleOrderWithOneLineItemAndOneFulfillment';
 import singleClosedOrderWithFulfillments from '../resources/singleClosedOrderWithFulfillments';
 import singleOrderToUpdate from '../resources/singleOrderToUpdate';
 import singleOrderToUpdateResponse from '../resources/singleOrderToUpdateResponse';
@@ -23,7 +27,7 @@ import multipleOrders from '../resources/multipleOrders';
 
 describe('OrdersService', () => {
 
-  describe('Given some rest client', () => {
+  describe('Given some valid rest client', () => {
     const client = request.defaults({
       baseUrl: Environment.STAGING,
       timeout: 60000, 
@@ -33,11 +37,11 @@ describe('OrdersService', () => {
       }
     });
     const clientWrapper: RequestClientWrapper =
-      new RequestClientWrapper(client, LogLevel.OFF);
+      new RequestClientWrapper(client, LogLevel.OFF, Environment.STAGING);
 
     let sandbox: sinon.SinonSandbox;
 
-    const expectedChannelApeErrorResponse : ChannelApeErrorResponse = {
+    const expectedChannelApeErrorResponse : ChannelApeApiErrorResponse = {
       statusCode: 404,
       errors: [
         { 
@@ -75,6 +79,7 @@ describe('OrdersService', () => {
         expect(actualOrder.id).to.equal(orderId);
         expect(typeof actualOrder.totalShippingTax).to.equal('undefined');
         expect(typeof actualOrder.canceledAt).to.equal('undefined');
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ORDERS}/${orderId}`);
       });
     });
 
@@ -84,7 +89,7 @@ describe('OrdersService', () => {
         statusCode: 200
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
-        .yields(null, response, singleCancelledOrder);
+        .yields(null, response, singleCanceledOrder);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = '06b70c49-a13e-42ca-a490-404d29c7fa46';
@@ -95,24 +100,34 @@ describe('OrdersService', () => {
         expect(actualOrder.lineItems[0].price).to.equal(15.99);
         if (typeof actualOrder.canceledAt !== 'undefined') {
           expect(actualOrder.canceledAt.getDate()).to.equal(5);
+        } else {
+          throw new Error('canceled at should not be undefined');
+        }
+        if (typeof actualOrder.fulfillments === 'undefined') {
+          throw new Error('fulfillments length should be 0');
         }
         expect(actualOrder.fulfillments.length).to.equal(0);
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ORDERS}/${orderId}`);
       });
     });
 
-    it(`And valid orderId for order with no line items or fulfillments
-          When retrieving order then return resolved promise with order and no line items or fulfillments`, () => {
+    it(`And valid orderId for order with one line item and fulfillment
+          When retrieving order then return resolved promise with order with line item and one fulfillment`, () => {
       const response = {
         statusCode: 200
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
-        .yields(null, response, singleOrderWithNoLineItems);
+        .yields(null, response, singleOrderWithOneLineItemAndOneFulfillment);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = '06b70c49-a13e-42ca-a490-404d29c7fa46';
       return ordersService.get(orderId).then((actualOrder) => {
-        expect(actualOrder.lineItems.length).to.equal(0);
-        expect(actualOrder.fulfillments.length).to.equal(0);
+        expect(actualOrder.lineItems.length).to.equal(1);
+        if (typeof actualOrder.fulfillments === 'undefined') {
+          throw new Error('fulfillments length should be 0');
+        }
+        expect(actualOrder.fulfillments.length).to.equal(1);
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ORDERS}/${orderId}`);
       });
     });
 
@@ -127,16 +142,30 @@ describe('OrdersService', () => {
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = '9dc34b92-70d1-42d8-8b4e-ae7fb3deca70';
       return ordersService.get(orderId).then((actualOrder) => {
+        if (typeof actualOrder.fulfillments === 'undefined') {
+          throw new Error('fulfillments length should be 0');
+        }
         expect(actualOrder.fulfillments.length).to.equal(1);
         expect(actualOrder.fulfillments[0].lineItems.length).to.equal(6);
         expect(actualOrder.fulfillments[0].lineItems[0].price).to.equal(15.91);
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ORDERS}/${orderId}`);
       });
     });
 
     it(`And invalid orderId 
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
       const response = {
-        statusCode: 404
+        method: 'GET',
+        statusCode: 404,
+        statusMessage: 'Not Found',
+        body: {
+          errors: [
+            {
+              code: 174,
+              message: 'Order could not be found.'
+            }
+          ]
+        }
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
           .yields(null, response, expectedChannelApeErrorResponse);
@@ -146,8 +175,9 @@ describe('OrdersService', () => {
       return ordersService.get(orderId).then((actualOrder) => {
         throw new Error('Test failed!');
       })
-      .catch((e: ChannelApeErrorResponse) => {
-        expect(e.errors).to.be.an('array');
+      .catch((e: ChannelApeError) => {
+        console.log(e.message);
+        expect(e.message).to.be.an('string');
       });
     });
 
@@ -167,7 +197,7 @@ describe('OrdersService', () => {
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const channelOrderId = '314980073478';
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
-      const requestOptions: OrdersRequestByChannelOrderId = {
+      const requestOptions: OrdersQueryRequestByChannelOrderId = {
         businessId,
         channelOrderId
       };
@@ -176,6 +206,7 @@ describe('OrdersService', () => {
         expect(actualOrders.length).to.equal(1);
         expect(actualOrders[0].channelOrderId).to.equal(channelOrderId);
         expect(actualOrders[0].businessId).to.equal(businessId);
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}/orders`);
       });
     });
 
@@ -195,7 +226,7 @@ describe('OrdersService', () => {
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
-      const requestOptions: OrdersRequestByBusinessId = {
+      const requestOptions: OrdersQueryRequestByBusinessId = {
         businessId,
         startDate: new Date('2018-05-01T18:07:58.009Z'),
         endDate: new Date('2018-05-07T18:07:58.009Z')
@@ -206,6 +237,7 @@ describe('OrdersService', () => {
         expect(actualOrders[0].businessId).to.equal(businessId);
         expect(clientGetStub.args[0][1].qs.startDate).to.equal('2018-05-01T18:07:58.009Z');
         expect(clientGetStub.args[0][1].qs.endDate).to.equal('2018-05-07T18:07:58.009Z');
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}/orders`);
       });
     });
 
@@ -233,7 +265,7 @@ describe('OrdersService', () => {
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
-      const requestOptions: OrdersRequestByBusinessId = {
+      const requestOptions: OrdersQueryRequestByBusinessId = {
         businessId
       };
       return ordersService.get(requestOptions).then((actualOrders) => {
@@ -242,6 +274,40 @@ describe('OrdersService', () => {
         expect(actualOrders[0].businessId).to.equal(businessId);
         expect(typeof clientGetStub.args[0][1].qs.startDate).to.equal('undefined');
         expect(typeof clientGetStub.args[0][1].qs.endDate).to.equal('undefined');
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}/orders`);
+      });
+    });
+
+    it(`And valid businessId with multiple pages of orders
+        and the singlePage option set to true
+            When retrieving orders 
+            Then return resolved promise with a single page of orders`, () => {
+
+      const response = {
+        statusCode: 200
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
+      clientGetStub.onFirstCall()
+        .yields(null, response, { 
+          orders: multipleOrders,
+          pagination: {
+            lastPage: false
+          }
+        });
+
+      const ordersService: OrdersService = new OrdersService(clientWrapper);
+      const expectedBusinessId = '4d688534-d82e-4111-940c-322ba9aec108';
+      const requestOptions: (OrdersQueryRequestByBusinessId) = {
+        businessId: 'something'
+      };
+      return ordersService.getPage(requestOptions).then((actualOrdersResponse) => {
+        expect(actualOrdersResponse.orders.length).to.equal(2);
+        expect(actualOrdersResponse.orders[0].businessId).to.equal(expectedBusinessId);
+        expect(typeof clientGetStub.args[0][1].qs.startDate).to.equal('undefined');
+        expect(typeof clientGetStub.args[0][1].qs.endDate).to.equal('undefined');
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}/orders`);
+        expect(clientGetStub.calledOnce).to.be.true;
+        expect(actualOrdersResponse.pagination.lastPage).to.be.false;
       });
     });
 
@@ -250,7 +316,7 @@ describe('OrdersService', () => {
       const response = {
         statusCode: 404
       };
-      const expectedChannelApeBusinessNotFoundError: ChannelApeErrorResponse = {
+      const expectedChannelApeBusinessNotFoundError: ChannelApeApiErrorResponse = {
         statusCode: 404,
         errors:[
           {
@@ -259,19 +325,25 @@ describe('OrdersService', () => {
           }
         ]
       };
+      const expectedErrorMessage =
+` /v1/orders
+  Status: 404 
+  Response Body:
+  404 undefined
+Code: 15 Message: Requested business cannot be found.`;
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
           .yields(null, response, expectedChannelApeBusinessNotFoundError);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const businessId = 'not-a-real-business-id';
-      const requestOptions: OrdersRequestByBusinessId = {
+      const requestOptions: OrdersQueryRequestByBusinessId = {
         businessId
       };
       return ordersService.get(requestOptions).then((actualOrders) => {
         throw new Error('Test failed!');
       })
-      .catch((e: ChannelApeErrorResponse) => {
-        expect(e.errors).to.be.an('array');
+      .catch((e: ChannelApeError) => {
+        expect(e.message).to.equal(expectedErrorMessage);
       });
     });
 
@@ -279,6 +351,9 @@ describe('OrdersService', () => {
           Then return updated order`, () => {
       const order: Order = singleOrderToUpdate;
       order.id = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      if (typeof order.fulfillments === 'undefined') {
+        throw new Error('fulfillments length should be 0');
+      }
       order.fulfillments.push({
         additionalFields: [
           {
@@ -298,10 +373,13 @@ describe('OrdersService', () => {
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       return ordersService.update(order).then((actualOrder) => {
         expect(actualOrder.id).to.equal(order.id);
+        if (typeof actualOrder.fulfillments === 'undefined') {
+          throw new Error('fulfillments length should be 0');
+        }
         expect(actualOrder.fulfillments.length).to.equal(1);
         expect(actualOrder.fulfillments[0].lineItems.length).to.equal(2);
         expect(actualOrder.fulfillments[0].lineItems[0].sku).to.equal('b4809155-1c5d-4b3b-affc-491ad5503007');
-        expect(clientPutStub.args[0][0]).to.equal(`v1/orders/${order.id}`);
+        expect(clientPutStub.args[0][0]).to.equal(`${Version.V1}${Resource.ORDERS}/${order.id}`);
       });
     });
   });
@@ -317,12 +395,18 @@ describe('OrdersService', () => {
           'X-Channel-Ape-Authorization-Token': 'valid-session-id'
         }
       }),
-      LogLevel.OFF
+      LogLevel.OFF,
+      Environment.STAGING
     );
 
     it(`And invalid orderId 
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
-      const expectedErrorMessage = 'Invalid URI "this-is-not-a-real-base-url/v1/orders/not-a-real-order-id"';
+      const expectedErrorMessage =
+` /v1/orders/not-a-real-order-id
+  Status: 0 
+  Response Body:
+  Invalid URI "this-is-not-a-real-base-url/v1/orders/not-a-real-order-id"
+Code: -1 Message: Invalid URI "this-is-not-a-real-base-url/v1/orders/not-a-real-order-id"`;
 
       const ordersService: OrdersService = new OrdersService(client);
       const orderId = 'not-a-real-order-id';
@@ -336,11 +420,16 @@ describe('OrdersService', () => {
 
     it(`And invalid businessId 
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
-      const expectedErrorMessage = 'Invalid URI "this-is-not-a-real-base-url/v1/orders"';
+      const expectedErrorMessage =
+` /v1/orders
+  Status: 0 
+  Response Body:
+  Invalid URI "this-is-not-a-real-base-url/v1/orders"
+Code: -1 Message: Invalid URI "this-is-not-a-real-base-url/v1/orders"`;
       
       const ordersService: OrdersService = new OrdersService(client);
       const businessId = 'not-a-real-business-id';
-      const requestOptions: OrdersRequestByBusinessId = {
+      const requestOptions: OrdersQueryRequestByBusinessId = {
         businessId
       };
       return ordersService.get(requestOptions).then((actualOrders) => {

@@ -1,11 +1,10 @@
 import Order from '../model/Order';
 import OrderStatus from '../model/OrderStatus';
-import OrdersResponse from '../model/OrdersResponse';
-import OrdersRequest from '../model/OrdersRequest';
-import OrdersRequestByBusinessId from '../model/OrdersRequestByBusinessId';
-import OrdersRequestByChannel from '../model/OrdersRequestByChannel';
-import OrdersRequestByChannelOrderId from '../model/OrdersRequestByChannelOrderId';
-import QueryUtils from '../../utils/QueryUtils';
+import Orders from '../model/Orders';
+import OrdersQueryRequest from '../model/OrdersQueryRequest';
+import OrdersQueryRequestByBusinessId from '../model/OrdersQueryRequestByBusinessId';
+import OrdersQueryRequestByChannel from '../model/OrdersQueryRequestByChannel';
+import OrdersQueryRequestByChannelOrderId from '../model/OrdersQueryRequestByChannelOrderId';
 import Address from '../model/Address';
 import Customer from '../model/Customer';
 import LineItem from '../model/LineItem';
@@ -16,7 +15,7 @@ import RequestClientWrapper from '../../RequestClientWrapper';
 import * as request from 'request';
 import Resource from '../../model/Resource';
 import Version from '../../model/Version';
-import ChannelApeErrorResponse from './../../model/ChannelApeErrorResponse';
+import ChannelApeApiErrorResponse from './../../model/ChannelApeApiErrorResponse';
 import * as Q from 'q';
 
 const EXPECTED_GET_STATUS = 200;
@@ -27,16 +26,28 @@ export default class OrdersService {
   constructor(private readonly client: RequestClientWrapper) { }
 
   public get(orderId: string): Promise<Order>;
-  public get(ordersRequestByBusinessId: OrdersRequestByBusinessId): Promise<Order[]>;
-  public get(ordersRequestByChannel: OrdersRequestByChannel): Promise<Order[]>;
-  public get(ordersRequestByChannelOrderId: OrdersRequestByChannelOrderId): Promise<Order[]>;
-  public get(orderIdOrRequest: string | OrdersRequestByBusinessId | OrdersRequestByChannel |
-    OrdersRequestByChannelOrderId): Promise<Order> | Promise<Order[]> {
+  public get(ordersRequestByBusinessId: OrdersQueryRequestByBusinessId): Promise<Order[]>;
+  public get(ordersRequestByChannel: OrdersQueryRequestByChannel): Promise<Order[]>;
+  public get(ordersRequestByChannelOrderId: OrdersQueryRequestByChannelOrderId): Promise<Order[]>;
+  public get(orderIdOrRequest: string | OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel |
+    OrdersQueryRequestByChannelOrderId): Promise<Order> | Promise<Order[]> {
     if (typeof orderIdOrRequest === 'string') {
       return this.getByOrderId(orderIdOrRequest);
     }
-    const deferred = Q.defer<Order[]>();
-    this.getOrdersByRequest(orderIdOrRequest, [], deferred);
+    const deferred: Q.Deferred<Order[]> = Q.defer<Order[]>();
+    const getSinglePage = false;
+    this.getOrdersByRequest(orderIdOrRequest, [], deferred, getSinglePage);
+    return deferred.promise as any;
+  }
+
+  public getPage(ordersRequestByBusinessId: OrdersQueryRequestByBusinessId): Promise<Orders>;
+  public getPage(ordersRequestByChannel: OrdersQueryRequestByChannel): Promise<Orders>;
+  public getPage(ordersRequestByChannelOrderId: OrdersQueryRequestByChannelOrderId): Promise<Orders>;
+  public getPage(orderRequest: OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel |
+    OrdersQueryRequestByChannelOrderId): Promise<Orders> {
+    const deferred = Q.defer<Orders>();
+    const getSinglePage = true;
+    this.getOrdersByRequest(orderRequest, [], deferred, getSinglePage);
     return deferred.promise as any;
   }
 
@@ -61,23 +72,22 @@ export default class OrdersService {
     return deferred.promise as any;
   }
 
-  private getOrdersByRequest(ordersRequest: OrdersRequestByBusinessId | OrdersRequestByChannel |
-    OrdersRequestByChannelOrderId, orders: Order[], deferred: Q.Deferred<Order[]>): Promise<Order[]> {
+  private getOrdersByRequest(ordersRequest: OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel |
+    OrdersQueryRequestByChannelOrderId, orders: Order[], deferred: Q.Deferred<any>, getSinglePage: boolean): void {
     const requestUrl = `/${Version.V1}${Resource.ORDERS}`;
     const ordersQueryParams = ordersRequest as any;
-    if (ordersRequest.startDate != null && typeof ordersRequest.startDate !== 'string') {
-      ordersQueryParams.startDate = QueryUtils.getDateQueryParameter(ordersRequest.startDate);
+    if (ordersQueryParams.startDate != null && typeof ordersQueryParams.startDate !== 'string') {
+      ordersQueryParams.startDate = ordersQueryParams.startDate.toISOString();
     }
-    if (ordersRequest.endDate != null && typeof ordersRequest.endDate !== 'string') {
-      ordersQueryParams.endDate = QueryUtils.getDateQueryParameter(ordersRequest.endDate);
+    if (ordersQueryParams.endDate != null && typeof ordersQueryParams.endDate !== 'string') {
+      ordersQueryParams.endDate = ordersQueryParams.endDate.toISOString();
     }
     const options: request.CoreOptions = {
-      qs: ordersRequest
+      qs: ordersQueryParams
     };
     this.client.get(requestUrl, options, (error, response, body) => {
-      this.mapOrdersPromise(deferred, error, response, body, orders, ordersRequest, EXPECTED_GET_STATUS);
+      this.mapOrdersPromise(deferred, error, response, body, orders, ordersRequest, EXPECTED_GET_STATUS, getSinglePage);
     });
-    return deferred.promise as any;
   }
 
   private mapOrderPromise(deferred: Q.Deferred<Order>, error: any, response: request.Response,
@@ -88,30 +98,40 @@ export default class OrdersService {
       const order: Order = this.formatOrder(body);
       deferred.resolve(order);
     } else {
-      const channelApeErrorResponse = body as ChannelApeErrorResponse;
+      const channelApeErrorResponse = body as ChannelApeApiErrorResponse;
       channelApeErrorResponse.statusCode = response.statusCode;
       deferred.reject(channelApeErrorResponse);
     }
   }
 
-  private mapOrdersPromise(deferred: Q.Deferred<Order[]>, error: any, response: request.Response,
-    body: OrdersResponse | ChannelApeErrorResponse, orders: Order[], ordersRequest: OrdersRequestByBusinessId |
-      OrdersRequestByChannel | OrdersRequestByChannelOrderId, expectedStatusCode: number) {
+  private mapOrdersPromise(deferred: Q.Deferred<any>, error: any, response: request.Response,
+    body: Orders | ChannelApeApiErrorResponse, orders: Order[], ordersRequest: OrdersQueryRequestByBusinessId |
+      OrdersQueryRequestByChannel | OrdersQueryRequestByChannelOrderId |
+      (OrdersQueryRequestByChannelOrderId & OrdersQueryRequest), expectedStatusCode: number,
+      getSinglePage: boolean): void {
     if (error) {
       deferred.reject(error);
     } else if (response.statusCode === expectedStatusCode) {
-      const data: OrdersResponse = body as OrdersResponse;
-      const ordersFromThisCall: Order[] = data.orders;
-      const mergedOrders: Order[] = orders.concat(ordersFromThisCall);
-      if (data.pagination.lastPage) {
+      const data: Orders = body as Orders;
+      const mergedOrders: Order[] = orders.concat(data.orders);
+      if (getSinglePage) {
+        deferred.resolve({
+          orders: mergedOrders.map(o => this.formatOrder(o)),
+          pagination: data.pagination
+        });
+      } else if (data.pagination.lastPage) {
         const ordersToReturn = mergedOrders.map(o => this.formatOrder(o));
         deferred.resolve(ordersToReturn);
       } else {
-        ordersRequest.lastKey = data.pagination.lastKey;
-        this.getOrdersByRequest(ordersRequest, mergedOrders, deferred);
+        const newOrdersRequest: OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel |
+        OrdersQueryRequestByChannelOrderId | (OrdersQueryRequestByChannelOrderId & OrdersQueryRequest) = {
+          ...ordersRequest,
+          lastKey: data.pagination.lastKey
+        };
+        this.getOrdersByRequest(newOrdersRequest, mergedOrders, deferred, getSinglePage);
       }
     } else {
-      const channelApeErrorResponse = body as ChannelApeErrorResponse;
+      const channelApeErrorResponse = body as ChannelApeApiErrorResponse;
       channelApeErrorResponse.statusCode = response.statusCode;
       deferred.reject(channelApeErrorResponse);
     }
@@ -119,7 +139,7 @@ export default class OrdersService {
 
   private formatOrder(order: any): Order {
     order.purchasedAt = new Date(order.purchasedAt);
-    if (typeof order.canceledAt !== 'undefined') {
+    if (order.canceledAt != null) {
       order.canceledAt = new Date(order.canceledAt);
     }
     order.updatedAt = new Date(order.updatedAt);
@@ -138,14 +158,14 @@ export default class OrdersService {
     return order as Order;
   }
 
-  private formatFulfillment(fulfillment: any): Fulfillment {
+  private formatFulfillment(fulfillment: Fulfillment): Fulfillment {
     fulfillment.lineItems = fulfillment.lineItems.map(this.formatLineItem);
-    return fulfillment as Fulfillment;
+    return fulfillment;
   }
 
-  private formatLineItem(lineItem: any): LineItem {
+  private formatLineItem(lineItem: LineItem): LineItem {
     lineItem.grams = Number(lineItem.grams);
     lineItem.price = Number(lineItem.price);
-    return lineItem as LineItem;
+    return lineItem;
   }
 }

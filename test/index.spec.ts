@@ -29,7 +29,7 @@ describe('Index', () => {
       healthCheckIntervalInSeconds: 3000,
       id: 'id',
       lastHealthCheckTime: new Date(),
-      processingStatus: ChannelApe.ActionStatus.IN_PROGRESS,
+      processingStatus: ChannelApe.ActionProcessingStatus.IN_PROGRESS,
       startTime: new Date(),
       targetId: 'targetId',
       targetType: 'channel'
@@ -37,12 +37,12 @@ describe('Index', () => {
     expect(action.id).to.equal('id');
   });
 
-  it('Expect ActionStatus to be exported', () => {
-    expect(ChannelApe.ActionStatus).to.equal(ChannelApe.ActionStatus);
+  it('Expect ActionProcessingStatus to be exported', () => {
+    expect(ChannelApe.ActionProcessingStatus).to.equal(ChannelApe.ActionProcessingStatus);
   });
 
   it('Expect ActionsRequest to be exported', () => {
-    const actionsRequest: ChannelApe.ActionsRequest = {
+    const actionsRequest: ChannelApe.ActionsQueryRequest = {
       businessId: 'businessId',
       endDate: new Date(),
       startDate: new Date(),
@@ -174,7 +174,7 @@ describe('Index', () => {
   });
 
   it('Expect OrdersRequestByBusinessId to be exported', () => {
-    const ordersRequestByBusinessId: ChannelApe.OrdersRequestByBusinessId = {
+    const ordersRequestByBusinessId: ChannelApe.OrdersQueryRequestByBusinessId = {
       businessId: 'businessId',
       endDate: new Date(),
       lastKey: 'some last key',
@@ -186,7 +186,7 @@ describe('Index', () => {
   });
 
   it('Expect OrdersRequestByChannel to be exported', () => {
-    const ordersRequestByChannel: ChannelApe.OrdersRequestByChannel = {
+    const ordersRequestByChannel: ChannelApe.OrdersQueryRequestByChannel = {
       channelId: 'channelId',
       endDate: new Date(),
       lastKey: 'some last key',
@@ -198,14 +198,9 @@ describe('Index', () => {
   });
 
   it('Expect OrdersRequestByChannelOrderId to be exported', () => {
-    const ordersRequestByChannelOrderId: ChannelApe.OrdersRequestByChannelOrderId = {
+    const ordersRequestByChannelOrderId: ChannelApe.OrdersQueryRequestByChannelOrderId = {
       businessId: 'businessId',
-      channelOrderId: 'channelOrderId',
-      endDate: new Date(),
-      lastKey: 'some last key',
-      size: 100,
-      startDate: new Date(),
-      status: ChannelApe.OrderStatus.OPEN
+      channelOrderId: 'channelOrderId'
     };
     expect(ordersRequestByChannelOrderId.channelOrderId).to.equal('channelOrderId');
   });
@@ -262,7 +257,6 @@ describe('Index', () => {
           provinceCode: 'KS'
         }
       },
-      errors: [],
       fulfillments: [],
       id: 'c0f45529-cbed-4e90-9a38-c208d409ef2a',
       lineItems: [
@@ -333,6 +327,10 @@ describe('Index', () => {
       updatedAt: new Date('2018-05-03T18:07:58.009Z')
     };
     expect(order.id).to.equal('c0f45529-cbed-4e90-9a38-c208d409ef2a');
+  });
+
+  it('Expect ChannelApeError to be exported', () => {
+    expect(typeof ChannelApe.ChannelApeError).not.to.equal('undefined');
   });
 
 });

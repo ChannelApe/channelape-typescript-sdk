@@ -1,11 +1,11 @@
 import Action from '../model/Action';
-import ActionsRequest from '../model/ActionsRequest';
+import Actions from '../model/Actions';
+import ActionsQueryRequest from '../model/ActionsQueryRequest';
 import * as request from 'request';
 import Resource from '../../model/Resource';
 import Subresource from '../model/Subresource';
 import Version from '../../model/Version';
-import ChannelApeErrorResponse from './../../model/ChannelApeErrorResponse';
-import QueryUtils from '../../utils/QueryUtils';
+import ChannelApeApiErrorResponse from './../../model/ChannelApeApiErrorResponse';
 import RequestClientWrapper from '../../RequestClientWrapper';
 import * as Q from 'q';
 
@@ -14,13 +14,21 @@ export default class ActionsService {
   constructor(private readonly client: RequestClientWrapper) { }
 
   public get(actionId: string): Promise<Action>;
-  public get(actionsRequest: ActionsRequest): Promise<Action[]>;
-  public get(actionIdOrRequest: string | ActionsRequest): Promise<Action> | Promise<Action[]> {
+  public get(actionsRequest: ActionsQueryRequest): Promise<Action[]>;
+  public get(actionIdOrRequest: string | ActionsQueryRequest): Promise<Action> | Promise<Action[]> {
     if (typeof actionIdOrRequest === 'string') {
       return this.getByActionId(actionIdOrRequest);
     }
     const deferred = Q.defer<Action[]>();
-    this.getByRequest(actionIdOrRequest, [], deferred);
+    const getSinglePage = false;
+    this.getByRequest(actionIdOrRequest, [], deferred, getSinglePage);
+    return deferred.promise as any;
+  }
+
+  public getPage(actionRequest: ActionsQueryRequest): Promise<Actions> {
+    const deferred = Q.defer<Actions>();
+    const getSinglePage = true;
+    this.getByRequest(actionRequest, [], deferred, getSinglePage);
     return deferred.promise as any;
   }
 
@@ -33,21 +41,21 @@ export default class ActionsService {
     return deferred.promise as any;
   }
 
-  private getByRequest(actionsRequest: ActionsRequest, actions: Action[],
-    deferred: Q.Deferred<Action[]>): Promise<Action[]> {
+  private getByRequest(actionsRequest: ActionsQueryRequest, actions: Action[],
+    deferred: Q.Deferred<any>, getSinglePage: boolean): Promise<Action[]> {
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}`;
     const queryParams = actionsRequest as any;
     if (typeof actionsRequest.startDate !== 'undefined' && typeof actionsRequest.startDate !== 'string') {
-      queryParams.startDate = QueryUtils.getDateQueryParameter(actionsRequest.startDate);
+      queryParams.startDate = actionsRequest.startDate.toISOString();
     }
     if (typeof actionsRequest.endDate !== 'undefined' && typeof actionsRequest.endDate !== 'string') {
-      queryParams.endDate = QueryUtils.getDateQueryParameter(actionsRequest.endDate);
+      queryParams.endDate = actionsRequest.endDate.toISOString();
     }
     const options: request.CoreOptions = {
       qs: queryParams
     };
     this.client.get(requestUrl, options, (error, response, body) => {
-      this.mapActionsPromise(deferred, error, response, body, actions, actionsRequest);
+      this.mapActionsPromise(deferred, error, response, body, actions, actionsRequest, getSinglePage);
     });
     return deferred.promise as any;
   }
@@ -86,27 +94,32 @@ export default class ActionsService {
       const action = this.formatAction(body);
       deferred.resolve(action);
     } else {
-      const channelApeErrorResponse = body as ChannelApeErrorResponse;
+      const channelApeErrorResponse = body as ChannelApeApiErrorResponse;
       channelApeErrorResponse.statusCode = response.statusCode;
       deferred.reject(channelApeErrorResponse);
     }
   }
 
-  private mapActionsPromise(deferred: Q.Deferred<Action[]>, error: any, response: request.Response, body: any,
-    actions: Action[], actionsRequest: ActionsRequest) {
+  private mapActionsPromise(deferred: Q.Deferred<Action[] | Actions>, error: any, response: request.Response, body: any,
+    actions: Action[], actionsRequest: ActionsQueryRequest, getSinglePage: boolean) {
     if (error) {
       deferred.reject(error);
     } else if (response.statusCode === 200) {
       const actionsFromThisCall: Action[] = body.actions.map(this.formatAction);
       const mergedActions: Action[] = actions.concat(actionsFromThisCall);
-      if (body.pagination.lastPage) {
+      if (getSinglePage) {
+        deferred.resolve({
+          actions: actionsFromThisCall,
+          pagination: body.pagination
+        });
+      } else if (body.pagination.lastPage) {
         deferred.resolve(mergedActions);
       } else {
         actionsRequest.lastKey = body.pagination.lastKey;
-        this.getByRequest(actionsRequest, mergedActions, deferred);
+        this.getByRequest(actionsRequest, mergedActions, deferred, getSinglePage);
       }
     } else {
-      const channelApeErrorResponse = body as ChannelApeErrorResponse;
+      const channelApeErrorResponse = body as ChannelApeApiErrorResponse;
       channelApeErrorResponse.statusCode = response.statusCode;
       deferred.reject(channelApeErrorResponse);
     }

@@ -13,4 +13,8 @@ describe('OrderStatus', () => {
   it('CLOSED', () => {
     expect(OrderStatus.CLOSED).to.equal('CLOSED');
   });
+
+  it('CANCELED', () => {
+    expect(OrderStatus.CANCELED).to.equal('CANCELED');
+  });
 });

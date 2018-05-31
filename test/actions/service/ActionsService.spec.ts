@@ -3,12 +3,12 @@ import * as sinon from 'sinon';
 import * as request from 'request';
 import LogLevel from '../../../src/model/LogLevel';
 import ActionsService from './../../../src/actions/service/ActionsService';
-import ActionsRequest from '../../../src/actions/model/ActionsRequest';
+import ActionsQueryRequest from '../../../src/actions/model/ActionsQueryRequest';
 import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
 import Subresource from '../../../src/actions/model/Subresource';
 import Environment from '../../../src/model/Environment';
-import ChannelApeErrorResponse from '../../../src/model/ChannelApeErrorResponse';
+import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import Action from '../../../src/actions/model/Action';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 
@@ -25,7 +25,8 @@ describe('Actions Service', () => {
           timeout: 60000, 
           json: true
         }),
-        LogLevel.OFF
+        LogLevel.OFF,
+        Environment.STAGING
       );
 
     let sandbox: sinon.SinonSandbox;
@@ -57,7 +58,7 @@ describe('Actions Service', () => {
       endTime: '2018-05-01T14:47:58.018Z'
     };
 
-    const expectedChannelApeErrorResponse : ChannelApeErrorResponse = {
+    const expectedChannelApeErrorResponse : ChannelApeApiErrorResponse = {
       statusCode: 404,
       errors: [
         { 
@@ -307,7 +308,7 @@ describe('Actions Service', () => {
       });
     });
 
-    it(`And valid Business ID when calling get() Then expect multiple actions to be returned`, () => {
+    it(`And valid Business ID When retrieving actions Then expect multiple actions to be returned`, () => {
       const clientGetStub = sandbox.stub(client, 'get');
       const response = {
         statusCode: 200
@@ -316,7 +317,7 @@ describe('Actions Service', () => {
         .yields(null, response, actionsFirstPageResponse);
       clientGetStub.onSecondCall()
         .yields(null, response, actionsFinalPageResponse);
-      const actionsRequest: ActionsRequest = {
+      const actionsRequest: ActionsQueryRequest = {
         businessId: '4d688534-d82e-4111-940c-322ba9aec108',
         startDate: new Date('2018-05-01T18:07:58.009Z'),
         endDate: new Date('2018-05-07T18:07:58.009Z'),
@@ -336,6 +337,32 @@ describe('Actions Service', () => {
       });
     });
 
+    it(`And valid Business ID And singlePage set to true And the business has multiple pages worth of actions
+        When retrieving actions
+        Then expect a single page of actions to be returned`, () => {
+      const clientGetStub = sandbox.stub(client, 'get');
+      const response = {
+        statusCode: 200
+      };
+      clientGetStub.onFirstCall()
+        .yields(null, response, actionsFirstPageResponse);
+      const actionsRequest: ActionsQueryRequest = {
+        businessId: '4d688534-d82e-4111-940c-322ba9aec108',
+        startDate: new Date('2018-05-01T18:07:58.009Z'),
+        endDate: new Date('2018-05-07T18:07:58.009Z'),
+        size: 50
+      };
+      const actionsService: ActionsService = new ActionsService(client);
+      return actionsService.getPage(actionsRequest).then((actualResponse) => {
+        expect(actualResponse.actions).to.be.an('array');
+        expect(actualResponse.actions.length).to.equal(50);
+        expect(clientGetStub.args[0][0]).to.equal('/v1/actions');
+        expect(clientGetStub.args[0][1].qs.startDate).to.equal('2018-05-01T18:07:58.009Z');
+        expect(clientGetStub.args[0][1].qs.endDate).to.equal('2018-05-07T18:07:58.009Z');
+        expect(clientGetStub.args[0][1].qs.size).to.equal(50);
+      });
+    });
+
     it(`And invalid Business ID when calling getByBusinessId() Then expect ChannelApeError to be returned`, () => {
       const clientGetStub = sandbox.stub(client, 'get');
       const response = {
@@ -347,14 +374,14 @@ describe('Actions Service', () => {
           message: 'Requested business cannot be found.'
         }]
       });
-      const actionsRequest: ActionsRequest = {
+      const actionsRequest: ActionsQueryRequest = {
         businessId: 'not-a-real-business-id'
       };
       const actionsService: ActionsService = new ActionsService(client);
       return actionsService.get(actionsRequest).then((actualResponse) => {
         throw new Error('Expected ChannelApeError');
       })
-      .catch((e: ChannelApeErrorResponse) => {
+      .catch((e: ChannelApeApiErrorResponse) => {
         expect(e.errors[0].code).to.equal(15);
         expect(e.errors[0].message).to.equal('Requested business cannot be found.');
       });
@@ -366,7 +393,7 @@ describe('Actions Service', () => {
         statusCode: 500
       };
       clientGetStub.yields(new Error('server went away'), response, null);
-      const actionsRequest: ActionsRequest = {
+      const actionsRequest: ActionsQueryRequest = {
         businessId: 'real-business-id'
       };
       const actionsService: ActionsService = new ActionsService(client);
@@ -408,7 +435,7 @@ describe('Actions Service', () => {
     }
 
     function expectChannelApeErrorResponse(error: any) {
-      const actualChannelApeErrorResponse = error as ChannelApeErrorResponse;
+      const actualChannelApeErrorResponse = error as ChannelApeApiErrorResponse;
       expect(actualChannelApeErrorResponse.statusCode).to.equal(404);
       expect(actualChannelApeErrorResponse.errors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
       expect(actualChannelApeErrorResponse.errors[0].message)

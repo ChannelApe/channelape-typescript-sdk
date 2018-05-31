@@ -1,7 +1,7 @@
-enum ActionStatus {
+enum ActionProcessingStatus {
   COMPLETED = 'completed',
   ERROR = 'error',
   IN_PROGRESS = 'inProgress'
 }
 
-export default ActionStatus;
+export default ActionProcessingStatus;

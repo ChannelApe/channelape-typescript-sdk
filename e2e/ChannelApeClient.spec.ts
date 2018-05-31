@@ -1,9 +1,14 @@
 import ClientConfiguration from '../src/model/ClientConfiguration';
 import Session from '../src/sessions/model/Session';
 import ChannelApeError from '../src/model/ChannelApeError';
-import ChannelApeErrorResponse from '../src/model/ChannelApeErrorResponse';
+import ChannelApeApiError from '../src/model/ChannelApeApiError';
 import ChannelApeClient from '../src/ChannelApeClient';
+import OrderStatus from '../src/orders/model/OrderStatus';
 import { expect } from 'chai';
+import OrdersQueryRequestByBusinessId from '../src/orders/model/OrdersQueryRequestByBusinessId';
+import OrdersQueryRequestByChannel from '../src/orders/model/OrdersQueryRequestByChannel';
+import OrdersQueryRequestByChannelOrderId from '../src/orders/model/OrdersQueryRequestByChannelOrderId';
+import LogLevel from '../src/model/LogLevel';
 
 describe('ChannelApe Client', () => {
 
@@ -11,7 +16,8 @@ describe('ChannelApe Client', () => {
     const sessionId = getSessionId();
 
     const channelApeClient = new ChannelApeClient({
-      sessionId
+      sessionId,
+      logLevel: LogLevel.OFF
     });
 
     describe('And valid action ID for action with error processing status', () => {
@@ -77,14 +83,13 @@ describe('ChannelApe Client', () => {
         it('Then return 404 status code and action not found error message', () => {
           return actualActionPromise.then((actualAction) => {
             throw new Error('Expected rejected promise');
-          }).catch((e) => {
-            const actualChannelApeErrorResponse = e as ChannelApeErrorResponse;
-            expect(actualChannelApeErrorResponse.statusCode).to.equal(404);
-            const expectedChannelApeErrors = [{
+          }).catch((actualChannelApeError: ChannelApeError) => {
+            expect(actualChannelApeError.Response.statusCode).to.equal(404);
+            const expectedChannelApeApiErrors = [{
               code: 111,
               message: 'Action could not be found.'
             }];
-            assertChannelApeErrors(expectedChannelApeErrors, actualChannelApeErrorResponse.errors);
+            assertChannelApeErrors(expectedChannelApeApiErrors, actualChannelApeError.ApiErrors);
           });
         });
       });
@@ -127,6 +132,85 @@ describe('ChannelApe Client', () => {
       });
     });
 
+    describe('And valid order ID', () => {
+      context('When retrieving order', () => {
+        const expectedOrderId = '3bc9120d-b706-49cd-ad81-6445ce77d8ad';
+        const actualOrderPromise = channelApeClient.orders().get(expectedOrderId);
+
+        it('Then return order', () => {
+          return actualOrderPromise.then((actualOrder) => {
+            expect(actualOrder.id).to.equal(expectedOrderId);
+            expect(actualOrder.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
+            expect(actualOrder.status).to.equal(OrderStatus.OPEN);
+            expect(actualOrder.lineItems.length).to.equal(2);
+            expect(actualOrder.lineItems[0].sku).to.equal('e67f1d90-824a-4941-8497-08d632763c93');
+            expect(actualOrder.lineItems[0].title).to.equal('Generic Steel Shirt');
+            const expectedCreatedAt = new Date('2018-05-23T15:31:14.126Z');
+            expect(actualOrder.createdAt.toISOString()).to.equal(expectedCreatedAt.toISOString());
+          });
+        });
+      });
+    });
+
+    describe('And valid business ID', () => {
+      context('When retrieving orders', () => {
+        const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+        const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
+          businessId: expectedBusinessId
+        };
+        const actualOrdersPromise = channelApeClient.orders().get(ordersQueryRequestByBusinessId);
+
+        it('Then return all orders for the business', () => {
+          return actualOrdersPromise.then((actualOrders) => {
+            expect(actualOrders).to.be.an('array');
+            expect(actualOrders.length).to.equal(201);
+            expect(actualOrders[0].id).to.equal('3bc9120d-b706-49cd-ad81-6445ce77d8ad');
+          });
+        });
+      });
+
+      describe('And query request size of 150 And business has 201 orders', () => {
+        context('When retrieving a single page of orders', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
+            businessId: expectedBusinessId,
+            size: 150
+          };
+          const actualOrdersPromise = channelApeClient.orders().getPage(ordersQueryRequestByBusinessId);
+  
+          it('Then return a single page of 150 orders for the business', () => {
+            return actualOrdersPromise.then((actualOrders) => {
+              expect(actualOrders.orders).to.be.an('array');
+              expect(actualOrders.orders.length).to.equal(150);
+              expect(actualOrders.orders[0].id).to.equal('3bc9120d-b706-49cd-ad81-6445ce77d8ad');
+              expect(actualOrders.pagination.lastPage).to.equal(false);
+            });
+          });
+        });
+  
+        describe('And lastKey of "1f557ede-3df5-4335-a64b-cb4181943965"', () => {
+          context('When retrieving the next single page of orders', () => {
+            const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+            const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
+              businessId: expectedBusinessId,
+              lastKey: '1f557ede-3df5-4335-a64b-cb4181943965',
+              size: 150
+            };
+            const actualOrdersPromise = channelApeClient.orders().getPage(ordersQueryRequestByBusinessId);
+    
+            it('Then return the last single page of 51 orders for the business', () => {
+              return actualOrdersPromise.then((actualOrders) => {
+                expect(actualOrders.orders).to.be.an('array');
+                expect(actualOrders.orders.length).to.equal(51);
+                expect(actualOrders.orders[0].id).to.equal('a6f23ae7-fae6-4cf3-b7b9-10eaa84d7ff2');
+                expect(actualOrders.pagination.lastPage).to.equal(true);
+              });
+            });
+          });
+        });        
+      });
+    });
+
   });
 
   function getSessionId(): string {
@@ -137,8 +221,8 @@ describe('ChannelApe Client', () => {
     return sessionIdEnvironmentVariable;
   }
 
-  function assertChannelApeErrors(expectedChannelApeErrors: ChannelApeError[],
-    actualChannelApeErrors: ChannelApeError[] | undefined) {
+  function assertChannelApeErrors(expectedChannelApeErrors: ChannelApeApiError[],
+    actualChannelApeErrors: ChannelApeApiError[]) {
 
     if (Array.isArray(actualChannelApeErrors)) {
       expect(expectedChannelApeErrors.length).to.equal(actualChannelApeErrors.length,

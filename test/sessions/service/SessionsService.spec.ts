@@ -5,7 +5,7 @@ import SessionsService from './../../../src/sessions/service/SessionsService';
 import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
 import Environment from '../../../src/model/Environment';
-import ChannelApeErrorResponse from '../../../src/model/ChannelApeErrorResponse';
+import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import Session from '../../../src/sessions/model/Session';
 
 describe('Sessions Service', () => {
@@ -87,7 +87,7 @@ describe('Sessions Service', () => {
       const response = {
         statusCode: 401
       };
-      const expectedChannelApeErrorResponse : ChannelApeErrorResponse = {
+      const expectedChannelApeApiErrorResponse : ChannelApeApiErrorResponse = {
         statusCode: 401,
         errors: [
           { 
@@ -97,7 +97,7 @@ describe('Sessions Service', () => {
         ]
       };
       const clientGetStub = sandbox.stub(client, 'get')
-        .yields(null, response, expectedChannelApeErrorResponse);
+        .yields(null, response, expectedChannelApeApiErrorResponse);
 
       sessionsService.get().then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
@@ -107,12 +107,13 @@ describe('Sessions Service', () => {
 
         const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
 
-        const actualChannelApeErrorResponse = e as ChannelApeErrorResponse;
+        const actualChannelApeErrorResponse = e as ChannelApeApiErrorResponse;
         expect(actualChannelApeErrorResponse.statusCode).to.equal(401);
         expect(actualChannelApeErrorResponse.errors.length).to.equal(1);
-        expect(actualChannelApeErrorResponse.errors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
+        expect(actualChannelApeErrorResponse.errors[0].code)
+          .to.equal(expectedChannelApeApiErrorResponse.errors[0].code);
         expect(actualChannelApeErrorResponse.errors[0].message)
-          .to.equal(expectedChannelApeErrorResponse.errors[0].message);
+          .to.equal(expectedChannelApeApiErrorResponse.errors[0].message);
         done();
       });
     });
