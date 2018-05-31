@@ -19,3 +19,4 @@ export { default as LogLevel } from './model/LogLevel';
 export { default as Environment } from './model/Environment';
 export { default as FulfillmentStatus } from './orders/model/FulfillmentStatus';
 export { default as OrderStatus } from './orders/model/OrderStatus';
+export { default as ChannelApeError } from './model/ChannelApeError';

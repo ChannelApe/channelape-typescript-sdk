@@ -329,4 +329,8 @@ describe('Index', () => {
     expect(order.id).to.equal('c0f45529-cbed-4e90-9a38-c208d409ef2a');
   });
 
+  it('Expect ChannelApeError to be exported', () => {
+    expect(typeof ChannelApe.ChannelApeError).not.to.equal('undefined');
+  });
+
 });
