@@ -192,12 +192,18 @@ describe('RequestClientWrapper', () => {
         code: 0,
         message: 'You didnt pass any body'
       };
+      const expectedErrorMessage =
+`PUT /v1/orders/c0f45529-cbed-4e90-9a38-c208d409ef2a
+  Status: 404 
+  Response Body:
+  404 undefined
+Code: 0 Message: You didnt pass any body`;
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'put')
         .yields(null, response, { errors: [channelApeApiError] });
 
       requestClientWrapper.put(requestUrl, (error, response, body) => {
-        expect(error).to.be.null;
-        expect(body.errors[0].code).to.equal(0);
+        expect(error).not.to.be.null;
+        expect(error.message).to.equal(expectedErrorMessage);
         done();
       });
     });

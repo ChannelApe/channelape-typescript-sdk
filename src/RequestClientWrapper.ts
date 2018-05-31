@@ -116,7 +116,7 @@ export default class RequestClientWrapper {
         message: error.message
       }]);
     } else if (this.requestHadAnApiError(body)) {
-      finalError = new ChannelApeError(`API Error: ${response.statusCode} ${response.statusMessage}`,
+      finalError = new ChannelApeError(`${response.statusCode} ${response.statusMessage}`,
         response, uri, body.errors);
     }
     if (typeof callBackOrUndefined === 'function') {

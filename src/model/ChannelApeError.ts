@@ -4,31 +4,36 @@ import ChannelApeApiError from '../model/ChannelApeApiError';
 export default class ChannelApeError extends Error {
   constructor(
     message: string,
-    private response: Response,
-    private uri: string,
-    private apiErrors: ChannelApeApiError[]
+    response: Response,
+    uri: string,
+    apiErrors: ChannelApeApiError[]
   ) {
-    super(message);
-  }
-
-  public get message(): string {
-    const message =
-`${this.response.method} ${this.uri}
-  Status: ${this.response.statusCode} ${this.response.statusMessage}
-  Response:
-  ${this.getResponseMessage()}`;
-    return message;
-  }
-
-  private getResponseMessage(): string {
-    const responseMessage = this.message;
-    if (this.apiErrors.length > 0) {
-      const messageParts = this.apiErrors.map(this.getApiError).join('\n');
+    let responseMessage = message;
+    if (apiErrors.length > 0) {
+      const messageParts = apiErrors.map(getApiError).join('\n');
+      responseMessage += `\n${messageParts}`;
     }
-    return responseMessage;
-  }
+    let method: string;
+    let statusCode: number;
+    let statusMessage: string;
+    if (typeof response === 'undefined') {
+      method = '';
+      statusCode = 0;
+      statusMessage = '';
+    } else {
+      method = typeof response.method === 'undefined' ? '' : response.method;
+      statusCode = typeof response.statusCode === 'undefined' ? 0 : response.statusCode;
+      statusMessage = typeof response.statusMessage === 'undefined' ? '' : response.statusMessage;
+    }
+    const finalMessage =
+`${method} ${uri}
+  Status: ${statusCode} ${statusMessage}
+  Response Body:
+  ${responseMessage}`;
+    super(finalMessage);
 
-  private getApiError(apiError: ChannelApeApiError, index: number): string {
-    return `Code: ${apiError.code} Message: ${apiError.message}`;
+    function getApiError(apiError: ChannelApeApiError, index: number): string {
+      return `Code: ${apiError.code} Message: ${apiError.message}`;
+    }
   }
 }
