@@ -1,7 +1,7 @@
 import ClientConfiguration from '../src/model/ClientConfiguration';
 import Session from '../src/sessions/model/Session';
 import ChannelApeError from '../src/model/ChannelApeError';
-import ChannelApeErrorResponse from '../src/model/ChannelApeErrorResponse';
+import ChannelApeApiError from '../src/model/ChannelApeApiError';
 import ChannelApeClient from '../src/ChannelApeClient';
 import OrderStatus from '../src/orders/model/OrderStatus';
 import { expect } from 'chai';
@@ -83,14 +83,13 @@ describe('ChannelApe Client', () => {
         it('Then return 404 status code and action not found error message', () => {
           return actualActionPromise.then((actualAction) => {
             throw new Error('Expected rejected promise');
-          }).catch((e) => {
-            const actualChannelApeErrorResponse = e as ChannelApeErrorResponse;
-            expect(actualChannelApeErrorResponse.statusCode).to.equal(404);
-            const expectedChannelApeErrors = [{
+          }).catch((actualChannelApeError: ChannelApeError) => {
+            expect(actualChannelApeError.Response.statusCode).to.equal(404);
+            const expectedChannelApeApiErrors = [{
               code: 111,
               message: 'Action could not be found.'
             }];
-            assertChannelApeErrors(expectedChannelApeErrors, actualChannelApeErrorResponse.errors);
+            assertChannelApeErrors(expectedChannelApeApiErrors, actualChannelApeError.ApiErrors);
           });
         });
       });
@@ -222,8 +221,8 @@ describe('ChannelApe Client', () => {
     return sessionIdEnvironmentVariable;
   }
 
-  function assertChannelApeErrors(expectedChannelApeErrors: ChannelApeError[],
-    actualChannelApeErrors: ChannelApeError[] | undefined) {
+  function assertChannelApeErrors(expectedChannelApeErrors: ChannelApeApiError[],
+    actualChannelApeErrors: ChannelApeApiError[]) {
 
     if (Array.isArray(actualChannelApeErrors)) {
       expect(expectedChannelApeErrors.length).to.equal(actualChannelApeErrors.length,
