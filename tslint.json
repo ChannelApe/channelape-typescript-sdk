@@ -3,6 +3,8 @@
   "rules": {
     "trailing-comma": false,
     "align": false,
-    "max-line-length": [true, 120]
+    "max-line-length": [true, 120],
+    "strict": true,
+    "no-increment-decrement": false
   }
 }

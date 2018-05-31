@@ -7,49 +7,11 @@ import { expect } from 'chai';
 
 describe('ChannelApe Client', () => {
 
-  describe('Given invalid session ID', () => {
-
-    const channelApeClient = new ChannelApeClient({
-      sessionId: 'c14fefcf-2594-4d39-b927-71fde1210bd4'
-    });
-
-    context('When retrieving session', () => {
-      const actualSessionPromise = channelApeClient.sessions().get();
-
-      it('Then return 401 status code and invalid auth token error message', (done) => {
-        actualSessionPromise.then((actualSession) => {
-          expect(actualSession.userId).to.equal(undefined);
-          expect(actualSession.sessionId).to.equal(undefined);
-        }).catch((e) => {
-          const actualChannelApeErrorResponse = e as ChannelApeErrorResponse;
-          expect(actualChannelApeErrorResponse.statusCode).to.equal(401);
-          const expectedChannelApeErrors = [{
-            code: 12,
-            message: 'Invalid authorization token. Please check the server logs and try again.'
-          }];
-          assertChannelApeErrors(expectedChannelApeErrors, actualChannelApeErrorResponse.errors);
-          done();
-        });
-      });
-    });
-  });
-
   describe('Given valid session ID', () => {
     const sessionId = getSessionId();
 
     const channelApeClient = new ChannelApeClient({
       sessionId
-    });
-
-    context('When retrieving session', () => {
-      const actualSessionPromise = channelApeClient.sessions().get();
-
-      it('Then return session ID and user ID', () => {
-        return actualSessionPromise.then((actualSession) => {
-          expect(actualSession.userId).to.equal('addb5bac-d629-4179-a2a8-790763163fcb');
-          expect(actualSession.sessionId).to.equal(sessionId);
-        });
-      });
     });
 
     describe('And valid action ID for action with error processing status', () => {

@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import request = require('request');
+import * as request from 'request';
+import LogLevel from '../../../src/model/LogLevel';
 import ChannelsService from './../../../src/channels/service/ChannelsService';
 import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
@@ -8,15 +9,20 @@ import Subresource from '../../../src/actions/model/Subresource';
 import Environment from '../../../src/model/Environment';
 import ChannelApeErrorResponse from '../../../src/model/ChannelApeErrorResponse';
 import Channel from '../../../src/channels/model/Channel';
+import RequestClientWrapper from '../../../src/RequestClientWrapper';
 
 describe('Channels Service', () => {
 
   describe('Given some rest client', () => {
-    const client = request.defaults({
-      baseUrl: Environment.STAGING,
-      timeout: 60000,
-      json: true
-    });
+    const client: RequestClientWrapper =
+      new RequestClientWrapper(
+        request.defaults({
+          baseUrl: Environment.STAGING,
+          timeout: 60000, 
+          json: true
+        }),
+        LogLevel.OFF
+      );
 
     let sandbox: sinon.SinonSandbox;
 
