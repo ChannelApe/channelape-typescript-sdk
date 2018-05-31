@@ -8,7 +8,7 @@ import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
 import Subresource from '../../../src/actions/model/Subresource';
 import Environment from '../../../src/model/Environment';
-import ChannelApeErrorResponse from '../../../src/model/ChannelApeErrorResponse';
+import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import Action from '../../../src/actions/model/Action';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 
@@ -58,7 +58,7 @@ describe('Actions Service', () => {
       endTime: '2018-05-01T14:47:58.018Z'
     };
 
-    const expectedChannelApeErrorResponse : ChannelApeErrorResponse = {
+    const expectedChannelApeErrorResponse : ChannelApeApiErrorResponse = {
       statusCode: 404,
       errors: [
         { 
@@ -381,7 +381,7 @@ describe('Actions Service', () => {
       return actionsService.get(actionsRequest).then((actualResponse) => {
         throw new Error('Expected ChannelApeError');
       })
-      .catch((e: ChannelApeErrorResponse) => {
+      .catch((e: ChannelApeApiErrorResponse) => {
         expect(e.errors[0].code).to.equal(15);
         expect(e.errors[0].message).to.equal('Requested business cannot be found.');
       });
@@ -435,7 +435,7 @@ describe('Actions Service', () => {
     }
 
     function expectChannelApeErrorResponse(error: any) {
-      const actualChannelApeErrorResponse = error as ChannelApeErrorResponse;
+      const actualChannelApeErrorResponse = error as ChannelApeApiErrorResponse;
       expect(actualChannelApeErrorResponse.statusCode).to.equal(404);
       expect(actualChannelApeErrorResponse.errors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
       expect(actualChannelApeErrorResponse.errors[0].message)

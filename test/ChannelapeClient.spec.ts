@@ -8,7 +8,7 @@ import ActionProcessingStatus from '../src/actions/model/ActionProcessingStatus'
 import ChannelsService from '../src/channels/service/ChannelsService';
 import request = require('request');
 import Session from '../src/sessions/model/Session';
-import ChannelApeErrorResponse from '../src/model/ChannelApeErrorResponse';
+import ChannelApeApiErrorResponse from '../src/model/ChannelApeApiErrorResponse';
 import LogLevel from '../src/model/LogLevel';
 import Action from '../src/actions/model/Action';
 import Order from '../src/orders/model/Order';
@@ -155,7 +155,7 @@ describe('ChannelApe Client', () => {
 
     it('When retrieving invalid channel Then return resolved promise with channel data', () => {
       const channelId = 'c0eb01a0-bcd5-4dba-98fb-fd7f7993ecb2';
-      const expectedChannelApeErrorResponse : ChannelApeErrorResponse = {
+      const expectedChannelApeErrorResponse : ChannelApeApiErrorResponse = {
         statusCode: 404,
         errors: [
           { 
@@ -173,7 +173,7 @@ describe('ChannelApe Client', () => {
       return channelApeClient.channels().get(channelId).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((error) => {
-        const actualChannelApeErrorResponse = error as ChannelApeErrorResponse;
+        const actualChannelApeErrorResponse = error as ChannelApeApiErrorResponse;
         expect(actualChannelApeErrorResponse.statusCode).to.equal(404);
         expect(actualChannelApeErrorResponse.errors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
         expect(actualChannelApeErrorResponse.errors[0].message)

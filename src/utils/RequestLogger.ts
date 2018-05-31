@@ -48,6 +48,10 @@ export default class RequestLogger {
     }
   }
 
+  public logError(): void {
+    
+  }
+
   private responseIsLevel200(statusCode: number): boolean {
     return (statusCode >= 200 && statusCode <= 299);
   }

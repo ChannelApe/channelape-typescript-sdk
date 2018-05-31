@@ -2,7 +2,7 @@ import * as request from 'request';
 import Resource from '../../model/Resource';
 import Channel from '../model/Channel';
 import Version from '../../model/Version';
-import ChannelApeErrorResponse from './../../model/ChannelApeErrorResponse';
+import ChannelApeApiErrorResponse from './../../model/ChannelApeApiErrorResponse';
 import RequestClientWrapper from '../../RequestClientWrapper';
 import * as Q from 'q';
 
@@ -28,7 +28,7 @@ export default class ChannelsService {
       channel.updatedAt = new Date(body.updatedAt);
       deferred.resolve(channel);
     } else {
-      const channelApeErrorResponse = body as ChannelApeErrorResponse;
+      const channelApeErrorResponse = body as ChannelApeApiErrorResponse;
       channelApeErrorResponse.statusCode = response.statusCode;
       deferred.reject(channelApeErrorResponse);
     }

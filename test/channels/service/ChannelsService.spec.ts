@@ -7,7 +7,7 @@ import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
 import Subresource from '../../../src/actions/model/Subresource';
 import Environment from '../../../src/model/Environment';
-import ChannelApeErrorResponse from '../../../src/model/ChannelApeErrorResponse';
+import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import Channel from '../../../src/channels/model/Channel';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 
@@ -55,7 +55,7 @@ describe('Channels Service', () => {
       updatedAt: new Date('2018-04-02T13:04:27.299Z')
     };
 
-    const expectedChannelApeErrorResponse : ChannelApeErrorResponse = {
+    const expectedChannelApeErrorResponse : ChannelApeApiErrorResponse = {
       statusCode: 404,
       errors: [
         { 
@@ -147,7 +147,7 @@ describe('Channels Service', () => {
     }
 
     function expectChannelApeErrorResponse(error: any) {
-      const actualChannelApeErrorResponse = error as ChannelApeErrorResponse;
+      const actualChannelApeErrorResponse = error as ChannelApeApiErrorResponse;
       expect(actualChannelApeErrorResponse.statusCode).to.equal(404);
       expect(actualChannelApeErrorResponse.errors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
       expect(actualChannelApeErrorResponse.errors[0].message)

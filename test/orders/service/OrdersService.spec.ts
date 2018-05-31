@@ -5,7 +5,7 @@ import { expect } from 'chai';
 import * as request from 'request';
 import LogLevel from '../../../src/model/LogLevel';
 import Environment from '../../../src/model/Environment';
-import ChannelApeErrorResponse from '../../../src/model/ChannelApeErrorResponse';
+import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import OrdersQueryRequest from '../../../src/orders/model/OrdersQueryRequest';
 import OrdersQueryRequestByBusinessId from '../../../src/orders/model/OrdersQueryRequestByBusinessId';
 import OrdersQueryRequestByChannel from '../../../src/orders/model/OrdersQueryRequestByChannel';
@@ -40,7 +40,7 @@ describe('OrdersService', () => {
 
     let sandbox: sinon.SinonSandbox;
 
-    const expectedChannelApeErrorResponse : ChannelApeErrorResponse = {
+    const expectedChannelApeErrorResponse : ChannelApeApiErrorResponse = {
       statusCode: 404,
       errors: [
         { 
@@ -164,7 +164,7 @@ describe('OrdersService', () => {
       return ordersService.get(orderId).then((actualOrder) => {
         throw new Error('Test failed!');
       })
-      .catch((e: ChannelApeErrorResponse) => {
+      .catch((e: ChannelApeApiErrorResponse) => {
         expect(e.errors).to.be.an('array');
       });
     });
@@ -304,7 +304,7 @@ describe('OrdersService', () => {
       const response = {
         statusCode: 404
       };
-      const expectedChannelApeBusinessNotFoundError: ChannelApeErrorResponse = {
+      const expectedChannelApeBusinessNotFoundError: ChannelApeApiErrorResponse = {
         statusCode: 404,
         errors:[
           {
@@ -324,7 +324,7 @@ describe('OrdersService', () => {
       return ordersService.get(requestOptions).then((actualOrders) => {
         throw new Error('Test failed!');
       })
-      .catch((e: ChannelApeErrorResponse) => {
+      .catch((e: ChannelApeApiErrorResponse) => {
         expect(e.errors).to.be.an('array');
       });
     });

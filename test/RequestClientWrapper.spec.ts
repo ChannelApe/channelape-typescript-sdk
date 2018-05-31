@@ -9,7 +9,7 @@ import * as winston from 'winston';
 import singleOrder from './orders/resources/singleOrder';
 import singleOrderToUpdate from './orders/resources/singleOrderToUpdate';
 import multipleOrders from './orders/resources/multipleOrders';
-import ChannelApeError from '../src/model/ChannelApeError';
+import ChannelApeApiError from '../src/model/ChannelApeApiError';
 
 describe('RequestClientWrapper', () => {
 
@@ -188,12 +188,12 @@ describe('RequestClientWrapper', () => {
         method: 'PUT',
         url: `${Environment.STAGING}${requestUrl}`
       };
-      const channelApeError: ChannelApeError = {
+      const channelApeApiError: ChannelApeApiError = {
         code: 0,
         message: 'You didnt pass any body'
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'put')
-        .yields(null, response, { errors: [channelApeError] });
+        .yields(null, response, { errors: [channelApeApiError] });
 
       requestClientWrapper.put(requestUrl, (error, response, body) => {
         expect(error).to.be.null;

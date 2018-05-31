@@ -15,7 +15,7 @@ import RequestClientWrapper from '../../RequestClientWrapper';
 import * as request from 'request';
 import Resource from '../../model/Resource';
 import Version from '../../model/Version';
-import ChannelApeErrorResponse from './../../model/ChannelApeErrorResponse';
+import ChannelApeApiErrorResponse from './../../model/ChannelApeApiErrorResponse';
 import * as Q from 'q';
 
 const EXPECTED_GET_STATUS = 200;
@@ -98,14 +98,14 @@ export default class OrdersService {
       const order: Order = this.formatOrder(body);
       deferred.resolve(order);
     } else {
-      const channelApeErrorResponse = body as ChannelApeErrorResponse;
+      const channelApeErrorResponse = body as ChannelApeApiErrorResponse;
       channelApeErrorResponse.statusCode = response.statusCode;
       deferred.reject(channelApeErrorResponse);
     }
   }
 
   private mapOrdersPromise(deferred: Q.Deferred<any>, error: any, response: request.Response,
-    body: Orders | ChannelApeErrorResponse, orders: Order[], ordersRequest: OrdersQueryRequestByBusinessId |
+    body: Orders | ChannelApeApiErrorResponse, orders: Order[], ordersRequest: OrdersQueryRequestByBusinessId |
       OrdersQueryRequestByChannel | OrdersQueryRequestByChannelOrderId |
       (OrdersQueryRequestByChannelOrderId & OrdersQueryRequest), expectedStatusCode: number,
       getSinglePage: boolean): void {
@@ -131,7 +131,7 @@ export default class OrdersService {
         this.getOrdersByRequest(newOrdersRequest, mergedOrders, deferred, getSinglePage);
       }
     } else {
-      const channelApeErrorResponse = body as ChannelApeErrorResponse;
+      const channelApeErrorResponse = body as ChannelApeApiErrorResponse;
       channelApeErrorResponse.statusCode = response.statusCode;
       deferred.reject(channelApeErrorResponse);
     }

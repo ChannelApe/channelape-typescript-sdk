@@ -1,6 +1,9 @@
 import * as request from 'request';
 import { LogLevel } from 'channelape-logger';
 import RequestLogger from './utils/RequestLogger';
+import ChannelApeError from './model/ChannelApeError';
+
+const GENERIC_ERROR_CODE = -1;
 
 export default class RequestClientWrapper {
 
@@ -106,13 +109,30 @@ export default class RequestClientWrapper {
       this.retryRequest(response.method, uri, options, callBackOrUndefined);
       return;
     }
+    let finalError: ChannelApeError | null = null;
+    if (error) {
+      finalError = new ChannelApeError(error.message, response, uri, [{
+        code: GENERIC_ERROR_CODE,
+        message: error.message
+      }]);
+    } else if (this.requestHadAnApiError(body)) {
+      finalError = new ChannelApeError(`API Error: ${response.statusCode} ${response.statusMessage}`,
+        response, uri, body.errors);
+    }
     if (typeof callBackOrUndefined === 'function') {
-      callBackOrUndefined(error, response, body);
+      callBackOrUndefined(finalError, response, body);
     }
   }
 
   private requestShouldBeRetried(error: Error, response: request.Response): boolean {
     return (!error && ((response.statusCode >= 500 && response.statusCode <= 599) || response.statusCode === 429));
+  }
+
+  private requestHadAnApiError(body: any): boolean {
+    if (typeof body.errors === 'undefined') {
+      return false;
+    }
+    return body.errors.length > 0;
   }
 
   private retryRequest(
