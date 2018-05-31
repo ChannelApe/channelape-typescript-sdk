@@ -7,6 +7,7 @@ export default interface Address {
   city?: string;
   country?: string;
   countryCode?: string;
+  company?: string;
   firstName?: string;
   lastName?: string;
   name?: string;
