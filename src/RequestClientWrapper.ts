@@ -115,7 +115,7 @@ export default class RequestClientWrapper {
         code: GENERIC_ERROR_CODE,
         message: error.message
       }]);
-    } else if (this.requestHadAnApiError(body)) {
+    } else if (this.isApiError(body)) {
       finalError = new ChannelApeError(`${response.statusCode} ${response.statusMessage}`,
         response, uri, body.errors);
     }
@@ -128,7 +128,7 @@ export default class RequestClientWrapper {
     return (!error && ((response.statusCode >= 500 && response.statusCode <= 599) || response.statusCode === 429));
   }
 
-  private requestHadAnApiError(body: any): boolean {
+  private isApiError(body: any): boolean {
     if (typeof body.errors === 'undefined') {
       return false;
     }
