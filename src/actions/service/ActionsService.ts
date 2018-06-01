@@ -5,9 +5,12 @@ import * as request from 'request';
 import Resource from '../../model/Resource';
 import Subresource from '../model/Subresource';
 import Version from '../../model/Version';
-import ChannelApeApiErrorResponse from './../../model/ChannelApeApiErrorResponse';
 import RequestClientWrapper from '../../RequestClientWrapper';
+import RequestCallbackParams from '../../model/RequestCallbackParams';
+import GenerateApiError from '../../utils/GenerateApiError';
 import * as Q from 'q';
+
+const EXPECTED_STATUS_CODE = 200;
 
 export default class ActionsService {
 
@@ -20,15 +23,15 @@ export default class ActionsService {
       return this.getByActionId(actionIdOrRequest);
     }
     const deferred = Q.defer<Action[]>();
-    const getSinglePage = false;
-    this.getByRequest(actionIdOrRequest, [], deferred, getSinglePage);
+    const singlePage = false;
+    this.getByRequest(actionIdOrRequest, [], deferred, singlePage);
     return deferred.promise as any;
   }
 
   public getPage(actionRequest: ActionsQueryRequest): Promise<ActionsPage> {
     const deferred = Q.defer<ActionsPage>();
-    const getSinglePage = true;
-    this.getByRequest(actionRequest, [], deferred, getSinglePage);
+    const singlePage = true;
+    this.getByRequest(actionRequest, [], deferred, singlePage);
     return deferred.promise as any;
   }
 
@@ -36,13 +39,13 @@ export default class ActionsService {
     const deferred = Q.defer<Action>();
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}/${actionId}`;
     this.client.get(requestUrl, (error, response, body) => {
-      this.mapActionPromise(deferred, error, response, body);
+      this.mapActionPromise(requestUrl, deferred, error, response, body);
     });
     return deferred.promise as any;
   }
 
   private getByRequest(actionsRequest: ActionsQueryRequest, actions: Action[],
-    deferred: Q.Deferred<any>, getSinglePage: boolean): Promise<Action[]> {
+    deferred: Q.Deferred<any>, singlePage: boolean): Promise<Action[]> {
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}`;
     const queryParams = actionsRequest as any;
     if (typeof actionsRequest.startDate !== 'undefined' && typeof actionsRequest.startDate !== 'string') {
@@ -55,7 +58,10 @@ export default class ActionsService {
       qs: queryParams
     };
     this.client.get(requestUrl, options, (error, response, body) => {
-      this.mapActionsPromise(deferred, error, response, body, actions, actionsRequest, getSinglePage);
+      const requestCallbackParams = {
+        error, response, body
+      };
+      this.mapActionsPromise(requestUrl, deferred, requestCallbackParams, actions, actionsRequest, singlePage);
     });
     return deferred.promise as any;
   }
@@ -64,7 +70,7 @@ export default class ActionsService {
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}/${actionId}/${Subresource.HEALTH_CHECK}`;
     const deferred = Q.defer<Action>();
     this.client.put(requestUrl, (error, response, body) => {
-      this.mapActionPromise(deferred, error, response, body);
+      this.mapActionPromise(requestUrl, deferred, error, response, body);
     });
     return deferred.promise as any;
   }
@@ -73,7 +79,7 @@ export default class ActionsService {
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}/${actionId}/${Subresource.COMPLETE}`;
     const deferred = Q.defer<Action>();
     this.client.put(requestUrl, (error, response, body) => {
-      this.mapActionPromise(deferred, error, response, body);
+      this.mapActionPromise(requestUrl, deferred, error, response, body);
     });
     return deferred.promise as any;
   }
@@ -82,45 +88,46 @@ export default class ActionsService {
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}/${actionId}/${Subresource.ERROR}`;
     const deferred = Q.defer<Action>();
     this.client.put(requestUrl, (error, response, body) => {
-      this.mapActionPromise(deferred, error, response, body);
+      this.mapActionPromise(requestUrl, deferred, error, response, body);
     });
     return deferred.promise as any;
   }
 
-  private mapActionPromise(deferred: Q.Deferred<Action>, error: any, response: request.Response, body: any) {
+  private mapActionPromise(requestUrl: string, deferred: Q.Deferred<Action>, error: any, response: request.Response,
+    body: any) {
     if (error) {
       deferred.reject(error);
-    } else if (response.statusCode === 200) {
+    } else if (response.statusCode === EXPECTED_STATUS_CODE) {
       const action = this.formatAction(body);
       deferred.resolve(action);
     } else {
-      const channelApeErrorResponse = body as ChannelApeApiErrorResponse;
-      channelApeErrorResponse.statusCode = response.statusCode;
+      const channelApeErrorResponse = GenerateApiError(requestUrl, response, body, EXPECTED_STATUS_CODE);
       deferred.reject(channelApeErrorResponse);
     }
   }
 
-  private mapActionsPromise(deferred: Q.Deferred<Action[] | ActionsPage>,error: any, response: request.Response,
-    body: any, actions: Action[], actionsRequest: ActionsQueryRequest, getSinglePage: boolean) {
-    if (error) {
-      deferred.reject(error);
-    } else if (response.statusCode === 200) {
-      const actionsFromThisCall: Action[] = body.actions.map(this.formatAction);
+  private mapActionsPromise(requestUrl: string, deferred: Q.Deferred<Action[] | ActionsPage>,
+    requestCallbackParams: RequestCallbackParams, actions: Action[], actionsRequest: ActionsQueryRequest,
+    singlePage: boolean) {
+    if (requestCallbackParams.error) {
+      deferred.reject(requestCallbackParams.error);
+    } else if (requestCallbackParams.response.statusCode === EXPECTED_STATUS_CODE) {
+      const actionsFromThisCall: Action[] = requestCallbackParams.body.actions.map(this.formatAction);
       const mergedActions: Action[] = actions.concat(actionsFromThisCall);
-      if (getSinglePage) {
+      if (singlePage) {
         deferred.resolve({
           actions: actionsFromThisCall,
-          pagination: body.pagination
+          pagination: requestCallbackParams.body.pagination
         });
-      } else if (body.pagination.lastPage) {
+      } else if (requestCallbackParams.body.pagination.lastPage) {
         deferred.resolve(mergedActions);
       } else {
-        actionsRequest.lastKey = body.pagination.lastKey;
-        this.getByRequest(actionsRequest, mergedActions, deferred, getSinglePage);
+        actionsRequest.lastKey = requestCallbackParams.body.pagination.lastKey;
+        this.getByRequest(actionsRequest, mergedActions, deferred, singlePage);
       }
     } else {
-      const channelApeErrorResponse = body as ChannelApeApiErrorResponse;
-      channelApeErrorResponse.statusCode = response.statusCode;
+      const channelApeErrorResponse =
+        GenerateApiError(requestUrl, requestCallbackParams.response, requestCallbackParams.body, EXPECTED_STATUS_CODE);
       deferred.reject(channelApeErrorResponse);
     }
   }

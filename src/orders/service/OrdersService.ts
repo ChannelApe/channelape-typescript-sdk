@@ -16,7 +16,7 @@ import * as request from 'request';
 import Resource from '../../model/Resource';
 import Version from '../../model/Version';
 import ChannelApeApiErrorResponse from './../../model/ChannelApeApiErrorResponse';
-import RequestCallbackParams from '../model/RequestCallbackParams';
+import RequestCallbackParams from '../../model/RequestCallbackParams';
 import * as Q from 'q';
 
 const EXPECTED_GET_STATUS = 200;
