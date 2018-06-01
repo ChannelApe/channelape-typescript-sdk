@@ -3,7 +3,13 @@
   "rules": {
     "trailing-comma": false,
     "align": false,
-    "max-line-length": [true, 120],
-    "no-increment-decrement": false
+    "max-line-length": [
+      true,
+      120
+    ],
+    "no-trailing-whitespace": true,
+    "no-debugger": true,
+    "no-console": true,
+    "no-unused-variable": true
   }
 }
