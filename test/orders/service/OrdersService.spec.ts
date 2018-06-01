@@ -13,7 +13,7 @@ import OrdersQueryRequestByChannel from '../../../src/orders/model/OrdersQueryRe
 import OrdersQueryRequestByChannelOrderId from '../../../src/orders/model/OrdersQueryRequestByChannelOrderId';
 import FulfillmentStatus from '../../../src/orders/model/FulfillmentStatus';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
-import Orders from '../../../src/orders/model/Orders';
+import OrdersPage from '../../../src/orders/model/OrdersPage';
 import Resource from '../../../src/model/Resource';
 import Version from '../../../src/model/Version';
 
