@@ -148,9 +148,6 @@ export default class RequestClientWrapper {
       case ('PUT'):
         this.put(uri, options, callBackOrUndefined);
         break;
-      case ('POST'):
-        // TODO
-        break;
       default:
         this.get(uri, options, callBackOrUndefined);
         break;
