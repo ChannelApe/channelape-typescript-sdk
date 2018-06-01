@@ -100,7 +100,6 @@ describe('RequestClientWrapper', () => {
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
         .yields(null, response, { orders: multipleOrders });
-      const loggerInfoSpy: sinon.SinonSpy = sandbox.spy(Logger.prototype, 'info');
 
       requestClientWrapper.get(options, (error, response, body) => {
         expect(error).to.be.null;
