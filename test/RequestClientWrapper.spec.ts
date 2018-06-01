@@ -182,12 +182,14 @@ describe('RequestClientWrapper', () => {
         code: 0,
         message: 'You didnt pass any body'
       };
+      // tslint:disable:no-trailing-whitespace
       const expectedErrorMessage =
 `PUT /v1/orders/c0f45529-cbed-4e90-9a38-c208d409ef2a
-  Status: 404
+  Status: 404 
   Response Body:
   404 undefined
 Code: 0 Message: You didnt pass any body`;
+      // tslint:enable:no-trailing-whitespace
       sandbox.stub(client, 'put')
         .yields(null, response, { errors: [channelApeApiError] });
 

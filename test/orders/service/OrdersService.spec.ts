@@ -317,12 +317,14 @@ describe('OrdersService', () => {
           }
         ]
       };
+      // tslint:disable:no-trailing-whitespace
       const expectedErrorMessage =
 ` /v1/orders
-  Status: 404
+  Status: 404 
   Response Body:
   404 undefined
 Code: 15 Message: Requested business cannot be found.`;
+      // tslint:enable:no-trailing-whitespace
       sandbox.stub(client, 'get')
           .yields(null, response, expectedChannelApeBusinessNotFoundError);
 
@@ -393,13 +395,14 @@ Code: 15 Message: Requested business cannot be found.`;
 
     it(`And invalid orderId
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
+      // tslint:disable:no-trailing-whitespace
       const expectedErrorMessage =
 ` /v1/orders/not-a-real-order-id
-  Status: 0
+  Status: 0 
   Response Body:
   Invalid URI "this-is-not-a-real-base-url/v1/orders/not-a-real-order-id"
 Code: -1 Message: Invalid URI "this-is-not-a-real-base-url/v1/orders/not-a-real-order-id"`;
-
+      // tslint:enable:no-trailing-whitespace
       const ordersService: OrdersService = new OrdersService(client);
       const orderId = 'not-a-real-order-id';
       return ordersService.get(orderId).then((actualOrder) => {
@@ -412,13 +415,14 @@ Code: -1 Message: Invalid URI "this-is-not-a-real-base-url/v1/orders/not-a-real-
 
     it(`And invalid businessId
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
+      // tslint:disable:no-trailing-whitespace
       const expectedErrorMessage =
 ` /v1/orders
-  Status: 0
+  Status: 0 
   Response Body:
   Invalid URI "this-is-not-a-real-base-url/v1/orders"
 Code: -1 Message: Invalid URI "this-is-not-a-real-base-url/v1/orders"`;
-
+      // tslint:enable:no-trailing-whitespace
       const ordersService: OrdersService = new OrdersService(client);
       const businessId = 'not-a-real-business-id';
       const requestOptions: OrdersQueryRequestByBusinessId = {
