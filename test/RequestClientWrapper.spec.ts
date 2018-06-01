@@ -4,7 +4,6 @@ import * as request from 'request';
 import Environment from '../src/model/Environment';
 import RequestClientWrapper from '../src/RequestClientWrapper';
 import { Logger, LogLevel } from 'channelape-logger';
-import * as winston from 'winston';
 
 import singleOrder from './orders/resources/singleOrder';
 import singleOrderToUpdate from './orders/resources/singleOrderToUpdate';
@@ -101,8 +100,7 @@ describe('RequestClientWrapper', () => {
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
         .yields(null, response, { orders: multipleOrders });
-      const loggerInfoSpy: sinon.SinonSpy = sandbox.spy(winston, 'info');
-      const loggerVerboseSpy: sinon.SinonSpy = sandbox.spy(winston, 'verbose');
+      const loggerInfoSpy: sinon.SinonSpy = sandbox.spy(Logger.prototype, 'info');
 
       requestClientWrapper.get(options, (error, response, body) => {
         expect(error).to.be.null;
