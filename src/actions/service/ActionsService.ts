@@ -1,5 +1,5 @@
 import Action from '../model/Action';
-import Actions from '../model/Actions';
+import ActionsPage from '../model/ActionsPage';
 import ActionsQueryRequest from '../model/ActionsQueryRequest';
 import * as request from 'request';
 import Resource from '../../model/Resource';
@@ -25,8 +25,8 @@ export default class ActionsService {
     return deferred.promise as any;
   }
 
-  public getPage(actionRequest: ActionsQueryRequest): Promise<Actions> {
-    const deferred = Q.defer<Actions>();
+  public getPage(actionRequest: ActionsQueryRequest): Promise<ActionsPage> {
+    const deferred = Q.defer<ActionsPage>();
     const getSinglePage = true;
     this.getByRequest(actionRequest, [], deferred, getSinglePage);
     return deferred.promise as any;
@@ -100,8 +100,8 @@ export default class ActionsService {
     }
   }
 
-  private mapActionsPromise(deferred: Q.Deferred<Action[] | Actions>, error: any, response: request.Response, body: any,
-    actions: Action[], actionsRequest: ActionsQueryRequest, getSinglePage: boolean) {
+  private mapActionsPromise(deferred: Q.Deferred<Action[] | ActionsPage>,error: any, response: request.Response,
+    body: any, actions: Action[], actionsRequest: ActionsQueryRequest, getSinglePage: boolean) {
     if (error) {
       deferred.reject(error);
     } else if (response.statusCode === 200) {

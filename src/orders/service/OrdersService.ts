@@ -1,6 +1,6 @@
 import Order from '../model/Order';
 import OrderStatus from '../model/OrderStatus';
-import Orders from '../model/Orders';
+import OrdersPage from '../model/OrdersPage';
 import OrdersQueryRequest from '../model/OrdersQueryRequest';
 import OrdersQueryRequestByBusinessId from '../model/OrdersQueryRequestByBusinessId';
 import OrdersQueryRequestByChannel from '../model/OrdersQueryRequestByChannel';
@@ -43,12 +43,12 @@ export default class OrdersService {
     return deferred.promise as any;
   }
 
-  public getPage(ordersRequestByBusinessId: OrdersQueryRequestByBusinessId): Promise<Orders>;
-  public getPage(ordersRequestByChannel: OrdersQueryRequestByChannel): Promise<Orders>;
-  public getPage(ordersRequestByChannelOrderId: OrdersQueryRequestByChannelOrderId): Promise<Orders>;
+  public getPage(ordersRequestByBusinessId: OrdersQueryRequestByBusinessId): Promise<OrdersPage>;
+  public getPage(ordersRequestByChannel: OrdersQueryRequestByChannel): Promise<OrdersPage>;
+  public getPage(ordersRequestByChannelOrderId: OrdersQueryRequestByChannelOrderId): Promise<OrdersPage>;
   public getPage(orderRequest: OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel |
-    OrdersQueryRequestByChannelOrderId): Promise<Orders> {
-    const deferred = Q.defer<Orders>();
+    OrdersQueryRequestByChannelOrderId): Promise<OrdersPage> {
+    const deferred = Q.defer<OrdersPage>();
     const getSinglePage = true;
     this.getOrdersByRequest(orderRequest, [], deferred, getSinglePage);
     return deferred.promise as any;
@@ -122,7 +122,7 @@ export default class OrdersService {
     if (requestCallbackParams.error) {
       deferred.reject(requestCallbackParams.error);
     } else if (requestCallbackParams.response.statusCode === expectedStatusCode) {
-      const data: Orders = requestCallbackParams.body as Orders;
+      const data: OrdersPage = requestCallbackParams.body as OrdersPage;
       const mergedOrders: Order[] = orders.concat(data.orders);
       if (getSinglePage) {
         deferred.resolve({
