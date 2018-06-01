@@ -105,7 +105,7 @@ export default class RequestClientWrapper {
     options: (request.UriOptions & request.CoreOptions) | request.CoreOptions | undefined
   ): void {
     this.requestLogger.logResponse(error, response, body);
-    if (this.requestShouldBeRetried(error, response)) {
+    if (this.shouldRequestBeRetried(error, response)) {
       this.retryRequest(response.method, uri, options, callBackOrUndefined, response, body);
       return;
     }
@@ -124,7 +124,7 @@ export default class RequestClientWrapper {
     }
   }
 
-  private requestShouldBeRetried(error: Error, response: request.Response): boolean {
+  private shouldRequestBeRetried(error: Error, response: request.Response): boolean {
     return (!error && ((response.statusCode >= 500 && response.statusCode <= 599) || response.statusCode === 429));
   }
 
