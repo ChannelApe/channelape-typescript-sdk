@@ -60,7 +60,7 @@ export default class RequestLogger {
       return '';
     }
     const queryParms = Object.keys(params).map((k) => {
-      return k + '=' + params[k];
+      return `${k}=${params[k]}`;
     }).join('&');
     return `?${queryParms}`;
   }
