@@ -38,18 +38,18 @@ export default class RequestClientWrapper {
     if (typeof uriOrOptions === 'string') {
       if (typeof callbackOrOptionsOrUndefined === 'function') {
         return this.client.get(uriOrOptions, (error, response, body) => {
-          this.responseHandler(error, response, body, callbackOrOptionsOrUndefined,
+          this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
             uriOrOptions, undefined);
         });
       }
       return this.client.get(uriOrOptions, callbackOrOptionsOrUndefined, (error, response, body) => {
-        this.responseHandler(error, response, body, callBackOrUndefined,
+        this.handleResponse(error, response, body, callBackOrUndefined,
           uriOrOptions, callbackOrOptionsOrUndefined);
       });
     }
     if (typeof callbackOrOptionsOrUndefined === 'function') {
       return this.client.get(uriOrOptions, (error, response, body) => {
-        this.responseHandler(error, response, body, callbackOrOptionsOrUndefined,
+        this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
           uriOrOptions.uri.toString(), undefined);
       });
     }
@@ -78,25 +78,25 @@ export default class RequestClientWrapper {
     if (typeof uriOrOptions === 'string') {
       if (typeof callbackOrOptionsOrUndefined === 'function') {
         return this.client.put(uriOrOptions, (error, response, body) => {
-          this.responseHandler(error, response, body, callbackOrOptionsOrUndefined,
+          this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
             uriOrOptions, undefined);
         });
       }
       return this.client.put(uriOrOptions, callbackOrOptionsOrUndefined, (error, response, body) => {
-        this.responseHandler(error, response, body, callBackOrUndefined,
+        this.handleResponse(error, response, body, callBackOrUndefined,
           uriOrOptions, callbackOrOptionsOrUndefined);
       });
     }
     if (typeof callbackOrOptionsOrUndefined === 'function') {
       return this.client.put(uriOrOptions, (error, response, body) => {
-        this.responseHandler(error, response, body, callbackOrOptionsOrUndefined,
+        this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
           uriOrOptions.uri.toString(), undefined);
       });
     }
     return this.client.put(uriOrOptions);
   }
 
-  private responseHandler(
+  private handleResponse(
     error: Error,
     response: request.Response,
     body: any,
