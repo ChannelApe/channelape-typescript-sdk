@@ -83,7 +83,7 @@ describe('OrdersService', () => {
       });
     });
 
-    it(`And valid orderId for cancelled order
+    it(`And valid orderId for canceled order
           When retrieving order then return resolved promise with order and correct dates`, () => {
       const response = {
         statusCode: 200
