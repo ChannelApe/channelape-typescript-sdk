@@ -93,19 +93,12 @@
     "typescript": "2.7.2"
   },
   "nyc": {
+    "include": [
+      "src/**/*.ts"
+    ],
     "extension": [
       ".ts"
     ],
-    "exclude": [
-      "node_modules/**",
-      "dist/**",
-      "reports/**",
-      "test/**",
-      "e2e/**",
-      "**/*.d.ts",
-      "**/*.conf.js"
-    ],
-    "all": true,
     "reporter": [
       "lcov",
       "text",
