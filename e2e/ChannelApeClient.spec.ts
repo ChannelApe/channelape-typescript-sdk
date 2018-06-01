@@ -8,7 +8,7 @@ import { expect } from 'chai';
 import OrdersQueryRequestByBusinessId from '../src/orders/model/OrdersQueryRequestByBusinessId';
 import OrdersQueryRequestByChannel from '../src/orders/model/OrdersQueryRequestByChannel';
 import OrdersQueryRequestByChannelOrderId from '../src/orders/model/OrdersQueryRequestByChannelOrderId';
-import LogLevel from '../src/model/LogLevel';
+import { LogLevel } from 'channelape-logger';
 
 describe('ChannelApe Client', () => {
 
