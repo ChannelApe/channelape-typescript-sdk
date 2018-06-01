@@ -1,11 +1,7 @@
 import * as request from 'request';
-import * as Q from 'q';
 import RequestClientWrapper from './RequestClientWrapper';
 import ClientConfiguration from './model/ClientConfiguration';
-import SessionsService from './sessions/service/SessionsService';
 import ActionsService from './actions/service/ActionsService';
-import Session from './sessions/model/Session';
-import Action from './actions/model/Action';
 import { LogLevel } from 'channelape-logger';
 import { Environment } from '.';
 import ChannelsService from './channels/service/ChannelsService';
@@ -59,7 +55,7 @@ export default class ChannelApeClient {
   get Endpoint(): string {
     return this.endpoint;
   }
-  
+
   get LogLevel(): LogLevel {
     return this.logLevel;
   }

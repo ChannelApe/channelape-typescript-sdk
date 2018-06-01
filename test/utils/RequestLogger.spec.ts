@@ -2,7 +2,7 @@ import * as sinon from 'sinon';
 import { expect } from 'chai';
 import * as Logger from 'channelape-logger';
 import RequestLogger from '../../src/utils/RequestLogger';
-import { Response, CoreOptions, UriOptions } from 'request';
+import { CoreOptions, UriOptions } from 'request';
 import Environment from '../../src/model/Environment';
 
 describe('RequestLogger', () => {
@@ -34,7 +34,7 @@ describe('RequestLogger', () => {
     expect(loggerStub.args[0][0]).to.equal('ChannelApe API');
   });
 
-  describe('logCall', () => {    
+  describe('logCall', () => {
     describe('given no error', () => {
       it('expect info to be called', () => {
         const requestCoreOptions: UriOptions & CoreOptions = {
@@ -51,7 +51,7 @@ describe('RequestLogger', () => {
     });
   });
 
-  describe('logResponse', () => {    
+  describe('logResponse', () => {
     describe('given an error', () => {
       it('expect info not to be called', () => {
         requestLogger.logResponse(new Error('error'), undefined, undefined);

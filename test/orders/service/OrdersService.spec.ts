@@ -7,13 +7,10 @@ import { LogLevel } from 'channelape-logger';
 import Environment from '../../../src/model/Environment';
 import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import ChannelApeError from '../../../src/model/ChannelApeError';
-import OrdersQueryRequest from '../../../src/orders/model/OrdersQueryRequest';
 import OrdersQueryRequestByBusinessId from '../../../src/orders/model/OrdersQueryRequestByBusinessId';
-import OrdersQueryRequestByChannel from '../../../src/orders/model/OrdersQueryRequestByChannel';
 import OrdersQueryRequestByChannelOrderId from '../../../src/orders/model/OrdersQueryRequestByChannelOrderId';
 import FulfillmentStatus from '../../../src/orders/model/FulfillmentStatus';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
-import OrdersPage from '../../../src/orders/model/OrdersPage';
 import Resource from '../../../src/model/Resource';
 import Version from '../../../src/model/Version';
 
@@ -30,7 +27,7 @@ describe('OrdersService', () => {
   describe('Given some valid rest client', () => {
     const client = request.defaults({
       baseUrl: Environment.STAGING,
-      timeout: 60000, 
+      timeout: 60000,
       json: true,
       headers: {
         'X-Channel-Ape-Authorization-Token': 'valid-session-id'
@@ -44,15 +41,11 @@ describe('OrdersService', () => {
     const expectedChannelApeErrorResponse : ChannelApeApiErrorResponse = {
       statusCode: 404,
       errors: [
-        { 
-          code: 174, 
-          message: 'Order could not be found.' 
+        {
+          code: 174,
+          message: 'Order could not be found.'
         }
       ]
-    };
-
-    const expectedError = {
-      stack: 'oh no an error'
     };
 
     beforeEach((done) => {
@@ -65,7 +58,7 @@ describe('OrdersService', () => {
       done();
     });
 
-    it(`And valid orderId 
+    it(`And valid orderId
             When retrieving order Then return resolved promise with order`, () => {
       const response = {
         statusCode: 200
@@ -152,7 +145,7 @@ describe('OrdersService', () => {
       });
     });
 
-    it(`And invalid orderId 
+    it(`And invalid orderId
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
       const response = {
         method: 'GET',
@@ -167,7 +160,7 @@ describe('OrdersService', () => {
           ]
         }
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+      sandbox.stub(client, 'get')
           .yields(null, response, expectedChannelApeErrorResponse);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
@@ -176,12 +169,11 @@ describe('OrdersService', () => {
         throw new Error('Test failed!');
       })
       .catch((e: ChannelApeError) => {
-        console.log(e.message);
         expect(e.message).to.be.an('string');
       });
     });
 
-    it(`And valid businessId and channelOrderId 
+    it(`And valid businessId and channelOrderId
             When retrieving order Then return resolved promise with order`, () => {
       const response = {
         statusCode: 200
@@ -217,7 +209,7 @@ describe('OrdersService', () => {
         statusCode: 200
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
-          .yields(null, response, { 
+          .yields(null, response, {
             orders: multipleOrders,
             pagination: {
               lastPage: true
@@ -249,14 +241,14 @@ describe('OrdersService', () => {
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
       clientGetStub.onFirstCall()
-        .yields(null, response, { 
+        .yields(null, response, {
           orders: multipleOrders,
           pagination: {
             lastPage: false
           }
         });
       clientGetStub.onSecondCall()
-        .yields(null, response, { 
+        .yields(null, response, {
           orders: multipleOrders,
           pagination: {
             lastPage: true
@@ -280,7 +272,7 @@ describe('OrdersService', () => {
 
     it(`And valid businessId with multiple pages of orders
         and the singlePage option set to true
-            When retrieving orders 
+            When retrieving orders
             Then return resolved promise with a single page of orders`, () => {
 
       const response = {
@@ -288,7 +280,7 @@ describe('OrdersService', () => {
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
       clientGetStub.onFirstCall()
-        .yields(null, response, { 
+        .yields(null, response, {
           orders: multipleOrders,
           pagination: {
             lastPage: false
@@ -311,7 +303,7 @@ describe('OrdersService', () => {
       });
     });
 
-    it(`And invalid businessId 
+    it(`And invalid businessId
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
       const response = {
         statusCode: 404
@@ -327,11 +319,11 @@ describe('OrdersService', () => {
       };
       const expectedErrorMessage =
 ` /v1/orders
-  Status: 404 
+  Status: 404
   Response Body:
   404 undefined
 Code: 15 Message: Requested business cannot be found.`;
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+      sandbox.stub(client, 'get')
           .yields(null, response, expectedChannelApeBusinessNotFoundError);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
@@ -389,7 +381,7 @@ Code: 15 Message: Requested business cannot be found.`;
     new RequestClientWrapper(
       request.defaults({
         baseUrl: 'this-is-not-a-real-base-url',
-        timeout: 60000, 
+        timeout: 60000,
         json: true,
         headers: {
           'X-Channel-Ape-Authorization-Token': 'valid-session-id'
@@ -399,11 +391,11 @@ Code: 15 Message: Requested business cannot be found.`;
       Environment.STAGING
     );
 
-    it(`And invalid orderId 
+    it(`And invalid orderId
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
       const expectedErrorMessage =
 ` /v1/orders/not-a-real-order-id
-  Status: 0 
+  Status: 0
   Response Body:
   Invalid URI "this-is-not-a-real-base-url/v1/orders/not-a-real-order-id"
 Code: -1 Message: Invalid URI "this-is-not-a-real-base-url/v1/orders/not-a-real-order-id"`;
@@ -418,15 +410,15 @@ Code: -1 Message: Invalid URI "this-is-not-a-real-base-url/v1/orders/not-a-real-
       });
     });
 
-    it(`And invalid businessId 
+    it(`And invalid businessId
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
       const expectedErrorMessage =
 ` /v1/orders
-  Status: 0 
+  Status: 0
   Response Body:
   Invalid URI "this-is-not-a-real-base-url/v1/orders"
 Code: -1 Message: Invalid URI "this-is-not-a-real-base-url/v1/orders"`;
-      
+
       const ordersService: OrdersService = new OrdersService(client);
       const businessId = 'not-a-real-business-id';
       const requestOptions: OrdersQueryRequestByBusinessId = {

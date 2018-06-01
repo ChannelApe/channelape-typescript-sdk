@@ -7,7 +7,7 @@ import request = require('request');
 
 export default class SessionsService {
 
-  constructor(private readonly client: request.RequestAPI<request.Request, 
+  constructor(private readonly client: request.RequestAPI<request.Request,
     request.CoreOptions, request.RequiredUriUrl>, private readonly sessionId: string) { }
   get(): Q.Promise<Session> {
     const deferred = Q.defer<Session>();

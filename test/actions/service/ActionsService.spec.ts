@@ -9,7 +9,6 @@ import Resource from '../../../src/model/Resource';
 import Subresource from '../../../src/actions/model/Subresource';
 import Environment from '../../../src/model/Environment';
 import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
-import Action from '../../../src/actions/model/Action';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import ChannelApeError from '../../../src/model/ChannelApeError';
 
@@ -23,7 +22,7 @@ describe('Actions Service', () => {
       new RequestClientWrapper(
         request.defaults({
           baseUrl: Environment.STAGING,
-          timeout: 60000, 
+          timeout: 60000,
           json: true
         }),
         LogLevel.OFF,
@@ -62,9 +61,9 @@ describe('Actions Service', () => {
     const expectedChannelApeErrorResponse : ChannelApeApiErrorResponse = {
       statusCode: 404,
       errors: [
-        { 
-          code: 111, 
-          message: 'Action could not be found.' 
+        {
+          code: 111,
+          message: 'Action could not be found.'
         }
       ]
     };

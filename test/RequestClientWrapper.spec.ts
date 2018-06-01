@@ -21,7 +21,7 @@ describe('RequestClientWrapper', () => {
     beforeEach((done) => {
       sandbox = sinon.sandbox.create();
       infoLogSpy = sandbox.spy(Logger.prototype, 'info');
-      requestClientWrapper = new RequestClientWrapper(client, LogLevel.INFO, Environment.STAGING);      
+      requestClientWrapper = new RequestClientWrapper(client, LogLevel.INFO, Environment.STAGING);
       done();
     });
 
@@ -47,7 +47,7 @@ describe('RequestClientWrapper', () => {
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+      sandbox.stub(client, 'get')
         .yields(null, response, singleOrder);
 
       requestClientWrapper.get(requestUrl, (error, response, body) => {
@@ -58,7 +58,6 @@ describe('RequestClientWrapper', () => {
     });
 
     it('When doing a get() with a URI, options, and call back expect data to be returned', (done) => {
-      const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders`;
       const options: request.CoreOptions = {
@@ -72,7 +71,7 @@ describe('RequestClientWrapper', () => {
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+      sandbox.stub(client, 'get')
         .yields(null, response, { orders: multipleOrders });
 
       requestClientWrapper.get(requestUrl, options, (error, response, body) => {
@@ -83,7 +82,6 @@ describe('RequestClientWrapper', () => {
     });
 
     it('When doing a get() with just options and call back expect data to be returned', (done) => {
-      const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders`;
       const options: request.CoreOptions & request.UriOptions = {
@@ -98,7 +96,7 @@ describe('RequestClientWrapper', () => {
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+      sandbox.stub(client, 'get')
         .yields(null, response, { orders: multipleOrders });
 
       requestClientWrapper.get(options, (error, response, body) => {
@@ -109,7 +107,6 @@ describe('RequestClientWrapper', () => {
     });
 
     it('When doing a get() with just options then expect request.Request to be returned', () => {
-      const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders`;
       const options: request.CoreOptions & request.UriOptions = {
@@ -125,7 +122,6 @@ describe('RequestClientWrapper', () => {
 
     it('When doing a get() with query params, expect the query params to be logged', () => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
-      const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders/${orderId}`;
       const options: request.CoreOptions & request.UriOptions = {
         uri: requestUrl,
@@ -134,7 +130,7 @@ describe('RequestClientWrapper', () => {
           anotherParam: false
         }
       };
-      const r = requestClientWrapper.get(options);
+      requestClientWrapper.get(options);
       expect(infoLogSpy.called).to.be.true;
       expect(infoLogSpy.args[0][0])
         .to.equal(`GET ${Environment.STAGING}${requestUrl}?param=true&anotherParam=false -- STARTED`);
@@ -142,7 +138,6 @@ describe('RequestClientWrapper', () => {
 
     it('When doing a get() with a single query param, expect the query param to be logged', () => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
-      const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders/${orderId}`;
       const options: request.CoreOptions & request.UriOptions = {
         uri: requestUrl,
@@ -150,29 +145,27 @@ describe('RequestClientWrapper', () => {
           param: true
         }
       };
-      const r = requestClientWrapper.get(options);
+      requestClientWrapper.get(options);
       expect(infoLogSpy.called).to.be.true;
       expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl}?param=true -- STARTED`);
     });
 
     it('When doing a get() with no query params, expect no query params to be logged', () => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
-      const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders/${orderId}`;
       const options: request.CoreOptions & request.UriOptions = {
         uri: requestUrl,
         qs: { }
       };
-      const r = requestClientWrapper.get(options);
+      requestClientWrapper.get(options);
       expect(infoLogSpy.called).to.be.true;
       expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`);
     });
 
     it('When doing a get() with no options, expect just the url to be logged', () => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
-      const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders/${orderId}`;
-      const r = requestClientWrapper.get(requestUrl);
+      requestClientWrapper.get(requestUrl);
       expect(infoLogSpy.called).to.be.true;
       expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`);
     });
@@ -191,11 +184,11 @@ describe('RequestClientWrapper', () => {
       };
       const expectedErrorMessage =
 `PUT /v1/orders/c0f45529-cbed-4e90-9a38-c208d409ef2a
-  Status: 404 
+  Status: 404
   Response Body:
   404 undefined
 Code: 0 Message: You didnt pass any body`;
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'put')
+      sandbox.stub(client, 'put')
         .yields(null, response, { errors: [channelApeApiError] });
 
       requestClientWrapper.put(requestUrl, (error, response, body) => {
@@ -207,7 +200,6 @@ Code: 0 Message: You didnt pass any body`;
 
     it('When doing a put() with a URI, options, and call back expect data to be returned', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
-      const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders/${orderId}`;
       if (typeof singleOrderToUpdate.additionalFields === 'undefined') {
         throw new Error('additionalFields should be defined');
@@ -221,7 +213,7 @@ Code: 0 Message: You didnt pass any body`;
         method: 'PUT',
         url: `${Environment.STAGING}${requestUrl}`
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'put')
+      sandbox.stub(client, 'put')
         .yields(null, response, singleOrderToUpdate);
 
       requestClientWrapper.put(requestUrl, options, (error, response, body) => {
@@ -233,7 +225,6 @@ Code: 0 Message: You didnt pass any body`;
 
     it('When doing a put() with just options and call back expect data to be returned', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
-      const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders/${orderId}`;
       if (typeof singleOrderToUpdate.additionalFields === 'undefined') {
         throw new Error('additionalFields should be defined');
@@ -248,7 +239,7 @@ Code: 0 Message: You didnt pass any body`;
         method: 'PUT',
         url: `${Environment.STAGING}${requestUrl}`
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'put')
+      sandbox.stub(client, 'put')
         .yields(null, response, singleOrderToUpdate);
 
       requestClientWrapper.put(options, (error, response, body) => {
@@ -260,7 +251,6 @@ Code: 0 Message: You didnt pass any body`;
 
     it('When doing a put() with just options expect request.Request to be returned', () => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
-      const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders/${orderId}`;
       if (typeof singleOrderToUpdate.additionalFields === 'undefined') {
         throw new Error('additionalFields should be defined');
@@ -276,13 +266,12 @@ Code: 0 Message: You didnt pass any body`;
 
     it('When doing a put() expect the call to be logged', () => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
-      const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders/${orderId}`;
       const options: request.CoreOptions & request.UriOptions = {
         uri: requestUrl,
         body: singleOrderToUpdate
       };
-      const r = requestClientWrapper.put(options);
+      requestClientWrapper.put(options);
       expect(infoLogSpy.called).to.be.true;
       expect(infoLogSpy.args[0][0]).to.equal(`PUT ${Environment.STAGING}${requestUrl} -- STARTED`);
     });

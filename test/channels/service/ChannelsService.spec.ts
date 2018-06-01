@@ -5,7 +5,6 @@ import { LogLevel } from 'channelape-logger';
 import ChannelsService from './../../../src/channels/service/ChannelsService';
 import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
-import Subresource from '../../../src/actions/model/Subresource';
 import Environment from '../../../src/model/Environment';
 import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import Channel from '../../../src/channels/model/Channel';
@@ -18,7 +17,7 @@ describe('Channels Service', () => {
       new RequestClientWrapper(
         request.defaults({
           baseUrl: Environment.STAGING,
-          timeout: 60000, 
+          timeout: 60000,
           json: true
         }),
         LogLevel.OFF,
@@ -58,9 +57,9 @@ describe('Channels Service', () => {
     const expectedChannelApeErrorResponse : ChannelApeApiErrorResponse = {
       statusCode: 404,
       errors: [
-        { 
-          code: 70, 
-          message: 'Channel could not be found for business.' 
+        {
+          code: 70,
+          message: 'Channel could not be found for business.'
         }
       ]
     };

@@ -1,10 +1,10 @@
 import { Logger, LogLevel } from 'channelape-logger';
-import { Response, Request, UriOptions, CoreOptions, RequestCallback } from 'request';
+import { Response, UriOptions, CoreOptions, RequestCallback } from 'request';
 
 export default class RequestLogger {
   private readonly logger: Logger;
 
-  constructor (private readonly logLevel: LogLevel, private readonly endpoint: string) {
+  constructor (logLevel: LogLevel, private readonly endpoint: string) {
     this.logger = new Logger('ChannelApe API', logLevel);
   }
 
@@ -46,10 +46,6 @@ export default class RequestLogger {
       errorMessage = error.message;
       this.logger.error(errorMessage);
     }
-  }
-
-  public logError(): void {
-    
   }
 
   private responseIsLevel200(statusCode: number): boolean {
