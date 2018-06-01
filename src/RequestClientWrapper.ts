@@ -106,7 +106,7 @@ export default class RequestClientWrapper {
   ): void {
     this.requestLogger.logResponse(error, response, body);
     if (this.requestShouldBeRetried(error, response)) {
-      this.retryRequest(response.method, uri, options, callBackOrUndefined);
+      this.retryRequest(response.method, uri, options, callBackOrUndefined, response, body);
       return;
     }
     let finalError: ChannelApeError | null = null;
@@ -139,7 +139,9 @@ export default class RequestClientWrapper {
     method: string | undefined,
     uri: string,
     options: (request.UriOptions & request.CoreOptions) | request.CoreOptions | undefined,
-    callBackOrUndefined: request.RequestCallback | undefined
+    callBackOrUndefined: request.RequestCallback | undefined,
+    response: request.Response,
+    body: any
   ) {
     switch (method) {
       case ('GET'):
@@ -149,7 +151,10 @@ export default class RequestClientWrapper {
         this.put(uri, options, callBackOrUndefined);
         break;
       default:
-        this.get(uri, options, callBackOrUndefined);
+        if (typeof callBackOrUndefined === 'function') {
+          const e = new ChannelApeError('HTTP Request Method could not be determined', response, uri, []);
+          callBackOrUndefined(e, response, body);
+        }
         break;
     }
   }
