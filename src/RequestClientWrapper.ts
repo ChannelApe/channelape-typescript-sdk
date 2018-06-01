@@ -7,11 +7,11 @@ const GENERIC_ERROR_CODE = -1;
 
 export default class RequestClientWrapper {
 
-  private requestLogger: RequestLogger;
+  private readonly requestLogger: RequestLogger;
 
   constructor(
     private readonly client: request.RequestAPI<request.Request,
-    request.CoreOptions, request.RequiredUriUrl>, private logLevel: LogLevel, endpoint: string
+    request.CoreOptions, request.RequiredUriUrl>, private readonly logLevel: LogLevel, endpoint: string
   ) {
     this.requestLogger = new RequestLogger(this.logLevel, endpoint);
   }

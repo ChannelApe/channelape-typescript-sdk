@@ -21,6 +21,9 @@ import * as Q from 'q';
 const EXPECTED_GET_STATUS = 200;
 const EXPECTED_UPDATE_STATUS = 202;
 
+type GenericOrdersQueryRequest =
+  OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel | OrdersQueryRequestByChannelOrderId;
+
 export default class OrdersService {
 
   constructor(private readonly client: RequestClientWrapper) { }
@@ -29,8 +32,7 @@ export default class OrdersService {
   public get(ordersRequestByBusinessId: OrdersQueryRequestByBusinessId): Promise<Order[]>;
   public get(ordersRequestByChannel: OrdersQueryRequestByChannel): Promise<Order[]>;
   public get(ordersRequestByChannelOrderId: OrdersQueryRequestByChannelOrderId): Promise<Order[]>;
-  public get(orderIdOrRequest: string | OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel |
-    OrdersQueryRequestByChannelOrderId): Promise<Order> | Promise<Order[]> {
+  public get(orderIdOrRequest: string | GenericOrdersQueryRequest): Promise<Order> | Promise<Order[]> {
     if (typeof orderIdOrRequest === 'string') {
       return this.getByOrderId(orderIdOrRequest);
     }
@@ -105,8 +107,7 @@ export default class OrdersService {
   }
 
   private mapOrdersPromise(deferred: Q.Deferred<any>, error: any, response: request.Response,
-    body: Orders | ChannelApeApiErrorResponse, orders: Order[], ordersRequest: OrdersQueryRequestByBusinessId |
-      OrdersQueryRequestByChannel | OrdersQueryRequestByChannelOrderId |
+    body: Orders | ChannelApeApiErrorResponse, orders: Order[], ordersRequest: GenericOrdersQueryRequest |
       (OrdersQueryRequestByChannelOrderId & OrdersQueryRequest), expectedStatusCode: number,
       getSinglePage: boolean): void {
     if (error) {
@@ -123,11 +124,11 @@ export default class OrdersService {
         const ordersToReturn = mergedOrders.map(o => this.formatOrder(o));
         deferred.resolve(ordersToReturn);
       } else {
-        const newOrdersRequest: OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel |
-        OrdersQueryRequestByChannelOrderId | (OrdersQueryRequestByChannelOrderId & OrdersQueryRequest) = {
-          ...ordersRequest,
-          lastKey: data.pagination.lastKey
-        };
+        const newOrdersRequest: GenericOrdersQueryRequest |
+          (OrdersQueryRequestByChannelOrderId & OrdersQueryRequest) = {
+            ...ordersRequest,
+            lastKey: data.pagination.lastKey
+          };
         this.getOrdersByRequest(newOrdersRequest, mergedOrders, deferred, getSinglePage);
       }
     } else {

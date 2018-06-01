@@ -2,9 +2,9 @@ import { Logger, LogLevel } from 'channelape-logger';
 import { Response, Request, UriOptions, CoreOptions, RequestCallback } from 'request';
 
 export default class RequestLogger {
-  private logger: Logger;
+  private readonly logger: Logger;
 
-  constructor (private logLevel: LogLevel, private endpoint: string) {
+  constructor (private readonly logLevel: LogLevel, private readonly endpoint: string) {
     this.logger = new Logger('ChannelApe API', logLevel);
   }
 
@@ -63,9 +63,9 @@ export default class RequestLogger {
     if (Object.keys(params).length === 0) {
       return '';
     }
-    const queryParamsString = '?' + Object.keys(params).map((k) => {
+    const queryParms = Object.keys(params).map((k) => {
       return k + '=' + params[k];
     }).join('&');
-    return queryParamsString;
+    return `?${queryParms}`;
   }
 }
