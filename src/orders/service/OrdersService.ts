@@ -16,6 +16,7 @@ import * as request from 'request';
 import Resource from '../../model/Resource';
 import Version from '../../model/Version';
 import ChannelApeApiErrorResponse from './../../model/ChannelApeApiErrorResponse';
+import RequestCallbackParams from '../model/RequestCallbackParams';
 import * as Q from 'q';
 
 const EXPECTED_GET_STATUS = 200;
@@ -88,7 +89,12 @@ export default class OrdersService {
       qs: ordersQueryParams
     };
     this.client.get(requestUrl, options, (error, response, body) => {
-      this.mapOrdersPromise(deferred, error, response, body, orders, ordersRequest, EXPECTED_GET_STATUS, getSinglePage);
+      const requestResponse: RequestCallbackParams = {
+        error,
+        response,
+        body
+      };
+      this.mapOrdersPromise(deferred, requestResponse, orders, ordersRequest, EXPECTED_GET_STATUS, getSinglePage);
     });
   }
 
@@ -106,14 +112,17 @@ export default class OrdersService {
     }
   }
 
-  private mapOrdersPromise(deferred: Q.Deferred<any>, error: any, response: request.Response,
-    body: Orders | ChannelApeApiErrorResponse, orders: Order[], ordersRequest: GenericOrdersQueryRequest |
-      (OrdersQueryRequestByChannelOrderId & OrdersQueryRequest), expectedStatusCode: number,
-      getSinglePage: boolean): void {
-    if (error) {
-      deferred.reject(error);
-    } else if (response.statusCode === expectedStatusCode) {
-      const data: Orders = body as Orders;
+  private mapOrdersPromise(
+    deferred: Q.Deferred<any>, requestCallbackParams: RequestCallbackParams,
+    orders: Order[],
+    ordersRequest: GenericOrdersQueryRequest | (OrdersQueryRequestByChannelOrderId & OrdersQueryRequest),
+    expectedStatusCode: number,
+    getSinglePage: boolean
+  ): void {
+    if (requestCallbackParams.error) {
+      deferred.reject(requestCallbackParams.error);
+    } else if (requestCallbackParams.response.statusCode === expectedStatusCode) {
+      const data: Orders = requestCallbackParams.body as Orders;
       const mergedOrders: Order[] = orders.concat(data.orders);
       if (getSinglePage) {
         deferred.resolve({
@@ -132,8 +141,8 @@ export default class OrdersService {
         this.getOrdersByRequest(newOrdersRequest, mergedOrders, deferred, getSinglePage);
       }
     } else {
-      const channelApeErrorResponse = body as ChannelApeApiErrorResponse;
-      channelApeErrorResponse.statusCode = response.statusCode;
+      const channelApeErrorResponse = requestCallbackParams.body as ChannelApeApiErrorResponse;
+      channelApeErrorResponse.statusCode = requestCallbackParams.response.statusCode;
       deferred.reject(channelApeErrorResponse);
     }
   }
