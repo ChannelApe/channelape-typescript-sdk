@@ -9,7 +9,7 @@ import ChannelsService from '../src/channels/service/ChannelsService';
 import request = require('request');
 import Session from '../src/sessions/model/Session';
 import ChannelApeApiErrorResponse from '../src/model/ChannelApeApiErrorResponse';
-import LogLevel from '../src/model/LogLevel';
+import { LogLevel } from 'channelape-logger';
 import Action from '../src/actions/model/Action';
 import Order from '../src/orders/model/Order';
 import Environment from '../src/model/Environment';

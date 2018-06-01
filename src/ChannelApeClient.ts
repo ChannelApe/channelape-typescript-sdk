@@ -6,7 +6,7 @@ import SessionsService from './sessions/service/SessionsService';
 import ActionsService from './actions/service/ActionsService';
 import Session from './sessions/model/Session';
 import Action from './actions/model/Action';
-import LogLevel from './model/LogLevel';
+import { LogLevel } from 'channelape-logger';
 import { Environment } from '.';
 import ChannelsService from './channels/service/ChannelsService';
 import OrdersService from './orders/service/OrdersService';

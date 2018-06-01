@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import Order from '../../../src/orders/model/Order';
 import { expect } from 'chai';
 import * as request from 'request';
-import LogLevel from '../../../src/model/LogLevel';
+import { LogLevel } from 'channelape-logger';
 import Environment from '../../../src/model/Environment';
 import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import ChannelApeError from '../../../src/model/ChannelApeError';
