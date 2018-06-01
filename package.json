@@ -44,6 +44,10 @@
   "homepage": "https://github.com/ChannelApe/channelape-typescript-sdk#readme",
   "contributors": [
     {
+      "name": "Michael Bates",
+      "email": "mbates@channelape.com"
+    },
+    {
       "name": "RJ Davis",
       "email": "rjdavis@channelape.com"
     },
