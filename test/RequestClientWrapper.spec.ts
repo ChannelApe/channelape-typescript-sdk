@@ -469,5 +469,25 @@ Code: 0 Message: You didnt pass any body`;
         done();
       });
     }).timeout(100000);
+
+    it(`When handling a GET response expect callback with an empty response to be handled gracefully`, (done) => {
+      const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      const requestUrl = `/v1/orders/${orderId}`;
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
+      clientGetStub.callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
+        if (typeof cbOrOpts === 'function') {
+          setTimeout(() => cbOrOpts(null, undefined, undefined), 1000);
+        } else {
+          setTimeout(() => cb(null, undefined, undefined), 1000);
+        }
+      });
+
+      requestClientWrapper.get(requestUrl, (error, response, body) => {
+        const expectedErrorMessage = 'No response was received from the server';
+        expect(error).not.to.be.null;
+        expect(error.message).to.include(expectedErrorMessage);
+        done();
+      });
+    }).timeout(100000);
   });
 });
