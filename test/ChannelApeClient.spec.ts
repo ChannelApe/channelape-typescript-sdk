@@ -100,6 +100,38 @@ describe('ChannelApe Client', () => {
     });
   });
 
+  describe('Given client configuration with 3,600,000 ms timeout', () => {
+    const expectedSessionId = 'c478c897-dc1c-4171-a207-9e3af9b23579';
+    const channelApeClient = new ChannelApeClient({
+      sessionId: expectedSessionId,
+      timeout: 1999,
+      endpoint: Environment.STAGING,
+      maximumRequestRetryTimeout: 3600000
+    });
+
+    context('When retrieving maximumRequestRetryTimeout', () => {
+      it('Then expect default maximumRequestRetryTimeout of 3 minutes in milliseconds', () => {
+        expect(channelApeClient.MaximumRequestRetryTimeout).to.equal(180000);
+      });
+    });
+  });
+
+  describe('Given client configuration with 10000 ms timeout', () => {
+    const expectedSessionId = 'c478c897-dc1c-4171-a207-9e3af9b23579';
+    const channelApeClient = new ChannelApeClient({
+      sessionId: expectedSessionId,
+      timeout: 1999,
+      endpoint: Environment.STAGING,
+      maximumRequestRetryTimeout: 10000
+    });
+
+    context('When retrieving maximumRequestRetryTimeout', () => {
+      it('Then expect default maximumRequestRetryTimeout of 10 seconds in milliseconds', () => {
+        expect(channelApeClient.MaximumRequestRetryTimeout).to.equal(10000);
+      });
+    });
+  });
+
   describe('Given client configuration with valid session ID', () => {
     const channelApeClient = new ChannelApeClient({
       sessionId: 'c478c897-dc1c-4171-a207-9e3af9b23579'
