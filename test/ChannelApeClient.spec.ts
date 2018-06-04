@@ -1,15 +1,12 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import ChannelApeClient from '../src/ChannelApeClient';
-import ClientConfiguration from '../src/model/ClientConfiguration';
-import SessionsService from '../src/sessions/service/SessionsService';
 import ActionsService from '../src/actions/service/ActionsService';
 import ActionProcessingStatus from '../src/actions/model/ActionProcessingStatus';
 import ChannelsService from '../src/channels/service/ChannelsService';
 import request = require('request');
-import Session from '../src/sessions/model/Session';
 import ChannelApeApiErrorResponse from '../src/model/ChannelApeApiErrorResponse';
-import LogLevel from '../src/model/LogLevel';
+import { LogLevel } from 'channelape-logger';
 import Action from '../src/actions/model/Action';
 import Order from '../src/orders/model/Order';
 import Environment from '../src/model/Environment';
@@ -103,6 +100,38 @@ describe('ChannelApe Client', () => {
     });
   });
 
+  describe('Given client configuration with 3,600,000 ms timeout', () => {
+    const expectedSessionId = 'c478c897-dc1c-4171-a207-9e3af9b23579';
+    const channelApeClient = new ChannelApeClient({
+      sessionId: expectedSessionId,
+      timeout: 1999,
+      endpoint: Environment.STAGING,
+      maximumRequestRetryTimeout: 3600000
+    });
+
+    context('When retrieving maximumRequestRetryTimeout', () => {
+      it('Then expect default maximumRequestRetryTimeout of 3 minutes in milliseconds', () => {
+        expect(channelApeClient.MaximumRequestRetryTimeout).to.equal(180000);
+      });
+    });
+  });
+
+  describe('Given client configuration with 10000 ms timeout', () => {
+    const expectedSessionId = 'c478c897-dc1c-4171-a207-9e3af9b23579';
+    const channelApeClient = new ChannelApeClient({
+      sessionId: expectedSessionId,
+      timeout: 1999,
+      endpoint: Environment.STAGING,
+      maximumRequestRetryTimeout: 10000
+    });
+
+    context('When retrieving maximumRequestRetryTimeout', () => {
+      it('Then expect default maximumRequestRetryTimeout of 10 seconds in milliseconds', () => {
+        expect(channelApeClient.MaximumRequestRetryTimeout).to.equal(10000);
+      });
+    });
+  });
+
   describe('Given client configuration with valid session ID', () => {
     const channelApeClient = new ChannelApeClient({
       sessionId: 'c478c897-dc1c-4171-a207-9e3af9b23579'
@@ -134,7 +163,7 @@ describe('ChannelApe Client', () => {
         targetType: 'supplier'
       };
 
-      const retrieveActionStub = sandbox.stub(ActionsService.prototype, 'get')
+      sandbox.stub(ActionsService.prototype, 'get')
         .callsFake((expectedActionId) => {
           return Promise.resolve(expectedAction);
         });
@@ -158,14 +187,14 @@ describe('ChannelApe Client', () => {
       const expectedChannelApeErrorResponse : ChannelApeApiErrorResponse = {
         statusCode: 404,
         errors: [
-          { 
-            code: 70, 
-            message: 'Channel could not be found for business.' 
+          {
+            code: 70,
+            message: 'Channel could not be found for business.'
           }
         ]
       };
 
-      const retrieveActionStub = sandbox.stub(ChannelsService.prototype, 'get')
+      sandbox.stub(ChannelsService.prototype, 'get')
         .callsFake((channelId) => {
           return Promise.reject(expectedChannelApeErrorResponse);
         });
@@ -185,7 +214,7 @@ describe('ChannelApe Client', () => {
       const expectedOrder: Order = singleOrder;
       const expectedOrderId = expectedOrder.id;
 
-      const retrieveOrderStub = sandbox.stub(OrdersService.prototype, 'get')
+      sandbox.stub(OrdersService.prototype, 'get')
         .callsFake((expectedOrderId) => {
           return Promise.resolve(expectedOrder);
         });

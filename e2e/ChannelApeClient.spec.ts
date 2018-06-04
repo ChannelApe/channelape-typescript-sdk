@@ -1,14 +1,10 @@
-import ClientConfiguration from '../src/model/ClientConfiguration';
-import Session from '../src/sessions/model/Session';
 import ChannelApeError from '../src/model/ChannelApeError';
 import ChannelApeApiError from '../src/model/ChannelApeApiError';
 import ChannelApeClient from '../src/ChannelApeClient';
 import OrderStatus from '../src/orders/model/OrderStatus';
 import { expect } from 'chai';
 import OrdersQueryRequestByBusinessId from '../src/orders/model/OrdersQueryRequestByBusinessId';
-import OrdersQueryRequestByChannel from '../src/orders/model/OrdersQueryRequestByChannel';
-import OrdersQueryRequestByChannelOrderId from '../src/orders/model/OrdersQueryRequestByChannelOrderId';
-import LogLevel from '../src/model/LogLevel';
+import { LogLevel } from 'channelape-logger';
 
 describe('ChannelApe Client', () => {
 
@@ -177,7 +173,7 @@ describe('ChannelApe Client', () => {
             size: 150
           };
           const actualOrdersPromise = channelApeClient.orders().getPage(ordersQueryRequestByBusinessId);
-  
+
           it('Then return a single page of 150 orders for the business', () => {
             return actualOrdersPromise.then((actualOrders) => {
               expect(actualOrders.orders).to.be.an('array');
@@ -187,7 +183,7 @@ describe('ChannelApe Client', () => {
             });
           });
         });
-  
+
         describe('And lastKey of "1f557ede-3df5-4335-a64b-cb4181943965"', () => {
           context('When retrieving the next single page of orders', () => {
             const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
@@ -197,7 +193,7 @@ describe('ChannelApe Client', () => {
               size: 150
             };
             const actualOrdersPromise = channelApeClient.orders().getPage(ordersQueryRequestByBusinessId);
-    
+
             it('Then return the last single page of 51 orders for the business', () => {
               return actualOrdersPromise.then((actualOrders) => {
                 expect(actualOrders.orders).to.be.an('array');
@@ -207,7 +203,7 @@ describe('ChannelApe Client', () => {
               });
             });
           });
-        });        
+        });
       });
     });
 

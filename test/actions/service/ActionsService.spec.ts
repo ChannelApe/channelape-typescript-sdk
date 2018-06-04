@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import * as request from 'request';
-import LogLevel from '../../../src/model/LogLevel';
+import { LogLevel } from 'channelape-logger';
 import ActionsService from './../../../src/actions/service/ActionsService';
 import ActionsQueryRequest from '../../../src/actions/model/ActionsQueryRequest';
 import Version from '../../../src/model/Version';
@@ -9,8 +9,8 @@ import Resource from '../../../src/model/Resource';
 import Subresource from '../../../src/actions/model/Subresource';
 import Environment from '../../../src/model/Environment';
 import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
-import Action from '../../../src/actions/model/Action';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
+import ChannelApeError from '../../../src/model/ChannelApeError';
 
 import actionsFirstPageResponse from '../resources/actionsFirstPageResponse';
 import actionsFinalPageResponse from '../resources/actionsFinalPageResponse';
@@ -22,11 +22,12 @@ describe('Actions Service', () => {
       new RequestClientWrapper(
         request.defaults({
           baseUrl: Environment.STAGING,
-          timeout: 60000, 
+          timeout: 60000,
           json: true
         }),
         LogLevel.OFF,
-        Environment.STAGING
+        Environment.STAGING,
+        10000
       );
 
     let sandbox: sinon.SinonSandbox;
@@ -61,9 +62,9 @@ describe('Actions Service', () => {
     const expectedChannelApeErrorResponse : ChannelApeApiErrorResponse = {
       statusCode: 404,
       errors: [
-        { 
-          code: 111, 
-          message: 'Action could not be found.' 
+        {
+          code: 111,
+          message: 'Action could not be found.'
         }
       ]
     };
@@ -381,9 +382,9 @@ describe('Actions Service', () => {
       return actionsService.get(actionsRequest).then((actualResponse) => {
         throw new Error('Expected ChannelApeError');
       })
-      .catch((e: ChannelApeApiErrorResponse) => {
-        expect(e.errors[0].code).to.equal(15);
-        expect(e.errors[0].message).to.equal('Requested business cannot be found.');
+      .catch((e: ChannelApeError) => {
+        expect(e.ApiErrors[0].code).to.equal(15);
+        expect(e.ApiErrors[0].message).to.equal('Requested business cannot be found.');
       });
     });
 
@@ -434,11 +435,10 @@ describe('Actions Service', () => {
       expect(actualAction.targetType).to.equal(expectedAction.targetType);
     }
 
-    function expectChannelApeErrorResponse(error: any) {
-      const actualChannelApeErrorResponse = error as ChannelApeApiErrorResponse;
-      expect(actualChannelApeErrorResponse.statusCode).to.equal(404);
-      expect(actualChannelApeErrorResponse.errors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
-      expect(actualChannelApeErrorResponse.errors[0].message)
+    function expectChannelApeErrorResponse(actualChannelApeErrorResponse: ChannelApeError) {
+      expect(actualChannelApeErrorResponse.Response.statusCode).to.equal(404);
+      expect(actualChannelApeErrorResponse.ApiErrors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
+      expect(actualChannelApeErrorResponse.ApiErrors[0].message)
         .to.equal(expectedChannelApeErrorResponse.errors[0].message);
     }
 

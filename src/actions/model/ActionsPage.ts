@@ -1,7 +1,7 @@
-import Order from './Order';
+import Action from './Action';
 import PaginationResponse from '../../model/PaginationResponse';
 
-export default interface Orders {
-  orders: Order[];
+export default interface ActionsPage {
+  actions: Action[];
   pagination: PaginationResponse;
 }

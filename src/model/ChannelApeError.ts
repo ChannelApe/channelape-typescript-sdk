@@ -2,8 +2,8 @@ import { Response } from 'request';
 import ChannelApeApiError from '../model/ChannelApeApiError';
 
 export default class ChannelApeError extends Error {
-  private response: Response;
-  private apiErrors: ChannelApeApiError[];
+  private readonly response: Response;
+  private readonly apiErrors: ChannelApeApiError[];
 
   constructor(
     message: string,
@@ -33,12 +33,10 @@ export default class ChannelApeError extends Error {
         statusCode = typeof response.statusCode === 'undefined' ? 0 : response.statusCode;
         statusMessage = typeof response.statusMessage === 'undefined' ? '' : response.statusMessage;
       }
-      const finalMessage =
-`${method} ${uri}
+      return `${method} ${uri}
   Status: ${statusCode} ${statusMessage}
   Response Body:
   ${ret}`;
-      return finalMessage;
     }
 
     function getApiError(apiError: ChannelApeApiError, index: number): string {

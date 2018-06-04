@@ -6,7 +6,6 @@ import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
 import Environment from '../../../src/model/Environment';
 import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
-import Session from '../../../src/sessions/model/Session';
 
 describe('Sessions Service', () => {
 
@@ -43,16 +42,13 @@ describe('Sessions Service', () => {
       const response = {
         statusCode: 200
       };
-        
+
       const clientGetStub = sandbox.stub(client, 'get')
         .yields(null, response, expectedResponse);
 
       return sessionsService.get().then((actualResponse) => {
         expect(clientGetStub.args[0][0])
             .to.equal(`/${Version.V1}${Resource.SESSIONS}/${sessionId}`);
-        
-        const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
-
         expect(actualResponse.userId).to.equal(expectedResponse.userId);
         expect(actualResponse.sessionId).to.equal(expectedResponse.sessionId);
       });
@@ -72,9 +68,6 @@ describe('Sessions Service', () => {
       }).catch((e) => {
         expect(clientGetStub.args[0][0])
             .to.equal(`/${Version.V1}${Resource.SESSIONS}/${sessionId}`);
-
-        const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
-        
         expect(e).to.be.equal(expectedError);
         done();
       });
@@ -90,9 +83,9 @@ describe('Sessions Service', () => {
       const expectedChannelApeApiErrorResponse : ChannelApeApiErrorResponse = {
         statusCode: 401,
         errors: [
-          { 
-            code: 12, 
-            message: 'Invalid authorization token. Please check the server logs and try again.' 
+          {
+            code: 12,
+            message: 'Invalid authorization token. Please check the server logs and try again.'
           }
         ]
       };
@@ -104,9 +97,6 @@ describe('Sessions Service', () => {
       }).catch((e) => {
         expect(clientGetStub.args[0][0])
             .to.equal(`/${Version.V1}${Resource.SESSIONS}/${sessionId}`);
-
-        const actualOptions: request.CoreOptions = clientGetStub.args[0][1];
-
         const actualChannelApeErrorResponse = e as ChannelApeApiErrorResponse;
         expect(actualChannelApeErrorResponse.statusCode).to.equal(401);
         expect(actualChannelApeErrorResponse.errors.length).to.equal(1);

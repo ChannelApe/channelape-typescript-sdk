@@ -1,25 +1,25 @@
 import Order from '../model/Order';
 import OrderStatus from '../model/OrderStatus';
-import Orders from '../model/Orders';
+import OrdersPage from '../model/OrdersPage';
 import OrdersQueryRequest from '../model/OrdersQueryRequest';
 import OrdersQueryRequestByBusinessId from '../model/OrdersQueryRequestByBusinessId';
 import OrdersQueryRequestByChannel from '../model/OrdersQueryRequestByChannel';
 import OrdersQueryRequestByChannelOrderId from '../model/OrdersQueryRequestByChannelOrderId';
-import Address from '../model/Address';
-import Customer from '../model/Customer';
 import LineItem from '../model/LineItem';
 import Fulfillment from '../model/Fulfillment';
-import FulfillmentStatus from '../model/FulfillmentStatus';
-import AdditionalField from '../../model/AdditionalField';
 import RequestClientWrapper from '../../RequestClientWrapper';
 import * as request from 'request';
 import Resource from '../../model/Resource';
 import Version from '../../model/Version';
 import ChannelApeApiErrorResponse from './../../model/ChannelApeApiErrorResponse';
+import RequestCallbackParams from '../../model/RequestCallbackParams';
 import * as Q from 'q';
 
 const EXPECTED_GET_STATUS = 200;
 const EXPECTED_UPDATE_STATUS = 202;
+
+type GenericOrdersQueryRequest =
+  OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel | OrdersQueryRequestByChannelOrderId;
 
 export default class OrdersService {
 
@@ -29,8 +29,7 @@ export default class OrdersService {
   public get(ordersRequestByBusinessId: OrdersQueryRequestByBusinessId): Promise<Order[]>;
   public get(ordersRequestByChannel: OrdersQueryRequestByChannel): Promise<Order[]>;
   public get(ordersRequestByChannelOrderId: OrdersQueryRequestByChannelOrderId): Promise<Order[]>;
-  public get(orderIdOrRequest: string | OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel |
-    OrdersQueryRequestByChannelOrderId): Promise<Order> | Promise<Order[]> {
+  public get(orderIdOrRequest: string | GenericOrdersQueryRequest): Promise<Order> | Promise<Order[]> {
     if (typeof orderIdOrRequest === 'string') {
       return this.getByOrderId(orderIdOrRequest);
     }
@@ -40,12 +39,12 @@ export default class OrdersService {
     return deferred.promise as any;
   }
 
-  public getPage(ordersRequestByBusinessId: OrdersQueryRequestByBusinessId): Promise<Orders>;
-  public getPage(ordersRequestByChannel: OrdersQueryRequestByChannel): Promise<Orders>;
-  public getPage(ordersRequestByChannelOrderId: OrdersQueryRequestByChannelOrderId): Promise<Orders>;
+  public getPage(ordersRequestByBusinessId: OrdersQueryRequestByBusinessId): Promise<OrdersPage>;
+  public getPage(ordersRequestByChannel: OrdersQueryRequestByChannel): Promise<OrdersPage>;
+  public getPage(ordersRequestByChannelOrderId: OrdersQueryRequestByChannelOrderId): Promise<OrdersPage>;
   public getPage(orderRequest: OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel |
-    OrdersQueryRequestByChannelOrderId): Promise<Orders> {
-    const deferred = Q.defer<Orders>();
+    OrdersQueryRequestByChannelOrderId): Promise<OrdersPage> {
+    const deferred = Q.defer<OrdersPage>();
     const getSinglePage = true;
     this.getOrdersByRequest(orderRequest, [], deferred, getSinglePage);
     return deferred.promise as any;
@@ -86,7 +85,12 @@ export default class OrdersService {
       qs: ordersQueryParams
     };
     this.client.get(requestUrl, options, (error, response, body) => {
-      this.mapOrdersPromise(deferred, error, response, body, orders, ordersRequest, EXPECTED_GET_STATUS, getSinglePage);
+      const requestResponse: RequestCallbackParams = {
+        error,
+        response,
+        body
+      };
+      this.mapOrdersPromise(deferred, requestResponse, orders, ordersRequest, EXPECTED_GET_STATUS, getSinglePage);
     });
   }
 
@@ -104,15 +108,17 @@ export default class OrdersService {
     }
   }
 
-  private mapOrdersPromise(deferred: Q.Deferred<any>, error: any, response: request.Response,
-    body: Orders | ChannelApeApiErrorResponse, orders: Order[], ordersRequest: OrdersQueryRequestByBusinessId |
-      OrdersQueryRequestByChannel | OrdersQueryRequestByChannelOrderId |
-      (OrdersQueryRequestByChannelOrderId & OrdersQueryRequest), expectedStatusCode: number,
-      getSinglePage: boolean): void {
-    if (error) {
-      deferred.reject(error);
-    } else if (response.statusCode === expectedStatusCode) {
-      const data: Orders = body as Orders;
+  private mapOrdersPromise(
+    deferred: Q.Deferred<any>, requestCallbackParams: RequestCallbackParams,
+    orders: Order[],
+    ordersRequest: GenericOrdersQueryRequest | (OrdersQueryRequestByChannelOrderId & OrdersQueryRequest),
+    expectedStatusCode: number,
+    getSinglePage: boolean
+  ): void {
+    if (requestCallbackParams.error) {
+      deferred.reject(requestCallbackParams.error);
+    } else if (requestCallbackParams.response.statusCode === expectedStatusCode) {
+      const data: OrdersPage = requestCallbackParams.body as OrdersPage;
       const mergedOrders: Order[] = orders.concat(data.orders);
       if (getSinglePage) {
         deferred.resolve({
@@ -123,16 +129,16 @@ export default class OrdersService {
         const ordersToReturn = mergedOrders.map(o => this.formatOrder(o));
         deferred.resolve(ordersToReturn);
       } else {
-        const newOrdersRequest: OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel |
-        OrdersQueryRequestByChannelOrderId | (OrdersQueryRequestByChannelOrderId & OrdersQueryRequest) = {
-          ...ordersRequest,
-          lastKey: data.pagination.lastKey
-        };
+        const newOrdersRequest: GenericOrdersQueryRequest |
+          (OrdersQueryRequestByChannelOrderId & OrdersQueryRequest) = {
+            ...ordersRequest,
+            lastKey: data.pagination.lastKey
+          };
         this.getOrdersByRequest(newOrdersRequest, mergedOrders, deferred, getSinglePage);
       }
     } else {
-      const channelApeErrorResponse = body as ChannelApeApiErrorResponse;
-      channelApeErrorResponse.statusCode = response.statusCode;
+      const channelApeErrorResponse = requestCallbackParams.body as ChannelApeApiErrorResponse;
+      channelApeErrorResponse.statusCode = requestCallbackParams.response.statusCode;
       deferred.reject(channelApeErrorResponse);
     }
   }

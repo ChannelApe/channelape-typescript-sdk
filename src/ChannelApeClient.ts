@@ -1,21 +1,19 @@
 import * as request from 'request';
-import * as Q from 'q';
 import RequestClientWrapper from './RequestClientWrapper';
 import ClientConfiguration from './model/ClientConfiguration';
-import SessionsService from './sessions/service/SessionsService';
 import ActionsService from './actions/service/ActionsService';
-import Session from './sessions/model/Session';
-import Action from './actions/model/Action';
-import LogLevel from './model/LogLevel';
+import { LogLevel } from 'channelape-logger';
 import { Environment } from '.';
 import ChannelsService from './channels/service/ChannelsService';
 import OrdersService from './orders/service/OrdersService';
 
 const INVALID_CONFIGURATION_ERROR_MESSAGE = 'Invalid configuration. sessionId is required.';
+const THREE_MINUTES_IN_MS = 180000;
 export default class ChannelApeClient {
 
   private readonly sessionId: string;
   private readonly timeout: number;
+  private readonly maximumRequestRetryTimeout: number;
   private readonly endpoint: string;
   private readonly logLevel: LogLevel;
   private readonly requestClientWrapper: RequestClientWrapper;
@@ -31,7 +29,11 @@ export default class ChannelApeClient {
     this.sessionId = clientConfiguration.sessionId;
     this.endpoint = (clientConfiguration.endpoint == null) ? Environment.PRODUCTION : clientConfiguration.endpoint;
     this.timeout = (clientConfiguration.timeout == null || clientConfiguration.timeout < 2000)
-      ? 180000 : clientConfiguration.timeout;
+      ? THREE_MINUTES_IN_MS : clientConfiguration.timeout;
+    this.maximumRequestRetryTimeout =
+      (clientConfiguration.maximumRequestRetryTimeout == null ||
+        clientConfiguration.maximumRequestRetryTimeout > THREE_MINUTES_IN_MS)
+      ? THREE_MINUTES_IN_MS : clientConfiguration.maximumRequestRetryTimeout;
     this.logLevel = (clientConfiguration.logLevel == null) ? LogLevel.OFF : clientConfiguration.logLevel;
 
     const client = request.defaults({
@@ -42,7 +44,8 @@ export default class ChannelApeClient {
         'X-Channel-Ape-Authorization-Token': this.sessionId
       }
     });
-    this.requestClientWrapper = new RequestClientWrapper(client, this.logLevel, this.endpoint);
+    this.requestClientWrapper =
+      new RequestClientWrapper(client, this.logLevel, this.endpoint, this.maximumRequestRetryTimeout);
     this.actionsService = new ActionsService(this.requestClientWrapper);
     this.channelsService = new ChannelsService(this.requestClientWrapper);
     this.ordersService = new OrdersService(this.requestClientWrapper);
@@ -56,10 +59,14 @@ export default class ChannelApeClient {
     return this.timeout;
   }
 
+  get MaximumRequestRetryTimeout(): number {
+    return this.maximumRequestRetryTimeout;
+  }
+
   get Endpoint(): string {
     return this.endpoint;
   }
-  
+
   get LogLevel(): LogLevel {
     return this.logLevel;
   }

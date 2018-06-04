@@ -693,7 +693,7 @@ const actionsFirstPageResponse = {
   pagination: {
     lastKey: '39d78402-dcf1-4c7d-9d42-0c239a4e6524',
     lastPage: false,
-    nextPageHref: 
+    nextPageHref:
       'v1/actions?lastKey=39d78402-dcf1-4c7d-9d42-0c239a4e6524&size=50&businessId=4d688534-d82e-4111-940c-322ba9aec108',
     pageSize: 50,
     totalItems: 73
