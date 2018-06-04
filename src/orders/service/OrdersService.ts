@@ -11,7 +11,6 @@ import RequestClientWrapper from '../../RequestClientWrapper';
 import * as request from 'request';
 import Resource from '../../model/Resource';
 import Version from '../../model/Version';
-import ChannelApeApiErrorResponse from './../../model/ChannelApeApiErrorResponse';
 import RequestCallbackParams from '../../model/RequestCallbackParams';
 import GenerateApiError from '../../utils/GenerateApiError';
 import * as Q from 'q';
