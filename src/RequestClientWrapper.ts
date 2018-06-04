@@ -86,14 +86,15 @@ export default class RequestClientWrapper {
     callBackOrUndefined?: request.RequestCallback | undefined,
   ): void {
     this.limiter.removeTokens(1, (err, remainingRequest) => {
+      const callDetails =  { callStart, callCountForThisRequest: numberOfCalls };
       let callableRequestMethod: Function;
       try {
         callableRequestMethod = this.getCallableRequestMethod(method);
       } catch (e) {
         if (typeof callbackOrOptionsOrUndefined === 'function') {
-          this.handleResponse(e, {} as any, {}, callbackOrOptionsOrUndefined, '', undefined, callStart, numberOfCalls);
+          this.handleResponse(e, {} as any, {}, callbackOrOptionsOrUndefined, '', undefined, callDetails);
         } else if (typeof callBackOrUndefined === 'function') {
-          this.handleResponse(e, {} as any, {}, callBackOrUndefined, '', undefined, callStart, numberOfCalls);
+          this.handleResponse(e, {} as any, {}, callBackOrUndefined, '', undefined, callDetails);
         }
         return;
       }
@@ -103,7 +104,7 @@ export default class RequestClientWrapper {
         if (typeof callbackOrOptionsOrUndefined === 'function') {
           return callableRequestMethod(uriOrOptions, (error: Error , response: request.Response, body: any) => {
             this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-              uriOrOptions, undefined, callStart, numberOfCalls);
+              uriOrOptions, undefined, callDetails);
           });
         }
         return callableRequestMethod(
@@ -111,13 +112,13 @@ export default class RequestClientWrapper {
           callbackOrOptionsOrUndefined,
           (error: Error , response: request.Response, body: any) => {
             this.handleResponse(error, response, body, callBackOrUndefined,
-              uriOrOptions, callbackOrOptionsOrUndefined, callStart, numberOfCalls);
+              uriOrOptions, callbackOrOptionsOrUndefined, callDetails);
           });
       }
       if (typeof callbackOrOptionsOrUndefined === 'function') {
         return callableRequestMethod(uriOrOptions, (error: Error , response: request.Response, body: any) => {
           this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-            uriOrOptions.uri.toString(), undefined, callStart, numberOfCalls);
+            uriOrOptions.uri.toString(), undefined, callDetails);
         });
       }
       return callableRequestMethod(uriOrOptions);
