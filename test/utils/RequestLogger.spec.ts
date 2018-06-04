@@ -65,8 +65,7 @@ describe('RequestLogger', () => {
     });
 
     describe('given no error', () => {
-      describe('given a non-200 level response', () => {
-        requestLogger = new RequestLogger(Logger.LogLevel.VERBOSE, Environment.STAGING);
+      it('given a non-200 level response it should log the correct error', () => {
         requestLogger.logResponse(undefined, {
           statusCode: 504,
           statusMessage: 'Timeout',
