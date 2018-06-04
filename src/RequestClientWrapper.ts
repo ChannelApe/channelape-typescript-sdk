@@ -12,6 +12,8 @@ const DEFAULT_API_LIMIT_INTERVAL: Interval = 'second';
 const CHANNEL_APE_API_RETRY_TIMEOUT_MESSAGE = `A problem with the ChannelApe API has been encountered.
 Your request was tried a total of %s times over the course of %s milliseconds`;
 
+type CallbackOrOptionsOrUndefined = request.RequestCallback | request.CoreOptions | undefined;
+
 export default class RequestClientWrapper {
 
   private readonly requestLogger: RequestLogger;
@@ -42,7 +44,7 @@ export default class RequestClientWrapper {
   ): void;
   public get(
     uriOrOptions: string | (request.UriOptions & request.CoreOptions),
-    callbackOrOptionsOrUndefined?: request.RequestCallback | request.CoreOptions | undefined,
+    callbackOrOptionsOrUndefined?: CallbackOrOptionsOrUndefined,
     callBackOrUndefined?: request.RequestCallback | undefined
   ): void {
     const callStart = new Date();
@@ -66,7 +68,7 @@ export default class RequestClientWrapper {
   ): void;
   public put(
     uriOrOptions: string | (request.UriOptions & request.CoreOptions),
-    callbackOrOptionsOrUndefined?: request.RequestCallback | request.CoreOptions | undefined,
+    callbackOrOptionsOrUndefined?: CallbackOrOptionsOrUndefined,
     callBackOrUndefined?: request.RequestCallback | undefined
   ): void {
     const callStart = new Date();
@@ -80,7 +82,7 @@ export default class RequestClientWrapper {
     callStart: Date,
     numberOfCalls: number,
     uriOrOptions: string | (request.UriOptions & request.CoreOptions),
-    callbackOrOptionsOrUndefined?: request.RequestCallback | request.CoreOptions | undefined,
+    callbackOrOptionsOrUndefined?: CallbackOrOptionsOrUndefined,
     callBackOrUndefined?: request.RequestCallback | undefined,
   ): void {
     this.limiter.removeTokens(1, (err, remainingRequest) => {
