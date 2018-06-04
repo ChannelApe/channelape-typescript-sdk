@@ -43,23 +43,24 @@ export default class RequestClientWrapper {
     callBackOrUndefined?: request.RequestCallback | undefined
   ): void {
     this.limiter.removeTokens(1, (err, remainingRequest) => {
+      const callStart = new Date();
       this.requestLogger.logCall('GET', uriOrOptions, callbackOrOptionsOrUndefined);
       if (typeof uriOrOptions === 'string') {
         if (typeof callbackOrOptionsOrUndefined === 'function') {
           return this.client.get(uriOrOptions, (error, response, body) => {
             this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-              uriOrOptions, undefined);
+              uriOrOptions, undefined, callStart);
           });
         }
         return this.client.get(uriOrOptions, callbackOrOptionsOrUndefined, (error, response, body) => {
           this.handleResponse(error, response, body, callBackOrUndefined,
-            uriOrOptions, callbackOrOptionsOrUndefined);
+            uriOrOptions, callbackOrOptionsOrUndefined, callStart);
         });
       }
       if (typeof callbackOrOptionsOrUndefined === 'function') {
         return this.client.get(uriOrOptions, (error, response, body) => {
           this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-            uriOrOptions.uri.toString(), undefined);
+            uriOrOptions.uri.toString(), undefined, callStart);
         });
       }
       return this.client.get(uriOrOptions);
@@ -85,23 +86,24 @@ export default class RequestClientWrapper {
     callBackOrUndefined?: request.RequestCallback | undefined
   ): void {
     this.limiter.removeTokens(1, (err, remainingRequest) => {
+      const callStart = new Date();
       this.requestLogger.logCall('PUT', uriOrOptions, callbackOrOptionsOrUndefined);
       if (typeof uriOrOptions === 'string') {
         if (typeof callbackOrOptionsOrUndefined === 'function') {
           return this.client.put(uriOrOptions, (error, response, body) => {
             this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-              uriOrOptions, undefined);
+              uriOrOptions, undefined, callStart);
           });
         }
         return this.client.put(uriOrOptions, callbackOrOptionsOrUndefined, (error, response, body) => {
           this.handleResponse(error, response, body, callBackOrUndefined,
-            uriOrOptions, callbackOrOptionsOrUndefined);
+            uriOrOptions, callbackOrOptionsOrUndefined, callStart);
         });
       }
       if (typeof callbackOrOptionsOrUndefined === 'function') {
         return this.client.put(uriOrOptions, (error, response, body) => {
           this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-            uriOrOptions.uri.toString(), undefined);
+            uriOrOptions.uri.toString(), undefined, callStart);
         });
       }
       return this.client.put(uriOrOptions);
@@ -114,14 +116,17 @@ export default class RequestClientWrapper {
     body: any,
     callBackOrUndefined: request.RequestCallback | undefined,
     uri: string,
-    options: (request.UriOptions & request.CoreOptions) | request.CoreOptions | undefined
+    options: (request.UriOptions & request.CoreOptions) | request.CoreOptions | undefined,
+    callStart: Date
   ): void {
     this.requestLogger.logResponse(error, response, body);
-    if (this.shouldRequestBeRetried(error, response)) {
+    let finalError: ChannelApeError | null = null;
+    if (this.didRequestTimeout(callStart)) {
+      finalError = new ChannelApeError(`The call timed out`, response, uri, []);
+    } else if (this.shouldRequestBeRetried(error, response)) {
       this.retryRequest(response.method, uri, options, callBackOrUndefined, response, body);
       return;
     }
-    let finalError: ChannelApeError | null = null;
     if (error) {
       finalError = new ChannelApeError(error.message, response, uri, [{
         code: GENERIC_ERROR_CODE,
@@ -134,6 +139,12 @@ export default class RequestClientWrapper {
     if (typeof callBackOrUndefined === 'function') {
       callBackOrUndefined(finalError, response, body);
     }
+  }
+
+  private didRequestTimeout(callStart: Date): boolean {
+    const now = new Date();
+    const totalElapsedTime = now.getTime() - callStart.getTime();
+    return totalElapsedTime > this.maximumRequestRetryTimeout;
   }
 
   private shouldRequestBeRetried(error: Error, response: request.Response): boolean {
