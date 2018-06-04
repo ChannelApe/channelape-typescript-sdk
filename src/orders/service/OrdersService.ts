@@ -11,8 +11,8 @@ import RequestClientWrapper from '../../RequestClientWrapper';
 import * as request from 'request';
 import Resource from '../../model/Resource';
 import Version from '../../model/Version';
-import ChannelApeApiErrorResponse from './../../model/ChannelApeApiErrorResponse';
 import RequestCallbackParams from '../../model/RequestCallbackParams';
+import GenerateApiError from '../../utils/GenerateApiError';
 import * as Q from 'q';
 
 const EXPECTED_GET_STATUS = 200;
@@ -57,7 +57,7 @@ export default class OrdersService {
       body: order
     };
     this.client.put(requestUrl, options, (error, response, body) => {
-      this.mapOrderPromise(deferred, error, response, body, EXPECTED_UPDATE_STATUS);
+      this.mapOrderPromise(requestUrl, deferred, error, response, body, EXPECTED_UPDATE_STATUS);
     });
     return deferred.promise as any;
   }
@@ -66,7 +66,7 @@ export default class OrdersService {
     const deferred = Q.defer<Order>();
     const requestUrl = `/${Version.V1}${Resource.ORDERS}/${orderId}`;
     this.client.get(requestUrl, (error, response, body) => {
-      this.mapOrderPromise(deferred, error, response, body, EXPECTED_GET_STATUS);
+      this.mapOrderPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
     });
     return deferred.promise as any;
   }
@@ -90,11 +90,12 @@ export default class OrdersService {
         response,
         body
       };
-      this.mapOrdersPromise(deferred, requestResponse, orders, ordersRequest, EXPECTED_GET_STATUS, getSinglePage);
+      this.mapOrdersPromise(requestUrl, deferred, requestResponse, orders, ordersRequest, EXPECTED_GET_STATUS,
+          getSinglePage);
     });
   }
 
-  private mapOrderPromise(deferred: Q.Deferred<Order>, error: any, response: request.Response,
+  private mapOrderPromise(requestUrl: string, deferred: Q.Deferred<Order>, error: any, response: request.Response,
     body: any, expectedStatusCode: number) {
     if (error) {
       deferred.reject(error);
@@ -102,13 +103,13 @@ export default class OrdersService {
       const order: Order = this.formatOrder(body);
       deferred.resolve(order);
     } else {
-      const channelApeErrorResponse = body as ChannelApeApiErrorResponse;
-      channelApeErrorResponse.statusCode = response.statusCode;
+      const channelApeErrorResponse = GenerateApiError(requestUrl, response, body, EXPECTED_UPDATE_STATUS);
       deferred.reject(channelApeErrorResponse);
     }
   }
 
   private mapOrdersPromise(
+    requestUrl: string,
     deferred: Q.Deferred<any>, requestCallbackParams: RequestCallbackParams,
     orders: Order[],
     ordersRequest: GenericOrdersQueryRequest | (OrdersQueryRequestByChannelOrderId & OrdersQueryRequest),
@@ -137,8 +138,9 @@ export default class OrdersService {
         this.getOrdersByRequest(newOrdersRequest, mergedOrders, deferred, getSinglePage);
       }
     } else {
-      const channelApeErrorResponse = requestCallbackParams.body as ChannelApeApiErrorResponse;
-      channelApeErrorResponse.statusCode = requestCallbackParams.response.statusCode;
+      const channelApeErrorResponse =
+        GenerateApiError(requestUrl, requestCallbackParams.response, requestCallbackParams.body,
+            EXPECTED_UPDATE_STATUS);
       deferred.reject(channelApeErrorResponse);
     }
   }

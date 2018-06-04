@@ -2,12 +2,12 @@ import { Response } from 'request';
 import ChannelApeApiError from '../model/ChannelApeApiError';
 
 export default class ChannelApeError extends Error {
-  private readonly response: Response;
+  private readonly response: Response | undefined;
   private readonly apiErrors: ChannelApeApiError[];
 
   constructor(
     message: string,
-    response: Response,
+    response: Response | undefined,
     uri: string,
     apiErrors: ChannelApeApiError[]
   ) {
@@ -45,6 +45,12 @@ export default class ChannelApeError extends Error {
   }
 
   public get Response(): Response {
+    if (this.response === undefined) {
+      return {
+        statusCode: -1,
+        statusMessage: 'There was an error with the API'
+      } as any;
+    }
     return this.response;
   }
 

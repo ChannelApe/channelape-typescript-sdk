@@ -142,7 +142,7 @@ export default class RequestClientWrapper {
 
   private handleResponse(
     error: Error,
-    response: request.Response,
+    response: request.Response | undefined,
     body: any,
     callBackOrUndefined: request.RequestCallback | undefined,
     uri: string,
@@ -155,7 +155,13 @@ export default class RequestClientWrapper {
       const maximumRetryLimitExceededMessage =
         this.getMaximumRetryLimitExceededMessage(callDetails.callStart, callDetails.callCountForThisRequest);
       finalError = new ChannelApeError(maximumRetryLimitExceededMessage, response, uri, []);
-    } else if (this.shouldRequestBeRetried(error, response)) {
+    } else if (response == null) {
+      const badResponseMessage = 'No response was received from the server';
+      finalError = new ChannelApeError(badResponseMessage, undefined, uri, [{
+        code: 504,
+        message: badResponseMessage
+      }]);
+    } else if (this.shouldRequestBeRetried(error, response) && response) {
       this.retryRequest(response.method, uri, options, callBackOrUndefined, response, body, callDetails);
       return;
     }
@@ -164,12 +170,12 @@ export default class RequestClientWrapper {
         code: GENERIC_ERROR_CODE,
         message: error.message
       }]);
-    } else if (this.isApiError(body)) {
+    } else if (this.isApiError(body) && response && body) {
       finalError = new ChannelApeError(`${response.statusCode} ${response.statusMessage}`,
         response, uri, body.errors);
     }
     if (typeof callBackOrUndefined === 'function') {
-      callBackOrUndefined(finalError, response, body);
+      callBackOrUndefined(finalError, response as any, body);
     }
   }
 
@@ -184,12 +190,15 @@ export default class RequestClientWrapper {
     return totalElapsedTime > this.maximumRequestRetryTimeout;
   }
 
-  private shouldRequestBeRetried(error: Error, response: request.Response): boolean {
+  private shouldRequestBeRetried(error: Error, response: request.Response | undefined): boolean {
+    if (response == null) {
+      return false;
+    }
     return (!error && ((response.statusCode >= 500 && response.statusCode <= 599) || response.statusCode === 429));
   }
 
   private isApiError(body: any): boolean {
-    if (typeof body.errors === 'undefined') {
+    if (typeof body === 'undefined' || typeof body.errors === 'undefined') {
       return false;
     }
     return body.errors.length > 0;
