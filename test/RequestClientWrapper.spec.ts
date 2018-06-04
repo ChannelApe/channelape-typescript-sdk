@@ -10,6 +10,8 @@ import singleOrderToUpdate from './orders/resources/singleOrderToUpdate';
 import multipleOrders from './orders/resources/multipleOrders';
 import ChannelApeApiError from '../src/model/ChannelApeApiError';
 
+const maximumRequestRetryTimeout = 3000;
+
 describe('RequestClientWrapper', () => {
 
   describe('Given some rest client', () => {
@@ -21,7 +23,8 @@ describe('RequestClientWrapper', () => {
     beforeEach((done) => {
       sandbox = sinon.sandbox.create();
       infoLogSpy = sandbox.spy(Logger.prototype, 'info');
-      requestClientWrapper = new RequestClientWrapper(client, LogLevel.INFO, Environment.STAGING);
+      requestClientWrapper =
+        new RequestClientWrapper(client, LogLevel.INFO, Environment.STAGING, maximumRequestRetryTimeout);
       done();
     });
 
@@ -106,21 +109,7 @@ describe('RequestClientWrapper', () => {
       });
     });
 
-    it('When doing a get() with just options then expect request.Request to be returned', () => {
-      const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
-      const requestUrl = `/v1/orders`;
-      const options: request.CoreOptions & request.UriOptions = {
-        uri: requestUrl,
-        qs: {
-          businessId,
-          status: 'OPEN'
-        }
-      };
-      const r = requestClientWrapper.get(options);
-      expect(r).to.be.an('object');
-    });
-
-    it('When doing a get() with query params, expect the query params to be logged', () => {
+    it('When doing a get() with query params, expect the query params to be logged', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
       const options: request.CoreOptions & request.UriOptions = {
@@ -130,13 +119,15 @@ describe('RequestClientWrapper', () => {
           anotherParam: false
         }
       };
-      requestClientWrapper.get(options);
-      expect(infoLogSpy.called).to.be.true;
-      expect(infoLogSpy.args[0][0])
-        .to.equal(`GET ${Environment.STAGING}${requestUrl}?param=true&anotherParam=false -- STARTED`);
+      requestClientWrapper.get(options, () => {
+        expect(infoLogSpy.called).to.be.true;
+        expect(infoLogSpy.args[0][0])
+          .to.equal(`GET ${Environment.STAGING}${requestUrl}?param=true&anotherParam=false -- STARTED`);
+        done();
+      });
     });
 
-    it('When doing a get() with a single query param, expect the query param to be logged', () => {
+    it('When doing a get() with a single query param, expect the query param to be logged', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
       const options: request.CoreOptions & request.UriOptions = {
@@ -145,29 +136,35 @@ describe('RequestClientWrapper', () => {
           param: true
         }
       };
-      requestClientWrapper.get(options);
-      expect(infoLogSpy.called).to.be.true;
-      expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl}?param=true -- STARTED`);
+      requestClientWrapper.get(options, () => {
+        expect(infoLogSpy.called).to.be.true;
+        expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl}?param=true -- STARTED`);
+        done();
+      });
     });
 
-    it('When doing a get() with no query params, expect no query params to be logged', () => {
+    it('When doing a get() with no query params, expect no query params to be logged', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
       const options: request.CoreOptions & request.UriOptions = {
         uri: requestUrl,
         qs: { }
       };
-      requestClientWrapper.get(options);
-      expect(infoLogSpy.called).to.be.true;
-      expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`);
+      requestClientWrapper.get(options, () => {
+        expect(infoLogSpy.called).to.be.true;
+        expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`);
+        done();
+      });
     });
 
-    it('When doing a get() with no options, expect just the url to be logged', () => {
+    it('When doing a get() with no options, expect just the url to be logged', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
-      requestClientWrapper.get(requestUrl);
-      expect(infoLogSpy.called).to.be.true;
-      expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`);
+      requestClientWrapper.get(requestUrl, () => {
+        expect(infoLogSpy.called).to.be.true;
+        expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`);
+        done();
+      });
     });
 
     it('When doing a put() with just a URI and call back expect ChannelApe error to be returned', (done) => {
@@ -251,31 +248,18 @@ Code: 0 Message: You didnt pass any body`;
       });
     });
 
-    it('When doing a put() with just options expect request.Request to be returned', () => {
-      const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
-      const requestUrl = `/v1/orders/${orderId}`;
-      if (typeof singleOrderToUpdate.additionalFields === 'undefined') {
-        throw new Error('additionalFields should be defined');
-      }
-      singleOrderToUpdate.additionalFields[0].value = 'RRR';
-      const options: request.CoreOptions & request.UriOptions = {
-        uri: requestUrl,
-        body: singleOrderToUpdate
-      };
-      const r = requestClientWrapper.put(options);
-      expect(r).to.be.an('object');
-    });
-
-    it('When doing a put() expect the call to be logged', () => {
+    it('When doing a put() expect the call to be logged', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
       const options: request.CoreOptions & request.UriOptions = {
         uri: requestUrl,
         body: singleOrderToUpdate
       };
-      requestClientWrapper.put(options);
-      expect(infoLogSpy.called).to.be.true;
-      expect(infoLogSpy.args[0][0]).to.equal(`PUT ${Environment.STAGING}${requestUrl} -- STARTED`);
+      requestClientWrapper.put(options, () => {
+        expect(infoLogSpy.called).to.be.true;
+        expect(infoLogSpy.args[0][0]).to.equal(`PUT ${Environment.STAGING}${requestUrl} -- STARTED`);
+        done();
+      });
     });
 
     it('When handling a GET response expect the call to be retried on 500 level status codes and 429s', (done) => {
@@ -312,11 +296,46 @@ Code: 0 Message: You didnt pass any body`;
         request: fakeRequest
       }];
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
-      clientGetStub.onCall(0).yields(null, responses[0], 'Im');
-      clientGetStub.onCall(1).yields(null, responses[1], 'a');
-      clientGetStub.onCall(2).yields(null, responses[2], 'little');
-      clientGetStub.onCall(3).yields(null, responses[3], 'teapot');
-      clientGetStub.onCall(4).yields(null, responses[4], singleOrder);
+      // clientGetStub.onCall(0).yields(null, responses[0], 'Im');
+      // clientGetStub.onCall(1).yields(null, responses[1], 'a');
+      // clientGetStub.onCall(2).yields(null, responses[2], 'little');
+      // clientGetStub.onCall(3).yields(null, responses[3], 'teapot');
+      // clientGetStub.onCall(4).yields(null, responses[4], singleOrder);
+      clientGetStub.onCall(0).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
+        if (typeof cbOrOpts === 'function') {
+          setTimeout(() => cbOrOpts(null, responses[0], 'Im'), 500);
+        } else {
+          setTimeout(() => cb(null, responses[0], 'Im'), 500);
+        }
+      });
+      clientGetStub.onCall(1).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
+        if (typeof cbOrOpts === 'function') {
+          setTimeout(() => cbOrOpts(null, responses[1], 'a'), 500);
+        } else {
+          setTimeout(() => cb(null, responses[1], 'a'), 500);
+        }
+      });
+      clientGetStub.onCall(2).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
+        if (typeof cbOrOpts === 'function') {
+          setTimeout(() => cbOrOpts(null, responses[2], 'little'), 500);
+        } else {
+          setTimeout(() => cb(null, responses[2], 'little'), 500);
+        }
+      });
+      clientGetStub.onCall(3).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
+        if (typeof cbOrOpts === 'function') {
+          setTimeout(() => cbOrOpts(null, responses[3], 'teapot'), 500);
+        } else {
+          setTimeout(() => cb(null, responses[3], 'teapot'), 500);
+        }
+      });
+      clientGetStub.onCall(4).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
+        if (typeof cbOrOpts === 'function') {
+          setTimeout(() => cbOrOpts(null, responses[4], singleOrder), 500);
+        } else {
+          setTimeout(() => cb(null, responses[4], singleOrder), 500);
+        }
+      });
 
       requestClientWrapper.get(requestUrl, (error, response, body) => {
         expect(error).to.be.null;
@@ -325,7 +344,7 @@ Code: 0 Message: You didnt pass any body`;
           .to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`, 'should log correctly');
         done();
       });
-    });
+    }).timeout(100000);
 
     it('When handling a PUT response expect the call to be retried on 500 level status codes and 429s', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';

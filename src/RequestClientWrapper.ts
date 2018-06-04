@@ -2,98 +2,109 @@ import * as request from 'request';
 import { LogLevel } from 'channelape-logger';
 import RequestLogger from './utils/RequestLogger';
 import ChannelApeError from './model/ChannelApeError';
+import { RateLimiter, Interval } from 'limiter';
 
 const GENERIC_ERROR_CODE = -1;
+const IMMEDIATELY_FIRE_CALLBACK = false;
+const DEFAULT_API_CALLS_PER_INTERVAL = 20;
+const DEFAULT_API_LIMIT_INTERVAL: Interval = 'second';
 
 export default class RequestClientWrapper {
 
   private readonly requestLogger: RequestLogger;
+  private readonly limiter: RateLimiter;
 
   constructor(
-    private readonly client: request.RequestAPI<request.Request,
-    request.CoreOptions, request.RequiredUriUrl>, private readonly logLevel: LogLevel, endpoint: string
+    private readonly client: request.RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>,
+    private readonly logLevel: LogLevel, endpoint: string, private readonly maximumRequestRetryTimeout: number
   ) {
     this.requestLogger = new RequestLogger(this.logLevel, endpoint);
+    this.limiter =
+      new RateLimiter(DEFAULT_API_CALLS_PER_INTERVAL, DEFAULT_API_LIMIT_INTERVAL, IMMEDIATELY_FIRE_CALLBACK);
   }
 
   public get(
     uri: string,
     options?: request.CoreOptions | undefined,
     callback?: request.RequestCallback | undefined
-  ): request.Request;
+  ): void;
   public get(
     uri: string,
     callback?: request.RequestCallback | undefined
-  ): request.Request;
+  ): void;
   public get(
     options: (request.UriOptions & request.CoreOptions),
     callback?: request.RequestCallback | undefined
-  ): request.Request;
+  ): void;
   public get(
     uriOrOptions: string | (request.UriOptions & request.CoreOptions),
     callbackOrOptionsOrUndefined?: request.RequestCallback | request.CoreOptions | undefined,
     callBackOrUndefined?: request.RequestCallback | undefined
-  ): request.Request {
-    this.requestLogger.logCall('GET', uriOrOptions, callbackOrOptionsOrUndefined);
-    if (typeof uriOrOptions === 'string') {
+  ): void {
+    this.limiter.removeTokens(1, (err, remainingRequest) => {
+      this.requestLogger.logCall('GET', uriOrOptions, callbackOrOptionsOrUndefined);
+      if (typeof uriOrOptions === 'string') {
+        if (typeof callbackOrOptionsOrUndefined === 'function') {
+          return this.client.get(uriOrOptions, (error, response, body) => {
+            this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
+              uriOrOptions, undefined);
+          });
+        }
+        return this.client.get(uriOrOptions, callbackOrOptionsOrUndefined, (error, response, body) => {
+          this.handleResponse(error, response, body, callBackOrUndefined,
+            uriOrOptions, callbackOrOptionsOrUndefined);
+        });
+      }
       if (typeof callbackOrOptionsOrUndefined === 'function') {
         return this.client.get(uriOrOptions, (error, response, body) => {
           this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-            uriOrOptions, undefined);
+            uriOrOptions.uri.toString(), undefined);
         });
       }
-      return this.client.get(uriOrOptions, callbackOrOptionsOrUndefined, (error, response, body) => {
-        this.handleResponse(error, response, body, callBackOrUndefined,
-          uriOrOptions, callbackOrOptionsOrUndefined);
-      });
-    }
-    if (typeof callbackOrOptionsOrUndefined === 'function') {
-      return this.client.get(uriOrOptions, (error, response, body) => {
-        this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-          uriOrOptions.uri.toString(), undefined);
-      });
-    }
-    return this.client.get(uriOrOptions);
+      return this.client.get(uriOrOptions);
+    });
   }
 
   public put(
     uri: string,
     options?: request.CoreOptions | undefined,
     callback?: request.RequestCallback | undefined
-  ): request.Request;
+  ): void;
   public put(
     uri: string,
     callback?: request.RequestCallback | undefined
-  ): request.Request;
+  ): void;
   public put(
     options: (request.UriOptions & request.CoreOptions),
     callback?: request.RequestCallback | undefined
-  ): request.Request;
+  ): void;
   public put(
     uriOrOptions: string | (request.UriOptions & request.CoreOptions),
     callbackOrOptionsOrUndefined?: request.RequestCallback | request.CoreOptions | undefined,
     callBackOrUndefined?: request.RequestCallback | undefined
-  ): request.Request {
-    this.requestLogger.logCall('PUT', uriOrOptions, callbackOrOptionsOrUndefined);
-    if (typeof uriOrOptions === 'string') {
+  ): void {
+    this.limiter.removeTokens(1, (err, remainingRequest) => {
+      this.requestLogger.logCall('PUT', uriOrOptions, callbackOrOptionsOrUndefined);
+      if (typeof uriOrOptions === 'string') {
+        if (typeof callbackOrOptionsOrUndefined === 'function') {
+          return this.client.put(uriOrOptions, (error, response, body) => {
+            this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
+              uriOrOptions, undefined);
+          });
+        }
+        return this.client.put(uriOrOptions, callbackOrOptionsOrUndefined, (error, response, body) => {
+          this.handleResponse(error, response, body, callBackOrUndefined,
+            uriOrOptions, callbackOrOptionsOrUndefined);
+        });
+      }
       if (typeof callbackOrOptionsOrUndefined === 'function') {
         return this.client.put(uriOrOptions, (error, response, body) => {
           this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-            uriOrOptions, undefined);
+            uriOrOptions.uri.toString(), undefined);
         });
       }
-      return this.client.put(uriOrOptions, callbackOrOptionsOrUndefined, (error, response, body) => {
-        this.handleResponse(error, response, body, callBackOrUndefined,
-          uriOrOptions, callbackOrOptionsOrUndefined);
-      });
-    }
-    if (typeof callbackOrOptionsOrUndefined === 'function') {
-      return this.client.put(uriOrOptions, (error, response, body) => {
-        this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-          uriOrOptions.uri.toString(), undefined);
-      });
-    }
-    return this.client.put(uriOrOptions);
+      return this.client.put(uriOrOptions);
+    });
   }
 
   private handleResponse(

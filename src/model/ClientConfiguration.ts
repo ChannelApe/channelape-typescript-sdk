@@ -6,5 +6,6 @@ export default interface ClientConfiguration {
   timeout?: number;
   endpoint?: string;
   logLevel?: LogLevel;
+  maximumRequestRetryTimeout?: number;
 
 }

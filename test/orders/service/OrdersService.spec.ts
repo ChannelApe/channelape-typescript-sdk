@@ -22,6 +22,8 @@ import singleOrderToUpdate from '../resources/singleOrderToUpdate';
 import singleOrderToUpdateResponse from '../resources/singleOrderToUpdateResponse';
 import multipleOrders from '../resources/multipleOrders';
 
+const maximumRequestRetryTimeout = 3000;
+
 describe('OrdersService', () => {
 
   describe('Given some valid rest client', () => {
@@ -34,7 +36,7 @@ describe('OrdersService', () => {
       }
     });
     const clientWrapper: RequestClientWrapper =
-      new RequestClientWrapper(client, LogLevel.OFF, Environment.STAGING);
+      new RequestClientWrapper(client, LogLevel.OFF, Environment.STAGING, maximumRequestRetryTimeout);
 
     let sandbox: sinon.SinonSandbox;
 
@@ -390,7 +392,8 @@ Code: 15 Message: Requested business cannot be found.`;
         }
       }),
       LogLevel.OFF,
-      Environment.STAGING
+      Environment.STAGING,
+      maximumRequestRetryTimeout
     );
 
     it(`And invalid orderId

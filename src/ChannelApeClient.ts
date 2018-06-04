@@ -12,6 +12,7 @@ export default class ChannelApeClient {
 
   private readonly sessionId: string;
   private readonly timeout: number;
+  private readonly maximumRequestRetryTimeout: number;
   private readonly endpoint: string;
   private readonly logLevel: LogLevel;
   private readonly requestClientWrapper: RequestClientWrapper;
@@ -28,6 +29,9 @@ export default class ChannelApeClient {
     this.endpoint = (clientConfiguration.endpoint == null) ? Environment.PRODUCTION : clientConfiguration.endpoint;
     this.timeout = (clientConfiguration.timeout == null || clientConfiguration.timeout < 2000)
       ? 180000 : clientConfiguration.timeout;
+    this.maximumRequestRetryTimeout =
+      (clientConfiguration.maximumRequestRetryTimeout == null || clientConfiguration.maximumRequestRetryTimeout < 2000)
+      ? 180000 : clientConfiguration.maximumRequestRetryTimeout;
     this.logLevel = (clientConfiguration.logLevel == null) ? LogLevel.OFF : clientConfiguration.logLevel;
 
     const client = request.defaults({
@@ -38,7 +42,8 @@ export default class ChannelApeClient {
         'X-Channel-Ape-Authorization-Token': this.sessionId
       }
     });
-    this.requestClientWrapper = new RequestClientWrapper(client, this.logLevel, this.endpoint);
+    this.requestClientWrapper =
+      new RequestClientWrapper(client, this.logLevel, this.endpoint, this.maximumRequestRetryTimeout);
     this.actionsService = new ActionsService(this.requestClientWrapper);
     this.channelsService = new ChannelsService(this.requestClientWrapper);
     this.ordersService = new OrdersService(this.requestClientWrapper);
@@ -50,6 +55,10 @@ export default class ChannelApeClient {
 
   get Timeout(): number {
     return this.timeout;
+  }
+
+  get MaximumRequestRetryTimeout(): number {
+    return this.maximumRequestRetryTimeout;
   }
 
   get Endpoint(): string {

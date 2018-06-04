@@ -26,7 +26,8 @@ describe('Actions Service', () => {
           json: true
         }),
         LogLevel.OFF,
-        Environment.STAGING
+        Environment.STAGING,
+        10000
       );
 
     let sandbox: sinon.SinonSandbox;
