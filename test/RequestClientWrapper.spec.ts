@@ -296,11 +296,6 @@ Code: 0 Message: You didnt pass any body`;
         request: fakeRequest
       }];
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
-      // clientGetStub.onCall(0).yields(null, responses[0], 'Im');
-      // clientGetStub.onCall(1).yields(null, responses[1], 'a');
-      // clientGetStub.onCall(2).yields(null, responses[2], 'little');
-      // clientGetStub.onCall(3).yields(null, responses[3], 'teapot');
-      // clientGetStub.onCall(4).yields(null, responses[4], singleOrder);
       clientGetStub.onCall(0).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
           setTimeout(() => cbOrOpts(null, responses[0], 'Im'), 500);
