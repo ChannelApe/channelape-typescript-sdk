@@ -2,8 +2,7 @@ module.exports = function(config) {
   config.set({
     files: [
       "test/**/*.ts",
-      // "src/**/*.ts",
-      "src/utils/GenerateApiError.ts",
+      "src/**/*.ts",
       "!e2e/**/*.ts",
     ],
     testRunner: "mocha",
@@ -15,8 +14,7 @@ module.exports = function(config) {
     tsconfigFile: "tsconfig.json",
     thresholds: { high: 90, low: 70, break: 91 },
     mutate: [
-      // "src/**/*.ts",
-      "src/utils/GenerateApiError.ts",
+      "src/**/*.ts",
       "!src/types/*d.ts"
     ]
   });
