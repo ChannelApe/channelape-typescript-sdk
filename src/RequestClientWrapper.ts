@@ -154,8 +154,8 @@ export default class RequestClientWrapper {
         this.getMaximumRetryLimitExceededMessage(callStart, callCountForThisRequest);
       finalError = new ChannelApeError(maximumRetryLimitExceededMessage, response, uri, []);
     } else if (this.shouldRequestBeRetried(error, response)) {
-      this.retryRequest(response.method, uri, options, callBackOrUndefined, response, body, callStart,
-          callCountForThisRequest);
+      const callDetails = { callStart, callCountForThisRequest };
+      this.retryRequest(response.method, uri, options, callBackOrUndefined, response, body, callDetails);
       return;
     }
     if (error) {
@@ -201,8 +201,7 @@ export default class RequestClientWrapper {
     callBackOrUndefined: request.RequestCallback | undefined,
     response: request.Response,
     body: any,
-    callStart: Date,
-    numberOfCalls: number
+    callDetails: { callStart: Date, callCountForThisRequest: number }
   ) {
     if (method === undefined) {
       if (typeof callBackOrUndefined === 'function') {
@@ -211,7 +210,7 @@ export default class RequestClientWrapper {
       }
       return;
     }
-    const newNumberOfCalls = numberOfCalls + 1;
-    this.makeRequest(method, callStart, newNumberOfCalls, uri, options, callBackOrUndefined);
+    const newNumberOfCalls = callDetails.callCountForThisRequest + 1;
+    this.makeRequest(method, callDetails.callStart, newNumberOfCalls, uri, options, callBackOrUndefined);
   }
 }
