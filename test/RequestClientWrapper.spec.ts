@@ -470,6 +470,85 @@ Code: 0 Message: You didnt pass any body`;
       });
     }).timeout(100000);
 
+    it(`When handling a GET response expect the call to be retried
+      until the MaximumRequestRetryTimeout limit is exceeded`, (done) => {
+      const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      const requestUrl = `/v1/orders/${orderId}`;
+      const fakeRequest = {
+        method: 'GET',
+        href: `${Environment.STAGING}${requestUrl}`
+      };
+      const responses = [{
+        statusCode: 500,
+        method: 'GET',
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
+      }, {
+        statusCode: 502,
+        method: 'GET',
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
+      }, {
+        statusCode: 599,
+        method: 'GET',
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
+      }, {
+        statusCode: 429,
+        method: 'GET',
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
+      }, {
+        statusCode: 200,
+        method: 'GET',
+        url: `${Environment.STAGING}${requestUrl}`,
+        request: fakeRequest
+      }];
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
+      clientGetStub.onCall(0).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
+        if (typeof cbOrOpts === 'function') {
+          setTimeout(() => cbOrOpts(null, responses[0], 'Im'), 1000);
+        } else {
+          setTimeout(() => cb(null, responses[0], 'Im'), 1000);
+        }
+      });
+      clientGetStub.onCall(1).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
+        if (typeof cbOrOpts === 'function') {
+          setTimeout(() => cbOrOpts(null, responses[1], 'a'), 1000);
+        } else {
+          setTimeout(() => cb(null, responses[1], 'a'), 1000);
+        }
+      });
+      clientGetStub.onCall(2).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
+        if (typeof cbOrOpts === 'function') {
+          setTimeout(() => cbOrOpts(null, responses[2], 'little'), 1000);
+        } else {
+          setTimeout(() => cb(null, responses[2], 'little'), 1000);
+        }
+      });
+      clientGetStub.onCall(3).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
+        if (typeof cbOrOpts === 'function') {
+          setTimeout(() => cbOrOpts(null, responses[3], 'teapot'), 1000);
+        } else {
+          setTimeout(() => cb(null, responses[3], 'teapot'), 1000);
+        }
+      });
+      clientGetStub.onCall(4).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
+        if (typeof cbOrOpts === 'function') {
+          setTimeout(() => cbOrOpts(null, responses[4], singleOrder), 1000);
+        } else {
+          setTimeout(() => cb(null, responses[4], singleOrder), 1000);
+        }
+      });
+
+      requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
+        const expectedErrorMessage = 'Your request was tried a total of 2 times over the course of 30';
+        expect(error).not.to.be.null;
+        expect(error.message).to.include(expectedErrorMessage);
+        done();
+      });
+    }).timeout(100000);
+
     it(`When handling a GET response expect callback with an empty response to be handled gracefully`, (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
