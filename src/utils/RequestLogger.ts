@@ -13,6 +13,10 @@ export default class RequestLogger {
     uriOrOptions: string | (UriOptions & CoreOptions),
     callbackOrOptionsOrUndefined?: RequestCallback | CoreOptions | undefined
   ): void {
+    let methodToLog: string = '';
+    if (typeof method !== 'undefined') {
+      methodToLog = method.toUpperCase();
+    }
     let uri: string;
     let queryParams = '';
     if (typeof uriOrOptions === 'string') {
@@ -24,7 +28,7 @@ export default class RequestLogger {
       uri = `${this.endpoint}${uriOrOptions.uri.toString()}`;
       queryParams = this.getQueryParamString(uriOrOptions.qs);
     }
-    this.logger.info(`${method} ${uri}${queryParams} -- STARTED`);
+    this.logger.info(`${methodToLog} ${uri}${queryParams} -- STARTED`);
   }
 
   public logResponse(error: any, response: Response | undefined, body: any | undefined): void {

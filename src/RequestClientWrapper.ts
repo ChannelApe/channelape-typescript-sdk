@@ -99,7 +99,7 @@ export default class RequestClientWrapper {
         return;
       }
 
-      this.requestLogger.logCall(method.toUpperCase(), uriOrOptions, callbackOrOptionsOrUndefined);
+      this.requestLogger.logCall(method, uriOrOptions, callbackOrOptionsOrUndefined);
       if (typeof uriOrOptions === 'string') {
         if (typeof callbackOrOptionsOrUndefined === 'function') {
           return callableRequestMethod(uriOrOptions, (error: Error , response: request.Response, body: any) => {
@@ -204,7 +204,7 @@ export default class RequestClientWrapper {
     body: any,
     callDetails: { callStart: Date, callCountForThisRequest: number }
   ) {
-    if (method === undefined) {
+    if (method == null) {
       if (typeof callBackOrUndefined === 'function') {
         const e = new ChannelApeError('HTTP Request Method could not be determined', response, uri, []);
         callBackOrUndefined(e, response, body);
