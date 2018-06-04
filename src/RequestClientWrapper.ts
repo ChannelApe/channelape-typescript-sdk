@@ -189,7 +189,7 @@ export default class RequestClientWrapper {
   }
 
   private isApiError(body: any): boolean {
-    if (typeof body.errors === 'undefined') {
+    if (typeof body === 'undefined' || typeof body.errors === 'undefined') {
       return false;
     }
     return body.errors.length > 0;
