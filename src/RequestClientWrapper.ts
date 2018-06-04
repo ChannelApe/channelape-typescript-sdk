@@ -5,7 +5,7 @@ import ChannelApeError from './model/ChannelApeError';
 import { RateLimiter, Interval } from 'limiter';
 
 const GENERIC_ERROR_CODE = -1;
-const IMMEDIATELY_FIRE_CALLBACK = false;
+const IMMEDIATELY_FIRE_RATE_LIMITED_CALLBACK = false;
 const DEFAULT_API_CALLS_PER_INTERVAL = 20;
 const DEFAULT_API_LIMIT_INTERVAL: Interval = 'second';
 
@@ -20,7 +20,8 @@ export default class RequestClientWrapper {
   ) {
     this.requestLogger = new RequestLogger(this.logLevel, endpoint);
     this.limiter =
-      new RateLimiter(DEFAULT_API_CALLS_PER_INTERVAL, DEFAULT_API_LIMIT_INTERVAL, IMMEDIATELY_FIRE_CALLBACK);
+      new RateLimiter(DEFAULT_API_CALLS_PER_INTERVAL, DEFAULT_API_LIMIT_INTERVAL,
+        IMMEDIATELY_FIRE_RATE_LIMITED_CALLBACK);
   }
 
   public get(
