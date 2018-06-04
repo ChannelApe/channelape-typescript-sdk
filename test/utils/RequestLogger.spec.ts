@@ -65,6 +65,20 @@ describe('RequestLogger', () => {
     });
 
     describe('given no error', () => {
+      describe('given a non-200 level response', () => {
+        requestLogger = new RequestLogger(Logger.LogLevel.VERBOSE, Environment.STAGING);
+        requestLogger.logResponse(undefined, {
+          statusCode: 504,
+          statusMessage: 'Timeout',
+          request: {
+            href: 'someurl',
+            method: 'PUT'
+          }
+        } as any, undefined);
+        expect(fakeLogger.error.called).to.be.true;
+        expect(fakeLogger.error.args[0][0]).to.equal('PUT someurl -- FAILED WITH STATUS: 504');
+      });
+
       it('expect error not to be called', () => {
         requestLogger.logResponse(undefined, undefined, undefined);
         expect(fakeLogger.error.called).to.be.false;
