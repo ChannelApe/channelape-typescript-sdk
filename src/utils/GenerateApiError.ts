@@ -4,14 +4,18 @@ import * as request from 'request';
 
 export default function generateApiError(url: string, response: request.Response, body: any,
   expectedStatusCode: number): ChannelApeError {
-  if (body.errors === undefined) {
-    body.errors = [];
+  let thisBody = body;
+  if (thisBody === undefined) {
+    thisBody = {};
+  }
+  if (thisBody.errors === undefined) {
+    thisBody.errors = [];
   }
   return new ChannelApeError(
     getErrorMessage(response, expectedStatusCode),
     response,
     url,
-    body.errors as ChannelApeApiError[]
+    thisBody.errors as ChannelApeApiError[]
   );
 }
 
