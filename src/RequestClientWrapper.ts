@@ -3,11 +3,14 @@ import { LogLevel } from 'channelape-logger';
 import RequestLogger from './utils/RequestLogger';
 import ChannelApeError from './model/ChannelApeError';
 import { RateLimiter, Interval } from 'limiter';
+import * as util from 'util';
 
 const GENERIC_ERROR_CODE = -1;
 const IMMEDIATELY_FIRE_RATE_LIMITED_CALLBACK = false;
 const DEFAULT_API_CALLS_PER_INTERVAL = 20;
 const DEFAULT_API_LIMIT_INTERVAL: Interval = 'second';
+const CHANNEL_APE_API_RETRY_TIMEOUT_MESSAGE = `A problem with the ChannelApe API has been encountered.
+Your request was tried a total of %s times over the course of %s milliseconds`;
 
 export default class RequestClientWrapper {
 
@@ -42,29 +45,10 @@ export default class RequestClientWrapper {
     callbackOrOptionsOrUndefined?: request.RequestCallback | request.CoreOptions | undefined,
     callBackOrUndefined?: request.RequestCallback | undefined
   ): void {
-    this.limiter.removeTokens(1, (err, remainingRequest) => {
-      const callStart = new Date();
-      this.requestLogger.logCall('GET', uriOrOptions, callbackOrOptionsOrUndefined);
-      if (typeof uriOrOptions === 'string') {
-        if (typeof callbackOrOptionsOrUndefined === 'function') {
-          return this.client.get(uriOrOptions, (error, response, body) => {
-            this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-              uriOrOptions, undefined, callStart);
-          });
-        }
-        return this.client.get(uriOrOptions, callbackOrOptionsOrUndefined, (error, response, body) => {
-          this.handleResponse(error, response, body, callBackOrUndefined,
-            uriOrOptions, callbackOrOptionsOrUndefined, callStart);
-        });
-      }
-      if (typeof callbackOrOptionsOrUndefined === 'function') {
-        return this.client.get(uriOrOptions, (error, response, body) => {
-          this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-            uriOrOptions.uri.toString(), undefined, callStart);
-        });
-      }
-      return this.client.get(uriOrOptions);
-    });
+    const callStart = new Date();
+    const initialCallCountForThisRequest = 0;
+    this.makeRequest('get', callStart, initialCallCountForThisRequest, uriOrOptions, callbackOrOptionsOrUndefined,
+      callBackOrUndefined);
   }
 
   public put(
@@ -85,29 +69,72 @@ export default class RequestClientWrapper {
     callbackOrOptionsOrUndefined?: request.RequestCallback | request.CoreOptions | undefined,
     callBackOrUndefined?: request.RequestCallback | undefined
   ): void {
+    const callStart = new Date();
+    const initialCallCountForThisRequest = 0;
+    this.makeRequest('put', callStart, initialCallCountForThisRequest, uriOrOptions, callbackOrOptionsOrUndefined,
+      callBackOrUndefined);
+  }
+
+  private makeRequest(
+    method: string,
+    callStart: Date,
+    numberOfCalls: number,
+    uriOrOptions: string | (request.UriOptions & request.CoreOptions),
+    callbackOrOptionsOrUndefined?: request.RequestCallback | request.CoreOptions | undefined,
+    callBackOrUndefined?: request.RequestCallback | undefined,
+  ): void {
     this.limiter.removeTokens(1, (err, remainingRequest) => {
-      const callStart = new Date();
-      this.requestLogger.logCall('PUT', uriOrOptions, callbackOrOptionsOrUndefined);
+      let callableRequestMethod: Function;
+      try {
+        callableRequestMethod = this.getCallableRequestMethod(method);
+      } catch (e) {
+        if (typeof callbackOrOptionsOrUndefined === 'function') {
+          this.handleResponse(e, {} as any, {}, callbackOrOptionsOrUndefined, '', undefined, callStart, numberOfCalls);
+        } else if (typeof callBackOrUndefined === 'function') {
+          this.handleResponse(e, {} as any, {}, callBackOrUndefined, '', undefined, callStart, numberOfCalls);
+        }
+        return;
+      }
+
+      this.requestLogger.logCall(method.toUpperCase(), uriOrOptions, callbackOrOptionsOrUndefined);
       if (typeof uriOrOptions === 'string') {
         if (typeof callbackOrOptionsOrUndefined === 'function') {
-          return this.client.put(uriOrOptions, (error, response, body) => {
+          return callableRequestMethod(uriOrOptions, (error: Error , response: request.Response, body: any) => {
             this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-              uriOrOptions, undefined, callStart);
+              uriOrOptions, undefined, callStart, numberOfCalls);
           });
         }
-        return this.client.put(uriOrOptions, callbackOrOptionsOrUndefined, (error, response, body) => {
-          this.handleResponse(error, response, body, callBackOrUndefined,
-            uriOrOptions, callbackOrOptionsOrUndefined, callStart);
-        });
+        return callableRequestMethod(
+          uriOrOptions,
+          callbackOrOptionsOrUndefined,
+          (error: Error , response: request.Response, body: any) => {
+            this.handleResponse(error, response, body, callBackOrUndefined,
+              uriOrOptions, callbackOrOptionsOrUndefined, callStart, numberOfCalls);
+          });
       }
       if (typeof callbackOrOptionsOrUndefined === 'function') {
-        return this.client.put(uriOrOptions, (error, response, body) => {
+        return callableRequestMethod(uriOrOptions, (error: Error , response: request.Response, body: any) => {
           this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-            uriOrOptions.uri.toString(), undefined, callStart);
+            uriOrOptions.uri.toString(), undefined, callStart, numberOfCalls);
         });
       }
-      return this.client.put(uriOrOptions);
+      return callableRequestMethod(uriOrOptions);
     });
+  }
+
+  private getCallableRequestMethod(method: string): Function {
+    let callableRequestMethod: Function;
+    switch (method.toUpperCase()) {
+      case ('GET'):
+        callableRequestMethod = this.client.get;
+        break;
+      case ('PUT'):
+        callableRequestMethod = this.client.put;
+        break;
+      default:
+        throw new ChannelApeError('HTTP Request Method could not be determined', {} as any, '', []);
+    }
+    return callableRequestMethod;
   }
 
   private handleResponse(
@@ -117,14 +144,18 @@ export default class RequestClientWrapper {
     callBackOrUndefined: request.RequestCallback | undefined,
     uri: string,
     options: (request.UriOptions & request.CoreOptions) | request.CoreOptions | undefined,
-    callStart: Date
+    callStart: Date,
+    callCountForThisRequest: number
   ): void {
     this.requestLogger.logResponse(error, response, body);
     let finalError: ChannelApeError | null = null;
     if (this.didRequestTimeout(callStart)) {
-      finalError = new ChannelApeError(`The call timed out`, response, uri, []);
+      const maximumRetryLimitExceededMessage =
+        this.getMaximumRetryLimitExceededMessage(callStart, callCountForThisRequest);
+      finalError = new ChannelApeError(maximumRetryLimitExceededMessage, response, uri, []);
     } else if (this.shouldRequestBeRetried(error, response)) {
-      this.retryRequest(response.method, uri, options, callBackOrUndefined, response, body);
+      this.retryRequest(response.method, uri, options, callBackOrUndefined, response, body, callStart,
+          callCountForThisRequest);
       return;
     }
     if (error) {
@@ -139,6 +170,11 @@ export default class RequestClientWrapper {
     if (typeof callBackOrUndefined === 'function') {
       callBackOrUndefined(finalError, response, body);
     }
+  }
+
+  private getMaximumRetryLimitExceededMessage(callStart: Date, numberOfCalls: number): string {
+    const elapsedTimeMs = new Date().getTime() - callStart.getTime();
+    return util.format(CHANNEL_APE_API_RETRY_TIMEOUT_MESSAGE, numberOfCalls, elapsedTimeMs);
   }
 
   private didRequestTimeout(callStart: Date): boolean {
@@ -164,21 +200,18 @@ export default class RequestClientWrapper {
     options: (request.UriOptions & request.CoreOptions) | request.CoreOptions | undefined,
     callBackOrUndefined: request.RequestCallback | undefined,
     response: request.Response,
-    body: any
+    body: any,
+    callStart: Date,
+    numberOfCalls: number
   ) {
-    switch (method) {
-      case ('GET'):
-        this.get(uri, options, callBackOrUndefined);
-        break;
-      case ('PUT'):
-        this.put(uri, options, callBackOrUndefined);
-        break;
-      default:
-        if (typeof callBackOrUndefined === 'function') {
-          const e = new ChannelApeError('HTTP Request Method could not be determined', response, uri, []);
-          callBackOrUndefined(e, response, body);
-        }
-        break;
+    if (method === undefined) {
+      if (typeof callBackOrUndefined === 'function') {
+        const e = new ChannelApeError('HTTP Request Method could not be determined', response, uri, []);
+        callBackOrUndefined(e, response, body);
+      }
+      return;
     }
+    const newNumberOfCalls = numberOfCalls + 1;
+    this.makeRequest(method, callStart, newNumberOfCalls, uri, options, callBackOrUndefined);
   }
 }
