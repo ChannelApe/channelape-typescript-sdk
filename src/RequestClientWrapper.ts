@@ -146,17 +146,15 @@ export default class RequestClientWrapper {
     callBackOrUndefined: request.RequestCallback | undefined,
     uri: string,
     options: (request.UriOptions & request.CoreOptions) | request.CoreOptions | undefined,
-    callStart: Date,
-    callCountForThisRequest: number
+    callDetails: { callStart: Date, callCountForThisRequest: number }
   ): void {
     this.requestLogger.logResponse(error, response, body);
     let finalError: ChannelApeError | null = null;
-    if (this.didRequestTimeout(callStart)) {
+    if (this.didRequestTimeout(callDetails.callStart)) {
       const maximumRetryLimitExceededMessage =
-        this.getMaximumRetryLimitExceededMessage(callStart, callCountForThisRequest);
+        this.getMaximumRetryLimitExceededMessage(callDetails.callStart, callDetails.callCountForThisRequest);
       finalError = new ChannelApeError(maximumRetryLimitExceededMessage, response, uri, []);
     } else if (this.shouldRequestBeRetried(error, response)) {
-      const callDetails = { callStart, callCountForThisRequest };
       this.retryRequest(response.method, uri, options, callBackOrUndefined, response, body, callDetails);
       return;
     }
