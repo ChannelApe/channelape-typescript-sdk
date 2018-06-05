@@ -70,17 +70,22 @@ describe('ChannelApe Client', () => {
     });
   });
 
-  describe('Given client configuration with valid session ID And -5 minute timeout And Staging endpoint', () => {
+  describe('Given client configuration with valid session ID ' +
+  'And -5 minute timeout And 1999 maximumRequestRetryTimeout And Staging endpoint', () => {
     const expectedSessionId = 'c478c897-dc1c-4171-a207-9e3af9b23579';
     const channelApeClient = new ChannelApeClient({
       sessionId: expectedSessionId,
       timeout: -300000,
+      maximumRequestRetryTimeout: 1999,
       endpoint: Environment.STAGING
     });
 
     context('When retrieving timeout', () => {
       it('Then expect default timeout of 3 minutes in milliseconds', () => {
         expect(channelApeClient.Timeout).to.equal(180000);
+      });
+      it('And expect default maximumRequestRetryTimeout of 3 minutes in milliseconds', () => {
+        expect(channelApeClient.MaximumRequestRetryTimeout).to.equal(180000);
       });
     });
   });
@@ -93,41 +98,28 @@ describe('ChannelApe Client', () => {
       endpoint: Environment.STAGING
     });
 
-    context('When retrieving timeout', () => {
-      it('Then expect default timeout of 3 minutes in milliseconds', () => {
-        expect(channelApeClient.Timeout).to.equal(180000);
-      });
-    });
-  });
-
-  describe('Given client configuration with 3,600,000 ms timeout', () => {
-    const expectedSessionId = 'c478c897-dc1c-4171-a207-9e3af9b23579';
-    const channelApeClient = new ChannelApeClient({
-      sessionId: expectedSessionId,
-      timeout: 1999,
-      endpoint: Environment.STAGING,
-      maximumRequestRetryTimeout: 3600000
-    });
-
     context('When retrieving maximumRequestRetryTimeout', () => {
       it('Then expect default maximumRequestRetryTimeout of 3 minutes in milliseconds', () => {
+        expect(channelApeClient.Timeout).to.equal(180000);
+      });
+      it('And expect default maximumRequestRetryTimeout of 3 minutes in milliseconds', () => {
         expect(channelApeClient.MaximumRequestRetryTimeout).to.equal(180000);
       });
     });
   });
 
-  describe('Given client configuration with 10000 ms timeout', () => {
+  describe('Given client configuration with 2000 ms maximumRequestRetryTimeout', () => {
     const expectedSessionId = 'c478c897-dc1c-4171-a207-9e3af9b23579';
     const channelApeClient = new ChannelApeClient({
       sessionId: expectedSessionId,
       timeout: 1999,
       endpoint: Environment.STAGING,
-      maximumRequestRetryTimeout: 10000
+      maximumRequestRetryTimeout: 2000
     });
 
     context('When retrieving maximumRequestRetryTimeout', () => {
-      it('Then expect default maximumRequestRetryTimeout of 10 seconds in milliseconds', () => {
-        expect(channelApeClient.MaximumRequestRetryTimeout).to.equal(10000);
+      it('Then expect maximumRequestRetryTimeout of 2000 ms', () => {
+        expect(channelApeClient.MaximumRequestRetryTimeout).to.equal(2000);
       });
     });
   });

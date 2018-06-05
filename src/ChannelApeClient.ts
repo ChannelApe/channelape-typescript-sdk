@@ -1,14 +1,15 @@
-import * as request from 'request';
-import RequestClientWrapper from './RequestClientWrapper';
-import ClientConfiguration from './model/ClientConfiguration';
-import ActionsService from './actions/service/ActionsService';
 import { LogLevel } from 'channelape-logger';
+import * as request from 'request';
 import { Environment } from '.';
+import RequestClientWrapper from './RequestClientWrapper';
+import ActionsService from './actions/service/ActionsService';
 import ChannelsService from './channels/service/ChannelsService';
+import ClientConfiguration from './model/ClientConfiguration';
 import OrdersService from './orders/service/OrdersService';
 
 const INVALID_CONFIGURATION_ERROR_MESSAGE = 'Invalid configuration. sessionId is required.';
 const THREE_MINUTES_IN_MS = 180000;
+const TWO_SECONDS_IN_MS = 2000;
 export default class ChannelApeClient {
 
   private readonly sessionId: string;
@@ -28,11 +29,11 @@ export default class ChannelApeClient {
 
     this.sessionId = clientConfiguration.sessionId;
     this.endpoint = (clientConfiguration.endpoint == null) ? Environment.PRODUCTION : clientConfiguration.endpoint;
-    this.timeout = (clientConfiguration.timeout == null || clientConfiguration.timeout < 2000)
+    this.timeout = (clientConfiguration.timeout == null || clientConfiguration.timeout < TWO_SECONDS_IN_MS)
       ? THREE_MINUTES_IN_MS : clientConfiguration.timeout;
     this.maximumRequestRetryTimeout =
       (clientConfiguration.maximumRequestRetryTimeout == null ||
-        clientConfiguration.maximumRequestRetryTimeout > THREE_MINUTES_IN_MS)
+        clientConfiguration.maximumRequestRetryTimeout < TWO_SECONDS_IN_MS)
       ? THREE_MINUTES_IN_MS : clientConfiguration.maximumRequestRetryTimeout;
     this.logLevel = (clientConfiguration.logLevel == null) ? LogLevel.OFF : clientConfiguration.logLevel;
 
