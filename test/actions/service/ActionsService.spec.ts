@@ -1,58 +1,70 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import request = require('request');
+import * as request from 'request';
+import { LogLevel } from 'channelape-logger';
 import ActionsService from './../../../src/actions/service/ActionsService';
+import ActionsQueryRequest from '../../../src/actions/model/ActionsQueryRequest';
 import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
 import Subresource from '../../../src/actions/model/Subresource';
 import Environment from '../../../src/model/Environment';
-import ChannelApeErrorResponse from '../../../src/model/ChannelApeErrorResponse';
-import Action from '../../../src/actions/model/Action';
+import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
+import RequestClientWrapper from '../../../src/RequestClientWrapper';
+import ChannelApeError from '../../../src/model/ChannelApeError';
+
+import actionsFirstPageResponse from '../resources/actionsFirstPageResponse';
+import actionsFinalPageResponse from '../resources/actionsFinalPageResponse';
 
 describe('Actions Service', () => {
 
   describe('Given some rest client', () => {
-    const client = request.defaults({
-      baseUrl: Environment.STAGING,
-      timeout: 60000,
-      json: true
-    });
+    const client: RequestClientWrapper =
+      new RequestClientWrapper(
+        request.defaults({
+          baseUrl: Environment.STAGING,
+          timeout: 60000,
+          json: true
+        }),
+        LogLevel.OFF,
+        Environment.STAGING,
+        10000
+      );
 
     let sandbox: sinon.SinonSandbox;
 
-    const expectedErrorAction: Action = {
+    const expectedErrorAction = {
       action: 'PRODUCT_PULL',
       businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4',
       description: 'Encountered error during product pull for Europa Sports',
       healthCheckIntervalInSeconds: 300,
       id: 'a85d7463-a2f2-46ae-95a1-549e70ecb2ca',
-      lastHealthCheckTime: new Date('2018-04-24T14:02:34.703Z'),
+      lastHealthCheckTime: '2018-04-24T14:02:34.703Z',
       processingStatus: 'error',
-      startTime: new Date('2018-04-24T14:02:34.703Z'),
+      startTime: '2018-04-24T14:02:34.703Z',
       targetId: '1e4ebaa6-9796-4ccf-bd73-8765893a66bd',
       targetType: 'supplier'
     };
 
-    const expectedCompletedAction: Action = {
+    const expectedCompletedAction = {
       action: 'PRODUCT_PUSH',
       businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4',
       description: 'Completed product push for Custom Column Export',
       healthCheckIntervalInSeconds: 300,
       id: '4da63571-a4c5-4774-ae20-4fee24ab98e5',
-      lastHealthCheckTime: new Date('2018-05-01T14:47:58.018Z'),
+      lastHealthCheckTime: '2018-05-01T14:47:58.018Z',
       processingStatus: 'completed',
-      startTime: new Date('2018-05-01T14:47:55.905Z'),
+      startTime: '2018-05-01T14:47:55.905Z',
       targetId: '9c728601-0286-457d-b0d6-ec19292d4485',
       targetType: 'channel',
-      endTime: new Date('2018-05-01T14:47:58.018Z')
+      endTime: '2018-05-01T14:47:58.018Z'
     };
 
-    const expectedChannelApeErrorResponse : ChannelApeErrorResponse = {
+    const expectedChannelApeErrorResponse : ChannelApeApiErrorResponse = {
       statusCode: 404,
       errors: [
-        { 
-          code: 111, 
-          message: 'Action could not be found.' 
+        {
+          code: 111,
+          message: 'Action could not be found.'
         }
       ]
     };
@@ -84,6 +96,7 @@ describe('Actions Service', () => {
       return actionsService.get(expectedErrorAction.id).then((actualAction) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedErrorAction.id}`);
         expectErrorAction(expectedErrorAction);
+        expect(actualAction.endTime).to.be.undefined;
       });
     });
 
@@ -135,6 +148,10 @@ describe('Actions Service', () => {
         expect(clientGetStub.args[0][0])
           .to.equal(`/${Version.V1}${Resource.ACTIONS}/${expectedCompletedAction.id}/${Subresource.HEALTH_CHECK}`);
         expectCompletedAction(actualAction);
+        expect(actualAction.endTime).not.to.be.undefined;
+        if (typeof actualAction.endTime === 'object') {
+          expect(actualAction.endTime.toISOString()).to.equal(actualAction.endTime.toISOString());
+        }
       });
     });
 
@@ -292,12 +309,109 @@ describe('Actions Service', () => {
       });
     });
 
-    function expectErrorAction(actualAction: Action) {
+    it(`And valid Business ID When retrieving actions Then expect multiple actions to be returned`, () => {
+      const clientGetStub = sandbox.stub(client, 'get');
+      const response = {
+        statusCode: 200
+      };
+      clientGetStub.onFirstCall()
+        .yields(null, response, actionsFirstPageResponse);
+      clientGetStub.onSecondCall()
+        .yields(null, response, actionsFinalPageResponse);
+      const actionsRequest: ActionsQueryRequest = {
+        businessId: '4d688534-d82e-4111-940c-322ba9aec108',
+        startDate: new Date('2018-05-01T18:07:58.009Z'),
+        endDate: new Date('2018-05-07T18:07:58.009Z'),
+        size: 50
+      };
+      const actionsService: ActionsService = new ActionsService(client);
+      return actionsService.get(actionsRequest).then((actualResponse) => {
+        expect(actualResponse).to.be.an('array');
+        expect(actualResponse.length).to.equal(73);
+        expect(clientGetStub.args[0][0]).to.equal('/v1/actions');
+        expect(clientGetStub.args[0][1].qs.startDate).to.equal('2018-05-01T18:07:58.009Z');
+        expect(clientGetStub.args[0][1].qs.endDate).to.equal('2018-05-07T18:07:58.009Z');
+        expect(clientGetStub.args[0][1].qs.size).to.equal(50);
+        expect(clientGetStub.args[1][1].qs.startDate).to.equal('2018-05-01T18:07:58.009Z');
+        expect(clientGetStub.args[1][1].qs.endDate).to.equal('2018-05-07T18:07:58.009Z');
+        expect(clientGetStub.args[1][1].qs.size).to.equal(50);
+      });
+    });
+
+    it(`And valid Business ID And singlePage set to true And the business has multiple pages worth of actions
+        When retrieving actions
+        Then expect a single page of actions to be returned`, () => {
+      const clientGetStub = sandbox.stub(client, 'get');
+      const response = {
+        statusCode: 200
+      };
+      clientGetStub.onFirstCall()
+        .yields(null, response, actionsFirstPageResponse);
+      const actionsRequest: ActionsQueryRequest = {
+        businessId: '4d688534-d82e-4111-940c-322ba9aec108',
+        startDate: new Date('2018-05-01T18:07:58.009Z'),
+        endDate: new Date('2018-05-07T18:07:58.009Z'),
+        size: 50
+      };
+      const actionsService: ActionsService = new ActionsService(client);
+      return actionsService.getPage(actionsRequest).then((actualResponse) => {
+        expect(actualResponse.actions).to.be.an('array');
+        expect(actualResponse.actions.length).to.equal(50);
+        expect(clientGetStub.args[0][0]).to.equal('/v1/actions');
+        expect(clientGetStub.args[0][1].qs.startDate).to.equal('2018-05-01T18:07:58.009Z');
+        expect(clientGetStub.args[0][1].qs.endDate).to.equal('2018-05-07T18:07:58.009Z');
+        expect(clientGetStub.args[0][1].qs.size).to.equal(50);
+      });
+    });
+
+    it(`And invalid Business ID when calling getByBusinessId() Then expect ChannelApeError to be returned`, () => {
+      const clientGetStub = sandbox.stub(client, 'get');
+      const response = {
+        statusCode: 404
+      };
+      clientGetStub.yields(null, response, {
+        errors: [{
+          code: 15,
+          message: 'Requested business cannot be found.'
+        }]
+      });
+      const actionsRequest: ActionsQueryRequest = {
+        businessId: 'not-a-real-business-id'
+      };
+      const actionsService: ActionsService = new ActionsService(client);
+      return actionsService.get(actionsRequest).then((actualResponse) => {
+        throw new Error('Expected ChannelApeError');
+      })
+      .catch((e: ChannelApeError) => {
+        expect(e.ApiErrors[0].code).to.equal(15);
+        expect(e.ApiErrors[0].message).to.equal('Requested business cannot be found.');
+      });
+    });
+
+    it(`And there is a request error Then expect an error to be returned`, () => {
+      const clientGetStub = sandbox.stub(client, 'get');
+      const response = {
+        statusCode: 500
+      };
+      clientGetStub.yields(new Error('server went away'), response, null);
+      const actionsRequest: ActionsQueryRequest = {
+        businessId: 'real-business-id'
+      };
+      const actionsService: ActionsService = new ActionsService(client);
+      return actionsService.get(actionsRequest).then((actualResponse) => {
+        throw new Error('Expected ChannelApeError');
+      })
+      .catch((e) => {
+        expect(e.message).to.equal('server went away');
+      });
+    });
+
+    function expectErrorAction(actualAction: any) {
       expectAction(expectedErrorAction, actualAction);
       expect(actualAction.endTime).to.equal(undefined);
     }
 
-    function expectCompletedAction(actualAction: Action) {
+    function expectCompletedAction(actualAction: any) {
       expectAction(expectedCompletedAction, actualAction);
       if (actualAction.endTime == null) {
         expect(actualAction.endTime).to.not.equal(undefined);
@@ -307,7 +421,7 @@ describe('Actions Service', () => {
       }
     }
 
-    function expectAction(expectedAction: Action, actualAction: Action) {
+    function expectAction(expectedAction: any, actualAction: any) {
       expect(actualAction.action).to.equal(expectedAction.action);
       expect(actualAction.businessId).to.equal(expectedAction.businessId);
       expect(actualAction.description).to.equal(expectedAction.description);
@@ -321,11 +435,10 @@ describe('Actions Service', () => {
       expect(actualAction.targetType).to.equal(expectedAction.targetType);
     }
 
-    function expectChannelApeErrorResponse(error: any) {
-      const actualChannelApeErrorResponse = error as ChannelApeErrorResponse;
-      expect(actualChannelApeErrorResponse.statusCode).to.equal(404);
-      expect(actualChannelApeErrorResponse.errors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
-      expect(actualChannelApeErrorResponse.errors[0].message)
+    function expectChannelApeErrorResponse(actualChannelApeErrorResponse: ChannelApeError) {
+      expect(actualChannelApeErrorResponse.Response.statusCode).to.equal(404);
+      expect(actualChannelApeErrorResponse.ApiErrors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
+      expect(actualChannelApeErrorResponse.ApiErrors[0].message)
         .to.equal(expectedChannelApeErrorResponse.errors[0].message);
     }
 

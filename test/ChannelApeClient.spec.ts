@@ -1,20 +1,27 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import ChannelApeClient from '../src/ChannelApeClient';
-import ClientConfiguration from '../src/model/ClientConfiguration';
-import SessionsService from '../src/sessions/service/SessionsService';
 import ActionsService from '../src/actions/service/ActionsService';
+import ActionProcessingStatus from '../src/actions/model/ActionProcessingStatus';
 import ChannelsService from '../src/channels/service/ChannelsService';
-import Session from '../src/sessions/model/Session';
-import ChannelApeErrorResponse from '../src/model/ChannelApeErrorResponse';
+import request = require('request');
+import ChannelApeApiErrorResponse from '../src/model/ChannelApeApiErrorResponse';
+import { LogLevel } from 'channelape-logger';
 import Action from '../src/actions/model/Action';
+import Order from '../src/orders/model/Order';
 import Environment from '../src/model/Environment';
+import OrdersService from '../src/orders/service/OrdersService';
+
+import singleOrder from '../test/orders/resources/singleOrder';
+
+let requestSpy: sinon.SinonSpy;
 
 describe('ChannelApe Client', () => {
 
   let sandbox: sinon.SinonSandbox;
   beforeEach((done) => {
     sandbox = sinon.sandbox.create();
+    requestSpy = sandbox.spy(request, 'defaults');
     done();
   });
 
@@ -23,12 +30,25 @@ describe('ChannelApe Client', () => {
     done();
   });
 
-  describe('Given client configuration with valid session ID And 2000 millisecond timeout And Staging endpoint', () => {
+  describe(`Given client configuration with valid session ID, 2000 millisecond timeout,
+             Staging endpoint, and logLevel of VERBOSE`, () => {
     const expectedSessionId = 'c478c897-dc1c-4171-a207-9e3af9b23579';
     const channelApeClient = new ChannelApeClient({
       sessionId: expectedSessionId,
       timeout: 2000,
       endpoint: Environment.STAGING
+    });
+
+    context('When retrieving LogLevel', () => {
+      it('Then expect LogLevel of "VERBOSE"', () => {
+        const channelApeClient = new ChannelApeClient({
+          sessionId: 'c478c897-dc1c-4171-a207-9e3af9b23579',
+          logLevel: LogLevel.VERBOSE
+        });
+        expect(channelApeClient.LogLevel).to.equal(LogLevel.VERBOSE);
+        expect(channelApeClient.LogLevel).to.equal('verbose');
+        expectRequestDefaults(requestSpy);
+      });
     });
 
     context('When retrieving sessionId', () => {
@@ -50,17 +70,22 @@ describe('ChannelApe Client', () => {
     });
   });
 
-  describe('Given client configuration with valid session ID And -5 minute timeout And Staging endpoint', () => {
+  describe('Given client configuration with valid session ID ' +
+  'And -5 minute timeout And 1999 maximumRequestRetryTimeout And Staging endpoint', () => {
     const expectedSessionId = 'c478c897-dc1c-4171-a207-9e3af9b23579';
     const channelApeClient = new ChannelApeClient({
       sessionId: expectedSessionId,
       timeout: -300000,
+      maximumRequestRetryTimeout: 1999,
       endpoint: Environment.STAGING
     });
 
     context('When retrieving timeout', () => {
       it('Then expect default timeout of 3 minutes in milliseconds', () => {
         expect(channelApeClient.Timeout).to.equal(180000);
+      });
+      it('And expect default maximumRequestRetryTimeout of 3 minutes in milliseconds', () => {
+        expect(channelApeClient.MaximumRequestRetryTimeout).to.equal(180000);
       });
     });
   });
@@ -73,9 +98,28 @@ describe('ChannelApe Client', () => {
       endpoint: Environment.STAGING
     });
 
-    context('When retrieving timeout', () => {
-      it('Then expect default timeout of 3 minutes in milliseconds', () => {
+    context('When retrieving maximumRequestRetryTimeout', () => {
+      it('Then expect default maximumRequestRetryTimeout of 3 minutes in milliseconds', () => {
         expect(channelApeClient.Timeout).to.equal(180000);
+      });
+      it('And expect default maximumRequestRetryTimeout of 3 minutes in milliseconds', () => {
+        expect(channelApeClient.MaximumRequestRetryTimeout).to.equal(180000);
+      });
+    });
+  });
+
+  describe('Given client configuration with 2000 ms maximumRequestRetryTimeout', () => {
+    const expectedSessionId = 'c478c897-dc1c-4171-a207-9e3af9b23579';
+    const channelApeClient = new ChannelApeClient({
+      sessionId: expectedSessionId,
+      timeout: 1999,
+      endpoint: Environment.STAGING,
+      maximumRequestRetryTimeout: 2000
+    });
+
+    context('When retrieving maximumRequestRetryTimeout', () => {
+      it('Then expect maximumRequestRetryTimeout of 2000 ms', () => {
+        expect(channelApeClient.MaximumRequestRetryTimeout).to.equal(2000);
       });
     });
   });
@@ -97,21 +141,6 @@ describe('ChannelApe Client', () => {
       });
     });
 
-    it('When getting session for a valid user Then return resolved promise with session data', () => {
-      const expectedSession: Session = {
-        userId: 'someuserId',
-        sessionId: 'somesessionid'
-      };
-      const retrieveSessionStub = sandbox.stub(SessionsService.prototype, 'get')
-        .callsFake(() => {
-          return Promise.resolve(expectedSession);
-        });
-      return channelApeClient.sessions().get().then((session) => {
-        expect(retrieveSessionStub.callCount).to.equal(1);
-        expect(session).to.equal(expectedSession);
-      });
-    });
-
     it('When retrieving valid action Then return resolved promise with action data', () => {
       const expectedAction: Action = {
         action: 'PRODUCT_PULL',
@@ -120,13 +149,13 @@ describe('ChannelApe Client', () => {
         healthCheckIntervalInSeconds: 300,
         id: 'a85d7463-a2f2-46ae-95a1-549e70ecb2ca',
         lastHealthCheckTime: new Date('2018-04-24T14:02:34.703Z'),
-        processingStatus: 'error',
+        processingStatus: ActionProcessingStatus.ERROR,
         startTime: new Date('2018-04-24T14:02:34.703Z'),
         targetId: '1e4ebaa6-9796-4ccf-bd73-8765893a66bd',
         targetType: 'supplier'
       };
 
-      const retrieveActionStub = sandbox.stub(ActionsService.prototype, 'get')
+      sandbox.stub(ActionsService.prototype, 'get')
         .callsFake((expectedActionId) => {
           return Promise.resolve(expectedAction);
         });
@@ -147,17 +176,17 @@ describe('ChannelApe Client', () => {
 
     it('When retrieving invalid channel Then return resolved promise with channel data', () => {
       const channelId = 'c0eb01a0-bcd5-4dba-98fb-fd7f7993ecb2';
-      const expectedChannelApeErrorResponse : ChannelApeErrorResponse = {
+      const expectedChannelApeErrorResponse : ChannelApeApiErrorResponse = {
         statusCode: 404,
         errors: [
-          { 
-            code: 70, 
-            message: 'Channel could not be found for business.' 
+          {
+            code: 70,
+            message: 'Channel could not be found for business.'
           }
         ]
       };
 
-      const retrieveActionStub = sandbox.stub(ChannelsService.prototype, 'get')
+      sandbox.stub(ChannelsService.prototype, 'get')
         .callsFake((channelId) => {
           return Promise.reject(expectedChannelApeErrorResponse);
         });
@@ -165,11 +194,25 @@ describe('ChannelApe Client', () => {
       return channelApeClient.channels().get(channelId).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((error) => {
-        const actualChannelApeErrorResponse = error as ChannelApeErrorResponse;
+        const actualChannelApeErrorResponse = error as ChannelApeApiErrorResponse;
         expect(actualChannelApeErrorResponse.statusCode).to.equal(404);
         expect(actualChannelApeErrorResponse.errors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
         expect(actualChannelApeErrorResponse.errors[0].message)
           .to.equal(expectedChannelApeErrorResponse.errors[0].message);
+      });
+    });
+
+    it('When retrieving order by valid orderId', () => {
+      const expectedOrder: Order = singleOrder;
+      const expectedOrderId = expectedOrder.id;
+
+      sandbox.stub(OrdersService.prototype, 'get')
+        .callsFake((expectedOrderId) => {
+          return Promise.resolve(expectedOrder);
+        });
+
+      return channelApeClient.orders().get(expectedOrder.id).then((actualOrder) => {
+        expect(actualOrder.id).to.equal(expectedOrderId);
       });
     });
   });
@@ -188,3 +231,9 @@ describe('ChannelApe Client', () => {
   });
 
 });
+
+function expectRequestDefaults(requestSpy: sinon.SinonSpy) {
+  expect(requestSpy.args[0][0].headers['X-Channel-Ape-Authorization-Token'])
+    .to.equal('c478c897-dc1c-4171-a207-9e3af9b23579');
+  expect(requestSpy.args[0][0].json).to.equal(true);
+}

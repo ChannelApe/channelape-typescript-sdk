@@ -9,6 +9,7 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Sessions](#sessions)
 - [Actions](#actions)
 - [Channels](#channels)
+- [Orders](#orders)
 
 ### Getting Started
 
@@ -28,6 +29,8 @@ const channelApeClient = new ChannelApeClient({
 
 * timeout - Number of milliseconds to wait for the API to send response headers. Defaults to 180000 (3 minutes). Cannot be set lower than 2000 (2 seconds).
 * endpoint - Envrionment endpoint you would like to hit. Defaults to https://api.channelape.com
+* logLevel - Level of logs you wish to see from the SDK. Defaults to OFF.
+* maximumRequestRetryTimeout - Number of milliseconds to keep retrying a request for when an undesired response status code is received. Defaults to 180000 (3 minutes). Cannot be set lower than 2000 (2 seconds).
 
 ### Sessions
 
@@ -81,5 +84,23 @@ channelapeClient.actions().updateHealthCheck(actionId)
 channelapeClient.channels().get(channelId)
   .then((channel: Channel) => {
     // do what you need to do with channel data here
+  });
+```
+
+### Orders
+
+#### Get order
+```typescript
+channelapeClient.orders().get(orderId)
+  .then((order: Order) => {
+    // do what you need to do with order data here
+  });
+```
+
+#### Update order
+```typescript
+channelapeClient.orders().update(order)
+  .then((updatedOrder: Order) => {
+    // do what you need to do with updatedOrder data here
   });
 ```

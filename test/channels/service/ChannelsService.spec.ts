@@ -1,22 +1,29 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import request = require('request');
+import * as request from 'request';
+import { LogLevel } from 'channelape-logger';
 import ChannelsService from './../../../src/channels/service/ChannelsService';
 import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
-import Subresource from '../../../src/actions/model/Subresource';
 import Environment from '../../../src/model/Environment';
-import ChannelApeErrorResponse from '../../../src/model/ChannelApeErrorResponse';
+import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import Channel from '../../../src/channels/model/Channel';
+import RequestClientWrapper from '../../../src/RequestClientWrapper';
 
 describe('Channels Service', () => {
 
   describe('Given some rest client', () => {
-    const client = request.defaults({
-      baseUrl: Environment.STAGING,
-      timeout: 60000,
-      json: true
-    });
+    const client: RequestClientWrapper =
+      new RequestClientWrapper(
+        request.defaults({
+          baseUrl: Environment.STAGING,
+          timeout: 60000,
+          json: true
+        }),
+        LogLevel.OFF,
+        Environment.STAGING,
+        10000
+      );
 
     let sandbox: sinon.SinonSandbox;
 
@@ -48,12 +55,12 @@ describe('Channels Service', () => {
       updatedAt: new Date('2018-04-02T13:04:27.299Z')
     };
 
-    const expectedChannelApeErrorResponse : ChannelApeErrorResponse = {
+    const expectedChannelApeErrorResponse : ChannelApeApiErrorResponse = {
       statusCode: 404,
       errors: [
-        { 
-          code: 70, 
-          message: 'Channel could not be found for business.' 
+        {
+          code: 70,
+          message: 'Channel could not be found for business.'
         }
       ]
     };
@@ -140,7 +147,7 @@ describe('Channels Service', () => {
     }
 
     function expectChannelApeErrorResponse(error: any) {
-      const actualChannelApeErrorResponse = error as ChannelApeErrorResponse;
+      const actualChannelApeErrorResponse = error as ChannelApeApiErrorResponse;
       expect(actualChannelApeErrorResponse.statusCode).to.equal(404);
       expect(actualChannelApeErrorResponse.errors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
       expect(actualChannelApeErrorResponse.errors[0].message)
