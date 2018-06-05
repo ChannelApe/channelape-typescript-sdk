@@ -91,7 +91,7 @@ channelapeClient.channels().get(channelId)
 
 #### Get order
 ```typescript
-channelapeClient.channels().get(orderId)
+channelapeClient.orders().get(orderId)
   .then((order: Order) => {
     // do what you need to do with order data here
   });
@@ -99,7 +99,7 @@ channelapeClient.channels().get(orderId)
 
 #### Update order
 ```typescript
-channelapeClient.channels().update(order)
+channelapeClient.orders().update(order)
   .then((updatedOrder: Order) => {
     // do what you need to do with updatedOrder data here
   });
