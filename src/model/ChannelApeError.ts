@@ -2,8 +2,10 @@ import { Response } from 'request';
 import ChannelApeApiError from '../model/ChannelApeApiError';
 
 export default class ChannelApeError extends Error {
-  private readonly response: Response | undefined;
   private readonly apiErrors: ChannelApeApiError[];
+  private readonly responseStatusCode: number;
+  private readonly responseStatusMessage: string;
+
 
   constructor(
     message: string,
@@ -12,8 +14,14 @@ export default class ChannelApeError extends Error {
     apiErrors: ChannelApeApiError[]
   ) {
     super(getMessage());
-    this.response = response;
     this.apiErrors = apiErrors;
+    if (typeof response === 'undefined') {
+      this.responseStatusCode = -1;
+      this.responseStatusMessage = 'There was an error with the API';
+    } else {
+      this.responseStatusCode = response.statusCode;
+      this.responseStatusMessage = response.statusMessage;
+    }
 
     function getMessage(): string {
       let ret = message;
@@ -44,14 +52,11 @@ export default class ChannelApeError extends Error {
     }
   }
 
-  public get Response(): Response {
-    if (this.response === undefined) {
-      return {
-        statusCode: -1,
-        statusMessage: 'There was an error with the API'
-      } as any;
-    }
-    return this.response;
+  public get Response(): { statusCode: number, statusMessage: string } {
+    return {
+      statusCode: this.responseStatusCode,
+      statusMessage: this.responseStatusMessage
+    };
   }
 
   public get ApiErrors(): ChannelApeApiError[] {
