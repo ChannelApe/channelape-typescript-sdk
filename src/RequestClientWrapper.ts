@@ -92,9 +92,9 @@ export default class RequestClientWrapper {
         callableRequestMethod = this.getCallableRequestMethod(method);
       } catch (e) {
         if (typeof callbackOrOptionsOrUndefined === 'function') {
-          this.handleResponse(e, {} as any, {}, callbackOrOptionsOrUndefined, '', undefined, callDetails);
+          this.handleResponse(e, {} as any, {}, callbackOrOptionsOrUndefined, '', undefined, callDetails, method);
         } else if (typeof callBackOrUndefined === 'function') {
-          this.handleResponse(e, {} as any, {}, callBackOrUndefined, '', undefined, callDetails);
+          this.handleResponse(e, {} as any, {}, callBackOrUndefined, '', undefined, callDetails, method);
         }
         return;
       }
@@ -104,7 +104,7 @@ export default class RequestClientWrapper {
         if (typeof callbackOrOptionsOrUndefined === 'function') {
           return callableRequestMethod(uriOrOptions, (error: Error , response: request.Response, body: any) => {
             this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-              uriOrOptions, undefined, callDetails);
+              uriOrOptions, undefined, callDetails, method);
           });
         }
         return callableRequestMethod(
@@ -112,13 +112,13 @@ export default class RequestClientWrapper {
           callbackOrOptionsOrUndefined,
           (error: Error , response: request.Response, body: any) => {
             this.handleResponse(error, response, body, callBackOrUndefined,
-              uriOrOptions, callbackOrOptionsOrUndefined, callDetails);
+              uriOrOptions, callbackOrOptionsOrUndefined, callDetails, method);
           });
       }
       if (typeof callbackOrOptionsOrUndefined === 'function') {
         return callableRequestMethod(uriOrOptions, (error: Error , response: request.Response, body: any) => {
           this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-            uriOrOptions.uri.toString(), undefined, callDetails);
+            uriOrOptions.uri.toString(), undefined, callDetails, method);
         });
       }
       return callableRequestMethod(uriOrOptions);
@@ -147,7 +147,8 @@ export default class RequestClientWrapper {
     callBackOrUndefined: request.RequestCallback | undefined,
     uri: string,
     options: (request.UriOptions & request.CoreOptions) | request.CoreOptions | undefined,
-    callDetails: { callStart: Date, callCountForThisRequest: number }
+    callDetails: { callStart: Date, callCountForThisRequest: number },
+    method: string
   ): void {
     this.requestLogger.logResponse(error, response, body);
     let finalError: ChannelApeError | null = null;
@@ -162,7 +163,7 @@ export default class RequestClientWrapper {
         message: badResponseMessage
       }]);
     } else if (this.shouldRequestBeRetried(error, response) && response) {
-      this.retryRequest(response.method, uri, options, callBackOrUndefined, response, body, callDetails);
+      this.retryRequest(method, uri, options, callBackOrUndefined, response, body, callDetails);
       return;
     }
     if (error) {
