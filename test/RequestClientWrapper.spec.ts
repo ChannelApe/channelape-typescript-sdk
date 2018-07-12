@@ -20,10 +20,12 @@ describe('RequestClientWrapper', () => {
     let sandbox: sinon.SinonSandbox;
     let requestClientWrapper: RequestClientWrapper;
     let infoLogSpy: sinon.SinonSpy;
+    let warnLogSpy: sinon.SinonSpy;
 
     beforeEach((done) => {
       sandbox = sinon.sandbox.create();
       infoLogSpy = sandbox.spy(Logger.prototype, 'info');
+      warnLogSpy = sandbox.spy(Logger.prototype, 'warn');
       requestClientWrapper =
         new RequestClientWrapper(client, LogLevel.INFO, Environment.STAGING, maximumRequestRetryTimeout);
       done();
@@ -334,6 +336,9 @@ Code: 0 Message: You didnt pass any body`;
       });
 
       requestClientWrapper.get(requestUrl, (error, response, body) => {
+        expect(warnLogSpy.called).to.be.true;
+        expect(warnLogSpy.args[0][0])
+          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for`, 'should log delay correctly');
         expect(error).to.be.null;
         expect(body.id).to.equal(orderId);
         expect(infoLogSpy.args[0][0])
