@@ -2,13 +2,9 @@ import * as request from 'request';
 import { LogLevel } from 'channelape-logger';
 import RequestLogger from './utils/RequestLogger';
 import ChannelApeError from './model/ChannelApeError';
-import { RateLimiter, Interval } from 'limiter';
 import * as util from 'util';
 
 const GENERIC_ERROR_CODE = -1;
-const IMMEDIATELY_FIRE_RATE_LIMITED_CALLBACK = false;
-const DEFAULT_API_CALLS_PER_INTERVAL = 20;
-const DEFAULT_API_LIMIT_INTERVAL: Interval = 'second';
 const CHANNEL_APE_API_RETRY_TIMEOUT_MESSAGE = `A problem with the ChannelApe API has been encountered.
 Your request was tried a total of %s times over the course of %s milliseconds`;
 
@@ -17,16 +13,12 @@ type CallbackOrOptionsOrUndefined = request.RequestCallback | request.CoreOption
 export default class RequestClientWrapper {
 
   private readonly requestLogger: RequestLogger;
-  private readonly limiter: RateLimiter;
 
   constructor(
     private readonly client: request.RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>,
     private readonly logLevel: LogLevel, endpoint: string, private readonly maximumRequestRetryTimeout: number
   ) {
     this.requestLogger = new RequestLogger(this.logLevel, endpoint);
-    this.limiter =
-      new RateLimiter(DEFAULT_API_CALLS_PER_INTERVAL, DEFAULT_API_LIMIT_INTERVAL,
-        IMMEDIATELY_FIRE_RATE_LIMITED_CALLBACK);
   }
 
   public get(
@@ -85,44 +77,42 @@ export default class RequestClientWrapper {
     callbackOrOptionsOrUndefined?: CallbackOrOptionsOrUndefined,
     callBackOrUndefined?: request.RequestCallback | undefined,
   ): void {
-    this.limiter.removeTokens(1, (err, remainingRequest) => {
-      const callDetails =  { callStart, callCountForThisRequest: numberOfCalls };
-      let callableRequestMethod: Function;
-      try {
-        callableRequestMethod = this.getCallableRequestMethod(method);
-      } catch (e) {
-        if (typeof callbackOrOptionsOrUndefined === 'function') {
-          this.handleResponse(e, {} as any, {}, callbackOrOptionsOrUndefined, '', undefined, callDetails, method);
-        } else if (typeof callBackOrUndefined === 'function') {
-          this.handleResponse(e, {} as any, {}, callBackOrUndefined, '', undefined, callDetails, method);
-        }
-        return;
-      }
-
-      this.requestLogger.logCall(method, uriOrOptions, callbackOrOptionsOrUndefined);
-      if (typeof uriOrOptions === 'string') {
-        if (typeof callbackOrOptionsOrUndefined === 'function') {
-          return callableRequestMethod(uriOrOptions, (error: Error , response: request.Response, body: any) => {
-            this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-              uriOrOptions, undefined, callDetails, method);
-          });
-        }
-        return callableRequestMethod(
-          uriOrOptions,
-          callbackOrOptionsOrUndefined,
-          (error: Error , response: request.Response, body: any) => {
-            this.handleResponse(error, response, body, callBackOrUndefined,
-              uriOrOptions, callbackOrOptionsOrUndefined, callDetails, method);
-          });
-      }
+    const callDetails = { callStart, callCountForThisRequest: numberOfCalls };
+    let callableRequestMethod: Function;
+    try {
+      callableRequestMethod = this.getCallableRequestMethod(method);
+    } catch (e) {
       if (typeof callbackOrOptionsOrUndefined === 'function') {
-        return callableRequestMethod(uriOrOptions, (error: Error , response: request.Response, body: any) => {
+        this.handleResponse(e, {} as any, {}, callbackOrOptionsOrUndefined, '', undefined, callDetails, method);
+      } else if (typeof callBackOrUndefined === 'function') {
+        this.handleResponse(e, {} as any, {}, callBackOrUndefined, '', undefined, callDetails, method);
+      }
+      return;
+    }
+
+    this.requestLogger.logCall(method, uriOrOptions, callbackOrOptionsOrUndefined);
+    if (typeof uriOrOptions === 'string') {
+      if (typeof callbackOrOptionsOrUndefined === 'function') {
+        return callableRequestMethod(uriOrOptions, (error: Error, response: request.Response, body: any) => {
           this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-            uriOrOptions.uri.toString(), undefined, callDetails, method);
+            uriOrOptions, undefined, callDetails, method);
         });
       }
-      return callableRequestMethod(uriOrOptions);
-    });
+      return callableRequestMethod(
+        uriOrOptions,
+        callbackOrOptionsOrUndefined,
+        (error: Error, response: request.Response, body: any) => {
+          this.handleResponse(error, response, body, callBackOrUndefined,
+            uriOrOptions, callbackOrOptionsOrUndefined, callDetails, method);
+        });
+    }
+    if (typeof callbackOrOptionsOrUndefined === 'function') {
+      return callableRequestMethod(uriOrOptions, (error: Error, response: request.Response, body: any) => {
+        this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
+          uriOrOptions.uri.toString(), undefined, callDetails, method);
+      });
+    }
+    return callableRequestMethod(uriOrOptions);
   }
 
   private getCallableRequestMethod(method: string): Function {
