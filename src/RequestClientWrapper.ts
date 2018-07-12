@@ -3,6 +3,9 @@ import { LogLevel } from 'channelape-logger';
 import RequestLogger from './utils/RequestLogger';
 import ChannelApeError from './model/ChannelApeError';
 import * as util from 'util';
+import * as backoff from 'backoff';
+import RequestRetryInfo from './model/RequestRetryInfo';
+import HttpRequestMethod from './model/HttpRequestMethod';
 
 const GENERIC_ERROR_CODE = -1;
 const CHANNEL_APE_API_RETRY_TIMEOUT_MESSAGE = `A problem with the ChannelApe API has been encountered.
@@ -40,9 +43,30 @@ export default class RequestClientWrapper {
     callBackOrUndefined?: request.RequestCallback | undefined
   ): void {
     const callStart = new Date();
-    const initialCallCountForThisRequest = 0;
-    this.makeRequest('get', callStart, initialCallCountForThisRequest, uriOrOptions, callbackOrOptionsOrUndefined,
-      callBackOrUndefined);
+    const exponentialBackoff = this.getExponentialBackoff();
+    exponentialBackoff.on('backoff', (callCount, delay, requestRetryInfo) => {
+      this.requestLogger.logDelay(callCount, delay, requestRetryInfo);
+    });
+    exponentialBackoff.on('ready', (callCount, delay) => {
+      this.makeRequest(
+        HttpRequestMethod.GET,
+        callStart,
+        callCount,
+        uriOrOptions,
+        exponentialBackoff,
+        callbackOrOptionsOrUndefined,
+        callBackOrUndefined
+      );
+    });
+    this.makeRequest(
+      HttpRequestMethod.GET,
+      callStart,
+      0,
+      uriOrOptions,
+      exponentialBackoff,
+      callbackOrOptionsOrUndefined,
+      callBackOrUndefined
+    );
   }
 
   public put(
@@ -64,16 +88,38 @@ export default class RequestClientWrapper {
     callBackOrUndefined?: request.RequestCallback | undefined
   ): void {
     const callStart = new Date();
-    const initialCallCountForThisRequest = 0;
-    this.makeRequest('put', callStart, initialCallCountForThisRequest, uriOrOptions, callbackOrOptionsOrUndefined,
-      callBackOrUndefined);
+    const exponentialBackoff = this.getExponentialBackoff();
+    exponentialBackoff.on('backoff', (callCount, delay, requestRetryInfo: RequestRetryInfo) => {
+      this.requestLogger.logDelay(callCount, delay, requestRetryInfo);
+    });
+    exponentialBackoff.on('ready', (callCount, delay) => {
+      this.makeRequest(
+        HttpRequestMethod.PUT,
+        callStart,
+        callCount,
+        uriOrOptions,
+        exponentialBackoff,
+        callbackOrOptionsOrUndefined,
+        callBackOrUndefined
+      );
+    });
+    this.makeRequest(
+      HttpRequestMethod.PUT,
+      callStart,
+      0,
+      uriOrOptions,
+      exponentialBackoff,
+      callbackOrOptionsOrUndefined,
+      callBackOrUndefined
+    );
   }
 
   private makeRequest(
-    method: string,
+    method: HttpRequestMethod,
     callStart: Date,
     numberOfCalls: number,
     uriOrOptions: string | (request.UriOptions & request.CoreOptions),
+    exponentialBackoff: backoff.Backoff,
     callbackOrOptionsOrUndefined?: CallbackOrOptionsOrUndefined,
     callBackOrUndefined?: request.RequestCallback | undefined,
   ): void {
@@ -83,9 +129,11 @@ export default class RequestClientWrapper {
       callableRequestMethod = this.getCallableRequestMethod(method);
     } catch (e) {
       if (typeof callbackOrOptionsOrUndefined === 'function') {
-        this.handleResponse(e, {} as any, {}, callbackOrOptionsOrUndefined, '', undefined, callDetails, method);
+        this.handleResponse(
+          e, {} as any, {}, callbackOrOptionsOrUndefined, '', undefined, callDetails, method, exponentialBackoff);
       } else if (typeof callBackOrUndefined === 'function') {
-        this.handleResponse(e, {} as any, {}, callBackOrUndefined, '', undefined, callDetails, method);
+        this.handleResponse(
+            e, {} as any, {}, callBackOrUndefined, '', undefined, callDetails, method, exponentialBackoff);
       }
       return;
     }
@@ -95,7 +143,7 @@ export default class RequestClientWrapper {
       if (typeof callbackOrOptionsOrUndefined === 'function') {
         return callableRequestMethod(uriOrOptions, (error: Error, response: request.Response, body: any) => {
           this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-            uriOrOptions, undefined, callDetails, method);
+            uriOrOptions, undefined, callDetails, method, exponentialBackoff);
         });
       }
       return callableRequestMethod(
@@ -103,16 +151,22 @@ export default class RequestClientWrapper {
         callbackOrOptionsOrUndefined,
         (error: Error, response: request.Response, body: any) => {
           this.handleResponse(error, response, body, callBackOrUndefined,
-            uriOrOptions, callbackOrOptionsOrUndefined, callDetails, method);
+            uriOrOptions, callbackOrOptionsOrUndefined, callDetails, method, exponentialBackoff);
         });
     }
     if (typeof callbackOrOptionsOrUndefined === 'function') {
       return callableRequestMethod(uriOrOptions, (error: Error, response: request.Response, body: any) => {
         this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-          uriOrOptions.uri.toString(), undefined, callDetails, method);
+          uriOrOptions.uri.toString(), undefined, callDetails, method, exponentialBackoff);
       });
     }
     return callableRequestMethod(uriOrOptions);
+  }
+
+  private getExponentialBackoff(): backoff.Backoff {
+    return backoff.exponential({
+      initialDelay: 100
+    });
   }
 
   private getCallableRequestMethod(method: string): Function {
@@ -138,7 +192,8 @@ export default class RequestClientWrapper {
     uri: string,
     options: (request.UriOptions & request.CoreOptions) | request.CoreOptions | undefined,
     callDetails: { callStart: Date, callCountForThisRequest: number },
-    method: string
+    method: HttpRequestMethod,
+    exponentialBackoff: backoff.Backoff
   ): void {
     this.requestLogger.logResponse(error, response, body);
     let finalError: ChannelApeError | null = null;
@@ -153,7 +208,7 @@ export default class RequestClientWrapper {
         message: badResponseMessage
       }]);
     } else if (this.shouldRequestBeRetried(error, response) && response) {
-      this.retryRequest(method, uri, options, callBackOrUndefined, response, body, callDetails);
+      this.retryRequest(method, uri, callBackOrUndefined, response, body, exponentialBackoff);
       return;
     }
     if (error) {
@@ -198,11 +253,10 @@ export default class RequestClientWrapper {
   private retryRequest(
     method: string | undefined,
     uri: string,
-    options: (request.UriOptions & request.CoreOptions) | request.CoreOptions | undefined,
     callBackOrUndefined: request.RequestCallback | undefined,
     response: request.Response,
     body: any,
-    callDetails: { callStart: Date, callCountForThisRequest: number }
+    exponentialBackoff: backoff.Backoff
   ) {
     if (method == null) {
       if (typeof callBackOrUndefined === 'function') {
@@ -211,7 +265,10 @@ export default class RequestClientWrapper {
       }
       return;
     }
-    const newNumberOfCalls = callDetails.callCountForThisRequest + 1;
-    this.makeRequest(method, callDetails.callStart, newNumberOfCalls, uri, options, callBackOrUndefined);
+    const requestRetryInfo: RequestRetryInfo = {
+      method,
+      endpoint: uri
+    };
+    exponentialBackoff.backoff(requestRetryInfo);
   }
 }

@@ -1,11 +1,17 @@
 import { Logger, LogLevel } from 'channelape-logger';
 import { Response, UriOptions, CoreOptions, RequestCallback } from 'request';
+import RequestRetryInfo from '../model/RequestRetryInfo';
 
 export default class RequestLogger {
   private readonly logger: Logger;
 
   constructor (logLevel: LogLevel, private readonly endpoint: string) {
     this.logger = new Logger('ChannelApe API', logLevel);
+  }
+
+  public logDelay(callCount: number, delay: number, requestRetryInfo: RequestRetryInfo) {
+    this.logger
+      .warn(`DELAYING ${requestRetryInfo.method} ${this.endpoint}${requestRetryInfo.endpoint} for ${delay}ms`);
   }
 
   public logCall(
