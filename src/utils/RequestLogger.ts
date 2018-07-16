@@ -69,9 +69,9 @@ export default class RequestLogger {
     if (Object.keys(params).length === 0) {
       return '';
     }
-    const queryParms = Object.keys(params).map((k) => {
+    const queryParams = Object.keys(params).map((k) => {
       return `${k}=${params[k]}`;
     }).join('&');
-    return `?${queryParms}`;
+    return `?${queryParams}`;
   }
 }
