@@ -8,6 +8,12 @@ export default function generateApiError(url: string, response: request.Response
   if (thisBody === undefined) {
     thisBody = {};
   }
+  if (typeof thisBody === 'string') {
+    thisBody = {
+      body: thisBody,
+      errors: []
+    };
+  }
   if (thisBody.errors === undefined) {
     thisBody.errors = [];
   }
