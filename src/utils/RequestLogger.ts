@@ -11,7 +11,7 @@ export default class RequestLogger {
 
   public logDelay(callCount: number, delay: number, requestRetryInfo: RequestRetryInfo) {
     this.logger
-      .warn(`DELAYING ${requestRetryInfo.method} ${this.endpoint}${requestRetryInfo.endpoint} for ${delay}ms`);
+      .warn(`DELAYING ${requestRetryInfo.method} ${this.endpoint}${requestRetryInfo.endpoint} for ${delay} ms`);
   }
 
   public logCall(
