@@ -44,7 +44,7 @@ export default class RequestLogger {
       if (!this.responseIsLevel200(response.statusCode)) {
         const errorMessage =
           `${response.request.method} ${response.request.href} -- FAILED WITH STATUS: ${response.statusCode}`;
-        this.logger.error(errorMessage);
+        this.logger.warn(errorMessage);
       } else {
         infoMessage = `${response.request.method} ${response.request.href} -- COMPLETED`;
       }
