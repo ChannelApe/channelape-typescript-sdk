@@ -165,7 +165,8 @@ export default class RequestClientWrapper {
 
   private getExponentialBackoff(): backoff.Backoff {
     return backoff.exponential({
-      initialDelay: 100
+      initialDelay: 100,
+      maxDelay: (this.maximumRequestRetryTimeout / 2)
     });
   }
 
