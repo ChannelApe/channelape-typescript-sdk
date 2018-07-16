@@ -6,6 +6,7 @@ import * as util from 'util';
 import * as backoff from 'backoff';
 import RequestRetryInfo from './model/RequestRetryInfo';
 import HttpRequestMethod from './model/HttpRequestMethod';
+import RequestResponse from './model/RequestResponse';
 
 const GENERIC_ERROR_CODE = -1;
 const CHANNEL_APE_API_RETRY_TIMEOUT_MESSAGE = `A problem with the ChannelApe API has been encountered.
@@ -128,12 +129,15 @@ export default class RequestClientWrapper {
     try {
       callableRequestMethod = this.getCallableRequestMethod(method);
     } catch (e) {
+      const requestResponse: RequestResponse = {
+        error: e,
+        body: {},
+        response: undefined
+      };
       if (typeof callbackOrOptionsOrUndefined === 'function') {
-        this.handleResponse(
-          e, {} as any, {}, callbackOrOptionsOrUndefined, '', undefined, callDetails, method, exponentialBackoff);
+        this.handleResponse(requestResponse, callbackOrOptionsOrUndefined, '', callDetails, method, exponentialBackoff);
       } else if (typeof callBackOrUndefined === 'function') {
-        this.handleResponse(
-            e, {} as any, {}, callBackOrUndefined, '', undefined, callDetails, method, exponentialBackoff);
+        this.handleResponse(requestResponse, callBackOrUndefined, '', callDetails, method, exponentialBackoff);
       }
       return;
     }
@@ -142,22 +146,25 @@ export default class RequestClientWrapper {
     if (typeof uriOrOptions === 'string') {
       if (typeof callbackOrOptionsOrUndefined === 'function') {
         return callableRequestMethod(uriOrOptions, (error: Error, response: request.Response, body: any) => {
-          this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-            uriOrOptions, undefined, callDetails, method, exponentialBackoff);
+          const requestResponse = { error, response, body };
+          this.handleResponse(requestResponse, callbackOrOptionsOrUndefined,
+            uriOrOptions, callDetails, method, exponentialBackoff);
         });
       }
       return callableRequestMethod(
         uriOrOptions,
         callbackOrOptionsOrUndefined,
         (error: Error, response: request.Response, body: any) => {
-          this.handleResponse(error, response, body, callBackOrUndefined,
-            uriOrOptions, callbackOrOptionsOrUndefined, callDetails, method, exponentialBackoff);
+          const requestResponse = { error, response, body };
+          this.handleResponse(requestResponse, callBackOrUndefined,
+            uriOrOptions, callDetails, method, exponentialBackoff);
         });
     }
     if (typeof callbackOrOptionsOrUndefined === 'function') {
       return callableRequestMethod(uriOrOptions, (error: Error, response: request.Response, body: any) => {
-        this.handleResponse(error, response, body, callbackOrOptionsOrUndefined,
-          uriOrOptions.uri.toString(), undefined, callDetails, method, exponentialBackoff);
+        const requestResponse = { error, response, body };
+        this.handleResponse(requestResponse, callbackOrOptionsOrUndefined,
+          uriOrOptions.uri.toString(), callDetails, method, exponentialBackoff);
       });
     }
     return callableRequestMethod(uriOrOptions);
@@ -186,43 +193,45 @@ export default class RequestClientWrapper {
   }
 
   private handleResponse(
-    error: Error,
-    response: request.Response | undefined,
-    body: any,
+    requestResponse: RequestResponse,
     callBackOrUndefined: request.RequestCallback | undefined,
     uri: string,
-    options: (request.UriOptions & request.CoreOptions) | request.CoreOptions | undefined,
     callDetails: { callStart: Date, callCountForThisRequest: number },
     method: HttpRequestMethod,
     exponentialBackoff: backoff.Backoff
   ): void {
-    this.requestLogger.logResponse(error, response, body);
+    this.requestLogger.logResponse(requestResponse.error, requestResponse.response, requestResponse.body);
     let finalError: ChannelApeError | null = null;
     if (this.didRequestTimeout(callDetails.callStart)) {
       const maximumRetryLimitExceededMessage =
         this.getMaximumRetryLimitExceededMessage(callDetails.callStart, callDetails.callCountForThisRequest);
-      finalError = new ChannelApeError(maximumRetryLimitExceededMessage, response, uri, []);
-    } else if (response == null) {
+      finalError = new ChannelApeError(maximumRetryLimitExceededMessage, requestResponse.response, uri, []);
+    } else if (requestResponse.response == null) {
       const badResponseMessage = 'No response was received from the server';
       finalError = new ChannelApeError(badResponseMessage, undefined, uri, [{
         code: 504,
         message: badResponseMessage
       }]);
-    } else if (this.shouldRequestBeRetried(error, response) && response) {
-      this.retryRequest(method, uri, callBackOrUndefined, response, body, exponentialBackoff);
+    } else if (
+      this.shouldRequestBeRetried(requestResponse.error, requestResponse.response) && requestResponse.response
+    ) {
+      this.retryRequest(
+        method, uri, callBackOrUndefined, requestResponse.response, requestResponse.body, exponentialBackoff
+      );
       return;
     }
-    if (error) {
-      finalError = new ChannelApeError(error.message, response, uri, [{
+    if (requestResponse.error) {
+      finalError = new ChannelApeError(requestResponse.error.message, requestResponse.response, uri, [{
         code: GENERIC_ERROR_CODE,
-        message: error.message
+        message: requestResponse.error.message
       }]);
-    } else if (this.isApiError(body) && response && body) {
-      finalError = new ChannelApeError(`${response.statusCode} ${response.statusMessage}`,
-        response, uri, body.errors);
+    } else if (this.isApiError(requestResponse.body) && requestResponse.response && requestResponse.body) {
+      finalError = new ChannelApeError(
+        `${requestResponse.response.statusCode} ${requestResponse.response.statusMessage}`,
+        requestResponse.response, uri, requestResponse.body.errors);
     }
     if (typeof callBackOrUndefined === 'function') {
-      callBackOrUndefined(finalError, response as any, body);
+      callBackOrUndefined(finalError, requestResponse.response as any, requestResponse.body);
     }
   }
 
