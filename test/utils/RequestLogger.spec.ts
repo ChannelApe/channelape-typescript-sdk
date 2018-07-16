@@ -74,8 +74,8 @@ describe('RequestLogger', () => {
             method: 'PUT'
           }
         } as any, undefined);
-        expect(fakeLogger.error.called).to.be.true;
-        expect(fakeLogger.error.args[0][0]).to.equal('PUT someurl -- FAILED WITH STATUS: 504');
+        expect(fakeLogger.warn.called).to.be.true;
+        expect(fakeLogger.warn.args[0][0]).to.equal('PUT someurl -- FAILED WITH STATUS: 504');
       });
 
       it('expect error not to be called', () => {

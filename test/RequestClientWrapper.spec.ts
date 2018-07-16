@@ -337,12 +337,12 @@ Code: 0 Message: You didnt pass any body`;
 
       requestClientWrapper.get(requestUrl, (error, response, body) => {
         expect(warnLogSpy.called).to.be.true;
-        expect(warnLogSpy.args[0][0])
-          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 100ms`, 'should log 1st delay correctly');
         expect(warnLogSpy.args[1][0])
-          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 200ms`, 'should log 2nd delay correctly');
-        expect(warnLogSpy.args[2][0])
-          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 400ms`, 'should log 3rd delay correctly');
+          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 100 ms`, 'should log 1st delay correctly');
+        expect(warnLogSpy.args[3][0])
+          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 200 ms`, 'should log 2nd delay correctly');
+        expect(warnLogSpy.args[5][0])
+          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 400 ms`, 'should log 3rd delay correctly');
         expect(error).to.be.null;
         expect(body.id).to.equal(orderId);
         expect(infoLogSpy.args[0][0])
@@ -394,12 +394,12 @@ Code: 0 Message: You didnt pass any body`;
       requestClientWrapper.put(requestUrl, { body: singleOrder }, (error, response, body) => {
         expect(error).to.be.null;
         expect(warnLogSpy.called).to.be.true;
-        expect(warnLogSpy.args[0][0])
-          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 100ms`, 'should log 1st delay correctly');
         expect(warnLogSpy.args[1][0])
-          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 200ms`, 'should log 2nd delay correctly');
-        expect(warnLogSpy.args[2][0])
-          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 400ms`, 'should log 3rd delay correctly');
+          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 100 ms`, 'should log 1st delay correctly');
+        expect(warnLogSpy.args[3][0])
+          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 200 ms`, 'should log 2nd delay correctly');
+        expect(warnLogSpy.args[5][0])
+          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 400 ms`, 'should log 3rd delay correctly');
         expect(body.id).to.equal(orderId);
         expect(infoLogSpy.args[0][0])
           .to.equal(`PUT ${Environment.STAGING}${requestUrl} -- STARTED`, 'should log correctly');
