@@ -20,10 +20,12 @@ describe('RequestClientWrapper', () => {
     let sandbox: sinon.SinonSandbox;
     let requestClientWrapper: RequestClientWrapper;
     let infoLogSpy: sinon.SinonSpy;
+    let warnLogSpy: sinon.SinonSpy;
 
     beforeEach((done) => {
       sandbox = sinon.sandbox.create();
       infoLogSpy = sandbox.spy(Logger.prototype, 'info');
+      warnLogSpy = sandbox.spy(Logger.prototype, 'warn');
       requestClientWrapper =
         new RequestClientWrapper(client, LogLevel.INFO, Environment.STAGING, maximumRequestRetryTimeout);
       done();
@@ -299,41 +301,48 @@ Code: 0 Message: You didnt pass any body`;
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
       clientGetStub.onCall(0).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[0], 'Im'), 500);
+          setTimeout(() => cbOrOpts(null, responses[0], 'Im'), 50);
         } else {
-          setTimeout(() => cb(null, responses[0], 'Im'), 500);
+          setTimeout(() => cb(null, responses[0], 'Im'), 50);
         }
       });
       clientGetStub.onCall(1).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[1], 'a'), 500);
+          setTimeout(() => cbOrOpts(null, responses[1], 'a'), 50);
         } else {
-          setTimeout(() => cb(null, responses[1], 'a'), 500);
+          setTimeout(() => cb(null, responses[1], 'a'), 50);
         }
       });
       clientGetStub.onCall(2).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[2], 'little'), 500);
+          setTimeout(() => cbOrOpts(null, responses[2], 'little'), 50);
         } else {
-          setTimeout(() => cb(null, responses[2], 'little'), 500);
+          setTimeout(() => cb(null, responses[2], 'little'), 50);
         }
       });
       clientGetStub.onCall(3).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[3], 'teapot'), 500);
+          setTimeout(() => cbOrOpts(null, responses[3], 'teapot'), 50);
         } else {
-          setTimeout(() => cb(null, responses[3], 'teapot'), 500);
+          setTimeout(() => cb(null, responses[3], 'teapot'), 50);
         }
       });
       clientGetStub.onCall(4).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[4], singleOrder), 500);
+          setTimeout(() => cbOrOpts(null, responses[4], singleOrder), 50);
         } else {
-          setTimeout(() => cb(null, responses[4], singleOrder), 500);
+          setTimeout(() => cb(null, responses[4], singleOrder), 50);
         }
       });
 
       requestClientWrapper.get(requestUrl, (error, response, body) => {
+        expect(warnLogSpy.called).to.be.true;
+        expect(warnLogSpy.args[1][0])
+          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 100 ms`, 'should log 1st delay correctly');
+        expect(warnLogSpy.args[3][0])
+          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 200 ms`, 'should log 2nd delay correctly');
+        expect(warnLogSpy.args[5][0])
+          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 400 ms`, 'should log 3rd delay correctly');
         expect(error).to.be.null;
         expect(body.id).to.equal(orderId);
         expect(infoLogSpy.args[0][0])
@@ -384,6 +393,13 @@ Code: 0 Message: You didnt pass any body`;
 
       requestClientWrapper.put(requestUrl, { body: singleOrder }, (error, response, body) => {
         expect(error).to.be.null;
+        expect(warnLogSpy.called).to.be.true;
+        expect(warnLogSpy.args[1][0])
+          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 100 ms`, 'should log 1st delay correctly');
+        expect(warnLogSpy.args[3][0])
+          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 200 ms`, 'should log 2nd delay correctly');
+        expect(warnLogSpy.args[5][0])
+          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 400 ms`, 'should log 3rd delay correctly');
         expect(body.id).to.equal(orderId);
         expect(infoLogSpy.args[0][0])
           .to.equal(`PUT ${Environment.STAGING}${requestUrl} -- STARTED`, 'should log correctly');
@@ -428,50 +444,50 @@ Code: 0 Message: You didnt pass any body`;
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
       clientGetStub.onCall(0).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[0], 'Im'), 1000);
+          setTimeout(() => cbOrOpts(null, responses[0], 'Im'), 1);
         } else {
-          setTimeout(() => cb(null, responses[0], 'Im'), 1000);
+          setTimeout(() => cb(null, responses[0], 'Im'), 1);
         }
       });
       clientGetStub.onCall(1).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[1], 'a'), 1000);
+          setTimeout(() => cbOrOpts(null, responses[1], 'a'), 1);
         } else {
-          setTimeout(() => cb(null, responses[1], 'a'), 1000);
+          setTimeout(() => cb(null, responses[1], 'a'), 1);
         }
       });
       clientGetStub.onCall(2).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[2], 'little'), 1000);
+          setTimeout(() => cbOrOpts(null, responses[2], 'little'), 1);
         } else {
-          setTimeout(() => cb(null, responses[2], 'little'), 1000);
+          setTimeout(() => cb(null, responses[2], 'little'), 1);
         }
       });
       clientGetStub.onCall(3).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[3], 'teapot'), 1000);
+          setTimeout(() => cbOrOpts(null, responses[3], 'teapot'), 1);
         } else {
-          setTimeout(() => cb(null, responses[3], 'teapot'), 1000);
+          setTimeout(() => cb(null, responses[3], 'teapot'), 1);
         }
       });
       clientGetStub.onCall(4).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[4], singleOrder), 1000);
+          setTimeout(() => cbOrOpts(null, responses[4], singleOrder), 4000);
         } else {
-          setTimeout(() => cb(null, responses[4], singleOrder), 1000);
+          setTimeout(() => cb(null, responses[4], singleOrder), 4000);
         }
       });
 
       requestClientWrapper.get(requestUrl, (error, response, body) => {
-        const expectedErrorMessage = 'Your request was tried a total of 2 times over the course of 30';
+        const expectedErrorMessage = 'Your request was tried a total of';
         expect(error).not.to.be.null;
         expect(error.message).to.include(expectedErrorMessage);
         done();
       });
-    }).timeout(100000);
+    }).timeout(10000);
 
     it(`When handling a GET response expect the call to be retried
-      until the MaximumRequestRetryTimeout limit is exceeded`, (done) => {
+      until only until a non 500 / 429 response is received`, (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
       const fakeRequest = {
@@ -507,47 +523,45 @@ Code: 0 Message: You didnt pass any body`;
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
       clientGetStub.onCall(0).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[0], 'Im'), 1000);
+          setTimeout(() => cbOrOpts(null, responses[0], 'Im'), 10);
         } else {
-          setTimeout(() => cb(null, responses[0], 'Im'), 1000);
+          setTimeout(() => cb(null, responses[0], 'Im'), 10);
         }
       });
       clientGetStub.onCall(1).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[1], 'a'), 1000);
+          setTimeout(() => cbOrOpts(null, responses[1], 'a'), 10);
         } else {
-          setTimeout(() => cb(null, responses[1], 'a'), 1000);
+          setTimeout(() => cb(null, responses[1], 'a'), 10);
         }
       });
       clientGetStub.onCall(2).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[2], 'little'), 1000);
+          setTimeout(() => cbOrOpts(null, responses[2], 'little'), 10);
         } else {
-          setTimeout(() => cb(null, responses[2], 'little'), 1000);
+          setTimeout(() => cb(null, responses[2], 'little'), 10);
         }
       });
       clientGetStub.onCall(3).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[3], 'teapot'), 1000);
+          setTimeout(() => cbOrOpts(null, responses[3], 'teapot'), 10);
         } else {
-          setTimeout(() => cb(null, responses[3], 'teapot'), 1000);
+          setTimeout(() => cb(null, responses[3], 'teapot'), 10);
         }
       });
       clientGetStub.onCall(4).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[4], singleOrder), 1000);
+          setTimeout(() => cbOrOpts(null, responses[4], singleOrder), 10);
         } else {
-          setTimeout(() => cb(null, responses[4], singleOrder), 1000);
+          setTimeout(() => cb(null, responses[4], singleOrder), 10);
         }
       });
 
       requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
-        const expectedErrorMessage = 'Your request was tried a total of 2 times over the course of 30';
-        expect(error).not.to.be.null;
-        expect(error.message).to.include(expectedErrorMessage);
+        expect(error).to.be.null;
         done();
       });
-    }).timeout(100000);
+    }).timeout(10000);
 
     it(`When handling a GET response expect callback with an empty response to be handled gracefully`, (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';

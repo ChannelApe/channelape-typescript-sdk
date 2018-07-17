@@ -1,11 +1,17 @@
 import { Logger, LogLevel } from 'channelape-logger';
 import { Response, UriOptions, CoreOptions, RequestCallback } from 'request';
+import RequestRetryInfo from '../model/RequestRetryInfo';
 
 export default class RequestLogger {
   private readonly logger: Logger;
 
   constructor (logLevel: LogLevel, private readonly endpoint: string) {
     this.logger = new Logger('ChannelApe API', logLevel);
+  }
+
+  public logDelay(callCount: number, delay: number, requestRetryInfo: RequestRetryInfo) {
+    this.logger
+      .warn(`DELAYING ${requestRetryInfo.method} ${this.endpoint}${requestRetryInfo.endpoint} for ${delay} ms`);
   }
 
   public logCall(
@@ -37,8 +43,9 @@ export default class RequestLogger {
     if (typeof response !== 'undefined' && typeof response.request !== 'undefined') {
       if (!this.responseIsLevel200(response.statusCode)) {
         const errorMessage =
-          `${response.request.method} ${response.request.href} -- FAILED WITH STATUS: ${response.statusCode}`;
-        this.logger.error(errorMessage);
+          `${response.request.method} ${response.request.href} ` +
+          `-- FAILED WITH STATUS: ${response.statusCode} and BODY OF: ${JSON.stringify(body)}`;
+        this.logger.warn(errorMessage);
       } else {
         infoMessage = `${response.request.method} ${response.request.href} -- COMPLETED`;
       }
@@ -63,9 +70,9 @@ export default class RequestLogger {
     if (Object.keys(params).length === 0) {
       return '';
     }
-    const queryParms = Object.keys(params).map((k) => {
+    const queryParams = Object.keys(params).map((k) => {
       return `${k}=${params[k]}`;
     }).join('&');
-    return `?${queryParms}`;
+    return `?${queryParams}`;
   }
 }
