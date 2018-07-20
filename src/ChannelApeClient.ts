@@ -34,7 +34,7 @@ export default class ChannelApeClient {
     this.maximumRequestRetryTimeout =
       (clientConfiguration.maximumRequestRetryTimeout == null ||
         clientConfiguration.maximumRequestRetryTimeout < TWO_SECONDS_IN_MS)
-      ? THREE_MINUTES_IN_MS : clientConfiguration.maximumRequestRetryTimeout;
+        ? THREE_MINUTES_IN_MS : clientConfiguration.maximumRequestRetryTimeout;
     this.logLevel = (clientConfiguration.logLevel == null) ? LogLevel.OFF : clientConfiguration.logLevel;
 
     const client = request.defaults({
