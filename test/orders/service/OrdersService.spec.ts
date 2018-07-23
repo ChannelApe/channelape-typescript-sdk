@@ -119,9 +119,17 @@ describe('OrdersService', () => {
       return ordersService.get(orderId).then((actualOrder) => {
         expect(actualOrder.lineItems.length).to.equal(1);
         if (typeof actualOrder.fulfillments === 'undefined') {
-          throw new Error('fulfillments length should be 0');
+          throw new Error('fulfillments length should be 1');
         }
         expect(actualOrder.fulfillments.length).to.equal(1);
+
+        const fulfillment1 = actualOrder.fulfillments[0];
+        if (typeof fulfillment1.trackingUrls === 'undefined') {
+          throw new Error('tracking urls for fulfillment 1 length should be 1');
+        }
+        expect(fulfillment1.trackingUrls.length).to.equal(2);
+        expect(fulfillment1.trackingUrls).to.contain('https://ups1.com/tracking-url1');
+        expect(fulfillment1.trackingUrls).to.contain('https://ups1.com/tracking-url2');
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ORDERS}/${orderId}`);
       });
     });
@@ -143,6 +151,14 @@ describe('OrdersService', () => {
         expect(actualOrder.fulfillments.length).to.equal(1);
         expect(actualOrder.fulfillments[0].lineItems.length).to.equal(6);
         expect(actualOrder.fulfillments[0].lineItems[0].price).to.equal(15.91);
+
+        const fulfillment1 = actualOrder.fulfillments[0];
+        if (typeof fulfillment1.trackingUrls === 'undefined') {
+          throw new Error('tracking urls for fulfillment 1 length should be 1');
+        }
+        expect(fulfillment1.trackingUrls.length).to.equal(2);
+        expect(fulfillment1.trackingUrls).to.contain('https://ups1.com/tracking-url1');
+        expect(fulfillment1.trackingUrls).to.contain('https://ups1.com/tracking-url2');
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ORDERS}/${orderId}`);
       });
     });
