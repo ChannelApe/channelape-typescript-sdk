@@ -513,7 +513,8 @@ export default {
           vendor: 'Black Rifle Coffee Company'
         }
       ],
-      status: 'OPEN'
+      status: 'OPEN',
+      trackingUrls: ['https://ups1.com/tracking-url1', 'https://ups1.com/tracking-url2']
     }
   ],
   id: '9dc34b92-70d1-42d8-8b4e-ae7fb3deca70',

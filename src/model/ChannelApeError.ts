@@ -6,7 +6,6 @@ export default class ChannelApeError extends Error {
   private readonly responseStatusCode: number;
   private readonly responseStatusMessage: string;
 
-
   constructor(
     message: string,
     response: Response | undefined,
