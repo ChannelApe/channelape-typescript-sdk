@@ -7,7 +7,6 @@ import RequestRetryInfo from './model/RequestRetryInfo';
 import HttpRequestMethod from './model/HttpRequestMethod';
 import RequestResponse from './model/RequestResponse';
 import { RequestCallback } from './model/RequestCallback';
-import { Environment } from './model/Environment';
 
 const GENERIC_ERROR_CODE = -1;
 const CHANNEL_APE_API_RETRY_TIMEOUT_MESSAGE = `A problem with the ChannelApe API has been encountered.
