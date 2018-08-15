@@ -1,5 +1,4 @@
 import { LogLevel } from 'channelape-logger';
-import * as request from 'request';
 import { Environment } from '.';
 import RequestClientWrapper from './RequestClientWrapper';
 import ActionsService from './actions/service/ActionsService';
@@ -37,16 +36,9 @@ export default class ChannelApeClient {
         ? THREE_MINUTES_IN_MS : clientConfiguration.maximumRequestRetryTimeout;
     this.logLevel = (clientConfiguration.logLevel == null) ? LogLevel.OFF : clientConfiguration.logLevel;
 
-    const client = request.defaults({
-      baseUrl: this.endpoint,
-      timeout: this.timeout,
-      json: true,
-      headers: {
-        'X-Channel-Ape-Authorization-Token': this.sessionId
-      }
-    });
-    this.requestClientWrapper =
-      new RequestClientWrapper(client, this.logLevel, this.endpoint, this.maximumRequestRetryTimeout);
+    this.requestClientWrapper = new RequestClientWrapper(
+      this.timeout, this.sessionId, this.logLevel, this.endpoint, this.maximumRequestRetryTimeout
+    );
     this.actionsService = new ActionsService(this.requestClientWrapper);
     this.channelsService = new ChannelsService(this.requestClientWrapper);
     this.ordersService = new OrdersService(this.requestClientWrapper);

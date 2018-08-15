@@ -1,7 +1,7 @@
 // tslint:disable:no-trailing-whitespace
 import * as sinon from 'sinon';
 import { expect } from 'chai';
-import * as request from 'request';
+import axios, { AxiosRequestConfig } from 'axios';
 import Environment from '../src/model/Environment';
 import RequestClientWrapper from '../src/RequestClientWrapper';
 import { Logger, LogLevel } from 'channelape-logger';
@@ -26,8 +26,9 @@ describe('RequestClientWrapper', () => {
       sandbox = sinon.sandbox.create();
       infoLogSpy = sandbox.spy(Logger.prototype, 'info');
       warnLogSpy = sandbox.spy(Logger.prototype, 'warn');
-      requestClientWrapper =
-        new RequestClientWrapper(client, LogLevel.INFO, Environment.STAGING, maximumRequestRetryTimeout);
+      requestClientWrapper = new RequestClientWrapper(
+        60000, 'valid-session-id', LogLevel.INFO, Environment.STAGING, maximumRequestRetryTimeout
+      );
       done();
     });
 
@@ -36,16 +37,7 @@ describe('RequestClientWrapper', () => {
       done();
     });
 
-    const client = request.defaults({
-      baseUrl: Environment.STAGING,
-      timeout: 60000,
-      json: true,
-      headers: {
-        'X-Channel-Ape-Authorization-Token': 'valid-session-id'
-      }
-    });
-
-    it('When doing a get() with just a URI and call back expect data to be returned', (done) => {
+    it.only('When doing a get() with just a URI and call back expect data to be returned', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
       const response = {
@@ -53,10 +45,10 @@ describe('RequestClientWrapper', () => {
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`
       };
-      sandbox.stub(client, 'get')
+      sandbox.stub(axios, 'get')
         .yields(null, response, singleOrder);
 
-      requestClientWrapper.get(requestUrl, (error, response, body) => {
+      requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
         expect(error).to.be.null;
         expect(body.id).to.equal(orderId);
         done();
@@ -66,8 +58,8 @@ describe('RequestClientWrapper', () => {
     it('When doing a get() with a URI, options, and call back expect data to be returned', (done) => {
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders`;
-      const options: request.CoreOptions = {
-        qs: {
+      const options: AxiosRequestConfig = {
+        params: {
           businessId,
           status: 'OPEN'
         }
@@ -77,7 +69,7 @@ describe('RequestClientWrapper', () => {
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`
       };
-      sandbox.stub(client, 'get')
+      sandbox.stub(axios, 'get')
         .yields(null, response, { orders: multipleOrders });
 
       requestClientWrapper.get(requestUrl, options, (error, response, body) => {
@@ -90,9 +82,9 @@ describe('RequestClientWrapper', () => {
     it('When doing a get() with just options and call back expect data to be returned', (done) => {
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestUrl = `/v1/orders`;
-      const options: request.CoreOptions & request.UriOptions = {
-        uri: requestUrl,
-        qs: {
+      const options: AxiosRequestConfig = {
+        url: requestUrl,
+        params: {
           businessId,
           status: 'OPEN'
         }
@@ -102,10 +94,10 @@ describe('RequestClientWrapper', () => {
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`
       };
-      sandbox.stub(client, 'get')
+      sandbox.stub(axios, 'get')
         .yields(null, response, { orders: multipleOrders });
 
-      requestClientWrapper.get(options, (error, response, body) => {
+      requestClientWrapper.get(options.url!, options, (error, response, body) => {
         expect(error).to.be.null;
         expect(body.orders[0].businessId).to.equal(businessId);
         done();
@@ -115,14 +107,14 @@ describe('RequestClientWrapper', () => {
     it('When doing a get() with query params, expect the query params to be logged', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
-      const options: request.CoreOptions & request.UriOptions = {
-        uri: requestUrl,
-        qs: {
+      const options: AxiosRequestConfig = {
+        url: requestUrl,
+        params: {
           param: true,
           anotherParam: false
         }
       };
-      requestClientWrapper.get(options, () => {
+      requestClientWrapper.get(options.url!, options, () => {
         expect(infoLogSpy.called).to.be.true;
         expect(infoLogSpy.args[0][0])
           .to.equal(`GET ${Environment.STAGING}${requestUrl}?param=true&anotherParam=false -- STARTED`);
@@ -133,13 +125,13 @@ describe('RequestClientWrapper', () => {
     it('When doing a get() with a single query param, expect the query param to be logged', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
-      const options: request.CoreOptions & request.UriOptions = {
-        uri: requestUrl,
-        qs: {
+      const options: AxiosRequestConfig = {
+        url: requestUrl,
+        params: {
           param: true
         }
       };
-      requestClientWrapper.get(options, () => {
+      requestClientWrapper.get(options.url!, options, () => {
         expect(infoLogSpy.called).to.be.true;
         expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl}?param=true -- STARTED`);
         done();
@@ -149,11 +141,11 @@ describe('RequestClientWrapper', () => {
     it('When doing a get() with no query params, expect no query params to be logged', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
-      const options: request.CoreOptions & request.UriOptions = {
-        uri: requestUrl,
-        qs: { }
+      const options: AxiosRequestConfig = {
+        url: requestUrl,
+        params: { }
       };
-      requestClientWrapper.get(options, () => {
+      requestClientWrapper.get(options.url!, options, () => {
         expect(infoLogSpy.called).to.be.true;
         expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`);
         done();
@@ -163,7 +155,7 @@ describe('RequestClientWrapper', () => {
     it('When doing a get() with no options, expect just the url to be logged', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
-      requestClientWrapper.get(requestUrl, () => {
+      requestClientWrapper.get(requestUrl, {}, () => {
         expect(infoLogSpy.called).to.be.true;
         expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`);
         done();
@@ -185,15 +177,15 @@ describe('RequestClientWrapper', () => {
       // tslint:disable:no-trailing-whitespace
       const expectedErrorMessage =
 `PUT /v1/orders/c0f45529-cbed-4e90-9a38-c208d409ef2a
-  Status: 404 
+  Status: 404
   Response Body:
   404 undefined
 Code: 0 Message: You didnt pass any body`;
       // tslint:enable:no-trailing-whitespace
-      sandbox.stub(client, 'put')
+      sandbox.stub(axios, 'put')
         .yields(null, response, { errors: [channelApeApiError] });
 
-      requestClientWrapper.put(requestUrl, (error, response, body) => {
+      requestClientWrapper.put(requestUrl, {}, (error, response, body) => {
         expect(error).not.to.be.null;
         expect(error.message).to.equal(expectedErrorMessage);
         done();
@@ -207,15 +199,15 @@ Code: 0 Message: You didnt pass any body`;
         throw new Error('additionalFields should be defined');
       }
       singleOrderToUpdate.additionalFields[0].value = 'RRR';
-      const options: request.CoreOptions = {
-        body: singleOrderToUpdate
+      const options: AxiosRequestConfig = {
+        data: singleOrderToUpdate
       };
       const response = {
         statusCode: 202,
         method: 'PUT',
         url: `${Environment.STAGING}${requestUrl}`
       };
-      sandbox.stub(client, 'put')
+      sandbox.stub(axios, 'put')
         .yields(null, response, singleOrderToUpdate);
 
       requestClientWrapper.put(requestUrl, options, (error, response, body) => {
@@ -232,19 +224,19 @@ Code: 0 Message: You didnt pass any body`;
         throw new Error('additionalFields should be defined');
       }
       singleOrderToUpdate.additionalFields[0].value = 'RRR';
-      const options: request.CoreOptions & request.UriOptions = {
-        uri: requestUrl,
-        body: singleOrderToUpdate
+      const options: AxiosRequestConfig = {
+        url: requestUrl,
+        data: singleOrderToUpdate
       };
       const response = {
         statusCode: 202,
         method: 'PUT',
         url: `${Environment.STAGING}${requestUrl}`
       };
-      sandbox.stub(client, 'put')
+      sandbox.stub(axios, 'put')
         .yields(null, response, singleOrderToUpdate);
 
-      requestClientWrapper.put(options, (error, response, body) => {
+      requestClientWrapper.put(options.url!, options, (error, response, body) => {
         expect(error).to.be.null;
         expect(body.additionalFields[0].value).to.equal('RRR');
         done();
@@ -254,11 +246,11 @@ Code: 0 Message: You didnt pass any body`;
     it('When doing a put() expect the call to be logged', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
-      const options: request.CoreOptions & request.UriOptions = {
-        uri: requestUrl,
-        body: singleOrderToUpdate
+      const options: AxiosRequestConfig = {
+        url: requestUrl,
+        data: singleOrderToUpdate
       };
-      requestClientWrapper.put(options, () => {
+      requestClientWrapper.put(options.url!, options, () => {
         expect(infoLogSpy.called).to.be.true;
         expect(infoLogSpy.args[0][0]).to.equal(`PUT ${Environment.STAGING}${requestUrl} -- STARTED`);
         done();
@@ -298,7 +290,7 @@ Code: 0 Message: You didnt pass any body`;
         url: `${Environment.STAGING}${requestUrl}`,
         request: fakeRequest
       }];
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
       clientGetStub.onCall(0).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
           setTimeout(() => cbOrOpts(null, responses[0], 'Im'), 50);
@@ -335,7 +327,7 @@ Code: 0 Message: You didnt pass any body`;
         }
       });
 
-      requestClientWrapper.get(requestUrl, (error, response, body) => {
+      requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
         expect(warnLogSpy.called).to.be.true;
         expect(warnLogSpy.args[1][0])
           .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 100 ms`, 'should log 1st delay correctly');
@@ -384,14 +376,14 @@ Code: 0 Message: You didnt pass any body`;
         url: `${Environment.STAGING}${requestUrl}`,
         request: fakeRequest
       }];
-      const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put');
+      const clientPutStub: sinon.SinonStub = sandbox.stub(axios, 'put');
       clientPutStub.onCall(0).yields(null, responses[0], 'Im');
       clientPutStub.onCall(1).yields(null, responses[1], 'a');
       clientPutStub.onCall(2).yields(null, responses[2], 'little');
       clientPutStub.onCall(3).yields(null, responses[3], 'teapot');
       clientPutStub.onCall(4).yields(null, responses[4], singleOrder);
 
-      requestClientWrapper.put(requestUrl, { body: singleOrder }, (error, response, body) => {
+      requestClientWrapper.put(requestUrl, { data: singleOrder }, (error, response, body) => {
         expect(error).to.be.null;
         expect(warnLogSpy.called).to.be.true;
         expect(warnLogSpy.args[1][0])
@@ -441,7 +433,7 @@ Code: 0 Message: You didnt pass any body`;
         url: `${Environment.STAGING}${requestUrl}`,
         request: fakeRequest
       }];
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
       clientGetStub.onCall(0).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
           setTimeout(() => cbOrOpts(null, responses[0], 'Im'), 1);
@@ -478,7 +470,7 @@ Code: 0 Message: You didnt pass any body`;
         }
       });
 
-      requestClientWrapper.get(requestUrl, (error, response, body) => {
+      requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
         const expectedErrorMessage = 'Your request was tried a total of';
         expect(error).not.to.be.null;
         expect(error.message).to.include(expectedErrorMessage);
@@ -520,7 +512,7 @@ Code: 0 Message: You didnt pass any body`;
         url: `${Environment.STAGING}${requestUrl}`,
         request: fakeRequest
       }];
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
       clientGetStub.onCall(0).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
           setTimeout(() => cbOrOpts(null, responses[0], 'Im'), 10);
@@ -566,7 +558,7 @@ Code: 0 Message: You didnt pass any body`;
     it(`When handling a GET response expect callback with an empty response to be handled gracefully`, (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
       clientGetStub.callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
         if (typeof cbOrOpts === 'function') {
           setTimeout(() => cbOrOpts(null, undefined, undefined), 1000);
@@ -575,7 +567,7 @@ Code: 0 Message: You didnt pass any body`;
         }
       });
 
-      requestClientWrapper.get(requestUrl, (error, response, body) => {
+      requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
         const expectedErrorMessage = 'No response was received from the server';
         expect(error).not.to.be.null;
         expect(error.message).to.include(expectedErrorMessage);

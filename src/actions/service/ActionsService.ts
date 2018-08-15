@@ -1,7 +1,7 @@
 import Action from '../model/Action';
 import ActionsPage from '../model/ActionsPage';
 import ActionsQueryRequest from '../model/ActionsQueryRequest';
-import * as request from 'request';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import Resource from '../../model/Resource';
 import Subresource from '../model/Subresource';
 import Version from '../../model/Version';
@@ -38,7 +38,7 @@ export default class ActionsService {
   private getByActionId(actionId: string): Promise<Action> {
     const deferred = Q.defer<Action>();
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}/${actionId}`;
-    this.client.get(requestUrl, (error, response, body) => {
+    this.client.get(requestUrl, {}, (error, response, body) => {
       this.mapActionPromise(requestUrl, deferred, error, response, body);
     });
     return deferred.promise as any;
@@ -54,8 +54,8 @@ export default class ActionsService {
     if (typeof actionsRequest.endDate !== 'undefined' && typeof actionsRequest.endDate !== 'string') {
       queryParams.endDate = actionsRequest.endDate.toISOString();
     }
-    const options: request.CoreOptions = {
-      qs: queryParams
+    const options: AxiosRequestConfig = {
+      params: queryParams
     };
     this.client.get(requestUrl, options, (error, response, body) => {
       const requestCallbackParams = {
@@ -69,7 +69,7 @@ export default class ActionsService {
   public updateHealthCheck(actionId: string): Promise<Action> {
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}/${actionId}/${Subresource.HEALTH_CHECK}`;
     const deferred = Q.defer<Action>();
-    this.client.put(requestUrl, (error, response, body) => {
+    this.client.put(requestUrl, {}, (error, response, body) => {
       this.mapActionPromise(requestUrl, deferred, error, response, body);
     });
     return deferred.promise as any;
@@ -78,7 +78,7 @@ export default class ActionsService {
   public complete(actionId: string): Promise<Action> {
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}/${actionId}/${Subresource.COMPLETE}`;
     const deferred = Q.defer<Action>();
-    this.client.put(requestUrl, (error, response, body) => {
+    this.client.put(requestUrl, {}, (error, response, body) => {
       this.mapActionPromise(requestUrl, deferred, error, response, body);
     });
     return deferred.promise as any;
@@ -87,17 +87,17 @@ export default class ActionsService {
   public error(actionId: string): Promise<Action> {
     const requestUrl = `/${Version.V1}${Resource.ACTIONS}/${actionId}/${Subresource.ERROR}`;
     const deferred = Q.defer<Action>();
-    this.client.put(requestUrl, (error, response, body) => {
+    this.client.put(requestUrl, {}, (error, response, body) => {
       this.mapActionPromise(requestUrl, deferred, error, response, body);
     });
     return deferred.promise as any;
   }
 
-  private mapActionPromise(requestUrl: string, deferred: Q.Deferred<Action>, error: any, response: request.Response,
+  private mapActionPromise(requestUrl: string, deferred: Q.Deferred<Action>, error: any, response: AxiosResponse,
     body: any) {
     if (error) {
       deferred.reject(error);
-    } else if (response.statusCode === EXPECTED_STATUS_CODE) {
+    } else if (response.status === EXPECTED_STATUS_CODE) {
       const action = this.formatAction(body);
       deferred.resolve(action);
     } else {
@@ -111,7 +111,7 @@ export default class ActionsService {
     singlePage: boolean) {
     if (requestCallbackParams.error) {
       deferred.reject(requestCallbackParams.error);
-    } else if (requestCallbackParams.response.statusCode === EXPECTED_STATUS_CODE) {
+    } else if (requestCallbackParams.response.status === EXPECTED_STATUS_CODE) {
       const actionsFromThisCall: Action[] = requestCallbackParams.body.actions.map(this.formatAction);
       const mergedActions: Action[] = actions.concat(actionsFromThisCall);
       if (singlePage) {

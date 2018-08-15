@@ -1,5 +1,5 @@
 import { Logger, LogLevel } from 'channelape-logger';
-import { Response, UriOptions, CoreOptions, RequestCallback } from 'request';
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import RequestRetryInfo from '../model/RequestRetryInfo';
 
 export default class RequestLogger {
@@ -16,8 +16,8 @@ export default class RequestLogger {
 
   public logCall(
     method: string,
-    uriOrOptions: string | (UriOptions & CoreOptions),
-    callbackOrOptionsOrUndefined?: RequestCallback | CoreOptions | undefined
+    url: string,
+    options?: AxiosRequestConfig
   ): void {
     let methodToLog: string = '';
     if (typeof method !== 'undefined') {
@@ -25,26 +25,21 @@ export default class RequestLogger {
     }
     let uri: string;
     let queryParams = '';
-    if (typeof uriOrOptions === 'string') {
-      uri = `${this.endpoint}${uriOrOptions}`;
-      if (typeof callbackOrOptionsOrUndefined !== 'undefined' && typeof callbackOrOptionsOrUndefined !== 'function') {
-        queryParams = this.getQueryParamString(callbackOrOptionsOrUndefined.qs);
-      }
-    } else {
-      uri = `${this.endpoint}${uriOrOptions.uri.toString()}`;
-      queryParams = this.getQueryParamString(uriOrOptions.qs);
+    uri = `${this.endpoint}${options}`;
+    if (options !== undefined) {
+      queryParams = this.getQueryParamString(options.params);
     }
     this.logger.info(`${methodToLog} ${uri}${queryParams} -- STARTED`);
   }
 
-  public logResponse(error: any, response: Response | undefined, body: any | undefined): void {
+  public logResponse(error: any, response: AxiosResponse | undefined, body: any | undefined): void {
     let errorMessage: string;
     let infoMessage = '';
     if (typeof response !== 'undefined' && typeof response.request !== 'undefined') {
-      if (!this.responseIsLevel200(response.statusCode)) {
+      if (!this.responseIsLevel200(response.status)) {
         const errorMessage =
-          `${response.request.method} ${response.request.href} ` +
-          `-- FAILED WITH STATUS: ${response.statusCode} and BODY OF: ${JSON.stringify(body)}`;
+          `${response.config.method} ${response.request.href} ` +
+          `-- FAILED WITH STATUS: ${response.status} and BODY OF: ${JSON.stringify(body)}`;
         this.logger.warn(errorMessage);
       } else {
         infoMessage = `${response.request.method} ${response.request.href} -- COMPLETED`;

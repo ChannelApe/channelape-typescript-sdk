@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import * as request from 'request';
+import * as axios from 'axios';
 import { LogLevel } from 'channelape-logger';
 import ActionsService from './../../../src/actions/service/ActionsService';
 import ActionsQueryRequest from '../../../src/actions/model/ActionsQueryRequest';
@@ -20,14 +20,7 @@ describe('Actions Service', () => {
   describe('Given some rest client', () => {
     const client: RequestClientWrapper =
       new RequestClientWrapper(
-        request.defaults({
-          baseUrl: Environment.STAGING,
-          timeout: 60000,
-          json: true
-        }),
-        LogLevel.OFF,
-        Environment.STAGING,
-        10000
+        60000, 'valid-session-id', LogLevel.INFO, Environment.STAGING, 10000
       );
 
     let sandbox: sinon.SinonSandbox;

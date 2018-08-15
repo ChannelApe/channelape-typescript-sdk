@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import * as request from 'request';
 import { LogLevel } from 'channelape-logger';
 import ChannelsService from './../../../src/channels/service/ChannelsService';
 import Version from '../../../src/model/Version';
@@ -15,11 +14,8 @@ describe('Channels Service', () => {
   describe('Given some rest client', () => {
     const client: RequestClientWrapper =
       new RequestClientWrapper(
-        request.defaults({
-          baseUrl: Environment.STAGING,
-          timeout: 60000,
-          json: true
-        }),
+        60000,
+        'valid-session-id',
         LogLevel.OFF,
         Environment.STAGING,
         10000
@@ -55,7 +51,7 @@ describe('Channels Service', () => {
       updatedAt: new Date('2018-04-02T13:04:27.299Z')
     };
 
-    const expectedChannelApeErrorResponse : ChannelApeApiErrorResponse = {
+    const expectedChannelApeErrorResponse: ChannelApeApiErrorResponse = {
       statusCode: 404,
       errors: [
         {
@@ -86,7 +82,7 @@ describe('Channels Service', () => {
         statusCode: 200
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
-          .yields(null, response, expectedChannel);
+        .yields(null, response, expectedChannel);
 
       const channelsService: ChannelsService = new ChannelsService(client);
       return channelsService.get(expectedChannel.id).then((actualAction) => {
@@ -111,8 +107,8 @@ describe('Channels Service', () => {
     });
 
     it('And invalid channel ID ' +
-    'When retrieving channel Then return a rejected promise with 404 status code ' +
-    'And channel not found error message', () => {
+      'When retrieving channel Then return a rejected promise with 404 status code ' +
+      'And channel not found error message', () => {
 
       const response = {
         statusCode: 404

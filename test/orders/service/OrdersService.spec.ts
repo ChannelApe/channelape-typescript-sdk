@@ -2,7 +2,7 @@ import OrdersService from './../../../src/orders/service/OrdersService';
 import * as sinon from 'sinon';
 import Order from '../../../src/orders/model/Order';
 import { expect } from 'chai';
-import * as request from 'request';
+import axios from 'axios';
 import { LogLevel } from 'channelape-logger';
 import Environment from '../../../src/model/Environment';
 import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
@@ -27,16 +27,9 @@ const maximumRequestRetryTimeout = 3000;
 describe('OrdersService', () => {
 
   describe('Given some valid rest client', () => {
-    const client = request.defaults({
-      baseUrl: Environment.STAGING,
-      timeout: 60000,
-      json: true,
-      headers: {
-        'X-Channel-Ape-Authorization-Token': 'valid-session-id'
-      }
-    });
-    const clientWrapper: RequestClientWrapper =
-      new RequestClientWrapper(client, LogLevel.OFF, Environment.STAGING, maximumRequestRetryTimeout);
+    const clientWrapper: RequestClientWrapper = new RequestClientWrapper(
+      60000, 'valid-session-id', LogLevel.INFO, Environment.STAGING, maximumRequestRetryTimeout
+    );
 
     let sandbox: sinon.SinonSandbox;
 
@@ -65,7 +58,7 @@ describe('OrdersService', () => {
       const response = {
         statusCode: 200
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get')
           .yields(null, response, singleOrder);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
@@ -83,7 +76,7 @@ describe('OrdersService', () => {
       const response = {
         statusCode: 200
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get')
         .yields(null, response, singleCanceledOrder);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
@@ -111,7 +104,7 @@ describe('OrdersService', () => {
       const response = {
         statusCode: 200
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get')
         .yields(null, response, singleOrderWithOneLineItemAndOneFulfillment);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
@@ -139,7 +132,7 @@ describe('OrdersService', () => {
       const response = {
         statusCode: 200
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get')
         .yields(null, response, singleClosedOrderWithFulfillments);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
@@ -178,7 +171,7 @@ describe('OrdersService', () => {
           ]
         }
       };
-      sandbox.stub(client, 'get')
+      sandbox.stub(axios, 'get')
           .yields(null, response, expectedChannelApeErrorResponse);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
@@ -196,7 +189,7 @@ describe('OrdersService', () => {
       const response = {
         statusCode: 200
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get')
           .yields(null, response, {
             orders: [singleOrder],
             pagination: {
@@ -226,7 +219,7 @@ describe('OrdersService', () => {
       const response = {
         statusCode: 200
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get')
           .yields(null, response, {
             orders: multipleOrders,
             pagination: {
@@ -257,7 +250,7 @@ describe('OrdersService', () => {
       const response = {
         statusCode: 200
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
       clientGetStub.onFirstCall()
         .yields(null, response, {
           orders: multipleOrders,
@@ -296,7 +289,7 @@ describe('OrdersService', () => {
       const response = {
         statusCode: 200
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
       clientGetStub.onFirstCall()
         .yields(null, response, {
           orders: multipleOrders,
@@ -338,12 +331,12 @@ describe('OrdersService', () => {
       // tslint:disable:no-trailing-whitespace
       const expectedErrorMessage =
 ` /v1/orders
-  Status: 404 
+  Status: 404
   Response Body:
   404 undefined
 Code: 15 Message: Requested business cannot be found.`;
       // tslint:enable:no-trailing-whitespace
-      sandbox.stub(client, 'get')
+      sandbox.stub(axios, 'get')
           .yields(null, response, expectedChannelApeBusinessNotFoundError);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
@@ -380,7 +373,7 @@ Code: 15 Message: Requested business cannot be found.`;
       const response = {
         statusCode: 202
       };
-      const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put')
+      const clientPutStub: sinon.SinonStub = sandbox.stub(axios, 'put')
           .yields(null, response, singleOrderToUpdateResponse);
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       return ordersService.update(order).then((actualOrder) => {
@@ -398,26 +391,16 @@ Code: 15 Message: Requested business cannot be found.`;
 
   describe('Given some invalid rest client', () => {
     const client: RequestClientWrapper =
-    new RequestClientWrapper(
-      request.defaults({
-        baseUrl: 'this-is-not-a-real-base-url',
-        timeout: 60000,
-        json: true,
-        headers: {
-          'X-Channel-Ape-Authorization-Token': 'valid-session-id'
-        }
-      }),
-      LogLevel.OFF,
-      Environment.STAGING,
-      maximumRequestRetryTimeout
-    );
+      new RequestClientWrapper(
+        60000, 'valid-session-id', LogLevel.INFO, Environment.STAGING, maximumRequestRetryTimeout
+      );
 
     it(`And invalid orderId
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
       // tslint:disable:no-trailing-whitespace
       const expectedErrorMessage =
 ` /v1/orders/not-a-real-order-id
-  Status: 0 
+  Status: 0
   Response Body:
   Invalid URI "this-is-not-a-real-base-url/v1/orders/not-a-real-order-id"
 Code: -1 Message: Invalid URI "this-is-not-a-real-base-url/v1/orders/not-a-real-order-id"`;
@@ -437,7 +420,7 @@ Code: -1 Message: Invalid URI "this-is-not-a-real-base-url/v1/orders/not-a-real-
       // tslint:disable:no-trailing-whitespace
       const expectedErrorMessage =
 ` /v1/orders
-  Status: 0 
+  Status: 0
   Response Body:
   Invalid URI "this-is-not-a-real-base-url/v1/orders"
 Code: -1 Message: Invalid URI "this-is-not-a-real-base-url/v1/orders"`;

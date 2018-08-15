@@ -2,8 +2,8 @@ import * as sinon from 'sinon';
 import { expect } from 'chai';
 import * as Logger from 'channelape-logger';
 import RequestLogger from '../../src/utils/RequestLogger';
-import { CoreOptions, UriOptions } from 'request';
 import Environment from '../../src/model/Environment';
+import { AxiosRequestConfig } from '../../node_modules/axios';
 
 describe('RequestLogger', () => {
 
@@ -37,9 +37,9 @@ describe('RequestLogger', () => {
   describe('logCall', () => {
     describe('given no error', () => {
       it('expect info to be called', () => {
-        const requestCoreOptions: UriOptions & CoreOptions = {
-          uri: '/v1/orders',
-          qs: {
+        const requestCoreOptions: AxiosRequestConfig = {
+          url: '/v1/orders',
+          params: {
             size: 100
           }
         };

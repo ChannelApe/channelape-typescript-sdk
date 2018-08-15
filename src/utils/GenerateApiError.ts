@@ -1,8 +1,8 @@
 import ChannelApeError from '../model/ChannelApeError';
 import ChannelApeApiError from '../model/ChannelApeApiError';
-import * as request from 'request';
+import { AxiosResponse } from 'axios';
 
-export default function generateApiError(url: string, response: request.Response, body: any,
+export default function generateApiError(url: string, response: AxiosResponse, body: any,
   expectedStatusCode: number): ChannelApeError {
   let thisBody = body;
   if (thisBody === undefined) {
@@ -25,6 +25,6 @@ export default function generateApiError(url: string, response: request.Response
   );
 }
 
-function getErrorMessage(response: request.Response, expectedStatusCode: number): string {
-  return `Expected Status ${expectedStatusCode} but got ${response.statusCode}`;
+function getErrorMessage(response: AxiosResponse, expectedStatusCode: number): string {
+  return `Expected Status ${expectedStatusCode} but got ${response.status}`;
 }

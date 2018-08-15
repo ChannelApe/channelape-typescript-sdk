@@ -1,20 +1,25 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import request = require('request');
+import { LogLevel } from 'channelape-logger';
+
 import SessionsService from './../../../src/sessions/service/SessionsService';
 import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
 import Environment from '../../../src/model/Environment';
 import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
+import RequestClientWrapper from '../../../src/RequestClientWrapper';
 
 describe('Sessions Service', () => {
 
   describe('Given some rest client and session ID ', () => {
-    const client = request.defaults({
-      baseUrl: Environment.STAGING,
-      timeout: 60000,
-      json: true
-    });
+    const client: RequestClientWrapper =
+      new RequestClientWrapper(
+        60000,
+        'valid-session-id',
+        LogLevel.OFF,
+        Environment.STAGING,
+        10000
+      );
     const sessionId = 'b40da0b8-a770-4de7-a496-361254bd7d6c';
     const userId = 'f6ed6f7a-47bf-4dd3-baed-71a8a9684e80';
     const sessionsService = new SessionsService(client, sessionId);
