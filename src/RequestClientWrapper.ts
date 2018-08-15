@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosInstance, AxiosPromise } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse, AxiosPromise } from 'axios';
 import { LogLevel } from 'channelape-logger';
 import RequestLogger from './utils/RequestLogger';
 import ChannelApeError from './model/ChannelApeError';
