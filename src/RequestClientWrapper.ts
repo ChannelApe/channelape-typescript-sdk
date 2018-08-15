@@ -86,7 +86,7 @@ export default class RequestClientWrapper {
             response,
             error: undefined,
             body: response.data
-          }
+          };
           this.handleResponse(requestResponse, callBackOrUndefined, url, callDetails, method);
         });
     } catch (e) {
