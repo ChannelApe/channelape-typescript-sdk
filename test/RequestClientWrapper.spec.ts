@@ -1,7 +1,7 @@
 // tslint:disable:no-trailing-whitespace
 import * as sinon from 'sinon';
 import { expect } from 'chai';
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosPromise } from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { Logger, LogLevel } from 'channelape-logger';
 import * as Q from 'q';
 
@@ -267,7 +267,7 @@ Code: 0 Message: You didnt pass any body`;
       const requestUrl = `/v1/orders/${orderId}`;
       const fakeRequest = {
         method: 'GET',
-        href: `${Environment.STAGING}${requestUrl}`
+        url: `${Environment.STAGING}${requestUrl}`
       };
       const responses = [{
         status: 500,
@@ -307,9 +307,9 @@ Code: 0 Message: You didnt pass any body`;
         expect(warnLogSpy.called).to.be.true;
         expect(warnLogSpy.args[1][0])
           .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 1st delay correctly');
-        expect(warnLogSpy.args[2][0])
-          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 2nd delay correctly');
         expect(warnLogSpy.args[3][0])
+          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 2nd delay correctly');
+        expect(warnLogSpy.args[5][0])
           .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 3rd delay correctly');
         expect(error).to.be.null;
         expect(body.id).to.equal(orderId);
@@ -317,7 +317,7 @@ Code: 0 Message: You didnt pass any body`;
           .to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`, 'should log correctly');
         done();
       });
-    }).timeout(100000);
+    }).timeout(5000);
 
     it('When handling a PUT response expect the call to be retried on 500 level status codes and 429s', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
@@ -368,9 +368,9 @@ Code: 0 Message: You didnt pass any body`;
         expect(warnLogSpy.called).to.be.true;
         expect(warnLogSpy.args[1][0])
           .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 1st delay correctly');
-        expect(warnLogSpy.args[2][0])
-          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 2nd delay correctly');
         expect(warnLogSpy.args[3][0])
+          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 2nd delay correctly');
+        expect(warnLogSpy.args[5][0])
           .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 3rd delay correctly');
         expect(body.id).to.equal(orderId);
         expect(infoLogSpy.args[0][0])
@@ -487,16 +487,12 @@ Code: 0 Message: You didnt pass any body`;
         expect(error).to.be.null;
         done();
       });
-    }).timeout(10000);
+    }).timeout(5000);
 
     it(`When handling a GET response expect callback with an empty response to be handled gracefully`, (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
       const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
-      const fakeRequest = {
-        method: 'GET',
-        href: `${Environment.STAGING}${requestUrl}`
-      };
       clientGetStub.callsFake((url: string, options: AxiosRequestConfig) => {
         const deferred = Q.defer();
         setTimeout(() => deferred.resolve(null as any), 1000);
@@ -509,6 +505,6 @@ Code: 0 Message: You didnt pass any body`;
         expect(error.message).to.include(expectedErrorMessage);
         done();
       });
-    }).timeout(100000);
+    }).timeout(5000);
   });
 });

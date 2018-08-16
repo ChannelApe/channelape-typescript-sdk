@@ -5,7 +5,10 @@ import { AxiosResponse } from '../../node_modules/axios';
 describe('GenerateApiErrors()', () => {
 
   const response = {
-    status: 505
+    status: 505,
+    config: {
+      method: 'GET'
+    }
   };
 
   context('given a body that is undefined', () => {

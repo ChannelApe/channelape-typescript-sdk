@@ -1,7 +1,7 @@
 import Action from '../model/Action';
 import ActionsPage from '../model/ActionsPage';
 import ActionsQueryRequest from '../model/ActionsQueryRequest';
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import Resource from '../../model/Resource';
 import Subresource from '../model/Subresource';
 import Version from '../../model/Version';

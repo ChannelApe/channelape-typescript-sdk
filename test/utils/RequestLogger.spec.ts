@@ -67,10 +67,10 @@ describe('RequestLogger', () => {
     describe('given no error', () => {
       it('given a non-200 level response it should log the correct error', () => {
         requestLogger.logResponse(undefined, {
-          statusCode: 504,
-          statusMessage: 'Timeout',
-          request: {
-            href: 'someurl',
+          status: 504,
+          statusText: 'Timeout',
+          config: {
+            url: 'someurl',
             method: 'PUT'
           }
         } as any, undefined);
@@ -85,17 +85,17 @@ describe('RequestLogger', () => {
 
       it('expect info to be called', () => {
         const response: any = {
-          body: { status: 'ok!' },
+          data: { status: 'ok!' },
           caseless: false,
           connection: null,
           headers: { 'Content-Type': 'application/json' },
           httpVersion: '5',
           httpVersionMajor: '5',
           httpVersionMinor: '5',
-          statusCode: 200,
+          status: 200,
           method: 'GET',
-          request: {
-            href: 'www.endpoint.com',
+          config: {
+            url: 'www.endpoint.com',
             method: 'GET'
           }
         };

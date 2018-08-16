@@ -14,12 +14,12 @@ export default class ChannelApeError extends Error {
   ) {
     super(getMessage());
     this.apiErrors = apiErrors;
-    if (typeof response === 'undefined') {
+    if (typeof response === 'undefined' || response.status === undefined) {
       this.responseStatusCode = -1;
       this.responseStatusMessage = 'There was an error with the API';
     } else {
       this.responseStatusCode = response.status;
-      this.responseStatusMessage = response.statusText;
+      this.responseStatusMessage = response.statusText == null ? '' : response.statusText;
     }
 
     function getMessage(): string {
@@ -31,7 +31,7 @@ export default class ChannelApeError extends Error {
       let method: string;
       let statusCode: number;
       let statusMessage: string;
-      if (typeof response === 'undefined') {
+      if (typeof response === 'undefined' || response.config === undefined) {
         method = '';
         statusCode = 0;
         statusMessage = '';

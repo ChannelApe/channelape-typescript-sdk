@@ -79,7 +79,10 @@ describe('Channels Service', () => {
       'When retrieving channel Then return resolved promise with channel', () => {
 
       const response = {
-        statusCode: 200
+        status: 200,
+        config: {
+          method: 'GET'
+        }
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
         .yields(null, response, expectedChannel);
@@ -111,7 +114,10 @@ describe('Channels Service', () => {
       'And channel not found error message', () => {
 
       const response = {
-        statusCode: 404
+        status: 404,
+        config: {
+          method: 'GET'
+        }
       };
       const clientGetStub = sandbox.stub(client, 'get')
         .yields(null, response, expectedChannelApeErrorResponse);

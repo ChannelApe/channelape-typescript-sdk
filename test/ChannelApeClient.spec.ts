@@ -4,7 +4,6 @@ import ChannelApeClient from '../src/ChannelApeClient';
 import ActionsService from '../src/actions/service/ActionsService';
 import ActionProcessingStatus from '../src/actions/model/ActionProcessingStatus';
 import ChannelsService from '../src/channels/service/ChannelsService';
-import axios from 'axios';
 import ChannelApeApiErrorResponse from '../src/model/ChannelApeApiErrorResponse';
 import { LogLevel } from 'channelape-logger';
 import Action from '../src/actions/model/Action';
@@ -14,14 +13,11 @@ import OrdersService from '../src/orders/service/OrdersService';
 
 import singleOrder from '../test/orders/resources/singleOrder';
 
-let requestSpy: sinon.SinonSpy;
-
 describe('ChannelApe Client', () => {
 
   let sandbox: sinon.SinonSandbox;
   beforeEach((done) => {
     sandbox = sinon.sandbox.create();
-    requestSpy = sandbox.spy(axios, 'defaults');
     done();
   });
 
@@ -47,7 +43,6 @@ describe('ChannelApe Client', () => {
         });
         expect(channelApeClient.LogLevel).to.equal(LogLevel.VERBOSE);
         expect(channelApeClient.LogLevel).to.equal('verbose');
-        expectRequestDefaults(requestSpy);
       });
     });
 
@@ -231,9 +226,3 @@ describe('ChannelApe Client', () => {
   });
 
 });
-
-function expectRequestDefaults(requestSpy: sinon.SinonSpy) {
-  expect(requestSpy.args[0][0].headers['X-Channel-Ape-Authorization-Token'])
-    .to.equal('c478c897-dc1c-4171-a207-9e3af9b23579');
-  expect(requestSpy.args[0][0].json).to.equal(true);
-}

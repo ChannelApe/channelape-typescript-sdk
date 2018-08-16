@@ -35,14 +35,14 @@ export default class RequestLogger {
   public logResponse(error: any, response: AxiosResponse | undefined | null, body: any | undefined): void {
     let errorMessage: string;
     let infoMessage = '';
-    if (response != null && typeof response.request !== 'undefined') {
+    if (response != null && typeof response.config !== 'undefined') {
       if (!this.responseIsLevel200(response.status)) {
         const errorMessage =
-          `${response.config.method} ${response.request.href} ` +
+          `${response.config.method} ${response.config.url} ` +
           `-- FAILED WITH STATUS: ${response.status} and BODY OF: ${JSON.stringify(body)}`;
         this.logger.warn(errorMessage);
       } else {
-        infoMessage = `${response.request.method} ${response.request.href} -- COMPLETED`;
+        infoMessage = `${response.config.method} ${response.config.url} -- COMPLETED`;
       }
     }
     if (infoMessage !== '') {

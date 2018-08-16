@@ -56,10 +56,11 @@ describe('OrdersService', () => {
     it(`And valid orderId
             When retrieving order Then return resolved promise with order`, () => {
       const response = {
-        statusCode: 200
+        status: 200,
+        config: {},
+        data: singleOrder
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get')
-          .yields(null, response, singleOrder);
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get').resolves(response);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
@@ -74,10 +75,11 @@ describe('OrdersService', () => {
     it(`And valid orderId for canceled order
           When retrieving order then return resolved promise with order and correct dates`, () => {
       const response = {
-        statusCode: 200
+        status: 200,
+        config: {},
+        data: singleCanceledOrder
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get')
-        .yields(null, response, singleCanceledOrder);
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get').resolves(response);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = '06b70c49-a13e-42ca-a490-404d29c7fa46';
@@ -102,10 +104,11 @@ describe('OrdersService', () => {
     it(`And valid orderId for order with one line item and fulfillment
           When retrieving order then return resolved promise with order with line item and one fulfillment`, () => {
       const response = {
-        statusCode: 200
+        status: 200,
+        config: {},
+        data: singleOrderWithOneLineItemAndOneFulfillment
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get')
-        .yields(null, response, singleOrderWithOneLineItemAndOneFulfillment);
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get').resolves(response);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = '06b70c49-a13e-42ca-a490-404d29c7fa46';
@@ -130,10 +133,11 @@ describe('OrdersService', () => {
     it(`And valid orderId for closed order with fulfillment
           When retrieving order then return resolved promise with closed order with fulfillment`, () => {
       const response = {
-        statusCode: 200
+        status: 200,
+        config: {},
+        data: singleClosedOrderWithFulfillments
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get')
-        .yields(null, response, singleClosedOrderWithFulfillments);
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get').resolves(response);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = '9dc34b92-70d1-42d8-8b4e-ae7fb3deca70';
@@ -159,9 +163,9 @@ describe('OrdersService', () => {
     it(`And invalid orderId
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
       const response = {
-        method: 'GET',
-        statusCode: 404,
-        statusMessage: 'Not Found',
+        config: {},
+        status: 404,
+        statusText: 'Not Found',
         body: {
           errors: [
             {
@@ -187,15 +191,16 @@ describe('OrdersService', () => {
     it(`And valid businessId and channelOrderId
             When retrieving order Then return resolved promise with order`, () => {
       const response = {
-        statusCode: 200
+        status: 200,
+        config: {},
+        data: {
+          orders: [singleOrder],
+          pagination: {
+            lastPage: true
+          }
+        }
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get')
-          .yields(null, response, {
-            orders: [singleOrder],
-            pagination: {
-              lastPage: true
-            }
-          });
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get').resolves(response);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const channelOrderId = '314980073478';
@@ -217,15 +222,16 @@ describe('OrdersService', () => {
             When retrieving orders Then return resolved promise with orders`, () => {
 
       const response = {
-        statusCode: 200
+        status: 200,
+        config: {},
+        data: {
+          orders: multipleOrders,
+          pagination: {
+            lastPage: true
+          }
+        }
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get')
-          .yields(null, response, {
-            orders: multipleOrders,
-            pagination: {
-              lastPage: true
-            }
-          });
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get').resolves(response);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
@@ -238,8 +244,8 @@ describe('OrdersService', () => {
         expect(actualOrders).to.be.an('array');
         expect(actualOrders.length).to.equal(2);
         expect(actualOrders[0].businessId).to.equal(businessId);
-        expect(clientGetStub.args[0][1].qs.startDate).to.equal('2018-05-01T18:07:58.009Z');
-        expect(clientGetStub.args[0][1].qs.endDate).to.equal('2018-05-07T18:07:58.009Z');
+        expect(clientGetStub.args[0][1].params.startDate).to.equal('2018-05-01T18:07:58.009Z');
+        expect(clientGetStub.args[0][1].params.endDate).to.equal('2018-05-07T18:07:58.009Z');
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}/orders`);
       });
     });
@@ -247,24 +253,29 @@ describe('OrdersService', () => {
     it(`And valid businessId with multiple pages of orders
             When retrieving orders Then return resolved promise with all orders`, () => {
 
-      const response = {
-        statusCode: 200
-      };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
-      clientGetStub.onFirstCall()
-        .yields(null, response, {
+      const response1 = {
+        status: 200,
+        config: {},
+        data: {
           orders: multipleOrders,
           pagination: {
             lastPage: false
           }
-        });
-      clientGetStub.onSecondCall()
-        .yields(null, response, {
+        }
+      };
+      const response2 = {
+        status: 200,
+        config: {},
+        data: {
           orders: multipleOrders,
           pagination: {
             lastPage: true
           }
-        });
+        }
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
+      clientGetStub.onFirstCall().resolves(response1);
+      clientGetStub.onSecondCall().resolves(response2);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
@@ -275,8 +286,8 @@ describe('OrdersService', () => {
         expect(actualOrders).to.be.an('array');
         expect(actualOrders.length).to.equal(4);
         expect(actualOrders[0].businessId).to.equal(businessId);
-        expect(typeof clientGetStub.args[0][1].qs.startDate).to.equal('undefined');
-        expect(typeof clientGetStub.args[0][1].qs.endDate).to.equal('undefined');
+        expect(typeof clientGetStub.args[0][1].params.startDate).to.equal('undefined');
+        expect(typeof clientGetStub.args[0][1].params.endDate).to.equal('undefined');
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}/orders`);
       });
     });
@@ -287,16 +298,17 @@ describe('OrdersService', () => {
             Then return resolved promise with a single page of orders`, () => {
 
       const response = {
-        statusCode: 200
-      };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
-      clientGetStub.onFirstCall()
-        .yields(null, response, {
+        status: 200,
+        config: {},
+        data: {
           orders: multipleOrders,
           pagination: {
             lastPage: false
           }
-        });
+        }
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
+      clientGetStub.onFirstCall().resolves(response);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const expectedBusinessId = '4d688534-d82e-4111-940c-322ba9aec108';
@@ -306,8 +318,8 @@ describe('OrdersService', () => {
       return ordersService.getPage(requestOptions).then((actualOrdersResponse) => {
         expect(actualOrdersResponse.orders.length).to.equal(2);
         expect(actualOrdersResponse.orders[0].businessId).to.equal(expectedBusinessId);
-        expect(typeof clientGetStub.args[0][1].qs.startDate).to.equal('undefined');
-        expect(typeof clientGetStub.args[0][1].qs.endDate).to.equal('undefined');
+        expect(typeof clientGetStub.args[0][1].params.startDate).to.equal('undefined');
+        expect(typeof clientGetStub.args[0][1].params.endDate).to.equal('undefined');
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}/orders`);
         expect(clientGetStub.calledOnce).to.be.true;
         expect(actualOrdersResponse.pagination.lastPage).to.be.false;
@@ -317,16 +329,17 @@ describe('OrdersService', () => {
     it(`And invalid businessId
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
       const response = {
-        statusCode: 404
-      };
-      const expectedChannelApeBusinessNotFoundError: ChannelApeApiErrorResponse = {
-        statusCode: 404,
-        errors:[
-          {
-            code: 15,
-            message: 'Requested business cannot be found.'
-          }
-        ]
+        status: 404,
+        config: {},
+        data: {
+          statusCode: 404,
+          errors:[
+            {
+              code: 15,
+              message: 'Requested business cannot be found.'
+            }
+          ]
+        }
       };
       // tslint:disable:no-trailing-whitespace
       const expectedErrorMessage =
@@ -336,8 +349,7 @@ describe('OrdersService', () => {
   404 undefined
 Code: 15 Message: Requested business cannot be found.`;
       // tslint:enable:no-trailing-whitespace
-      sandbox.stub(axios, 'get')
-          .yields(null, response, expectedChannelApeBusinessNotFoundError);
+      sandbox.stub(axios, 'get').resolves(response);
 
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       const businessId = 'not-a-real-business-id';
@@ -371,10 +383,11 @@ Code: 15 Message: Requested business cannot be found.`;
         status: FulfillmentStatus.OPEN
       });
       const response = {
-        statusCode: 202
+        status: 202,
+        config: {},
+        data: singleOrderToUpdateResponse
       };
-      const clientPutStub: sinon.SinonStub = sandbox.stub(axios, 'put')
-          .yields(null, response, singleOrderToUpdateResponse);
+      const clientPutStub: sinon.SinonStub = sandbox.stub(axios, 'put').resolves(response);
       const ordersService: OrdersService = new OrdersService(clientWrapper);
       return ordersService.update(order).then((actualOrder) => {
         expect(actualOrder.id).to.equal(order.id);
@@ -390,9 +403,8 @@ Code: 15 Message: Requested business cannot be found.`;
   });
 
   describe('Given some invalid rest client', () => {
-    const client: RequestClientWrapper =
-      new RequestClientWrapper(
-        60000, 'valid-session-id', LogLevel.INFO, Environment.STAGING, maximumRequestRetryTimeout
+    const client: RequestClientWrapper = new RequestClientWrapper(
+        60000, 'valid-session-id', LogLevel.INFO, 'this-is-not-a-real-base-url', maximumRequestRetryTimeout
       );
 
     it(`And invalid orderId
@@ -402,8 +414,7 @@ Code: 15 Message: Requested business cannot be found.`;
 ` /v1/orders/not-a-real-order-id
   Status: 0
   Response Body:
-  Invalid URI "this-is-not-a-real-base-url/v1/orders/not-a-real-order-id"
-Code: -1 Message: Invalid URI "this-is-not-a-real-base-url/v1/orders/not-a-real-order-id"`;
+  Request failed with status code 401`;
       // tslint:enable:no-trailing-whitespace
       const ordersService: OrdersService = new OrdersService(client);
       const orderId = 'not-a-real-order-id';
@@ -422,8 +433,7 @@ Code: -1 Message: Invalid URI "this-is-not-a-real-base-url/v1/orders/not-a-real-
 ` /v1/orders
   Status: 0
   Response Body:
-  Invalid URI "this-is-not-a-real-base-url/v1/orders"
-Code: -1 Message: Invalid URI "this-is-not-a-real-base-url/v1/orders"`;
+  Request failed with status code 401`;
       // tslint:enable:no-trailing-whitespace
       const ordersService: OrdersService = new OrdersService(client);
       const businessId = 'not-a-real-business-id';
