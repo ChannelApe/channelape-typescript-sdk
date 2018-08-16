@@ -19,7 +19,8 @@ export default class ChannelApeError extends Error {
       this.responseStatusMessage = 'There was an error with the API';
     } else {
       this.responseStatusCode = response.status == null ? -1 : response.status;
-      this.responseStatusMessage = response.statusText == null ? '' : response.statusText;
+      this.responseStatusMessage = response.statusText == null
+        ? 'There was an error with the API' : response.statusText;
     }
 
     function getMessage(): string {
