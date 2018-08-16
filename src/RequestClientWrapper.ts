@@ -97,7 +97,7 @@ export default class RequestClientWrapper {
         })
         .catch((e) => {
           const response = e.response == null ? undefined : e.response ;
-          const apiErrors = e.response == null || e.response.data == null || e.response.data.errors == null 
+          const apiErrors = e.response == null || e.response.data == null || e.response.data.errors == null
             ? [] : e.response.data.errors;
           const finalError = new ChannelApeError(e.message, response, url, apiErrors);
           try {
