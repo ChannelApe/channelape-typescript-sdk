@@ -411,10 +411,11 @@ Code: 15 Message: Requested business cannot be found.`;
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
       // tslint:disable:no-trailing-whitespace
       const expectedErrorMessage =
-` /v1/orders/not-a-real-order-id
-  Status: 0
+`get /v1/orders/not-a-real-order-id
+  Status: 401 
   Response Body:
-  Request failed with status code 401`;
+  Request failed with status code 401
+Code: 12 Message: Invalid authorization token. Please check the server logs and try again.`;
       // tslint:enable:no-trailing-whitespace
       const ordersService: OrdersService = new OrdersService(client);
       const orderId = 'not-a-real-order-id';
@@ -430,10 +431,11 @@ Code: 15 Message: Requested business cannot be found.`;
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
       // tslint:disable:no-trailing-whitespace
       const expectedErrorMessage =
-` /v1/orders
-  Status: 0
+`get /v1/orders
+  Status: 401 
   Response Body:
-  Request failed with status code 401`;
+  Request failed with status code 401
+Code: 12 Message: Invalid authorization token. Please check the server logs and try again.`;
       // tslint:enable:no-trailing-whitespace
       const ordersService: OrdersService = new OrdersService(client);
       const businessId = 'not-a-real-business-id';

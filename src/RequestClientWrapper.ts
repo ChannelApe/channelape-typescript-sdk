@@ -96,7 +96,10 @@ export default class RequestClientWrapper {
           this.handleResponse(requestResponse, callback, url, callDetails, method);
         })
         .catch((e) => {
-          const finalError = new ChannelApeError(e.message, undefined, url, []);
+          const response = e.response == null ? undefined : e.response ;
+          const apiErrors = e.response == null || e.response.data == null || e.response.data.errors == null 
+            ? [] : e.response.data.errors;
+          const finalError = new ChannelApeError(e.message, response, url, apiErrors);
           try {
             callback(finalError, {} as any, {} as any);
           } catch (e) {
