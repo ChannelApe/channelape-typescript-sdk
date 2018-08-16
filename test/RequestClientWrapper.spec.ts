@@ -11,6 +11,7 @@ import singleOrder from './orders/resources/singleOrder';
 import singleOrderToUpdate from './orders/resources/singleOrderToUpdate';
 import multipleOrders from './orders/resources/multipleOrders';
 import ChannelApeApiError from '../src/model/ChannelApeApiError';
+import { ChannelApeError } from '../src';
 
 const maximumRequestRetryTimeout = 3000;
 
@@ -499,10 +500,31 @@ Code: 0 Message: You didnt pass any body`;
         return deferred.promise;
       });
 
-      requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
+      requestClientWrapper.get(requestUrl, {}, (error: ChannelApeError, response, body) => {
         const expectedErrorMessage = 'No response was received from the server';
         expect(error).not.to.be.null;
         expect(error.message).to.include(expectedErrorMessage);
+        expect(error.ApiErrors.length).to.equal(1);
+        expect(error.ApiErrors[0].code).to.equal(504);
+        expect(error.ApiErrors[0].message).to.equal('No response was received from the server');
+        done();
+      });
+    }).timeout(5000);
+
+    it(`When handling an axios error ensure proper error handling`, (done) => {
+      const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      const requestUrl = `/v1/orders/${orderId}`;
+      const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
+      clientGetStub.rejects({
+        message: 'Generic Error',
+        response: {}
+      });
+
+      requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
+        const expectedErrorMessage = 'Generic Error';
+        expect(error).not.to.be.null;
+        expect(error.message).to.include(expectedErrorMessage);
+        expect(error.ApiErrors.length).to.equal(0);
         done();
       });
     }).timeout(5000);

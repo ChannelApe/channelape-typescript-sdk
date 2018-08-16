@@ -112,9 +112,7 @@ export default class RequestClientWrapper {
         body: {},
         response: undefined
       };
-      if (typeof callback === 'function') {
-        this.handleResponse(requestResponse, callback, '', callDetails, method);
-      }
+      this.handleResponse(requestResponse, callback, '', callDetails, method);
       return;
     }
   }
@@ -141,9 +139,7 @@ export default class RequestClientWrapper {
     } else if (
       this.shouldRequestBeRetried(requestResponse.error, requestResponse.response) && requestResponse.response
     ) {
-      this.retryRequest(
-        method, uri, callback, requestResponse.response, requestResponse.body, callDetails
-      );
+      this.retryRequest(method, uri, callback, callDetails);
       return;
     }
     if (requestResponse.error) {
@@ -192,19 +188,8 @@ export default class RequestClientWrapper {
     method: HttpRequestMethod,
     url: string,
     callback: RequestCallback,
-    response: AxiosResponse,
-    body: any,
     callDetails: CallDetails
   ) {
-    if (method == null) {
-      const e = new ChannelApeError('HTTP Request Method could not be determined', response, url, []);
-      try {
-        callback(e, response, body);
-      } catch (e) {
-        this.requestLogger.logCallbackError(e);
-      }
-      return;
-    }
     const jitterDelayAmount = 50;
     setTimeout(() => {
       callDetails.callCountForThisRequest += 1;
