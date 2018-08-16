@@ -102,7 +102,7 @@ describe('ChannelApe Client', () => {
             expect(actualChannel.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
             expect(actualChannel.enabled).to.equal(true);
             expect(actualChannel.integrationId).to.equal('02df0b31-a071-4791-b9c2-aa01e4fb0ce6');
-            expect(actualChannel.name).to.equal('Custom Column Export');
+            expect(actualChannel.name).to.equal('EuropaSports Snacks / Foods');
             expect(actualChannel.settings.allowCreate).to.equal(false);
             expect(actualChannel.settings.allowRead).to.equal(true);
             expect(actualChannel.settings.allowUpdate).to.equal(false);
@@ -159,8 +159,8 @@ describe('ChannelApe Client', () => {
         it('Then return all orders for the business', () => {
           return actualOrdersPromise.then((actualOrders) => {
             expect(actualOrders).to.be.an('array');
-            expect(actualOrders.length).to.equal(201);
-            expect(actualOrders[0].id).to.equal('3bc9120d-b706-49cd-ad81-6445ce77d8ad');
+            expect(actualOrders.length).to.equal(227);
+            expect(actualOrders[0].id).to.equal('1d963c9d-74bf-49ff-96f0-42f2d9d243ef');
           });
         });
       });
@@ -178,7 +178,7 @@ describe('ChannelApe Client', () => {
             return actualOrdersPromise.then((actualOrders) => {
               expect(actualOrders.orders).to.be.an('array');
               expect(actualOrders.orders.length).to.equal(150);
-              expect(actualOrders.orders[0].id).to.equal('3bc9120d-b706-49cd-ad81-6445ce77d8ad');
+              expect(actualOrders.orders[0].id).to.equal('1d963c9d-74bf-49ff-96f0-42f2d9d243ef');
               expect(actualOrders.pagination.lastPage).to.equal(false);
             });
           });
