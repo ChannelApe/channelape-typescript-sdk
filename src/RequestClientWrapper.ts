@@ -3,7 +3,6 @@ import { LogLevel } from 'channelape-logger';
 import RequestLogger from './utils/RequestLogger';
 import ChannelApeError from './model/ChannelApeError';
 import * as util from 'util';
-import RequestRetryInfo from './model/RequestRetryInfo';
 import HttpRequestMethod from './model/HttpRequestMethod';
 import RequestResponse from './model/RequestResponse';
 import { RequestCallback } from './model/RequestCallback';
@@ -11,6 +10,12 @@ import { RequestCallback } from './model/RequestCallback';
 const GENERIC_ERROR_CODE = -1;
 const CHANNEL_APE_API_RETRY_TIMEOUT_MESSAGE = `A problem with the ChannelApe API has been encountered.
 Your request was tried a total of %s times over the course of %s milliseconds`;
+
+interface CallDetails {
+  callStart: Date;
+  callCountForThisRequest: number;
+  options: AxiosRequestConfig;
+}
 
 export default class RequestClientWrapper {
 
@@ -45,7 +50,7 @@ export default class RequestClientWrapper {
 
   public put(url: string, params: AxiosRequestConfig, callback: RequestCallback): void {
     this.makeRequest(
-      HttpRequestMethod.GET,
+      HttpRequestMethod.PUT,
       new Date(),
       0,
       url,
@@ -60,9 +65,12 @@ export default class RequestClientWrapper {
     numberOfCalls: number,
     url: string,
     options: AxiosRequestConfig,
-    callBackOrUndefined: RequestCallback | undefined
+    callback: RequestCallback
   ): void {
-    const callDetails = { callStart, callCountForThisRequest: numberOfCalls };
+    const callDetails: CallDetails = { options, callStart, callCountForThisRequest: numberOfCalls };
+    options.baseURL = axios.defaults.baseURL;
+    options.headers = axios.defaults.headers;
+    options.method = method;
     try {
       this.requestLogger.logCall(method, url, options);
 
@@ -78,15 +86,22 @@ export default class RequestClientWrapper {
         default:
           throw new ChannelApeError('HTTP Request Method could not be determined', {} as any, '', []);
       }
-
       requestPromise
         .then((response) => {
           const requestResponse: RequestResponse = {
             response,
             error: undefined,
-            body: response.data
+            body: response == null ? {} : response.data
           };
-          this.handleResponse(requestResponse, callBackOrUndefined, url, callDetails, method);
+          this.handleResponse(requestResponse, callback, url, callDetails, method);
+        })
+        .catch((e) => {
+          const finalError = new ChannelApeError(e.message, undefined, url, []);
+          try {
+            callback(finalError, {} as any, {} as any);
+          } catch (e) {
+            this.requestLogger.logCallbackError(e);
+          }
         });
     } catch (e) {
       const requestResponse: RequestResponse = {
@@ -94,8 +109,8 @@ export default class RequestClientWrapper {
         body: {},
         response: undefined
       };
-      if (typeof callBackOrUndefined === 'function') {
-        this.handleResponse(requestResponse, callBackOrUndefined, '', callDetails, method);
+      if (typeof callback === 'function') {
+        this.handleResponse(requestResponse, callback, '', callDetails, method);
       }
       return;
     }
@@ -103,9 +118,9 @@ export default class RequestClientWrapper {
 
   private handleResponse(
     requestResponse: RequestResponse,
-    callBackOrUndefined: RequestCallback | undefined,
+    callback: RequestCallback,
     uri: string,
-    callDetails: { callStart: Date, callCountForThisRequest: number },
+    callDetails: CallDetails,
     method: HttpRequestMethod
   ): void {
     this.requestLogger.logResponse(requestResponse.error, requestResponse.response, requestResponse.body);
@@ -124,7 +139,7 @@ export default class RequestClientWrapper {
       this.shouldRequestBeRetried(requestResponse.error, requestResponse.response) && requestResponse.response
     ) {
       this.retryRequest(
-        method, uri, callBackOrUndefined, requestResponse.response, requestResponse.body
+        method, uri, callback, requestResponse.response, requestResponse.body, callDetails
       );
       return;
     }
@@ -138,8 +153,10 @@ export default class RequestClientWrapper {
         `${requestResponse.response.status} ${requestResponse.response.statusText}`,
         requestResponse.response, uri, requestResponse.body.errors);
     }
-    if (typeof callBackOrUndefined === 'function') {
-      callBackOrUndefined(finalError, requestResponse.response as any, requestResponse.body);
+    try {
+      callback(finalError, requestResponse.response as any, requestResponse.body);
+    } catch (e) {
+      this.requestLogger.logCallbackError(e);
     }
   }
 
@@ -169,23 +186,37 @@ export default class RequestClientWrapper {
   }
 
   private retryRequest(
-    method: string | undefined,
-    uri: string,
-    callBackOrUndefined: RequestCallback | undefined,
+    method: HttpRequestMethod,
+    url: string,
+    callback: RequestCallback,
     response: AxiosResponse,
-    body: any
+    body: any,
+    callDetails: CallDetails
   ) {
     if (method == null) {
-      if (typeof callBackOrUndefined === 'function') {
-        const e = new ChannelApeError('HTTP Request Method could not be determined', response, uri, []);
-        callBackOrUndefined(e, response, body);
+      const e = new ChannelApeError('HTTP Request Method could not be determined', response, url, []);
+      try {
+        callback(e, response, body);
+      } catch (e) {
+        this.requestLogger.logCallbackError(e);
       }
       return;
     }
-    const requestRetryInfo: RequestRetryInfo = {
-      method,
-      endpoint: uri
-    };
-    // exponentialBackoff.backoff(requestRetryInfo);
+    const jitterDelayAmount = 50;
+    setTimeout(() => {
+      callDetails.callCountForThisRequest += 1;
+      this.requestLogger.logDelay(callDetails.callCountForThisRequest, jitterDelayAmount, {
+        method,
+        endpoint: url
+      });
+      this.makeRequest(
+        method,
+        callDetails.callStart,
+        callDetails.callCountForThisRequest,
+        url,
+        callDetails.options,
+        callback
+      );
+    }, jitterDelayAmount);
   }
 }

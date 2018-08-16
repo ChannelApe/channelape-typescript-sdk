@@ -10,8 +10,8 @@ export default class RequestLogger {
   }
 
   public logDelay(callCount: number, delay: number, requestRetryInfo: RequestRetryInfo) {
-    this.logger
-      .warn(`DELAYING ${requestRetryInfo.method} ${this.endpoint}${requestRetryInfo.endpoint} for ${delay} ms`);
+    const methodAndUrl = `${requestRetryInfo.method} ${this.endpoint}${requestRetryInfo.endpoint}`;
+    this.logger.warn(`DELAYING ${methodAndUrl} for ${delay}ms. Delayed ${callCount} times`);
   }
 
   public logCall(
@@ -25,17 +25,17 @@ export default class RequestLogger {
     }
     let uri: string;
     let queryParams = '';
-    uri = `${this.endpoint}${options}`;
+    uri = `${this.endpoint}${url}`;
     if (options !== undefined) {
       queryParams = this.getQueryParamString(options.params);
     }
     this.logger.info(`${methodToLog} ${uri}${queryParams} -- STARTED`);
   }
 
-  public logResponse(error: any, response: AxiosResponse | undefined, body: any | undefined): void {
+  public logResponse(error: any, response: AxiosResponse | undefined | null, body: any | undefined): void {
     let errorMessage: string;
     let infoMessage = '';
-    if (typeof response !== 'undefined' && typeof response.request !== 'undefined') {
+    if (response != null && typeof response.request !== 'undefined') {
       if (!this.responseIsLevel200(response.status)) {
         const errorMessage =
           `${response.config.method} ${response.request.href} ` +
@@ -52,6 +52,10 @@ export default class RequestLogger {
       errorMessage = error.message;
       this.logger.error(errorMessage);
     }
+  }
+
+  public logCallbackError(error: Error): void {
+    this.logger.error(`Your callback threw the following uncaught error: ${error}`);
   }
 
   private responseIsLevel200(statusCode: number): boolean {

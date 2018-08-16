@@ -38,10 +38,10 @@ export default class ChannelApeError extends Error {
       } else {
         method = typeof response.config.method === 'undefined' ? '' : response.config.method;
         statusCode = typeof response.status === 'undefined' ? 0 : response.status;
-        statusMessage = typeof response.statusText === 'undefined' ? '' : response.statusText;
+        statusMessage = typeof response.statusText === 'undefined' ? '' : ` ${response.statusText}`;
       }
       return `${method} ${uri}
-  Status: ${statusCode} ${statusMessage}
+  Status: ${statusCode}${statusMessage}
   Response Body:
   ${ret}`;
     }

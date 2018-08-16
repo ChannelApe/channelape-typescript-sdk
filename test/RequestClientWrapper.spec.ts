@@ -1,11 +1,12 @@
 // tslint:disable:no-trailing-whitespace
 import * as sinon from 'sinon';
 import { expect } from 'chai';
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse, AxiosPromise } from 'axios';
+import { Logger, LogLevel } from 'channelape-logger';
+import * as Q from 'q';
+
 import Environment from '../src/model/Environment';
 import RequestClientWrapper from '../src/RequestClientWrapper';
-import { Logger, LogLevel } from 'channelape-logger';
-
 import singleOrder from './orders/resources/singleOrder';
 import singleOrderToUpdate from './orders/resources/singleOrderToUpdate';
 import multipleOrders from './orders/resources/multipleOrders';
@@ -37,16 +38,17 @@ describe('RequestClientWrapper', () => {
       done();
     });
 
-    it.only('When doing a get() with just a URI and call back expect data to be returned', (done) => {
+    it('When doing a get() with just a URI and call back expect data to be returned', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
       const response = {
-        statusCode: 200,
+        status: 200,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`
+        url: `${Environment.STAGING}${requestUrl}`,
+        data: singleOrder
       };
-      sandbox.stub(axios, 'get')
-        .yields(null, response, singleOrder);
+
+      sandbox.stub(axios, 'get').resolves(response);
 
       requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
         expect(error).to.be.null;
@@ -65,12 +67,12 @@ describe('RequestClientWrapper', () => {
         }
       };
       const response = {
-        statusCode: 200,
+        status: 200,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`
+        url: `${Environment.STAGING}${requestUrl}`,
+        data: { orders: multipleOrders }
       };
-      sandbox.stub(axios, 'get')
-        .yields(null, response, { orders: multipleOrders });
+      sandbox.stub(axios, 'get').resolves(response);
 
       requestClientWrapper.get(requestUrl, options, (error, response, body) => {
         expect(error).to.be.null;
@@ -90,12 +92,12 @@ describe('RequestClientWrapper', () => {
         }
       };
       const response = {
-        statusCode: 200,
+        status: 200,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`
+        url: `${Environment.STAGING}${requestUrl}`,
+        data: { orders: multipleOrders }
       };
-      sandbox.stub(axios, 'get')
-        .yields(null, response, { orders: multipleOrders });
+      sandbox.stub(axios, 'get').resolves(response);
 
       requestClientWrapper.get(options.url!, options, (error, response, body) => {
         expect(error).to.be.null;
@@ -165,14 +167,16 @@ describe('RequestClientWrapper', () => {
     it('When doing a put() with just a URI and call back expect ChannelApe error to be returned', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
-      const response = {
-        statusCode: 404,
-        method: 'PUT',
-        url: `${Environment.STAGING}${requestUrl}`
-      };
       const channelApeApiError: ChannelApeApiError = {
         code: 0,
         message: 'You didnt pass any body'
+      };
+      const response = {
+        status: 404,
+        method: 'PUT',
+        url: `${Environment.STAGING}${requestUrl}`,
+        data: { errors: [channelApeApiError] },
+        config: { method: 'PUT' }
       };
       // tslint:disable:no-trailing-whitespace
       const expectedErrorMessage =
@@ -182,8 +186,7 @@ describe('RequestClientWrapper', () => {
   404 undefined
 Code: 0 Message: You didnt pass any body`;
       // tslint:enable:no-trailing-whitespace
-      sandbox.stub(axios, 'put')
-        .yields(null, response, { errors: [channelApeApiError] });
+      sandbox.stub(axios, 'put').resolves(response);
 
       requestClientWrapper.put(requestUrl, {}, (error, response, body) => {
         expect(error).not.to.be.null;
@@ -200,15 +203,17 @@ Code: 0 Message: You didnt pass any body`;
       }
       singleOrderToUpdate.additionalFields[0].value = 'RRR';
       const options: AxiosRequestConfig = {
-        data: singleOrderToUpdate
+        data: singleOrderToUpdate,
+        method: 'PUT'
       };
       const response = {
-        statusCode: 202,
+        status: 202,
         method: 'PUT',
-        url: `${Environment.STAGING}${requestUrl}`
+        url: `${Environment.STAGING}${requestUrl}`,
+        config: options,
+        data: singleOrderToUpdate
       };
-      sandbox.stub(axios, 'put')
-        .yields(null, response, singleOrderToUpdate);
+      sandbox.stub(axios, 'put').resolves(response);
 
       requestClientWrapper.put(requestUrl, options, (error, response, body) => {
         expect(error).to.be.null;
@@ -229,12 +234,12 @@ Code: 0 Message: You didnt pass any body`;
         data: singleOrderToUpdate
       };
       const response = {
-        statusCode: 202,
+        status: 202,
         method: 'PUT',
-        url: `${Environment.STAGING}${requestUrl}`
+        url: `${Environment.STAGING}${requestUrl}`,
+        data: singleOrderToUpdate
       };
-      sandbox.stub(axios, 'put')
-        .yields(null, response, singleOrderToUpdate);
+      sandbox.stub(axios, 'put').resolves(response);
 
       requestClientWrapper.put(options.url!, options, (error, response, body) => {
         expect(error).to.be.null;
@@ -265,76 +270,47 @@ Code: 0 Message: You didnt pass any body`;
         href: `${Environment.STAGING}${requestUrl}`
       };
       const responses = [{
-        statusCode: 500,
+        status: 500,
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest
       }, {
-        statusCode: 502,
+        status: 502,
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest
       }, {
-        statusCode: 599,
+        status: 599,
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest
       }, {
-        statusCode: 429,
+        status: 429,
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest
       }, {
-        statusCode: 200,
+        status: 200,
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest,
+        data: { id: orderId }
       }];
       const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
-      clientGetStub.onCall(0).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
-        if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[0], 'Im'), 50);
-        } else {
-          setTimeout(() => cb(null, responses[0], 'Im'), 50);
-        }
-      });
-      clientGetStub.onCall(1).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
-        if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[1], 'a'), 50);
-        } else {
-          setTimeout(() => cb(null, responses[1], 'a'), 50);
-        }
-      });
-      clientGetStub.onCall(2).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
-        if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[2], 'little'), 50);
-        } else {
-          setTimeout(() => cb(null, responses[2], 'little'), 50);
-        }
-      });
-      clientGetStub.onCall(3).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
-        if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[3], 'teapot'), 50);
-        } else {
-          setTimeout(() => cb(null, responses[3], 'teapot'), 50);
-        }
-      });
-      clientGetStub.onCall(4).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
-        if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[4], singleOrder), 50);
-        } else {
-          setTimeout(() => cb(null, responses[4], singleOrder), 50);
-        }
-      });
+      clientGetStub.onCall(0).resolves(responses[0]);
+      clientGetStub.onCall(1).resolves(responses[1]);
+      clientGetStub.onCall(2).resolves(responses[2]);
+      clientGetStub.onCall(3).resolves(responses[3]);
+      clientGetStub.onCall(4).resolves(responses[4]);
 
       requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
         expect(warnLogSpy.called).to.be.true;
         expect(warnLogSpy.args[1][0])
-          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 100 ms`, 'should log 1st delay correctly');
+          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 1st delay correctly');
+        expect(warnLogSpy.args[2][0])
+          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 2nd delay correctly');
         expect(warnLogSpy.args[3][0])
-          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 200 ms`, 'should log 2nd delay correctly');
-        expect(warnLogSpy.args[5][0])
-          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 400 ms`, 'should log 3rd delay correctly');
+          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 3rd delay correctly');
         expect(error).to.be.null;
         expect(body.id).to.equal(orderId);
         expect(infoLogSpy.args[0][0])
@@ -346,52 +322,56 @@ Code: 0 Message: You didnt pass any body`;
     it('When handling a PUT response expect the call to be retried on 500 level status codes and 429s', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
-      const fakeRequest = {
-        method: 'PUT',
-        href: `${Environment.STAGING}${requestUrl}`
+      const fakeRequest: AxiosRequestConfig = {
+        data: singleOrderToUpdate
       };
       const responses = [{
-        statusCode: 500,
+        status: 500,
         method: 'PUT',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest,
+        data: 'Im'
       }, {
-        statusCode: 502,
+        status: 502,
         method: 'PUT',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest,
+        data: 'a'
       }, {
-        statusCode: 599,
+        status: 599,
         method: 'PUT',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest,
+        data: 'little'
       }, {
-        statusCode: 429,
+        status: 429,
         method: 'PUT',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest,
+        data: 'teapot'
       }, {
-        statusCode: 202,
+        status: 202,
         method: 'PUT',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest,
+        data: { id: orderId }
       }];
       const clientPutStub: sinon.SinonStub = sandbox.stub(axios, 'put');
-      clientPutStub.onCall(0).yields(null, responses[0], 'Im');
-      clientPutStub.onCall(1).yields(null, responses[1], 'a');
-      clientPutStub.onCall(2).yields(null, responses[2], 'little');
-      clientPutStub.onCall(3).yields(null, responses[3], 'teapot');
-      clientPutStub.onCall(4).yields(null, responses[4], singleOrder);
+      clientPutStub.onCall(0).resolves(responses[0]);
+      clientPutStub.onCall(1).resolves(responses[1]);
+      clientPutStub.onCall(2).resolves(responses[2]);
+      clientPutStub.onCall(3).resolves(responses[3]);
+      clientPutStub.onCall(4).resolves(responses[4]);
 
-      requestClientWrapper.put(requestUrl, { data: singleOrder }, (error, response, body) => {
+      requestClientWrapper.put(requestUrl, fakeRequest, (error, response, body) => {
         expect(error).to.be.null;
         expect(warnLogSpy.called).to.be.true;
         expect(warnLogSpy.args[1][0])
-          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 100 ms`, 'should log 1st delay correctly');
+          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 1st delay correctly');
+        expect(warnLogSpy.args[2][0])
+          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 2nd delay correctly');
         expect(warnLogSpy.args[3][0])
-          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 200 ms`, 'should log 2nd delay correctly');
-        expect(warnLogSpy.args[5][0])
-          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 400 ms`, 'should log 3rd delay correctly');
+          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 3rd delay correctly');
         expect(body.id).to.equal(orderId);
         expect(infoLogSpy.args[0][0])
           .to.equal(`PUT ${Environment.STAGING}${requestUrl} -- STARTED`, 'should log correctly');
@@ -403,72 +383,51 @@ Code: 0 Message: You didnt pass any body`;
       until the MaximumRequestRetryTimeout limit is exceeded`, (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
-      const fakeRequest = {
+      const fakeRequest: AxiosRequestConfig = {
         method: 'GET',
-        href: `${Environment.STAGING}${requestUrl}`
+        data: { order: { id: orderId } }
       };
       const responses = [{
-        statusCode: 500,
+        status: 500,
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest,
+        data: 'Im'
       }, {
-        statusCode: 502,
+        status: 502,
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest,
+        data: 'a'
       }, {
-        statusCode: 599,
+        status: 599,
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest,
+        data: 'little'
       }, {
-        statusCode: 429,
+        status: 429,
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest,
+        data: 'teapot'
       }, {
-        statusCode: 200,
+        status: 200,
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest,
+        data: fakeRequest.data
       }];
       const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
-      clientGetStub.onCall(0).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
-        if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[0], 'Im'), 1);
-        } else {
-          setTimeout(() => cb(null, responses[0], 'Im'), 1);
-        }
+      clientGetStub.onCall(0).resolves(responses[0]);
+      clientGetStub.onCall(1).resolves(responses[1]);
+      clientGetStub.onCall(2).callsFake(() => {
+        const deferred = Q.defer();
+        setTimeout(() => deferred.resolve(responses[2]), 6000);
+        return deferred.promise;
       });
-      clientGetStub.onCall(1).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
-        if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[1], 'a'), 1);
-        } else {
-          setTimeout(() => cb(null, responses[1], 'a'), 1);
-        }
-      });
-      clientGetStub.onCall(2).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
-        if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[2], 'little'), 1);
-        } else {
-          setTimeout(() => cb(null, responses[2], 'little'), 1);
-        }
-      });
-      clientGetStub.onCall(3).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
-        if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[3], 'teapot'), 1);
-        } else {
-          setTimeout(() => cb(null, responses[3], 'teapot'), 1);
-        }
-      });
-      clientGetStub.onCall(4).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
-        if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[4], singleOrder), 4000);
-        } else {
-          setTimeout(() => cb(null, responses[4], singleOrder), 4000);
-        }
-      });
+      clientGetStub.onCall(3).resolves(responses[3]);
+      clientGetStub.onCall(4).resolves(responses[4]);
 
       requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
         const expectedErrorMessage = 'Your request was tried a total of';
@@ -487,67 +446,42 @@ Code: 0 Message: You didnt pass any body`;
         href: `${Environment.STAGING}${requestUrl}`
       };
       const responses = [{
-        statusCode: 500,
+        status: 500,
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest,
+        data: 'Im'
       }, {
-        statusCode: 502,
+        status: 502,
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest,
+        data: 'a'
       }, {
-        statusCode: 599,
+        status: 599,
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest,
+        data: 'little'
       }, {
-        statusCode: 429,
+        status: 429,
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest,
+        data: 'teapot'
       }, {
-        statusCode: 200,
+        status: 200,
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`,
-        request: fakeRequest
+        config: fakeRequest,
+        data: singleOrder
       }];
       const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
-      clientGetStub.onCall(0).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
-        if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[0], 'Im'), 10);
-        } else {
-          setTimeout(() => cb(null, responses[0], 'Im'), 10);
-        }
-      });
-      clientGetStub.onCall(1).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
-        if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[1], 'a'), 10);
-        } else {
-          setTimeout(() => cb(null, responses[1], 'a'), 10);
-        }
-      });
-      clientGetStub.onCall(2).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
-        if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[2], 'little'), 10);
-        } else {
-          setTimeout(() => cb(null, responses[2], 'little'), 10);
-        }
-      });
-      clientGetStub.onCall(3).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
-        if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[3], 'teapot'), 10);
-        } else {
-          setTimeout(() => cb(null, responses[3], 'teapot'), 10);
-        }
-      });
-      clientGetStub.onCall(4).callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
-        if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, responses[4], singleOrder), 10);
-        } else {
-          setTimeout(() => cb(null, responses[4], singleOrder), 10);
-        }
-      });
+      clientGetStub.onCall(0).resolves(responses[0]);
+      clientGetStub.onCall(1).resolves(responses[1]);
+      clientGetStub.onCall(2).resolves(responses[2]);
+      clientGetStub.onCall(3).resolves(responses[3]);
+      clientGetStub.onCall(4).resolves(responses[4]);
 
       requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
         expect(error).to.be.null;
@@ -559,12 +493,14 @@ Code: 0 Message: You didnt pass any body`;
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
       const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
-      clientGetStub.callsFake((uriOrOptions: any, cbOrOpts: any, cb: any) => {
-        if (typeof cbOrOpts === 'function') {
-          setTimeout(() => cbOrOpts(null, undefined, undefined), 1000);
-        } else {
-          setTimeout(() => cb(null, undefined, undefined), 1000);
-        }
+      const fakeRequest = {
+        method: 'GET',
+        href: `${Environment.STAGING}${requestUrl}`
+      };
+      clientGetStub.callsFake((url: string, options: AxiosRequestConfig) => {
+        const deferred = Q.defer();
+        setTimeout(() => deferred.resolve(null as any), 1000);
+        return deferred.promise;
       });
 
       requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
