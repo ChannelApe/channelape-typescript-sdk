@@ -2,14 +2,11 @@ import axios, { AxiosRequestConfig, AxiosResponse, AxiosPromise } from 'axios';
 import { LogLevel } from 'channelape-logger';
 import RequestLogger from './utils/RequestLogger';
 import ChannelApeError from './model/ChannelApeError';
-import * as util from 'util';
 import HttpRequestMethod from './model/HttpRequestMethod';
 import RequestResponse from './model/RequestResponse';
 import { RequestCallback } from './model/RequestCallback';
 
 const GENERIC_ERROR_CODE = -1;
-const CHANNEL_APE_API_RETRY_TIMEOUT_MESSAGE = `A problem with the ChannelApe API has been encountered.
-Your request was tried a total of %s times over the course of %s milliseconds`;
 
 interface CallDetails {
   callStart: Date;
@@ -162,7 +159,8 @@ export default class RequestClientWrapper {
 
   private getMaximumRetryLimitExceededMessage(callStart: Date, numberOfCalls: number): string {
     const elapsedTimeMs = new Date().getTime() - callStart.getTime();
-    return util.format(CHANNEL_APE_API_RETRY_TIMEOUT_MESSAGE, numberOfCalls, elapsedTimeMs);
+    return `A problem with the ChannelApe API has been encountered.
+    Your request was tried a total of ${numberOfCalls} times over the course of ${elapsedTimeMs} milliseconds`;
   }
 
   private didRequestTimeout(callStart: Date): boolean {
