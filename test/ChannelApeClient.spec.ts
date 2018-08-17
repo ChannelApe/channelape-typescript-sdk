@@ -5,7 +5,7 @@ import ActionsService from '../src/actions/service/ActionsService';
 import ActionProcessingStatus from '../src/actions/model/ActionProcessingStatus';
 import ChannelsService from '../src/channels/service/ChannelsService';
 import ChannelApeApiErrorResponse from '../src/model/ChannelApeApiErrorResponse';
-import { LogLevel } from 'channelape-logger';
+import LogLevel from '../src/model/LogLevel';
 import Action from '../src/actions/model/Action';
 import Order from '../src/orders/model/Order';
 import Environment from '../src/model/Environment';

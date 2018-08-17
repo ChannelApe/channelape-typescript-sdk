@@ -1,4 +1,4 @@
-import { LogLevel } from 'channelape-logger';
+import LogLevel from '../model/LogLevel';
 
 export default interface ClientConfiguration {
 

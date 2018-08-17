@@ -1,10 +1,10 @@
-import { LogLevel } from 'channelape-logger';
-import { Environment } from '.';
+import LogLevel from './model/LogLevel';
 import RequestClientWrapper from './RequestClientWrapper';
 import ActionsService from './actions/service/ActionsService';
 import ChannelsService from './channels/service/ChannelsService';
 import ClientConfiguration from './model/ClientConfiguration';
 import OrdersService from './orders/service/OrdersService';
+import Environment from './model/Environment';
 
 const INVALID_CONFIGURATION_ERROR_MESSAGE = 'Invalid configuration. sessionId is required.';
 const THREE_MINUTES_IN_MS = 180000;

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import { LogLevel } from 'channelape-logger';
+import LogLevel from '../../../src/model/LogLevel';
 import ActionsService from './../../../src/actions/service/ActionsService';
 import ActionsQueryRequest from '../../../src/actions/model/ActionsQueryRequest';
 import Version from '../../../src/model/Version';
