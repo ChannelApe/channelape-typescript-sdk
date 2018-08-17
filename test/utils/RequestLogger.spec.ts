@@ -104,4 +104,14 @@ describe('RequestLogger', () => {
       });
     });
   });
+
+  describe('logCallbackError', () => {
+    describe('given an error', () => {
+      it('expect error to be called', () => {
+        requestLogger.logCallbackError(new Error('error'));
+        expect(fakeLogger.error.called).to.be.true;
+        expect(fakeLogger.error.args[0][0]).to.equal(`Your callback threw the following uncaught error: Error: error`);
+      });
+    });
+  });
 });
