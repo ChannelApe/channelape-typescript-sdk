@@ -80,9 +80,9 @@ describe('Sessions Service', () => {
       });
     });
 
-    xit('And session ID is invalid ' +
+    it('And session ID is invalid ' +
       'When retrieving session Then return rejected promise with 401 ' +
-      'status code and invalid auth error message', (done) => {
+      'status code and invalid auth error message', () => {
 
       const expectedChannelApeApiErrorResponse : ChannelApeApiErrorResponse = {
         statusCode: 401,
@@ -100,19 +100,17 @@ describe('Sessions Service', () => {
       };
       const clientGetStub = sandbox.stub(axios, 'get').resolves(response);
 
-      sessionsService.get().then((actualResponse) => {
+      return sessionsService.get().then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
-      }).catch((e) => {
+      }).catch((actualChannelApeErrorResponse) => {
         expect(clientGetStub.args[0][0])
-            .to.equal(`/${Version.V1}${Resource.SESSIONS}/${sessionId}`);
-        const actualChannelApeErrorResponse = e as ChannelApeApiErrorResponse;
-        expect(actualChannelApeErrorResponse.statusCode).to.equal(401);
-        expect(actualChannelApeErrorResponse.errors.length).to.equal(1);
-        expect(actualChannelApeErrorResponse.errors[0].code)
+          .to.equal(`/${Version.V1}${Resource.SESSIONS}/${sessionId}`);
+        expect(actualChannelApeErrorResponse.responseStatusCode).to.equal(401);
+        expect(actualChannelApeErrorResponse.ApiErrors.length).to.equal(1);
+        expect(actualChannelApeErrorResponse.ApiErrors[0].code)
           .to.equal(expectedChannelApeApiErrorResponse.errors[0].code);
-        expect(actualChannelApeErrorResponse.errors[0].message)
+        expect(actualChannelApeErrorResponse.ApiErrors[0].message)
           .to.equal(expectedChannelApeApiErrorResponse.errors[0].message);
-        done();
       });
     });
   });
