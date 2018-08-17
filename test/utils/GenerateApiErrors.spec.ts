@@ -19,6 +19,14 @@ describe('GenerateApiErrors()', () => {
     });
   });
 
+  context('given a body that is a string', () => {
+    it('should return a new ChannelApeError object with an empty array of ApiErrors', () => {
+      const cae = GenerateApiError('www.ca.com', response as AxiosResponse, 'Some string body', 200);
+      expect(cae.ApiErrors).to.be.an('array');
+      expect(cae.ApiErrors.length).to.equal(0);
+    });
+  });
+
   context('given a body with the errors property undefined', () => {
     it('should return a new ChannelApeError object with an empty array of ApiErrors', () => {
       const cae = GenerateApiError('www.ca.com', response as AxiosResponse, {}, 200);
