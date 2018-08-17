@@ -65,6 +65,19 @@ describe('RequestLogger', () => {
     });
 
     describe('given no error', () => {
+      it('given a 200 level response it should log the completed call as info', () => {
+        requestLogger.logResponse(undefined, {
+          status: 299,
+          statusText: 'OK',
+          config: {
+            url: 'someurl',
+            method: 'PUT'
+          }
+        } as any, undefined);
+        expect(fakeLogger.info.called).to.be.true;
+        expect(fakeLogger.info.args[0][0]).to.equal('PUT someurl -- COMPLETED');
+      });
+
       it('given a non-200 level response it should log the correct error', () => {
         requestLogger.logResponse(undefined, {
           status: 504,
