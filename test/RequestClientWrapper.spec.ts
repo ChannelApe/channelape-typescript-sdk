@@ -15,6 +15,9 @@ import { ChannelApeError } from '../src';
 
 const maximumRequestRetryTimeout = 3000;
 
+const JITTER_DELAY_MIN = 50;
+const JITTER_DELAY_MAX = 200;
+
 describe('RequestClientWrapper', () => {
 
   describe('Given some rest client', () => {
@@ -29,7 +32,13 @@ describe('RequestClientWrapper', () => {
       infoLogSpy = sandbox.spy(Logger.prototype, 'info');
       warnLogSpy = sandbox.spy(Logger.prototype, 'warn');
       requestClientWrapper = new RequestClientWrapper(
-        60000, 'valid-session-id', LogLevel.INFO, Environment.STAGING, maximumRequestRetryTimeout
+        60000,
+        'valid-session-id',
+        LogLevel.INFO,
+        Environment.STAGING,
+        maximumRequestRetryTimeout,
+        JITTER_DELAY_MIN,
+        JITTER_DELAY_MAX
       );
       done();
     });
@@ -307,11 +316,11 @@ Code: 0 Message: You didnt pass any body`;
       requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
         expect(warnLogSpy.called).to.be.true;
         expect(warnLogSpy.args[1][0])
-          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 1st delay correctly');
+          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for `, 'should log 1st delay correctly');
         expect(warnLogSpy.args[3][0])
-          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 2nd delay correctly');
+          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for `, 'should log 2nd delay correctly');
         expect(warnLogSpy.args[5][0])
-          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 3rd delay correctly');
+          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for `, 'should log 3rd delay correctly');
         expect(error).to.be.null;
         expect(body.id).to.equal(orderId);
         expect(infoLogSpy.args[0][0])
@@ -367,12 +376,21 @@ Code: 0 Message: You didnt pass any body`;
       requestClientWrapper.put(requestUrl, fakeRequest, (error, response, body) => {
         expect(error).to.be.null;
         expect(warnLogSpy.called).to.be.true;
+        const delayMs1 = parseInt(warnLogSpy.args[1][0].match(/\s(\d*)ms/g)[0].trim().replace('ms', ''), 10);
+        expect(delayMs1).to.be.lessThan(JITTER_DELAY_MAX + 1);
+        expect(delayMs1).to.be.greaterThan(JITTER_DELAY_MIN - 1);
         expect(warnLogSpy.args[1][0])
-          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 1st delay correctly');
+          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for `, 'should log 1st delay correctly');
+        const delayMs2 = parseInt(warnLogSpy.args[3][0].match(/\s(\d*)ms/g)[0].trim().replace('ms', ''), 10);
+        expect(delayMs2).to.be.lessThan(JITTER_DELAY_MAX + 1);
+        expect(delayMs2).to.be.greaterThan(JITTER_DELAY_MIN - 1);
         expect(warnLogSpy.args[3][0])
-          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 2nd delay correctly');
+          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for `, 'should log 2nd delay correctly');
+        const delayMs3 = parseInt(warnLogSpy.args[5][0].match(/\s(\d*)ms/g)[0].trim().replace('ms', ''), 10);
+        expect(delayMs3).to.be.lessThan(JITTER_DELAY_MAX + 1);
+        expect(delayMs3).to.be.greaterThan(JITTER_DELAY_MIN - 1);
         expect(warnLogSpy.args[5][0])
-          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for 50ms`, 'should log 3rd delay correctly');
+          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for `, 'should log 3rd delay correctly');
         expect(body.id).to.equal(orderId);
         expect(infoLogSpy.args[0][0])
           .to.equal(`PUT ${Environment.STAGING}${requestUrl} -- STARTED`, 'should log correctly');

@@ -18,7 +18,9 @@ describe('Channels Service', () => {
         'valid-session-id',
         LogLevel.OFF,
         Environment.STAGING,
-        10000
+        10000,
+        50,
+        50
       );
 
     let sandbox: sinon.SinonSandbox;

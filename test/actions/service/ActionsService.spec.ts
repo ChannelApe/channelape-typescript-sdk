@@ -19,7 +19,7 @@ describe('Actions Service', () => {
   describe('Given some rest client', () => {
     const client: RequestClientWrapper =
       new RequestClientWrapper(
-        60000, 'valid-session-id', LogLevel.INFO, Environment.STAGING, 10000
+        60000, 'valid-session-id', LogLevel.INFO, Environment.STAGING, 10000, 50, 50
       );
 
     let sandbox: sinon.SinonSandbox;

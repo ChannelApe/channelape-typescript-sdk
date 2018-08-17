@@ -28,7 +28,7 @@ describe('OrdersService', () => {
 
   describe('Given some valid rest client', () => {
     const clientWrapper: RequestClientWrapper = new RequestClientWrapper(
-      60000, 'valid-session-id', LogLevel.INFO, Environment.STAGING, maximumRequestRetryTimeout
+      60000, 'valid-session-id', LogLevel.INFO, Environment.STAGING, maximumRequestRetryTimeout, 50, 50
     );
 
     let sandbox: sinon.SinonSandbox;
@@ -404,7 +404,7 @@ Code: 15 Message: Requested business cannot be found.`;
 
   describe('Given some invalid rest client', () => {
     const client: RequestClientWrapper = new RequestClientWrapper(
-        60000, 'valid-session-id', LogLevel.INFO, 'this-is-not-a-real-base-url', maximumRequestRetryTimeout
+        60000, 'valid-session-id', LogLevel.INFO, 'this-is-not-a-real-base-url', maximumRequestRetryTimeout, 50, 50
       );
 
     it(`And invalid orderId

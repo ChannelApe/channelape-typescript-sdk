@@ -24,7 +24,8 @@ export default class RequestClientWrapper {
   constructor(
     timeout: number,
     session: string,
-    private readonly logLevel: LogLevel, endpoint: string, private readonly maximumRequestRetryTimeout: number
+    private readonly logLevel: LogLevel, endpoint: string, private readonly maximumRequestRetryTimeout: number,
+    private readonly jitterDelayMsMinimum: number, private readonly jitterDelayMsMaximum: number
   ) {
     axios.defaults = {
       timeout,
@@ -190,10 +191,10 @@ export default class RequestClientWrapper {
     callback: RequestCallback,
     callDetails: CallDetails
   ) {
-    const jitterDelayAmount = 50;
+    const jitterDelayAmountMs = this.getJitterDelayMs();
     setTimeout(() => {
       callDetails.callCountForThisRequest += 1;
-      this.requestLogger.logDelay(callDetails.callCountForThisRequest, jitterDelayAmount, {
+      this.requestLogger.logDelay(callDetails.callCountForThisRequest, jitterDelayAmountMs, {
         method,
         endpoint: url
       });
@@ -205,6 +206,11 @@ export default class RequestClientWrapper {
         callDetails.options,
         callback
       );
-    }, jitterDelayAmount);
+    }, jitterDelayAmountMs);
+  }
+
+  private getJitterDelayMs(): number {
+    const range = this.jitterDelayMsMaximum - this.jitterDelayMsMinimum + 1;
+    return Math.floor(Math.random() * (range)) + this.jitterDelayMsMinimum;
   }
 }

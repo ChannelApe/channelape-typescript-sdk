@@ -7,5 +7,7 @@ export default interface ClientConfiguration {
   endpoint?: string;
   logLevel?: LogLevel;
   maximumRequestRetryTimeout?: number;
+  jitterDelayMsMinimum?: number;
+  jitterDelayMsMaximum?: number;
 
 }
