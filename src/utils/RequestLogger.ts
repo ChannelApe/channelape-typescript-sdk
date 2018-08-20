@@ -49,7 +49,7 @@ export default class RequestLogger {
         const errorMessage =
           `${response.config.method} ${response.config.url} ` +
           `-- FAILED WITH STATUS: ${response.status} and BODY OF: ${JSON.stringify(body)}`;
-        if (this.logger) {
+        if (this.logger !== undefined) {
           this.logger.warn(errorMessage);
         }
       } else {
