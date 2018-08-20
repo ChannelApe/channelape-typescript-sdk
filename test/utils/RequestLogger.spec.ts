@@ -1,6 +1,7 @@
 import * as sinon from 'sinon';
 import { expect } from 'chai';
 import * as Logger from 'channelape-logger';
+
 import RequestLogger from '../../src/utils/RequestLogger';
 import Environment from '../../src/model/Environment';
 import { AxiosRequestConfig } from '../../node_modules/axios';
