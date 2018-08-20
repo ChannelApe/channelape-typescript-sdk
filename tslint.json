@@ -9,7 +9,6 @@
     ],
     "no-trailing-whitespace": true,
     "no-debugger": true,
-    "no-console": true,
-    "no-unused-variable": true
+    "no-console": true
   }
 }
