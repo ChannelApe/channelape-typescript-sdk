@@ -14,7 +14,7 @@ describe('RequestLogger', () => {
   let fakeLogger: any;
 
   beforeEach((done) => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     fakeLogger = {
       info: sinon.spy(),
       warn: sinon.spy(),

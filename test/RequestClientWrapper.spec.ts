@@ -28,7 +28,7 @@ describe('RequestClientWrapper', () => {
     let warnLogSpy: sinon.SinonSpy;
 
     beforeEach((done) => {
-      sandbox = sinon.sandbox.create();
+      sandbox = sinon.createSandbox();
       infoLogSpy = sandbox.spy(Logger.prototype, 'info');
       warnLogSpy = sandbox.spy(Logger.prototype, 'warn');
       requestClientWrapper = new RequestClientWrapper(

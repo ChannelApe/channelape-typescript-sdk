@@ -17,7 +17,7 @@ describe('ChannelApe Client', () => {
 
   let sandbox: sinon.SinonSandbox;
   beforeEach((done) => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     done();
   });
 

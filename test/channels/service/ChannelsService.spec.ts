@@ -68,7 +68,7 @@ describe('Channels Service', () => {
     };
 
     beforeEach((done) => {
-      sandbox = sinon.sandbox.create();
+      sandbox = sinon.createSandbox();
       done();
     });
 

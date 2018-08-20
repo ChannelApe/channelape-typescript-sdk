@@ -44,7 +44,7 @@ describe('OrdersService', () => {
     };
 
     beforeEach((done) => {
-      sandbox = sinon.sandbox.create();
+      sandbox = sinon.createSandbox();
       done();
     });
 
