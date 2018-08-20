@@ -2,7 +2,7 @@
 import * as sinon from 'sinon';
 import { expect } from 'chai';
 import axios, { AxiosRequestConfig } from 'axios';
-import { Logger, LogLevel } from 'channelape-logger';
+import { Logger } from 'channelape-logger';
 import * as Q from 'q';
 
 import Environment from '../src/model/Environment';
@@ -11,7 +11,7 @@ import singleOrder from './orders/resources/singleOrder';
 import singleOrderToUpdate from './orders/resources/singleOrderToUpdate';
 import multipleOrders from './orders/resources/multipleOrders';
 import ChannelApeApiError from '../src/model/ChannelApeApiError';
-import { ChannelApeError } from '../src';
+import { ChannelApeError, LogLevel } from '../src';
 
 const maximumRequestRetryTimeout = 3000;
 

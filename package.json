@@ -66,8 +66,10 @@
 	],
 	"dependencies": {
 		"axios": "^0.18.0",
-		"channelape-logger": "^0.1.5",
 		"q": "1.5.1"
+	},
+	"optionalDependencies": {
+		"channelape-logger": "^0.1.6"
 	},
 	"devDependencies": {
 		"@types/axios": "^0.14.0",
