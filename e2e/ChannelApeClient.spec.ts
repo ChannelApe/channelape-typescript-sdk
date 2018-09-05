@@ -149,23 +149,27 @@ describe('ChannelApe Client', () => {
     });
 
     describe('And valid business ID', () => {
-      context('When retrieving orders', () => {
-        const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
-        const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
-          businessId: expectedBusinessId
-        };
-        const actualOrdersPromise = channelApeClient.orders().get(ordersQueryRequestByBusinessId);
+      describe('And a startDate of "2018-03-29T17:00:51.000Z" and an endDate of "2018-08-23T12:41:33.000Z"', () => {
+        context('When retrieving orders', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
+            businessId: expectedBusinessId,
+            startDate: new Date('2018-03-29T17:00:51.000Z'),
+            endDate: new Date('2018-08-23T12:41:33.000Z')
+          };
+          const actualOrdersPromise = channelApeClient.orders().get(ordersQueryRequestByBusinessId);
 
-        it('Then return all orders for the business', () => {
-          return actualOrdersPromise.then((actualOrders) => {
-            expect(actualOrders).to.be.an('array');
-            expect(actualOrders.length).to.equal(227);
-            expect(actualOrders[0].id).to.equal('1d963c9d-74bf-49ff-96f0-42f2d9d243ef');
+          it('Then return all orders for the business', () => {
+            return actualOrdersPromise.then((actualOrders) => {
+              expect(actualOrders).to.be.an('array');
+              expect(actualOrders.length).to.equal(228);
+              expect(actualOrders[0].id).to.equal('dda8a05f-d5dd-4535-9261-b55c501085ef');
+            });
           });
         });
       });
 
-      describe('And query request size of 150 And business has 201 orders', () => {
+      describe('And query request size of 150 And business has more than 150 orders', () => {
         context('When retrieving a single page of orders', () => {
           const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
           const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
@@ -178,7 +182,6 @@ describe('ChannelApe Client', () => {
             return actualOrdersPromise.then((actualOrders) => {
               expect(actualOrders.orders).to.be.an('array');
               expect(actualOrders.orders.length).to.equal(150);
-              expect(actualOrders.orders[0].id).to.equal('1d963c9d-74bf-49ff-96f0-42f2d9d243ef');
               expect(actualOrders.pagination.lastPage).to.equal(false);
             });
           });
