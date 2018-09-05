@@ -13,7 +13,10 @@ describe('ChannelApe Client', () => {
 
     const channelApeClient = new ChannelApeClient({
       sessionId,
-      logLevel: LogLevel.OFF
+      logLevel: LogLevel.OFF,
+      jitterDelayMsMaximum: 6000,
+      jitterDelayMsMinimum: 3000,
+      maximumRequestRetryTimeout: 20000
     });
 
     describe('And valid action ID for action with error processing status', () => {
