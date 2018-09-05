@@ -8,6 +8,10 @@ import { LogLevel } from 'channelape-logger';
 
 describe('ChannelApe Client', () => {
 
+  beforeEach((done) => {
+    setTimeout(() => done(), 1000);
+  });
+
   describe('Given valid session ID', () => {
     const sessionId = getSessionId();
 
@@ -16,7 +20,8 @@ describe('ChannelApe Client', () => {
       logLevel: LogLevel.OFF,
       jitterDelayMsMaximum: 6000,
       jitterDelayMsMinimum: 3000,
-      maximumRequestRetryTimeout: 20000
+      maximumRequestRetryTimeout: 20000,
+      timeout: 2000
     });
 
     describe('And valid action ID for action with error processing status', () => {
