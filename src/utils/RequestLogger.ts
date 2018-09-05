@@ -2,7 +2,7 @@ import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import RequestRetryInfo from '../model/RequestRetryInfo';
 
 export default class RequestLogger {
-  private channelapeLogger: any;
+  private readonly channelapeLogger: any;
   private logger: any = undefined;
 
   constructor(logLevel: string, private readonly endpoint: string) {
