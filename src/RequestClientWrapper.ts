@@ -94,14 +94,18 @@ export default class RequestClientWrapper {
           this.handleResponse(requestResponse, callback, url, callDetails, method);
         })
         .catch((e) => {
-          const response = e.response == null ? undefined : e.response ;
-          const apiErrors = e.response == null || e.response.data == null || e.response.data.errors == null
-            ? [] : e.response.data.errors;
-          const finalError = new ChannelApeError(e.message, response, url, apiErrors);
-          try {
-            callback(finalError, {} as any, {} as any);
-          } catch (e) {
-            this.requestLogger.logCallbackError(e);
+          if (this.shouldRequestBeRetried(e.error, e.response) && e.response) {
+            this.retryRequest(method, url, callback, callDetails);
+          } else {
+            try {
+              const apiErrors = e.response == null || e.response.data == null || e.response.data.errors == null
+                ? [] : e.response.data.errors;
+              const finalError = new ChannelApeError(e.message, e.response, url, apiErrors);
+              callback(finalError, e, e.body);
+            } catch (e) {
+              callback(new Error('API Error'), e, {});
+              this.requestLogger.logCallbackError(e);
+            }
           }
         });
     } catch (e) {
