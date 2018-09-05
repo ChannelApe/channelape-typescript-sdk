@@ -13,7 +13,7 @@ import multipleOrders from './orders/resources/multipleOrders';
 import ChannelApeApiError from '../src/model/ChannelApeApiError';
 import { ChannelApeError, LogLevel } from '../src';
 
-const maximumRequestRetryTimeout = 3000;
+const maximumRequestRetryTimeout = 800;
 
 const JITTER_DELAY_MIN = 50;
 const JITTER_DELAY_MAX = 200;
@@ -396,7 +396,7 @@ Code: 0 Message: You didnt pass any body`;
           .to.equal(`PUT ${Environment.STAGING}${requestUrl} -- STARTED`, 'should log correctly');
         done();
       });
-    });
+    }).timeout(5000);
 
     it(`When handling a GET response expect the call to be retried
       until the MaximumRequestRetryTimeout limit is exceeded`, (done) => {
@@ -442,7 +442,7 @@ Code: 0 Message: You didnt pass any body`;
       clientGetStub.onCall(1).resolves(responses[1]);
       clientGetStub.onCall(2).callsFake(() => {
         const deferred = Q.defer();
-        setTimeout(() => deferred.resolve(responses[2]), 6000);
+        setTimeout(() => deferred.resolve(responses[2]), 850);
         return deferred.promise;
       });
       clientGetStub.onCall(3).resolves(responses[3]);
@@ -454,7 +454,7 @@ Code: 0 Message: You didnt pass any body`;
         expect(error.message).to.include(expectedErrorMessage);
         done();
       });
-    }).timeout(10000);
+    }).timeout(2000);
 
     it(`When handling a GET response expect the call to be retried
       until only until a non 500 / 429 response is received`, (done) => {
@@ -514,7 +514,7 @@ Code: 0 Message: You didnt pass any body`;
       const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
       clientGetStub.callsFake((url: string, options: AxiosRequestConfig) => {
         const deferred = Q.defer();
-        setTimeout(() => deferred.resolve(null as any), 1000);
+        setTimeout(() => deferred.resolve(null as any), 100);
         return deferred.promise;
       });
 
@@ -527,7 +527,7 @@ Code: 0 Message: You didnt pass any body`;
         expect(error.ApiErrors[0].message).to.equal('No response was received from the server');
         done();
       });
-    }).timeout(5000);
+    });
 
     it(`When handling an axios error ensure proper error handling`, (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
@@ -545,6 +545,6 @@ Code: 0 Message: You didnt pass any body`;
         expect(error.ApiErrors.length).to.equal(0);
         done();
       });
-    }).timeout(5000);
+    });
   });
 });
