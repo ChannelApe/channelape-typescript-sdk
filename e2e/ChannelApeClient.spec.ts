@@ -148,7 +148,7 @@ describe('ChannelApe Client', () => {
     describe('And valid business ID', () => {
       describe('And a startDate of "2018-03-29T17:00:51.000Z" and an endDate of "2018-08-23T12:41:33.000Z"', () => {
         context('When retrieving orders', () => {
-          it('Then return all orders for the business', () => {
+          it('Then return the 228 orders between those dates', () => {
             const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
             const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
               businessId: expectedBusinessId,
