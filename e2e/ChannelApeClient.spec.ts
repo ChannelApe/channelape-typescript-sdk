@@ -7,21 +7,22 @@ import OrdersQueryRequestByBusinessId from '../src/orders/model/OrdersQueryReque
 import { LogLevel } from 'channelape-logger';
 
 describe('ChannelApe Client', () => {
-
   describe('Given valid session ID', () => {
     const sessionId = getSessionId();
 
     const channelApeClient = new ChannelApeClient({
       sessionId,
-      logLevel: LogLevel.OFF
+      logLevel: LogLevel.OFF,
+      jitterDelayMsMaximum: 2000,
+      jitterDelayMsMinimum: 500,
+      maximumRequestRetryTimeout: 30000
     });
 
     describe('And valid action ID for action with error processing status', () => {
       context('When retrieving action', () => {
-        const expectedActionId = 'a85d7463-a2f2-46ae-95a1-549e70ecb2ca';
-        const actualActionPromise = channelApeClient.actions().get(expectedActionId);
-
         it('Then return action', () => {
+          const expectedActionId = 'a85d7463-a2f2-46ae-95a1-549e70ecb2ca';
+          const actualActionPromise = channelApeClient.actions().get(expectedActionId);
           return actualActionPromise.then((actualAction) => {
             expect(actualAction.action).to.equal('PRODUCT_PULL');
             expect(actualAction.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
@@ -43,10 +44,9 @@ describe('ChannelApe Client', () => {
 
     describe('And valid action ID for action with completed processing status', () => {
       context('When retrieving action', () => {
-        const expectedActionId = '4da63571-a4c5-4774-ae20-4fee24ab98e5';
-        const actualActionPromise = channelApeClient.actions().get(expectedActionId);
-
         it('Then return action', () => {
+          const expectedActionId = '4da63571-a4c5-4774-ae20-4fee24ab98e5';
+          const actualActionPromise = channelApeClient.actions().get(expectedActionId);
           return actualActionPromise.then((actualAction) => {
             expect(actualAction.action).to.equal('PRODUCT_PUSH');
             expect(actualAction.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
@@ -73,10 +73,9 @@ describe('ChannelApe Client', () => {
 
     describe('And invalid action ID', () => {
       context('When retrieving action', () => {
-        const expectedActionId = '676cb925-b603-4140-a3dd-2af160c257d1';
-        const actualActionPromise = channelApeClient.actions().get(expectedActionId);
-
         it('Then return 404 status code and action not found error message', () => {
+          const expectedActionId = '676cb925-b603-4140-a3dd-2af160c257d1';
+          const actualActionPromise = channelApeClient.actions().get(expectedActionId);
           return actualActionPromise.then((actualAction) => {
             throw new Error('Expected rejected promise');
           }).catch((actualChannelApeError: ChannelApeError) => {
@@ -93,10 +92,9 @@ describe('ChannelApe Client', () => {
 
     describe('And valid channel ID', () => {
       context('When retrieving channel', () => {
-        const expectedChannelId = '9c728601-0286-457d-b0d6-ec19292d4485';
-        const actualChannelPromise = channelApeClient.channels().get(expectedChannelId);
-
         it('Then return channel', () => {
+          const expectedChannelId = '9c728601-0286-457d-b0d6-ec19292d4485';
+          const actualChannelPromise = channelApeClient.channels().get(expectedChannelId);
           return actualChannelPromise.then((actualChannel) => {
             expect(actualChannel.id).to.equal('9c728601-0286-457d-b0d6-ec19292d4485');
             expect(actualChannel.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
@@ -130,10 +128,9 @@ describe('ChannelApe Client', () => {
 
     describe('And valid order ID', () => {
       context('When retrieving order', () => {
-        const expectedOrderId = '3bc9120d-b706-49cd-ad81-6445ce77d8ad';
-        const actualOrderPromise = channelApeClient.orders().get(expectedOrderId);
-
         it('Then return order', () => {
+          const expectedOrderId = '3bc9120d-b706-49cd-ad81-6445ce77d8ad';
+          const actualOrderPromise = channelApeClient.orders().get(expectedOrderId);
           return actualOrderPromise.then((actualOrder) => {
             expect(actualOrder.id).to.equal(expectedOrderId);
             expect(actualOrder.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
@@ -149,36 +146,37 @@ describe('ChannelApe Client', () => {
     });
 
     describe('And valid business ID', () => {
-      context('When retrieving orders', () => {
-        const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
-        const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
-          businessId: expectedBusinessId
-        };
-        const actualOrdersPromise = channelApeClient.orders().get(ordersQueryRequestByBusinessId);
-
-        it('Then return all orders for the business', () => {
-          return actualOrdersPromise.then((actualOrders) => {
-            expect(actualOrders).to.be.an('array');
-            expect(actualOrders.length).to.equal(227);
-            expect(actualOrders[0].id).to.equal('1d963c9d-74bf-49ff-96f0-42f2d9d243ef');
+      describe('And a startDate of "2018-03-29T17:00:51.000Z" and an endDate of "2018-08-23T12:41:33.000Z"', () => {
+        context('When retrieving orders', () => {
+          it('Then return the 228 orders between those dates', () => {
+            const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+            const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
+              businessId: expectedBusinessId,
+              startDate: new Date('2018-03-29T17:00:51.000Z'),
+              endDate: new Date('2018-08-23T12:41:33.000Z')
+            };
+            const actualOrdersPromise = channelApeClient.orders().get(ordersQueryRequestByBusinessId);
+            return actualOrdersPromise.then((actualOrders) => {
+              expect(actualOrders).to.be.an('array');
+              expect(actualOrders.length).to.equal(228);
+              expect(actualOrders[0].id).to.equal('dda8a05f-d5dd-4535-9261-b55c501085ef');
+            });
           });
         });
       });
 
-      describe('And query request size of 150 And business has 201 orders', () => {
+      describe('And query request size of 150 And business has more than 150 orders', () => {
         context('When retrieving a single page of orders', () => {
-          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
-          const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
-            businessId: expectedBusinessId,
-            size: 150
-          };
-          const actualOrdersPromise = channelApeClient.orders().getPage(ordersQueryRequestByBusinessId);
-
           it('Then return a single page of 150 orders for the business', () => {
+            const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+            const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
+              businessId: expectedBusinessId,
+              size: 150
+            };
+            const actualOrdersPromise = channelApeClient.orders().getPage(ordersQueryRequestByBusinessId);
             return actualOrdersPromise.then((actualOrders) => {
               expect(actualOrders.orders).to.be.an('array');
               expect(actualOrders.orders.length).to.equal(150);
-              expect(actualOrders.orders[0].id).to.equal('1d963c9d-74bf-49ff-96f0-42f2d9d243ef');
               expect(actualOrders.pagination.lastPage).to.equal(false);
             });
           });
@@ -186,15 +184,14 @@ describe('ChannelApe Client', () => {
 
         describe('And lastKey of "1f557ede-3df5-4335-a64b-cb4181943965"', () => {
           context('When retrieving the next single page of orders', () => {
-            const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
-            const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
-              businessId: expectedBusinessId,
-              lastKey: '1f557ede-3df5-4335-a64b-cb4181943965',
-              size: 150
-            };
-            const actualOrdersPromise = channelApeClient.orders().getPage(ordersQueryRequestByBusinessId);
-
             it('Then return the last single page of 51 orders for the business', () => {
+              const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+              const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
+                businessId: expectedBusinessId,
+                lastKey: '1f557ede-3df5-4335-a64b-cb4181943965',
+                size: 150
+              };
+              const actualOrdersPromise = channelApeClient.orders().getPage(ordersQueryRequestByBusinessId);
               return actualOrdersPromise.then((actualOrders) => {
                 expect(actualOrders.orders).to.be.an('array');
                 expect(actualOrders.orders.length).to.equal(51);

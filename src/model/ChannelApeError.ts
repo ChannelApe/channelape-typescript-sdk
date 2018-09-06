@@ -8,7 +8,7 @@ export default class ChannelApeError extends Error {
 
   constructor(
     message: string,
-    response: AxiosResponse<any> | undefined,
+    response: AxiosResponse | undefined,
     uri: string,
     apiErrors: ChannelApeApiError[]
   ) {
