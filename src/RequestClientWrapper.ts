@@ -19,19 +19,14 @@ export default class RequestClientWrapper {
   private readonly requestLogger: RequestLogger;
 
   constructor(
-    timeout: number,
-    session: string,
-    private readonly logLevel: LogLevel, endpoint: string, private readonly maximumRequestRetryTimeout: number,
-    private readonly jitterDelayMsMinimum: number, private readonly jitterDelayMsMaximum: number
+    private readonly timeout: number,
+    private readonly session: string,
+    private readonly logLevel: LogLevel,
+    private readonly endpoint: string,
+    private readonly maximumRequestRetryTimeout: number,
+    private readonly jitterDelayMsMinimum: number,
+    private readonly jitterDelayMsMaximum: number
   ) {
-    axios.defaults = {
-      timeout,
-      baseURL: endpoint,
-      responseType: 'json',
-      headers: {
-        'X-Channel-Ape-Authorization-Token': session
-      }
-    };
     this.requestLogger = new RequestLogger(this.logLevel, endpoint);
   }
 
@@ -66,8 +61,9 @@ export default class RequestClientWrapper {
     callback: RequestCallback
   ): void {
     const callDetails: CallDetails = { options, callStart, callCountForThisRequest: numberOfCalls };
-    options.baseURL = axios.defaults.baseURL;
-    options.headers = axios.defaults.headers;
+    options.baseURL = this.endpoint;
+    options.headers = { 'X-Channel-Ape-Authorization-Token': this.session };
+    options.timeout = this.timeout;
     options.method = method;
     try {
       this.requestLogger.logCall(method, url, options);
@@ -95,7 +91,7 @@ export default class RequestClientWrapper {
         })
         .catch((e) => {
           if (this.shouldRequestBeRetried(e.error, e.response) && e.response) {
-            this.retryRequest(method, url, callback, callDetails);
+            this.handleResponse(e, callback, url, callDetails, method);
           } else {
             try {
               const apiErrors = e.response == null || e.response.data == null || e.response.data.errors == null
