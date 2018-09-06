@@ -7,19 +7,14 @@ import OrdersQueryRequestByBusinessId from '../src/orders/model/OrdersQueryReque
 import { LogLevel } from 'channelape-logger';
 
 describe('ChannelApe Client', () => {
-
-  beforeEach((done) => {
-    setTimeout(() => done(), 100);
-  });
-
   describe('Given valid session ID', () => {
     const sessionId = getSessionId();
 
     const channelApeClient = new ChannelApeClient({
       sessionId,
       logLevel: LogLevel.OFF,
-      jitterDelayMsMaximum: 5000,
-      jitterDelayMsMinimum: 1000,
+      jitterDelayMsMaximum: 2000,
+      jitterDelayMsMinimum: 500,
       maximumRequestRetryTimeout: 30000
     });
 
