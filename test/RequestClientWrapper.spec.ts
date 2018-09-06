@@ -13,7 +13,7 @@ import multipleOrders from './orders/resources/multipleOrders';
 import ChannelApeApiError from '../src/model/ChannelApeApiError';
 import { ChannelApeError, LogLevel } from '../src';
 
-const maximumRequestRetryTimeout = 800;
+const maximumRequestRetryTimeout = 600;
 
 const JITTER_DELAY_MIN = 50;
 const JITTER_DELAY_MAX = 200;
@@ -285,11 +285,6 @@ Code: 0 Message: You didnt pass any body`;
         url: `${Environment.STAGING}${requestUrl}`,
         config: fakeRequest
       }, {
-        status: 502,
-        method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`,
-        config: fakeRequest
-      }, {
         status: 599,
         method: 'GET',
         url: `${Environment.STAGING}${requestUrl}`,
@@ -311,7 +306,6 @@ Code: 0 Message: You didnt pass any body`;
       clientGetStub.onCall(1).resolves(responses[1]);
       clientGetStub.onCall(2).resolves(responses[2]);
       clientGetStub.onCall(3).resolves(responses[3]);
-      clientGetStub.onCall(4).resolves(responses[4]);
 
       requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
         expect(warnLogSpy.called).to.be.true;
@@ -327,7 +321,7 @@ Code: 0 Message: You didnt pass any body`;
           .to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`, 'should log correctly');
         done();
       });
-    }).timeout(5000);
+    });
 
     it('When handling a PUT response expect the call to be retried on 500 level status codes and 429s', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
@@ -341,12 +335,6 @@ Code: 0 Message: You didnt pass any body`;
         url: `${Environment.STAGING}${requestUrl}`,
         config: fakeRequest,
         data: 'Im'
-      }, {
-        status: 502,
-        method: 'PUT',
-        url: `${Environment.STAGING}${requestUrl}`,
-        config: fakeRequest,
-        data: 'a'
       }, {
         status: 599,
         method: 'PUT',
@@ -371,7 +359,6 @@ Code: 0 Message: You didnt pass any body`;
       clientPutStub.onCall(1).resolves(responses[1]);
       clientPutStub.onCall(2).resolves(responses[2]);
       clientPutStub.onCall(3).resolves(responses[3]);
-      clientPutStub.onCall(4).resolves(responses[4]);
 
       requestClientWrapper.put(requestUrl, fakeRequest, (error, response, body) => {
         expect(error).to.be.null;
@@ -396,7 +383,7 @@ Code: 0 Message: You didnt pass any body`;
           .to.equal(`PUT ${Environment.STAGING}${requestUrl} -- STARTED`, 'should log correctly');
         done();
       });
-    }).timeout(5000);
+    });
 
     it(`When handling a GET response expect the call to be retried
       until the MaximumRequestRetryTimeout limit is exceeded`, (done) => {
@@ -442,7 +429,7 @@ Code: 0 Message: You didnt pass any body`;
       clientGetStub.onCall(1).resolves(responses[1]);
       clientGetStub.onCall(2).callsFake(() => {
         const deferred = Q.defer();
-        setTimeout(() => deferred.resolve(responses[2]), 850);
+        setTimeout(() => deferred.resolve(responses[2]), 600);
         return deferred.promise;
       });
       clientGetStub.onCall(3).resolves(responses[3]);
@@ -454,7 +441,7 @@ Code: 0 Message: You didnt pass any body`;
         expect(error.message).to.include(expectedErrorMessage);
         done();
       });
-    }).timeout(2000);
+    });
 
     it(`When handling a GET response expect the call to be retried
       until only until a non 500 / 429 response is received`, (done) => {
@@ -506,7 +493,7 @@ Code: 0 Message: You didnt pass any body`;
         expect(error).to.be.null;
         done();
       });
-    }).timeout(5000);
+    });
 
     it(`When handling a GET response expect callback with an empty response to be handled gracefully`, (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
