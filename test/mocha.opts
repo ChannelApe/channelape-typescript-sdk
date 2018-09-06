@@ -1,5 +1,5 @@
 --require ts-node/register 
 --require source-map-support/register 
 --recursive 
---timeout 1000 
+--timeout 2000 
 test/**/*.spec.*

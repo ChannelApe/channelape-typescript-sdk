@@ -5,7 +5,6 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { Logger } from 'channelape-logger';
 import * as Q from 'q';
 
-import Environment from '../src/model/Environment';
 import RequestClientWrapper from '../src/RequestClientWrapper';
 import singleOrder from './orders/resources/singleOrder';
 import singleOrderToUpdate from './orders/resources/singleOrderToUpdate';
@@ -14,7 +13,7 @@ import ChannelApeApiError from '../src/model/ChannelApeApiError';
 import { ChannelApeError, LogLevel } from '../src';
 
 const maximumRequestRetryTimeout = 600;
-
+const endpoint = 'https://fake-api.test.com';
 const JITTER_DELAY_MIN = 50;
 const JITTER_DELAY_MAX = 200;
 
@@ -35,7 +34,7 @@ describe('RequestClientWrapper', () => {
         60000,
         'valid-session-id',
         LogLevel.INFO,
-        Environment.STAGING,
+        endpoint,
         maximumRequestRetryTimeout,
         JITTER_DELAY_MIN,
         JITTER_DELAY_MAX
@@ -54,7 +53,7 @@ describe('RequestClientWrapper', () => {
       const response = {
         status: 200,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         data: singleOrder
       };
 
@@ -79,7 +78,7 @@ describe('RequestClientWrapper', () => {
       const response = {
         status: 200,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         data: { orders: multipleOrders }
       };
       sandbox.stub(axios, 'get').resolves(response);
@@ -104,7 +103,7 @@ describe('RequestClientWrapper', () => {
       const response = {
         status: 200,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         data: { orders: multipleOrders }
       };
       sandbox.stub(axios, 'get').resolves(response);
@@ -129,7 +128,7 @@ describe('RequestClientWrapper', () => {
       requestClientWrapper.get(options.url!, options, () => {
         expect(infoLogSpy.called).to.be.true;
         expect(infoLogSpy.args[0][0])
-          .to.equal(`GET ${Environment.STAGING}${requestUrl}?param=true&anotherParam=false -- STARTED`);
+          .to.equal(`GET ${endpoint}${requestUrl}?param=true&anotherParam=false -- STARTED`);
         done();
       });
     });
@@ -145,7 +144,7 @@ describe('RequestClientWrapper', () => {
       };
       requestClientWrapper.get(options.url!, options, () => {
         expect(infoLogSpy.called).to.be.true;
-        expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl}?param=true -- STARTED`);
+        expect(infoLogSpy.args[0][0]).to.equal(`GET ${endpoint}${requestUrl}?param=true -- STARTED`);
         done();
       });
     });
@@ -159,7 +158,7 @@ describe('RequestClientWrapper', () => {
       };
       requestClientWrapper.get(options.url!, options, () => {
         expect(infoLogSpy.called).to.be.true;
-        expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`);
+        expect(infoLogSpy.args[0][0]).to.equal(`GET ${endpoint}${requestUrl} -- STARTED`);
         done();
       });
     });
@@ -169,7 +168,7 @@ describe('RequestClientWrapper', () => {
       const requestUrl = `/v1/orders/${orderId}`;
       requestClientWrapper.get(requestUrl, {}, () => {
         expect(infoLogSpy.called).to.be.true;
-        expect(infoLogSpy.args[0][0]).to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`);
+        expect(infoLogSpy.args[0][0]).to.equal(`GET ${endpoint}${requestUrl} -- STARTED`);
         done();
       });
     });
@@ -184,7 +183,7 @@ describe('RequestClientWrapper', () => {
       const response = {
         status: 404,
         method: 'PUT',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         data: { errors: [channelApeApiError] },
         config: { method: 'PUT' }
       };
@@ -219,7 +218,7 @@ Code: 0 Message: You didnt pass any body`;
       const response = {
         status: 202,
         method: 'PUT',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: options,
         data: singleOrderToUpdate
       };
@@ -246,7 +245,7 @@ Code: 0 Message: You didnt pass any body`;
       const response = {
         status: 202,
         method: 'PUT',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         data: singleOrderToUpdate
       };
       sandbox.stub(axios, 'put').resolves(response);
@@ -267,7 +266,7 @@ Code: 0 Message: You didnt pass any body`;
       };
       requestClientWrapper.put(options.url!, options, () => {
         expect(infoLogSpy.called).to.be.true;
-        expect(infoLogSpy.args[0][0]).to.equal(`PUT ${Environment.STAGING}${requestUrl} -- STARTED`);
+        expect(infoLogSpy.args[0][0]).to.equal(`PUT ${endpoint}${requestUrl} -- STARTED`);
         done();
       });
     });
@@ -277,27 +276,27 @@ Code: 0 Message: You didnt pass any body`;
       const requestUrl = `/v1/orders/${orderId}`;
       const fakeRequest = {
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`
+        url: `${endpoint}${requestUrl}`
       };
       const responses = [{
         status: 500,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: fakeRequest
       }, {
         status: 599,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: fakeRequest
       }, {
         status: 429,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: fakeRequest
       }, {
         status: 200,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: fakeRequest,
         data: { id: orderId }
       }];
@@ -310,15 +309,15 @@ Code: 0 Message: You didnt pass any body`;
       requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
         expect(warnLogSpy.called).to.be.true;
         expect(warnLogSpy.args[1][0])
-          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for `, 'should log 1st delay correctly');
+          .to.include(`DELAYING GET ${endpoint}${requestUrl} for `, 'should log 1st delay correctly');
         expect(warnLogSpy.args[3][0])
-          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for `, 'should log 2nd delay correctly');
+          .to.include(`DELAYING GET ${endpoint}${requestUrl} for `, 'should log 2nd delay correctly');
         expect(warnLogSpy.args[5][0])
-          .to.include(`DELAYING GET ${Environment.STAGING}${requestUrl} for `, 'should log 3rd delay correctly');
+          .to.include(`DELAYING GET ${endpoint}${requestUrl} for `, 'should log 3rd delay correctly');
         expect(error).to.be.null;
         expect(body.id).to.equal(orderId);
         expect(infoLogSpy.args[0][0])
-          .to.equal(`GET ${Environment.STAGING}${requestUrl} -- STARTED`, 'should log correctly');
+          .to.equal(`GET ${endpoint}${requestUrl} -- STARTED`, 'should log correctly');
         done();
       });
     });
@@ -332,25 +331,25 @@ Code: 0 Message: You didnt pass any body`;
       const responses = [{
         status: 500,
         method: 'PUT',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: fakeRequest,
         data: 'Im'
       }, {
         status: 599,
         method: 'PUT',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: fakeRequest,
         data: 'little'
       }, {
         status: 429,
         method: 'PUT',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: fakeRequest,
         data: 'teapot'
       }, {
         status: 202,
         method: 'PUT',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: fakeRequest,
         data: { id: orderId }
       }];
@@ -367,20 +366,20 @@ Code: 0 Message: You didnt pass any body`;
         expect(delayMs1).to.be.lessThan(JITTER_DELAY_MAX + 1);
         expect(delayMs1).to.be.greaterThan(JITTER_DELAY_MIN - 1);
         expect(warnLogSpy.args[1][0])
-          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for `, 'should log 1st delay correctly');
+          .to.include(`DELAYING PUT ${endpoint}${requestUrl} for `, 'should log 1st delay correctly');
         const delayMs2 = parseInt(warnLogSpy.args[3][0].match(/\s(\d*)ms/g)[0].trim().replace('ms', ''), 10);
         expect(delayMs2).to.be.lessThan(JITTER_DELAY_MAX + 1);
         expect(delayMs2).to.be.greaterThan(JITTER_DELAY_MIN - 1);
         expect(warnLogSpy.args[3][0])
-          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for `, 'should log 2nd delay correctly');
+          .to.include(`DELAYING PUT ${endpoint}${requestUrl} for `, 'should log 2nd delay correctly');
         const delayMs3 = parseInt(warnLogSpy.args[5][0].match(/\s(\d*)ms/g)[0].trim().replace('ms', ''), 10);
         expect(delayMs3).to.be.lessThan(JITTER_DELAY_MAX + 1);
         expect(delayMs3).to.be.greaterThan(JITTER_DELAY_MIN - 1);
         expect(warnLogSpy.args[5][0])
-          .to.include(`DELAYING PUT ${Environment.STAGING}${requestUrl} for `, 'should log 3rd delay correctly');
+          .to.include(`DELAYING PUT ${endpoint}${requestUrl} for `, 'should log 3rd delay correctly');
         expect(body.id).to.equal(orderId);
         expect(infoLogSpy.args[0][0])
-          .to.equal(`PUT ${Environment.STAGING}${requestUrl} -- STARTED`, 'should log correctly');
+          .to.equal(`PUT ${endpoint}${requestUrl} -- STARTED`, 'should log correctly');
         done();
       });
     });
@@ -396,31 +395,31 @@ Code: 0 Message: You didnt pass any body`;
       const responses = [{
         status: 500,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: fakeRequest,
         data: 'Im'
       }, {
         status: 502,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: fakeRequest,
         data: 'a'
       }, {
         status: 599,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: fakeRequest,
         data: 'little'
       }, {
         status: 429,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: fakeRequest,
         data: 'teapot'
       }, {
         status: 200,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: fakeRequest,
         data: fakeRequest.data
       }];
@@ -444,41 +443,41 @@ Code: 0 Message: You didnt pass any body`;
     });
 
     it(`When handling a GET response expect the call to be retried
-      until only until a non 500 / 429 response is received`, (done) => {
+      until a non 500 / 429 response is received`, (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
       const fakeRequest = {
         method: 'GET',
-        href: `${Environment.STAGING}${requestUrl}`
+        href: `${endpoint}${requestUrl}`
       };
       const responses = [{
         status: 500,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: fakeRequest,
         data: 'Im'
       }, {
         status: 502,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: fakeRequest,
         data: 'a'
       }, {
         status: 599,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: fakeRequest,
         data: 'little'
       }, {
         status: 429,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: fakeRequest,
         data: 'teapot'
       }, {
         status: 200,
         method: 'GET',
-        url: `${Environment.STAGING}${requestUrl}`,
+        url: `${endpoint}${requestUrl}`,
         config: fakeRequest,
         data: singleOrder
       }];
