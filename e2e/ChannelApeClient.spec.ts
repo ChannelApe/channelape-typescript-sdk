@@ -14,7 +14,7 @@ describe('ChannelApe Client', () => {
       sessionId,
       logLevel: LogLevel.OFF,
       maximumRequestRetryRandomDelay: 2000,
-      minimumRequestRetryRandomDelay: 500,
+      minimumRequestRetryRandomDelay: 1000,
       maximumRequestRetryTimeout: 30000
     });
 
