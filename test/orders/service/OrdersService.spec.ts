@@ -148,9 +148,18 @@ describe('OrdersService', () => {
             When retrieving orders Then return resolved promise with orders`, () => {
       const startDate = '2018-05-01T18:07:58.009Z';
       const endDate = '2018-05-07T18:07:58.009Z';
+      const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
+
       const mockedAxiosAdapter = new axiosMockAdapter(axios);
       mockedAxiosAdapter.onGet(
-        `${Environment.STAGING}/${Version.V1}/orders` // ?startDate=${startDate}&endDate=${endDate}
+        `${Environment.STAGING}/${Version.V1}/orders`,
+        {
+          params: {
+            startDate,
+            endDate,
+            businessId
+          }
+        }
       ).reply(200, {
         orders: multipleOrders,
         pagination: {
@@ -158,7 +167,6 @@ describe('OrdersService', () => {
         }
       });
 
-      const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestOptions: OrdersQueryRequestByBusinessId = {
         businessId,
         startDate: new Date(startDate),
