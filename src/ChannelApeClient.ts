@@ -6,18 +6,24 @@ import ClientConfiguration from './model/ClientConfiguration';
 import OrdersService from './orders/service/OrdersService';
 import Environment from './model/Environment';
 
-const INVALID_CONFIGURATION_ERROR_MESSAGE = 'Invalid configuration. sessionId is required.';
+const INVALID_CONFIGURATION_ERROR_MESSAGE = 'sessionId is required.';
+const MINIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_SMALL_ERROR_MESSAGE =
+  'minimumRequestRetryRandomDelay must be 1000 or greater';
+const MAXIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_LARGE_ERROR_MESSAGE =
+  'maximumRequestRetryRandomDelay must be 5000 or less';
+const MINIMUM_REQUEST_RETRY_RANDOM_DELAY_GREATER_THAN_MAXIMUM_REQUEST_RETRY_RANDOM_ERROR_MESSAGE =
+  'minimumRequestRetryRandomDelay cannot be greater than maximumRequestRetryRandomDelay';
 const THREE_MINUTES_IN_MS = 180000;
 const TWO_SECONDS_IN_MS = 2000;
-const JITTER_DELAY_MS_MINIMUM_DEFAULT = 1000;
-const JITTER_DELAY_MS_MAXIMUM_DEFAULT = 5000;
+const ONE_SECOND_IN_MS = 1000;
+const FIVE_SECONDS_IN_MS = 5000;
 export default class ChannelApeClient {
 
   private readonly sessionId: string;
   private readonly timeout: number;
   private readonly maximumRequestRetryTimeout: number;
-  private readonly jitterDelayMsMinimum: number;
-  private readonly jitterDelayMsMaximum: number;
+  private readonly minimumRequestRetryRandomDelay: number;
+  private readonly maximumRequestRetryRandomDelay: number;
   private readonly endpoint: string;
   private readonly logLevel: LogLevel;
   private readonly requestClientWrapper: RequestClientWrapper;
@@ -26,8 +32,9 @@ export default class ChannelApeClient {
   private readonly ordersService: OrdersService;
 
   constructor(clientConfiguration: ClientConfiguration) {
-    if (clientConfiguration.sessionId.length === 0) {
-      throw new Error(INVALID_CONFIGURATION_ERROR_MESSAGE);
+    const configurationErrors = this.validateConfiguration(clientConfiguration);
+    if (configurationErrors !== undefined) {
+      throw new Error(`Invalid configuration. ${configurationErrors}`);
     }
 
     this.sessionId = clientConfiguration.sessionId;
@@ -39,20 +46,22 @@ export default class ChannelApeClient {
         clientConfiguration.maximumRequestRetryTimeout < TWO_SECONDS_IN_MS)
         ? THREE_MINUTES_IN_MS : clientConfiguration.maximumRequestRetryTimeout;
     this.logLevel = (clientConfiguration.logLevel == null) ? LogLevel.OFF : clientConfiguration.logLevel;
-    this.jitterDelayMsMinimum = (clientConfiguration.jitterDelayMsMinimum == null)
-      ? JITTER_DELAY_MS_MINIMUM_DEFAULT : clientConfiguration.jitterDelayMsMinimum;
-    this.jitterDelayMsMaximum = (clientConfiguration.jitterDelayMsMaximum == null)
-      ? JITTER_DELAY_MS_MAXIMUM_DEFAULT : clientConfiguration.jitterDelayMsMaximum;
+    this.minimumRequestRetryRandomDelay =
+      clientConfiguration.minimumRequestRetryRandomDelay ?
+      clientConfiguration.minimumRequestRetryRandomDelay : ONE_SECOND_IN_MS;
+    this.maximumRequestRetryRandomDelay =
+      clientConfiguration.maximumRequestRetryRandomDelay ?
+      clientConfiguration.maximumRequestRetryRandomDelay : FIVE_SECONDS_IN_MS;
 
-    this.requestClientWrapper = new RequestClientWrapper(
-      this.timeout,
-      this.sessionId,
-      this.logLevel,
-      this.endpoint,
-      this.maximumRequestRetryTimeout,
-      this.jitterDelayMsMinimum,
-      this.jitterDelayMsMaximum
-    );
+    this.requestClientWrapper = new RequestClientWrapper({
+      timeout: this.timeout,
+      session: this.sessionId,
+      logLevel: this.logLevel,
+      endpoint: this.endpoint,
+      maximumRequestRetryTimeout: this.maximumRequestRetryTimeout,
+      jitterDelayMsMinimum: this.minimumRequestRetryRandomDelay,
+      jitterDelayMsMaximum: this.maximumRequestRetryRandomDelay
+    });
     this.actionsService = new ActionsService(this.requestClientWrapper);
     this.channelsService = new ChannelsService(this.requestClientWrapper);
     this.ordersService = new OrdersService(this.requestClientWrapper);
@@ -88,5 +97,28 @@ export default class ChannelApeClient {
 
   orders(): OrdersService {
     return this.ordersService;
+  }
+
+  private validateConfiguration(clientConfiguration: ClientConfiguration): string | undefined {
+    const errors: string[] = [];
+    if (clientConfiguration.sessionId.length === 0) {
+      errors.push(INVALID_CONFIGURATION_ERROR_MESSAGE);
+    }
+    if (clientConfiguration.minimumRequestRetryRandomDelay &&
+        clientConfiguration.minimumRequestRetryRandomDelay < ONE_SECOND_IN_MS) {
+      errors.push(MINIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_SMALL_ERROR_MESSAGE);
+    }
+    if (clientConfiguration.maximumRequestRetryRandomDelay &&
+        clientConfiguration.maximumRequestRetryRandomDelay > FIVE_SECONDS_IN_MS) {
+      errors.push(MAXIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_LARGE_ERROR_MESSAGE);
+    }
+    if (clientConfiguration.maximumRequestRetryRandomDelay && clientConfiguration.minimumRequestRetryRandomDelay &&
+        clientConfiguration.minimumRequestRetryRandomDelay > clientConfiguration.maximumRequestRetryRandomDelay) {
+      errors.push(MINIMUM_REQUEST_RETRY_RANDOM_DELAY_GREATER_THAN_MAXIMUM_REQUEST_RETRY_RANDOM_ERROR_MESSAGE);
+    }
+    if (errors.length > 0) {
+      return errors.join('\n');
+    }
+    return undefined;
   }
 }
