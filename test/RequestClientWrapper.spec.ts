@@ -32,15 +32,15 @@ describe('RequestClientWrapper', () => {
       sandbox = sinon.createSandbox();
       infoLogSpy = sandbox.spy(Logger.prototype, 'info');
       warnLogSpy = sandbox.spy(Logger.prototype, 'warn');
-      requestClientWrapper = new RequestClientWrapper(
-        60000,
-        'valid-session-id',
-        LogLevel.INFO,
+      requestClientWrapper = new RequestClientWrapper({
         endpoint,
         maximumRequestRetryTimeout,
-        JITTER_DELAY_MIN,
-        JITTER_DELAY_MAX
-      );
+        timeout: 60000,
+        session: 'valid-session-id',
+        logLevel: LogLevel.INFO,
+        jitterDelayMsMinimum: JITTER_DELAY_MIN,
+        jitterDelayMsMaximum: JITTER_DELAY_MAX
+      });
       done();
     });
 

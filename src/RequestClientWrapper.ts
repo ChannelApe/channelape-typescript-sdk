@@ -1,10 +1,10 @@
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosPromise } from 'axios';
-import LogLevel from './model/LogLevel';
 import RequestLogger from './utils/RequestLogger';
 import ChannelApeError from './model/ChannelApeError';
 import HttpRequestMethod from './model/HttpRequestMethod';
 import RequestResponse from './model/RequestResponse';
 import { RequestCallback } from './model/RequestCallback';
+import RequestClientWrapperConfiguration from '../src/model/RequestClientWrapperConfiguration';
 
 const GENERIC_ERROR_CODE = -1;
 
@@ -19,15 +19,12 @@ export default class RequestClientWrapper {
   private readonly requestLogger: RequestLogger;
 
   constructor(
-    private readonly timeout: number,
-    private readonly session: string,
-    private readonly logLevel: LogLevel,
-    private readonly endpoint: string,
-    private readonly maximumRequestRetryTimeout: number,
-    private readonly jitterDelayMsMinimum: number,
-    private readonly jitterDelayMsMaximum: number
+    private readonly requestClientWrapperConfiguration: RequestClientWrapperConfiguration
   ) {
-    this.requestLogger = new RequestLogger(this.logLevel, endpoint);
+    this.requestLogger = new RequestLogger(
+      this.requestClientWrapperConfiguration.logLevel,
+      this.requestClientWrapperConfiguration.endpoint
+    );
   }
 
   public get(url: string, params: AxiosRequestConfig, callback: RequestCallback): void {
@@ -61,9 +58,9 @@ export default class RequestClientWrapper {
     callback: RequestCallback
   ): void {
     const callDetails: CallDetails = { options, callStart, callCountForThisRequest: numberOfCalls };
-    options.baseURL = this.endpoint;
-    options.headers = { 'X-Channel-Ape-Authorization-Token': this.session };
-    options.timeout = this.timeout;
+    options.baseURL = this.requestClientWrapperConfiguration.endpoint;
+    options.headers = { 'X-Channel-Ape-Authorization-Token': this.requestClientWrapperConfiguration.session };
+    options.timeout = this.requestClientWrapperConfiguration.timeout;
     options.method = method;
     try {
       this.requestLogger.logCall(method, url, options);
@@ -160,7 +157,7 @@ export default class RequestClientWrapper {
   private didRequestTimeout(callStart: Date): boolean {
     const now = new Date();
     const totalElapsedTime = now.getTime() - callStart.getTime();
-    return totalElapsedTime > this.maximumRequestRetryTimeout;
+    return totalElapsedTime > this.requestClientWrapperConfiguration.maximumRequestRetryTimeout;
   }
 
   private shouldRequestBeRetried(error: Error | undefined, response: AxiosResponse | undefined): boolean {
@@ -202,7 +199,8 @@ export default class RequestClientWrapper {
   }
 
   private getJitterDelayMs(): number {
-    const range = this.jitterDelayMsMaximum - this.jitterDelayMsMinimum + 1;
-    return Math.floor(Math.random() * (range)) + this.jitterDelayMsMinimum;
+    const range = (this.requestClientWrapperConfiguration.jitterDelayMsMaximum -
+      this.requestClientWrapperConfiguration.jitterDelayMsMinimum) + 1;
+    return (Math.floor(Math.random() * (range))) + this.requestClientWrapperConfiguration.jitterDelayMsMinimum;
   }
 }

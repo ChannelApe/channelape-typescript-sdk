@@ -14,15 +14,15 @@ describe('Sessions Service', () => {
 
   describe('Given some rest client and session ID ', () => {
     const client: RequestClientWrapper =
-      new RequestClientWrapper(
-        60000,
-        'valid-session-id',
-        LogLevel.OFF,
-        Environment.STAGING,
-        10000,
-        50,
-        50
-      );
+      new RequestClientWrapper({
+        endpoint: Environment.STAGING,
+        maximumRequestRetryTimeout: 10000,
+        timeout: 60000,
+        session: 'valid-session-id',
+        logLevel: LogLevel.INFO,
+        jitterDelayMsMinimum: 50,
+        jitterDelayMsMaximum: 50
+      });
     const sessionId = 'b40da0b8-a770-4de7-a496-361254bd7d6c';
     const userId = 'f6ed6f7a-47bf-4dd3-baed-71a8a9684e80';
     const sessionsService = new SessionsService(client, sessionId);

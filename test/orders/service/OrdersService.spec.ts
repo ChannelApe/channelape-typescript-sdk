@@ -23,9 +23,15 @@ import multipleOrders from '../resources/multipleOrders';
 
 const maximumRequestRetryTimeout = 3000;
 
-const clientWrapper: RequestClientWrapper = new RequestClientWrapper(
-  60000, 'valid-session-id', LogLevel.INFO, Environment.STAGING, maximumRequestRetryTimeout, 50, 50
-);
+const clientWrapper: RequestClientWrapper = new RequestClientWrapper({
+  maximumRequestRetryTimeout,
+  endpoint: Environment.STAGING,
+  timeout: 60000,
+  session: 'valid-session-id',
+  logLevel: LogLevel.INFO,
+  jitterDelayMsMinimum: 50,
+  jitterDelayMsMaximum: 50
+});
 const ordersService: OrdersService = new OrdersService(clientWrapper);
 
 describe('OrdersService', () => {
@@ -311,9 +317,15 @@ Code: 12 Message: Invalid authorization token. Please check the server logs and 
         { errors:
           [{ code: 12, message: 'Invalid authorization token. Please check the server logs and try again' }]
         });
-      const client: RequestClientWrapper = new RequestClientWrapper(
-        60000, 'valid-session-id', LogLevel.INFO, 'this-is-not-a-real-base-url', maximumRequestRetryTimeout, 50, 50
-      );
+      const client: RequestClientWrapper = new RequestClientWrapper({
+        endpoint: 'this-is-not-a-real-base-url',
+        maximumRequestRetryTimeout: 10000,
+        timeout: 60000,
+        session: 'valid-session-id',
+        logLevel: LogLevel.INFO,
+        jitterDelayMsMinimum: 50,
+        jitterDelayMsMaximum: 50
+      });
       const ordersService: OrdersService = new OrdersService(client);
       const orderId = 'not-a-real-order-id';
       return ordersService.get(orderId).then((actualOrder) => {
@@ -326,9 +338,15 @@ Code: 12 Message: Invalid authorization token. Please check the server logs and 
 
     it(`And invalid businessId
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
-      const client: RequestClientWrapper = new RequestClientWrapper(
-        60000, 'valid-session-id', LogLevel.INFO, 'this-is-not-a-real-base-url', maximumRequestRetryTimeout, 50, 50
-      );
+      const client: RequestClientWrapper = new RequestClientWrapper({
+        endpoint: 'this-is-not-a-real-base-url',
+        maximumRequestRetryTimeout: 10000,
+        timeout: 60000,
+        session: 'valid-session-id',
+        logLevel: LogLevel.INFO,
+        jitterDelayMsMinimum: 50,
+        jitterDelayMsMaximum: 50
+      });
       const expectedErrorMessage =
 `get /v1/orders
   Status: 401

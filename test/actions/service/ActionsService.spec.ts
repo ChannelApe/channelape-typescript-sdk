@@ -18,9 +18,15 @@ describe('Actions Service', () => {
 
   describe('Given some rest client', () => {
     const client: RequestClientWrapper =
-      new RequestClientWrapper(
-        60000, 'valid-session-id', LogLevel.INFO, Environment.STAGING, 10000, 50, 50
-      );
+      new RequestClientWrapper({
+        endpoint: Environment.STAGING,
+        maximumRequestRetryTimeout: 10000,
+        timeout: 60000,
+        session: 'valid-session-id',
+        logLevel: LogLevel.INFO,
+        jitterDelayMsMinimum: 50,
+        jitterDelayMsMaximum: 50
+      });
 
     let sandbox: sinon.SinonSandbox;
 
