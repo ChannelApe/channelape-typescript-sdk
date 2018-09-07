@@ -128,12 +128,6 @@ export default class RequestClientWrapper {
       const maximumRetryLimitExceededMessage =
         this.getMaximumRetryLimitExceededMessage(callDetails.callStart, callDetails.callCountForThisRequest);
       finalError = new ChannelApeError(maximumRetryLimitExceededMessage, requestResponse.response, uri, []);
-    } else if (requestResponse.response == null) {
-      const badResponseMessage = 'No response was received from the server';
-      finalError = new ChannelApeError(badResponseMessage, undefined, uri, [{
-        code: 504,
-        message: badResponseMessage
-      }]);
     } else if (
       this.shouldRequestBeRetried(requestResponse.error, requestResponse.response) && requestResponse.response
     ) {
