@@ -119,6 +119,64 @@ describe('ChannelApe Client', () => {
     });
   });
 
+  describe('Given client configuration with invalid session ID, ' +
+  'a minimumRequestRetryRandomDelay of 100 and a maximumRequestRetryRandomDelay of 10000', () => {
+    it('Should throw an error', () => {
+      try {
+        const channelApeClient = new ChannelApeClient({
+          sessionId: '',
+          minimumRequestRetryRandomDelay: 100,
+          maximumRequestRetryRandomDelay: 10000
+        });
+        expect(channelApeClient).to.be.undefined;
+      } catch (e) {
+        expect(e.message).to.equal(`Invalid configuration. sessionId is required.
+minimumRequestRetryRandomDelay must be 1000 or greater
+maximumRequestRetryRandomDelay must be 5000 or less`);
+      }
+    });
+  });
+
+  describe('Given client configuration with a valid session ID, ' +
+  'a minimumRequestRetryRandomDelay of 1000 and a maximumRequestRetryRandomDelay of 5000', () => {
+    it('Should create the client', () => {
+      const channelApeClient = new ChannelApeClient({
+        sessionId: 'valid-session-d',
+        minimumRequestRetryRandomDelay: 1000,
+        maximumRequestRetryRandomDelay: 5000
+      });
+      expect(channelApeClient).not.to.be.undefined;
+    });
+  });
+
+  describe('Given client configuration with minimumRequestRetryRandomDelay > maximumRequestRetryRandomDelay', () => {
+    it('Should throw an error', () => {
+      try {
+        const channelApeClient = new ChannelApeClient({
+          sessionId: 'valid-session-id',
+          minimumRequestRetryRandomDelay: 2000,
+          maximumRequestRetryRandomDelay: 1000
+        });
+        expect(channelApeClient).to.be.undefined;
+      } catch (e) {
+        expect(e.message).to.equal(
+          `Invalid configuration. minimumRequestRetryRandomDelay cannot be greater than maximumRequestRetryRandomDelay`
+        );
+      }
+    });
+  });
+
+  describe('Given client configuration with a minimumRequestRetryRandomDelay = maximumRequestRetryRandomDelay', () => {
+    it('Should create the client', () => {
+      const channelApeClient = new ChannelApeClient({
+        sessionId: 'valid-session-d',
+        minimumRequestRetryRandomDelay: 2000,
+        maximumRequestRetryRandomDelay: 2000
+      });
+      expect(channelApeClient).not.to.be.undefined;
+    });
+  });
+
   describe('Given client configuration with valid session ID', () => {
     const channelApeClient = new ChannelApeClient({
       sessionId: 'c478c897-dc1c-4171-a207-9e3af9b23579'

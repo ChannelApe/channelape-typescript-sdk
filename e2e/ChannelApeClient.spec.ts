@@ -13,8 +13,8 @@ describe('ChannelApe Client', () => {
     const channelApeClient = new ChannelApeClient({
       sessionId,
       logLevel: LogLevel.OFF,
-      jitterDelayMsMaximum: 2000,
-      jitterDelayMsMinimum: 500,
+      maximumRequestRetryRandomDelay: 2000,
+      minimumRequestRetryRandomDelay: 500,
       maximumRequestRetryTimeout: 30000
     });
 
