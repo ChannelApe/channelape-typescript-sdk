@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import GenerateApiError from '../../src/utils/GenerateApiError';
-import { AxiosResponse } from '../../node_modules/axios';
+import { AxiosResponse } from 'axios';
 
 describe('GenerateApiErrors()', () => {
 
