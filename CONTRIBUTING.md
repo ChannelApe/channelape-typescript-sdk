@@ -43,9 +43,11 @@ ChannelApe uses different types of tests to verify functionality.
 ``mvn install ``
 
 #### Coverage
-The goal is to get line and branch coverage to **100%** on new code. 
+The goal is to get line and branch coverage to **100%** on new code.
 
-ChannelApe uses [PIT Test](http://pitest.org/) for running mutations on unit tests. This ensures that tests are well written. The goal for mutation coverage is equal to or greater than the threshold. The threshold is defined in **pom.xml**. If you are to increase mutation coverage, please update the threshold to reflect the new coverage percentage.
+ChannelApe uses [Mocha](https://mochajs.org/) for running tests and [NYC](https://www.npmjs.com/package/nyc) for simple code coverage.
+
+Additionally ChannelApe uses [Stryker](https://stryker-mutator.io/) for running mutations on unit tests. This ensures that tests are well written. The goal for mutation coverage is equal to or greater than the threshold. The threshold is defined in **stryker.conf.js**. If you are to increase mutation coverage, please update the threshold to reflect the new coverage percentage.
 
 ## Reporting a bug
 If you find a bug and would like to report it, please follow the guidelines below:
