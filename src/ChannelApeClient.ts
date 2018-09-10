@@ -6,7 +6,7 @@ import ClientConfiguration from './model/ClientConfiguration';
 import OrdersService from './orders/service/OrdersService';
 import Environment from './model/Environment';
 
-const INVALID_CONFIGURATION_ERROR_MESSAGE = 'sessionId is required.';
+const MISSING_SESSION_ID_ERROR_MESSAGE = 'sessionId is required.';
 const MINIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_SMALL_ERROR_MESSAGE =
   'minimumRequestRetryRandomDelay must be 1000 or greater';
 const MAXIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_LARGE_ERROR_MESSAGE =
@@ -102,7 +102,7 @@ export default class ChannelApeClient {
   private validateConfiguration(clientConfiguration: ClientConfiguration): string | undefined {
     const errors: string[] = [];
     if (clientConfiguration.sessionId.length === 0) {
-      errors.push(INVALID_CONFIGURATION_ERROR_MESSAGE);
+      errors.push(MISSING_SESSION_ID_ERROR_MESSAGE);
     }
     if (clientConfiguration.minimumRequestRetryRandomDelay &&
         clientConfiguration.minimumRequestRetryRandomDelay < ONE_SECOND_IN_MS) {
