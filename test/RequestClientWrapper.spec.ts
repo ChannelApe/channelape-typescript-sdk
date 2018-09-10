@@ -10,7 +10,7 @@ import singleOrder from './orders/resources/singleOrder';
 import singleOrderToUpdate from './orders/resources/singleOrderToUpdate';
 import multipleOrders from './orders/resources/multipleOrders';
 import ChannelApeApiError from '../src/model/ChannelApeApiError';
-import { ChannelApeError, LogLevel, Environment } from '../src';
+import { ChannelApeError, LogLevel } from '../src';
 
 const maximumRequestRetryTimeout = 600;
 
@@ -25,7 +25,7 @@ describe('RequestClientWrapper', () => {
     let requestClientWrapper: RequestClientWrapper;
     let infoLogSpy: sinon.SinonSpy;
     let warnLogSpy: sinon.SinonSpy;
-    const endpoint = Environment.STAGING;
+    const endpoint = 'https://fake-api.test.com';
 
     beforeEach((done) => {
       mockedAxios = new axiosMockAdapter(axios);
@@ -52,7 +52,7 @@ describe('RequestClientWrapper', () => {
     it('When doing a get() with just a URI and call back expect data to be returned', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
-      mockedAxios.onGet(`${Environment.STAGING}${requestUrl}`).reply(200, singleOrder);
+      mockedAxios.onGet(`${endpoint}${requestUrl}`).reply(200, singleOrder);
       requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
         expect(error).to.be.null;
         expect(body.id).to.equal(orderId);
@@ -69,7 +69,7 @@ describe('RequestClientWrapper', () => {
           status: 'OPEN'
         }
       };
-      mockedAxios.onGet(`${Environment.STAGING}${requestUrl}`).reply(200, { orders: multipleOrders });
+      mockedAxios.onGet(`${endpoint}${requestUrl}`).reply(200, { orders: multipleOrders });
       requestClientWrapper.get(requestUrl, options, (error, response, body) => {
         expect(error).to.be.null;
         expect(body.orders[0].businessId).to.equal(businessId);
@@ -172,7 +172,7 @@ describe('RequestClientWrapper', () => {
   Request failed with status code 404
 Code: 0 Message: You didnt pass any body`;
       // tslint:enable:no-trailing-whitespace
-      mockedAxios.onPut(`${Environment.STAGING}${requestUrl}`).reply(404, { errors: [channelApeApiError] });
+      mockedAxios.onPut(`${endpoint}${requestUrl}`).reply(404, { errors: [channelApeApiError] });
 
       requestClientWrapper.put(requestUrl, {}, (error, response, body) => {
         expect(error).not.to.be.null;
@@ -192,7 +192,7 @@ Code: 0 Message: You didnt pass any body`;
         data: singleOrderToUpdate,
         method: 'PUT'
       };
-      mockedAxios.onPut(`${Environment.STAGING}${requestUrl}`).reply(201, singleOrderToUpdate);
+      mockedAxios.onPut(`${endpoint}${requestUrl}`).reply(201, singleOrderToUpdate);
       requestClientWrapper.put(requestUrl, options, (error, response, body) => {
         expect(error).to.be.null;
         expect(body.additionalFields[0].value).to.equal('RRR');
@@ -211,7 +211,7 @@ Code: 0 Message: You didnt pass any body`;
         url: requestUrl,
         data: singleOrderToUpdate
       };
-      mockedAxios.onPut(`${Environment.STAGING}${requestUrl}`).reply(200, singleOrderToUpdate);
+      mockedAxios.onPut(`${endpoint}${requestUrl}`).reply(200, singleOrderToUpdate);
 
       requestClientWrapper.put(options.url!, options, (error, response, body) => {
         expect(error).to.be.null;
@@ -227,7 +227,7 @@ Code: 0 Message: You didnt pass any body`;
         url: requestUrl,
         data: singleOrderToUpdate
       };
-      mockedAxios.onPut(`${Environment.STAGING}${requestUrl}`).reply(201, singleOrderToUpdate);
+      mockedAxios.onPut(`${endpoint}${requestUrl}`).reply(201, singleOrderToUpdate);
       requestClientWrapper.put(options.url!, options, () => {
         expect(infoLogSpy.called).to.be.true;
         expect(infoLogSpy.args[0][0]).to.equal(`PUT ${endpoint}${requestUrl} -- STARTED`);
