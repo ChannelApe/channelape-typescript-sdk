@@ -1,5 +1,5 @@
 # Contributing
-Thanks for taking the time to contribute to the ChannelApe Web Service SDK project!
+Thanks for taking the time to contribute to the ChannelApe SDK project!
 
 The following is a guide for contributing to the project. These are mostly guidelines and not rules. We are open for discussion on changes to this document in a Pull Request.
 
@@ -49,7 +49,7 @@ ChannelApe uses [PIT Test](http://pitest.org/) for running mutations on unit tes
 
 ## Reporting a bug
 If you find a bug and would like to report it, please follow the guidelines below:
-- Verify that a bug for this doesn't already exist [here](https://github.com/ChannelApe/channelape-typescript-web-service-sdk/issues).
+- Verify that a bug for this doesn't already exist [here](https://github.com/ChannelApe/channelape-typescript-sdk/issues).
 - If a bug is closed and you find that it is possibly still an issue, open a new one and reference the old one.
 - Use a clear descriptive title.
 - Describe in detail how to reproduce the issue.
@@ -58,7 +58,7 @@ If you find a bug and would like to report it, please follow the guidelines belo
 
 ## Suggesting a new feature
 If you would like to suggest a new feature, please follow the guidelines below:
-- Verify that a feature request doesn't already exist [here](https://github.com/ChannelApe/channelape-typescript-web-service-sdk/issues).
+- Verify that a feature request doesn't already exist [here](https://github.com/ChannelApe/channelape-typescript-sdk/issues).
 - Use a clear descriptive title.
 - Describe in detail how the new feature should work.
 - Examples can help if you have them.
