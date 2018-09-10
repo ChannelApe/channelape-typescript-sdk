@@ -4,7 +4,7 @@ import ChannelApeError from './model/ChannelApeError';
 import HttpRequestMethod from './model/HttpRequestMethod';
 import RequestResponse from './model/RequestResponse';
 import { RequestCallback } from './model/RequestCallback';
-import RequestClientWrapperConfiguration from '../src/model/RequestClientWrapperConfiguration';
+import RequestClientWrapperConfiguration from './model/RequestClientWrapperConfiguration';
 
 const GENERIC_ERROR_CODE = -1;
 
