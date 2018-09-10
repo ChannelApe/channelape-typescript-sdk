@@ -39,7 +39,7 @@ const channelApeClient = new ChannelApeClient({
 * logLevel - Level of logs you wish to see from the SDK. Defaults to OFF.
 * maximumRequestRetryTimeout - Number of milliseconds to keep retrying a request for when an undesired response status code is received. Defaults to 180000 (3 minutes). Cannot be set lower than 2000 (2 seconds).
 * minimumRequestRetryRandomDelay - Minimum number of milliseconds to randomly delay by when an undesired response status code is received. Defaults to 1000 (1 second). Cannot be set lower than 1000 (1 second).
-* maximumRequestRetryRandomDelay - Maximum number of milliseconds to randomly delay by when an undesired response status code is received. Defaults to 5000 (5 seconds). Cannot be set higher than 5000 (5 second).
+* maximumRequestRetryRandomDelay - Maximum number of milliseconds to randomly delay by when an undesired response status code is received. Defaults to 5000 (5 seconds). Cannot be set lower than 2000 (2 seconds).
 
 ### Sessions
 
