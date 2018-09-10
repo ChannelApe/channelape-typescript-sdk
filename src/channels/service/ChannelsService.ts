@@ -4,7 +4,7 @@ import Version from '../../model/Version';
 import ChannelApeApiErrorResponse from './../../model/ChannelApeApiErrorResponse';
 import RequestClientWrapper from '../../RequestClientWrapper';
 import * as Q from 'q';
-import { AxiosResponse } from '../../../node_modules/axios';
+import { AxiosResponse } from 'axios';
 
 export default class ChannelsService {
 

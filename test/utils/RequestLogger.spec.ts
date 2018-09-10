@@ -4,7 +4,7 @@ import * as Logger from 'channelape-logger';
 
 import RequestLogger from '../../src/utils/RequestLogger';
 import Environment from '../../src/model/Environment';
-import { AxiosRequestConfig } from '../../node_modules/axios';
+import { AxiosRequestConfig } from 'axios';
 
 describe('RequestLogger', () => {
 
