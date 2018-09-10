@@ -9,8 +9,8 @@ import Environment from './model/Environment';
 const MISSING_SESSION_ID_ERROR_MESSAGE = 'sessionId is required.';
 const MINIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_SMALL_ERROR_MESSAGE =
   'minimumRequestRetryRandomDelay must be 1000 or greater';
-const MAXIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_LARGE_ERROR_MESSAGE =
-  'maximumRequestRetryRandomDelay must be 5000 or less';
+const MAXIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_SMALL_ERROR_MESSAGE =
+  'maximumRequestRetryRandomDelay must be 2000 or greater';
 const MINIMUM_REQUEST_RETRY_RANDOM_DELAY_GREATER_THAN_MAXIMUM_REQUEST_RETRY_RANDOM_ERROR_MESSAGE =
   'minimumRequestRetryRandomDelay cannot be greater than maximumRequestRetryRandomDelay';
 const THREE_MINUTES_IN_MS = 180000;
@@ -109,8 +109,8 @@ export default class ChannelApeClient {
       errors.push(MINIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_SMALL_ERROR_MESSAGE);
     }
     if (clientConfiguration.maximumRequestRetryRandomDelay &&
-        clientConfiguration.maximumRequestRetryRandomDelay > FIVE_SECONDS_IN_MS) {
-      errors.push(MAXIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_LARGE_ERROR_MESSAGE);
+        clientConfiguration.maximumRequestRetryRandomDelay < TWO_SECONDS_IN_MS) {
+      errors.push(MAXIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_SMALL_ERROR_MESSAGE);
     }
     if (clientConfiguration.maximumRequestRetryRandomDelay && clientConfiguration.minimumRequestRetryRandomDelay &&
         clientConfiguration.minimumRequestRetryRandomDelay > clientConfiguration.maximumRequestRetryRandomDelay) {
