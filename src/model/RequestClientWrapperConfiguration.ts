@@ -6,6 +6,6 @@ export default interface RequestClientWrapperConfiguration {
   readonly logLevel: LogLevel;
   readonly endpoint: string;
   readonly maximumRequestRetryTimeout: number;
-  readonly jitterDelayMsMinimum: number;
-  readonly jitterDelayMsMaximum: number;
+  readonly minimumRequestRetryRandomDelay: number;
+  readonly maximumRequestRetryRandomDelay: number;
 }

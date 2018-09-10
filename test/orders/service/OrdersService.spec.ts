@@ -29,8 +29,8 @@ const clientWrapper: RequestClientWrapper = new RequestClientWrapper({
   timeout: 60000,
   session: 'valid-session-id',
   logLevel: LogLevel.INFO,
-  jitterDelayMsMinimum: 50,
-  jitterDelayMsMaximum: 50
+  minimumRequestRetryRandomDelay: 50,
+  maximumRequestRetryRandomDelay: 50
 });
 const ordersService: OrdersService = new OrdersService(clientWrapper);
 
@@ -323,8 +323,8 @@ Code: 12 Message: Invalid authorization token. Please check the server logs and 
         timeout: 60000,
         session: 'valid-session-id',
         logLevel: LogLevel.INFO,
-        jitterDelayMsMinimum: 50,
-        jitterDelayMsMaximum: 50
+        minimumRequestRetryRandomDelay: 50,
+        maximumRequestRetryRandomDelay: 50
       });
       const ordersService: OrdersService = new OrdersService(client);
       const orderId = 'not-a-real-order-id';
@@ -344,8 +344,8 @@ Code: 12 Message: Invalid authorization token. Please check the server logs and 
         timeout: 60000,
         session: 'valid-session-id',
         logLevel: LogLevel.INFO,
-        jitterDelayMsMinimum: 50,
-        jitterDelayMsMaximum: 50
+        minimumRequestRetryRandomDelay: 50,
+        maximumRequestRetryRandomDelay: 50
       });
       const expectedErrorMessage =
 `get /v1/orders

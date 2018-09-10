@@ -59,8 +59,8 @@ export default class ChannelApeClient {
       logLevel: this.logLevel,
       endpoint: this.endpoint,
       maximumRequestRetryTimeout: this.maximumRequestRetryTimeout,
-      jitterDelayMsMinimum: this.minimumRequestRetryRandomDelay,
-      jitterDelayMsMaximum: this.maximumRequestRetryRandomDelay
+      minimumRequestRetryRandomDelay: this.minimumRequestRetryRandomDelay,
+      maximumRequestRetryRandomDelay: this.maximumRequestRetryRandomDelay
     });
     this.actionsService = new ActionsService(this.requestClientWrapper);
     this.channelsService = new ChannelsService(this.requestClientWrapper);

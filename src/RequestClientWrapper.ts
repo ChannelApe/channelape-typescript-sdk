@@ -199,8 +199,9 @@ export default class RequestClientWrapper {
   }
 
   private getJitterDelayMs(): number {
-    const range = (this.requestClientWrapperConfiguration.jitterDelayMsMaximum -
-      this.requestClientWrapperConfiguration.jitterDelayMsMinimum) + 1;
-    return (Math.floor(Math.random() * (range))) + this.requestClientWrapperConfiguration.jitterDelayMsMinimum;
+    const range = (this.requestClientWrapperConfiguration.maximumRequestRetryRandomDelay -
+      this.requestClientWrapperConfiguration.minimumRequestRetryRandomDelay) + 1;
+    return (Math.floor(Math.random() * (range))) +
+      this.requestClientWrapperConfiguration.minimumRequestRetryRandomDelay;
   }
 }

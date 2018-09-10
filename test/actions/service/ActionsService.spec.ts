@@ -24,8 +24,8 @@ describe('Actions Service', () => {
         timeout: 60000,
         session: 'valid-session-id',
         logLevel: LogLevel.INFO,
-        jitterDelayMsMinimum: 50,
-        jitterDelayMsMaximum: 50
+        minimumRequestRetryRandomDelay: 50,
+        maximumRequestRetryRandomDelay: 50
       });
 
     let sandbox: sinon.SinonSandbox;

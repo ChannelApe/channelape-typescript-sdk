@@ -38,8 +38,8 @@ describe('RequestClientWrapper', () => {
         timeout: 60000,
         session: 'valid-session-id',
         logLevel: LogLevel.INFO,
-        jitterDelayMsMinimum: JITTER_DELAY_MIN,
-        jitterDelayMsMaximum: JITTER_DELAY_MAX
+        minimumRequestRetryRandomDelay: JITTER_DELAY_MIN,
+        maximumRequestRetryRandomDelay: JITTER_DELAY_MAX
       });
       done();
     });
