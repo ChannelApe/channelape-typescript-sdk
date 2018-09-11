@@ -6,16 +6,17 @@ import axios from 'axios';
 import SessionsService from './../../../src/sessions/service/SessionsService';
 import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
-import Environment from '../../../src/model/Environment';
 import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
+
+const endpoint = 'https://fake-api.test.com';
 
 describe('Sessions Service', () => {
 
   describe('Given some rest client and session ID ', () => {
     const client: RequestClientWrapper =
       new RequestClientWrapper({
-        endpoint: Environment.STAGING,
+        endpoint,
         maximumRequestRetryTimeout: 10000,
         timeout: 60000,
         session: 'valid-session-id',
