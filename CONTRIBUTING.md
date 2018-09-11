@@ -29,7 +29,7 @@ ChannelApe uses the [gitflow](https://www.atlassian.com/git/tutorials/comparing-
 - Clone the repository locally.
 - New Features/Improvements start from the **'develop'** branch.
 - Hotfixes start from the **'master'** branch.
-- Run ``mvn install `` from the root directory of the project.
+- Run ``npm install `` from the root directory of the project.
 
 
 ## Building and Testing
@@ -40,7 +40,7 @@ ChannelApe uses different types of tests to verify functionality.
 
 #### Running all tests
 
-``mvn install ``
+``npm run test``
 
 #### Coverage
 The goal is to get line and branch coverage to **100%** on new code.
