@@ -1,4 +1,4 @@
-import { LogLevel } from 'channelape-logger';
+import LogLevel from '../model/LogLevel';
 
 export default interface ClientConfiguration {
 
@@ -7,5 +7,7 @@ export default interface ClientConfiguration {
   endpoint?: string;
   logLevel?: LogLevel;
   maximumRequestRetryTimeout?: number;
+  minimumRequestRetryRandomDelay?: number;
+  maximumRequestRetryRandomDelay?: number;
 
 }

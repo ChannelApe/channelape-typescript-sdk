@@ -4,9 +4,8 @@ import ChannelApeClient from '../src/ChannelApeClient';
 import ActionsService from '../src/actions/service/ActionsService';
 import ActionProcessingStatus from '../src/actions/model/ActionProcessingStatus';
 import ChannelsService from '../src/channels/service/ChannelsService';
-import request = require('request');
 import ChannelApeApiErrorResponse from '../src/model/ChannelApeApiErrorResponse';
-import { LogLevel } from 'channelape-logger';
+import LogLevel from '../src/model/LogLevel';
 import Action from '../src/actions/model/Action';
 import Order from '../src/orders/model/Order';
 import Environment from '../src/model/Environment';
@@ -14,14 +13,11 @@ import OrdersService from '../src/orders/service/OrdersService';
 
 import singleOrder from '../test/orders/resources/singleOrder';
 
-let requestSpy: sinon.SinonSpy;
-
 describe('ChannelApe Client', () => {
 
   let sandbox: sinon.SinonSandbox;
   beforeEach((done) => {
-    sandbox = sinon.sandbox.create();
-    requestSpy = sandbox.spy(request, 'defaults');
+    sandbox = sinon.createSandbox();
     done();
   });
 
@@ -47,7 +43,6 @@ describe('ChannelApe Client', () => {
         });
         expect(channelApeClient.LogLevel).to.equal(LogLevel.VERBOSE);
         expect(channelApeClient.LogLevel).to.equal('verbose');
-        expectRequestDefaults(requestSpy);
       });
     });
 
@@ -121,6 +116,64 @@ describe('ChannelApe Client', () => {
       it('Then expect maximumRequestRetryTimeout of 2000 ms', () => {
         expect(channelApeClient.MaximumRequestRetryTimeout).to.equal(2000);
       });
+    });
+  });
+
+  describe('Given client configuration with invalid session ID, ' +
+  'a minimumRequestRetryRandomDelay of 100 and a maximumRequestRetryRandomDelay of 200', () => {
+    it('Should throw an error', () => {
+      try {
+        const channelApeClient = new ChannelApeClient({
+          sessionId: '',
+          minimumRequestRetryRandomDelay: 100,
+          maximumRequestRetryRandomDelay: 200
+        });
+        expect(channelApeClient).to.be.undefined;
+      } catch (e) {
+        expect(e.message).to.equal(`Invalid configuration. sessionId is required.
+minimumRequestRetryRandomDelay must be 1000 or greater
+maximumRequestRetryRandomDelay must be 2000 or greater`);
+      }
+    });
+  });
+
+  describe('Given client configuration with a valid session ID, ' +
+  'a minimumRequestRetryRandomDelay of 1000 and a maximumRequestRetryRandomDelay of 5000', () => {
+    it('Should create the client', () => {
+      const channelApeClient = new ChannelApeClient({
+        sessionId: 'valid-session-d',
+        minimumRequestRetryRandomDelay: 1000,
+        maximumRequestRetryRandomDelay: 5000
+      });
+      expect(channelApeClient).not.to.be.undefined;
+    });
+  });
+
+  describe('Given client configuration with minimumRequestRetryRandomDelay > maximumRequestRetryRandomDelay', () => {
+    it('Should throw an error', () => {
+      try {
+        const channelApeClient = new ChannelApeClient({
+          sessionId: 'valid-session-id',
+          minimumRequestRetryRandomDelay: 3000,
+          maximumRequestRetryRandomDelay: 2000
+        });
+        expect(channelApeClient).to.be.undefined;
+      } catch (e) {
+        expect(e.message).to.equal(
+          `Invalid configuration. minimumRequestRetryRandomDelay cannot be greater than maximumRequestRetryRandomDelay`
+        );
+      }
+    });
+  });
+
+  describe('Given client configuration with a minimumRequestRetryRandomDelay = maximumRequestRetryRandomDelay', () => {
+    it('Should create the client', () => {
+      const channelApeClient = new ChannelApeClient({
+        sessionId: 'valid-session-d',
+        minimumRequestRetryRandomDelay: 2000,
+        maximumRequestRetryRandomDelay: 2000
+      });
+      expect(channelApeClient).not.to.be.undefined;
     });
   });
 
@@ -231,9 +284,3 @@ describe('ChannelApe Client', () => {
   });
 
 });
-
-function expectRequestDefaults(requestSpy: sinon.SinonSpy) {
-  expect(requestSpy.args[0][0].headers['X-Channel-Ape-Authorization-Token'])
-    .to.equal('c478c897-dc1c-4171-a207-9e3af9b23579');
-  expect(requestSpy.args[0][0].json).to.equal(true);
-}

@@ -1,7 +1,8 @@
-import * as request from 'request';
+import { AxiosResponse } from 'axios';
 
 export default interface RequestResponse {
-  error: Error;
-  response: request.Response | undefined;
+  error: Error | undefined;
+  response: AxiosResponse | undefined;
   body: any;
+  code?: string;
 }

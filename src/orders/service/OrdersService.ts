@@ -8,7 +8,7 @@ import OrdersQueryRequestByChannelOrderId from '../model/OrdersQueryRequestByCha
 import LineItem from '../model/LineItem';
 import Fulfillment from '../model/Fulfillment';
 import RequestClientWrapper from '../../RequestClientWrapper';
-import * as request from 'request';
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import Resource from '../../model/Resource';
 import Version from '../../model/Version';
 import RequestCallbackParams from '../../model/RequestCallbackParams';
@@ -53,8 +53,8 @@ export default class OrdersService {
   public update(order: Order): Promise<Order> {
     const deferred = Q.defer<Order>();
     const requestUrl = `${Version.V1}${Resource.ORDERS}/${order.id}`;
-    const options: request.CoreOptions = {
-      body: order
+    const options: AxiosRequestConfig = {
+      data: order
     };
     this.client.put(requestUrl, options, (error, response, body) => {
       this.mapOrderPromise(requestUrl, deferred, error, response, body, EXPECTED_UPDATE_STATUS);
@@ -65,7 +65,7 @@ export default class OrdersService {
   private getByOrderId(orderId: string): Promise<Order> {
     const deferred = Q.defer<Order>();
     const requestUrl = `/${Version.V1}${Resource.ORDERS}/${orderId}`;
-    this.client.get(requestUrl, (error, response, body) => {
+    this.client.get(requestUrl, {}, (error, response, body) => {
       this.mapOrderPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
     });
     return deferred.promise as any;
@@ -81,8 +81,8 @@ export default class OrdersService {
     if (ordersQueryParams.endDate != null && typeof ordersQueryParams.endDate !== 'string') {
       ordersQueryParams.endDate = ordersQueryParams.endDate.toISOString();
     }
-    const options: request.CoreOptions = {
-      qs: ordersQueryParams
+    const options: AxiosRequestConfig = {
+      params: ordersQueryParams
     };
     this.client.get(requestUrl, options, (error, response, body) => {
       const requestResponse: RequestCallbackParams = {
@@ -95,11 +95,11 @@ export default class OrdersService {
     });
   }
 
-  private mapOrderPromise(requestUrl: string, deferred: Q.Deferred<Order>, error: any, response: request.Response,
+  private mapOrderPromise(requestUrl: string, deferred: Q.Deferred<Order>, error: any, response: AxiosResponse,
     body: any, expectedStatusCode: number) {
     if (error) {
       deferred.reject(error);
-    } else if (response.statusCode === expectedStatusCode) {
+    } else if (response.status === expectedStatusCode) {
       const order: Order = this.formatOrder(body);
       deferred.resolve(order);
     } else {
@@ -118,7 +118,7 @@ export default class OrdersService {
   ): void {
     if (requestCallbackParams.error) {
       deferred.reject(requestCallbackParams.error);
-    } else if (requestCallbackParams.response.statusCode === expectedStatusCode) {
+    } else if (requestCallbackParams.response.status === expectedStatusCode) {
       const data: OrdersPage = requestCallbackParams.body as OrdersPage;
       const mergedOrders: Order[] = orders.concat(data.orders);
       if (getSinglePage) {

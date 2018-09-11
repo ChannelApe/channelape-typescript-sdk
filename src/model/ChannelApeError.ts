@@ -1,4 +1,4 @@
-import { Response } from 'request';
+import { AxiosResponse } from 'axios';
 import ChannelApeApiError from '../model/ChannelApeApiError';
 
 export default class ChannelApeError extends Error {
@@ -8,7 +8,7 @@ export default class ChannelApeError extends Error {
 
   constructor(
     message: string,
-    response: Response | undefined,
+    response: AxiosResponse | undefined,
     uri: string,
     apiErrors: ChannelApeApiError[]
   ) {
@@ -18,8 +18,9 @@ export default class ChannelApeError extends Error {
       this.responseStatusCode = -1;
       this.responseStatusMessage = 'There was an error with the API';
     } else {
-      this.responseStatusCode = response.statusCode;
-      this.responseStatusMessage = response.statusMessage;
+      this.responseStatusCode = response.status == null ? -1 : response.status;
+      this.responseStatusMessage = response.statusText == null
+        ? 'There was an error with the API' : response.statusText;
     }
 
     function getMessage(): string {
@@ -31,17 +32,17 @@ export default class ChannelApeError extends Error {
       let method: string;
       let statusCode: number;
       let statusMessage: string;
-      if (typeof response === 'undefined') {
+      if (typeof response === 'undefined' || response.config === undefined) {
         method = '';
         statusCode = 0;
         statusMessage = '';
       } else {
-        method = typeof response.method === 'undefined' ? '' : response.method;
-        statusCode = typeof response.statusCode === 'undefined' ? 0 : response.statusCode;
-        statusMessage = typeof response.statusMessage === 'undefined' ? '' : response.statusMessage;
+        method = typeof response.config.method === 'undefined' ? '' : response.config.method;
+        statusCode = typeof response.status === 'undefined' ? 0 : response.status;
+        statusMessage = typeof response.statusText === 'undefined' ? '' : ` ${response.statusText}`;
       }
       return `${method} ${uri}
-  Status: ${statusCode} ${statusMessage}
+  Status: ${statusCode}${statusMessage}
   Response Body:
   ${ret}`;
     }

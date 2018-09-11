@@ -1,7 +1,8 @@
-import * as request from 'request';
+import { AxiosResponse } from 'axios';
+
 
 export default interface RequestCallbackParams {
   error: any;
-  response: request.Response;
+  response: AxiosResponse;
   body: any;
 }

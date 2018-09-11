@@ -1,23 +1,30 @@
-import { Logger, LogLevel } from 'channelape-logger';
-import { Response, UriOptions, CoreOptions, RequestCallback } from 'request';
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import RequestRetryInfo from '../model/RequestRetryInfo';
 
 export default class RequestLogger {
-  private readonly logger: Logger;
+  private readonly channelapeLogger: any;
+  private logger: any = undefined;
 
-  constructor (logLevel: LogLevel, private readonly endpoint: string) {
-    this.logger = new Logger('ChannelApe API', logLevel);
+  constructor(logLevel: string, private readonly endpoint: string) {
+    try {
+      this.channelapeLogger = require('channelape-logger');
+    } catch (e) {
+      this.channelapeLogger = undefined;
+    }
+    this.getLogger(logLevel);
   }
 
   public logDelay(callCount: number, delay: number, requestRetryInfo: RequestRetryInfo) {
-    this.logger
-      .warn(`DELAYING ${requestRetryInfo.method} ${this.endpoint}${requestRetryInfo.endpoint} for ${delay} ms`);
+    const methodAndUrl = `${requestRetryInfo.method} ${this.endpoint}${requestRetryInfo.endpoint}`;
+    if (this.logger !== undefined) {
+      this.logger.warn(`DELAYING ${methodAndUrl} for ${delay}ms. Delayed ${callCount} times`);
+    }
   }
 
   public logCall(
     method: string,
-    uriOrOptions: string | (UriOptions & CoreOptions),
-    callbackOrOptionsOrUndefined?: RequestCallback | CoreOptions | undefined
+    url: string,
+    options?: AxiosRequestConfig
   ): void {
     let methodToLog: string = '';
     if (typeof method !== 'undefined') {
@@ -25,37 +32,54 @@ export default class RequestLogger {
     }
     let uri: string;
     let queryParams = '';
-    if (typeof uriOrOptions === 'string') {
-      uri = `${this.endpoint}${uriOrOptions}`;
-      if (typeof callbackOrOptionsOrUndefined !== 'undefined' && typeof callbackOrOptionsOrUndefined !== 'function') {
-        queryParams = this.getQueryParamString(callbackOrOptionsOrUndefined.qs);
-      }
-    } else {
-      uri = `${this.endpoint}${uriOrOptions.uri.toString()}`;
-      queryParams = this.getQueryParamString(uriOrOptions.qs);
+    uri = `${this.endpoint}${url}`;
+    if (options !== undefined) {
+      queryParams = this.getQueryParamString(options.params);
     }
-    this.logger.info(`${methodToLog} ${uri}${queryParams} -- STARTED`);
+    if (this.logger !== undefined) {
+      this.logger.info(`${methodToLog} ${uri}${queryParams} -- STARTED`);
+    }
   }
 
-  public logResponse(error: any, response: Response | undefined, body: any | undefined): void {
+  public logResponse(
+    error: any,
+    response: AxiosResponse | undefined | null,
+    body: any | undefined,
+    code?: string | undefined
+  ): void {
     let errorMessage: string;
     let infoMessage = '';
-    if (typeof response !== 'undefined' && typeof response.request !== 'undefined') {
-      if (!this.responseIsLevel200(response.statusCode)) {
-        const errorMessage =
-          `${response.request.method} ${response.request.href} ` +
-          `-- FAILED WITH STATUS: ${response.statusCode} and BODY OF: ${JSON.stringify(body)}`;
+    if (code && response) {
+      const errorMessage =
+        `${response.config.method} ${response.config.url} ` +
+        `-- FAILED WITH STATUS: ${code}`;
+      if (this.logger !== undefined) {
         this.logger.warn(errorMessage);
+      }
+    } else if (response != null && typeof response.config !== 'undefined') {
+      if (!this.responseIsLevel200(response.status)) {
+        const errorMessage =
+          `${response.config.method} ${response.config.url} ` +
+          `-- FAILED WITH STATUS: ${response.status} and BODY OF: ${JSON.stringify(body)}`;
+        if (this.logger !== undefined) {
+          this.logger.warn(errorMessage);
+        }
       } else {
-        infoMessage = `${response.request.method} ${response.request.href} -- COMPLETED`;
+        infoMessage = `${response.config.method} ${response.config.url} -- COMPLETED`;
       }
     }
-    if (infoMessage !== '') {
+    if (infoMessage !== '' && this.logger) {
       this.logger.info(infoMessage);
     }
-    if (error != null) {
+    if (error != null && this.logger !== undefined) {
       errorMessage = error.message;
       this.logger.error(errorMessage);
+    }
+  }
+
+  public logCallbackError(error: Error): void {
+    if (this.logger !== undefined) {
+      this.logger.error(`Your callback threw the following uncaught error: ${error}`);
     }
   }
 
@@ -74,5 +98,11 @@ export default class RequestLogger {
       return `${k}=${params[k]}`;
     }).join('&');
     return `?${queryParams}`;
+  }
+
+  private getLogger(logLevel: string): void {
+    if (this.channelapeLogger !== undefined) {
+      this.logger = new this.channelapeLogger.Logger('ChannelApe API', logLevel);
+    }
   }
 }

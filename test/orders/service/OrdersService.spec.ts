@@ -1,11 +1,10 @@
 import OrdersService from './../../../src/orders/service/OrdersService';
-import * as sinon from 'sinon';
 import Order from '../../../src/orders/model/Order';
 import { expect } from 'chai';
-import * as request from 'request';
-import { LogLevel } from 'channelape-logger';
+import axios from 'axios';
+import axiosMockAdapter from 'axios-mock-adapter';
+import LogLevel from '../../../src/model/LogLevel';
 import Environment from '../../../src/model/Environment';
-import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import ChannelApeError from '../../../src/model/ChannelApeError';
 import OrdersQueryRequestByBusinessId from '../../../src/orders/model/OrdersQueryRequestByBusinessId';
 import OrdersQueryRequestByChannelOrderId from '../../../src/orders/model/OrdersQueryRequestByChannelOrderId';
@@ -24,164 +23,100 @@ import multipleOrders from '../resources/multipleOrders';
 
 const maximumRequestRetryTimeout = 3000;
 
+const clientWrapper: RequestClientWrapper = new RequestClientWrapper({
+  maximumRequestRetryTimeout,
+  endpoint: Environment.STAGING,
+  timeout: 60000,
+  session: 'valid-session-id',
+  logLevel: LogLevel.INFO,
+  minimumRequestRetryRandomDelay: 50,
+  maximumRequestRetryRandomDelay: 50
+});
+const ordersService: OrdersService = new OrdersService(clientWrapper);
+
 describe('OrdersService', () => {
-
   describe('Given some valid rest client', () => {
-    const client = request.defaults({
-      baseUrl: Environment.STAGING,
-      timeout: 60000,
-      json: true,
-      headers: {
-        'X-Channel-Ape-Authorization-Token': 'valid-session-id'
-      }
-    });
-    const clientWrapper: RequestClientWrapper =
-      new RequestClientWrapper(client, LogLevel.OFF, Environment.STAGING, maximumRequestRetryTimeout);
-
-    let sandbox: sinon.SinonSandbox;
-
-    const expectedChannelApeErrorResponse : ChannelApeApiErrorResponse = {
-      statusCode: 404,
-      errors: [
-        {
-          code: 174,
-          message: 'Order could not be found.'
-        }
-      ]
-    };
-
-    beforeEach((done) => {
-      sandbox = sinon.sandbox.create();
-      done();
-    });
-
-    afterEach((done) => {
-      sandbox.restore();
-      done();
-    });
-
     it(`And valid orderId
             When retrieving order Then return resolved promise with order`, () => {
-      const response = {
-        statusCode: 200
-      };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
-          .yields(null, response, singleOrder);
-
-      const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onGet(`${Environment.STAGING}/${Version.V1}${Resource.ORDERS}/${orderId}`)
+        .reply(200, singleOrder);
+
       return ordersService.get(orderId).then((actualOrder) => {
         expect(actualOrder.id).to.equal(orderId);
         expect(typeof actualOrder.totalShippingTax).to.equal('undefined');
         expect(typeof actualOrder.canceledAt).to.equal('undefined');
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ORDERS}/${orderId}`);
       });
     });
 
     it(`And valid orderId for canceled order
           When retrieving order then return resolved promise with order and correct dates`, () => {
-      const response = {
-        statusCode: 200
-      };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
-        .yields(null, response, singleCanceledOrder);
-
-      const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = '06b70c49-a13e-42ca-a490-404d29c7fa46';
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+
+      mockedAxiosAdapter.onGet(`${Environment.STAGING}/${Version.V1}${Resource.ORDERS}/${orderId}`)
+        .reply(200, singleCanceledOrder);
+
       return ordersService.get(orderId).then((actualOrder) => {
         expect(actualOrder.id).to.equal(orderId);
         expect(actualOrder.totalShippingTax).to.equal(2);
         expect(actualOrder.lineItems.length).to.equal(3);
         expect(actualOrder.lineItems[0].price).to.equal(15.99);
-        if (typeof actualOrder.canceledAt !== 'undefined') {
-          expect(actualOrder.canceledAt.getDate()).to.equal(5);
-        } else {
-          throw new Error('canceled at should not be undefined');
-        }
-        if (typeof actualOrder.fulfillments === 'undefined') {
-          throw new Error('fulfillments length should be 0');
-        }
-        expect(actualOrder.fulfillments.length).to.equal(0);
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ORDERS}/${orderId}`);
+        expect(actualOrder.canceledAt!.getDate()).to.equal(5);
+        expect(actualOrder.fulfillments!.length).to.equal(0);
       });
     });
 
     it(`And valid orderId for order with one line item and fulfillment
           When retrieving order then return resolved promise with order with line item and one fulfillment`, () => {
-      const response = {
-        statusCode: 200
-      };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
-        .yields(null, response, singleOrderWithOneLineItemAndOneFulfillment);
-
-      const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = '06b70c49-a13e-42ca-a490-404d29c7fa46';
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+
+      mockedAxiosAdapter.onAny()
+        .reply(200, singleOrderWithOneLineItemAndOneFulfillment);
+
       return ordersService.get(orderId).then((actualOrder) => {
         expect(actualOrder.lineItems.length).to.equal(1);
-        if (typeof actualOrder.fulfillments === 'undefined') {
-          throw new Error('fulfillments length should be 1');
-        }
-        expect(actualOrder.fulfillments.length).to.equal(1);
-
-        const fulfillment1 = actualOrder.fulfillments[0];
-        if (typeof fulfillment1.trackingUrls === 'undefined') {
-          throw new Error('tracking urls for fulfillment 1 length should be 1');
-        }
-        expect(fulfillment1.trackingUrls.length).to.equal(2);
+        expect(actualOrder.fulfillments!.length).to.equal(1);
+        const fulfillment1 = actualOrder.fulfillments![0];
+        expect(fulfillment1.trackingUrls!.length).to.equal(2);
         expect(fulfillment1.trackingUrls).to.contain('https://ups1.com/tracking-url1');
         expect(fulfillment1.trackingUrls).to.contain('https://ups1.com/tracking-url2');
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ORDERS}/${orderId}`);
       });
     });
 
     it(`And valid orderId for closed order with fulfillment
           When retrieving order then return resolved promise with closed order with fulfillment`, () => {
-      const response = {
-        statusCode: 200
-      };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
-        .yields(null, response, singleClosedOrderWithFulfillments);
-
-      const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = '9dc34b92-70d1-42d8-8b4e-ae7fb3deca70';
-      return ordersService.get(orderId).then((actualOrder) => {
-        if (typeof actualOrder.fulfillments === 'undefined') {
-          throw new Error('fulfillments length should be 0');
-        }
-        expect(actualOrder.fulfillments.length).to.equal(1);
-        expect(actualOrder.fulfillments[0].lineItems.length).to.equal(6);
-        expect(actualOrder.fulfillments[0].lineItems[0].price).to.equal(15.91);
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onGet(`${Environment.STAGING}/${Version.V1}${Resource.ORDERS}/${orderId}`)
+        .reply(200, singleClosedOrderWithFulfillments);
 
-        const fulfillment1 = actualOrder.fulfillments[0];
-        if (typeof fulfillment1.trackingUrls === 'undefined') {
-          throw new Error('tracking urls for fulfillment 1 length should be 1');
-        }
-        expect(fulfillment1.trackingUrls.length).to.equal(2);
+      return ordersService.get(orderId).then((actualOrder) => {
+        expect(actualOrder.fulfillments!.length).to.equal(1);
+        expect(actualOrder.fulfillments![0].lineItems.length).to.equal(6);
+        expect(actualOrder.fulfillments![0].lineItems[0].price).to.equal(15.91);
+
+        const fulfillment1 = actualOrder.fulfillments![0];
+        expect(fulfillment1.trackingUrls!.length).to.equal(2);
         expect(fulfillment1.trackingUrls).to.contain('https://ups1.com/tracking-url1');
         expect(fulfillment1.trackingUrls).to.contain('https://ups1.com/tracking-url2');
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ORDERS}/${orderId}`);
       });
     });
 
     it(`And invalid orderId
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
-      const response = {
-        method: 'GET',
-        statusCode: 404,
-        statusMessage: 'Not Found',
-        body: {
-          errors: [
-            {
-              code: 174,
-              message: 'Order could not be found.'
-            }
-          ]
-        }
-      };
-      sandbox.stub(client, 'get')
-          .yields(null, response, expectedChannelApeErrorResponse);
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onGet().reply(404, {
+        errors: [
+          {
+            code: 174,
+            message: 'Order could not be found.'
+          }
+        ]
+      });
 
-      const ordersService: OrdersService = new OrdersService(clientWrapper);
       const orderId = 'not-a-real-order-id';
       return ordersService.get(orderId).then((actualOrder) => {
         throw new Error('Test failed!');
@@ -193,18 +128,14 @@ describe('OrdersService', () => {
 
     it(`And valid businessId and channelOrderId
             When retrieving order Then return resolved promise with order`, () => {
-      const response = {
-        statusCode: 200
-      };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
-          .yields(null, response, {
-            orders: [singleOrder],
-            pagination: {
-              lastPage: true
-            }
-          });
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onGet(`${Environment.STAGING}/${Version.V1}/orders`).reply(200, {
+        orders: [singleOrder],
+        pagination: {
+          lastPage: true
+        }
+      });
 
-      const ordersService: OrdersService = new OrdersService(clientWrapper);
       const channelOrderId = '314980073478';
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestOptions: OrdersQueryRequestByChannelOrderId = {
@@ -216,64 +147,72 @@ describe('OrdersService', () => {
         expect(actualOrders.length).to.equal(1);
         expect(actualOrders[0].channelOrderId).to.equal(channelOrderId);
         expect(actualOrders[0].businessId).to.equal(businessId);
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}/orders`);
       });
     });
 
     it(`And valid businessId, start date, and end date
             When retrieving orders Then return resolved promise with orders`, () => {
-
-      const response = {
-        statusCode: 200
-      };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
-          .yields(null, response, {
-            orders: multipleOrders,
-            pagination: {
-              lastPage: true
-            }
-          });
-
-      const ordersService: OrdersService = new OrdersService(clientWrapper);
+      const startDate = '2018-05-01T18:07:58.009Z';
+      const endDate = '2018-05-07T18:07:58.009Z';
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
+
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onGet(
+        `${Environment.STAGING}/${Version.V1}/orders`,
+        {
+          params: {
+            startDate,
+            endDate,
+            businessId
+          }
+        }
+      ).reply(200, {
+        orders: multipleOrders,
+        pagination: {
+          lastPage: true
+        }
+      });
+
       const requestOptions: OrdersQueryRequestByBusinessId = {
         businessId,
-        startDate: new Date('2018-05-01T18:07:58.009Z'),
-        endDate: new Date('2018-05-07T18:07:58.009Z')
+        startDate: new Date(startDate),
+        endDate: new Date(endDate)
       };
       return ordersService.get(requestOptions).then((actualOrders) => {
         expect(actualOrders).to.be.an('array');
         expect(actualOrders.length).to.equal(2);
         expect(actualOrders[0].businessId).to.equal(businessId);
-        expect(clientGetStub.args[0][1].qs.startDate).to.equal('2018-05-01T18:07:58.009Z');
-        expect(clientGetStub.args[0][1].qs.endDate).to.equal('2018-05-07T18:07:58.009Z');
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}/orders`);
       });
     });
 
     it(`And valid businessId with multiple pages of orders
             When retrieving orders Then return resolved promise with all orders`, () => {
 
-      const response = {
-        statusCode: 200
-      };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
-      clientGetStub.onFirstCall()
-        .yields(null, response, {
+      const responses = [{
+        status: 200,
+        config: {},
+        data: {
           orders: multipleOrders,
           pagination: {
             lastPage: false
           }
-        });
-      clientGetStub.onSecondCall()
-        .yields(null, response, {
+        }
+      }, {
+        status: 200,
+        config: {},
+        data: {
           orders: multipleOrders,
           pagination: {
             lastPage: true
           }
-        });
+        }
+      }];
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onGet(`${Environment.STAGING}/${Version.V1}/orders`).reply(() => {
+        const response = responses.shift();
+        return Promise.resolve([response!.status, response!.data]);
+      });
 
-      const ordersService: OrdersService = new OrdersService(clientWrapper);
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestOptions: OrdersQueryRequestByBusinessId = {
         businessId
@@ -282,9 +221,6 @@ describe('OrdersService', () => {
         expect(actualOrders).to.be.an('array');
         expect(actualOrders.length).to.equal(4);
         expect(actualOrders[0].businessId).to.equal(businessId);
-        expect(typeof clientGetStub.args[0][1].qs.startDate).to.equal('undefined');
-        expect(typeof clientGetStub.args[0][1].qs.endDate).to.equal('undefined');
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}/orders`);
       });
     });
 
@@ -292,20 +228,14 @@ describe('OrdersService', () => {
         and the singlePage option set to true
             When retrieving orders
             Then return resolved promise with a single page of orders`, () => {
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onGet(`${Environment.STAGING}/${Version.V1}/orders`).reply(200, {
+        orders: multipleOrders,
+        pagination: {
+          lastPage: false
+        }
+      });
 
-      const response = {
-        statusCode: 200
-      };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get');
-      clientGetStub.onFirstCall()
-        .yields(null, response, {
-          orders: multipleOrders,
-          pagination: {
-            lastPage: false
-          }
-        });
-
-      const ordersService: OrdersService = new OrdersService(clientWrapper);
       const expectedBusinessId = '4d688534-d82e-4111-940c-322ba9aec108';
       const requestOptions: (OrdersQueryRequestByBusinessId) = {
         businessId: 'something'
@@ -313,40 +243,26 @@ describe('OrdersService', () => {
       return ordersService.getPage(requestOptions).then((actualOrdersResponse) => {
         expect(actualOrdersResponse.orders.length).to.equal(2);
         expect(actualOrdersResponse.orders[0].businessId).to.equal(expectedBusinessId);
-        expect(typeof clientGetStub.args[0][1].qs.startDate).to.equal('undefined');
-        expect(typeof clientGetStub.args[0][1].qs.endDate).to.equal('undefined');
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}/orders`);
-        expect(clientGetStub.calledOnce).to.be.true;
         expect(actualOrdersResponse.pagination.lastPage).to.be.false;
       });
     });
 
     it(`And invalid businessId
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
-      const response = {
-        statusCode: 404
-      };
-      const expectedChannelApeBusinessNotFoundError: ChannelApeApiErrorResponse = {
-        statusCode: 404,
-        errors:[
-          {
-            code: 15,
-            message: 'Requested business cannot be found.'
-          }
-        ]
-      };
       // tslint:disable:no-trailing-whitespace
       const expectedErrorMessage =
-` /v1/orders
-  Status: 404 
+`get /v1/orders
+  Status: 404
   Response Body:
-  404 undefined
+  Request failed with status code 404
 Code: 15 Message: Requested business cannot be found.`;
       // tslint:enable:no-trailing-whitespace
-      sandbox.stub(client, 'get')
-          .yields(null, response, expectedChannelApeBusinessNotFoundError);
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onGet().reply(404, {
+        statusCode: 404,
+        errors:[{ code: 15, message: 'Requested business cannot be found.' }]
+      });
 
-      const ordersService: OrdersService = new OrdersService(clientWrapper);
       const businessId = 'not-a-real-business-id';
       const requestOptions: OrdersQueryRequestByBusinessId = {
         businessId
@@ -363,10 +279,7 @@ Code: 15 Message: Requested business cannot be found.`;
           Then return updated order`, () => {
       const order: Order = singleOrderToUpdate;
       order.id = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
-      if (typeof order.fulfillments === 'undefined') {
-        throw new Error('fulfillments length should be 0');
-      }
-      order.fulfillments.push({
+      order.fulfillments!.push({
         additionalFields: [
           {
             name: 'some-addtl-field',
@@ -377,51 +290,42 @@ Code: 15 Message: Requested business cannot be found.`;
         lineItems: order.lineItems,
         status: FulfillmentStatus.OPEN
       });
-      const response = {
-        statusCode: 202
-      };
-      const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put')
-          .yields(null, response, singleOrderToUpdateResponse);
-      const ordersService: OrdersService = new OrdersService(clientWrapper);
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onPut(`${Environment.STAGING}/${Version.V1}${Resource.ORDERS}/${order.id}`)
+        .reply(202, singleOrderToUpdateResponse);
+
       return ordersService.update(order).then((actualOrder) => {
         expect(actualOrder.id).to.equal(order.id);
-        if (typeof actualOrder.fulfillments === 'undefined') {
-          throw new Error('fulfillments length should be 0');
-        }
-        expect(actualOrder.fulfillments.length).to.equal(1);
-        expect(actualOrder.fulfillments[0].lineItems.length).to.equal(2);
-        expect(actualOrder.fulfillments[0].lineItems[0].sku).to.equal('b4809155-1c5d-4b3b-affc-491ad5503007');
-        expect(clientPutStub.args[0][0]).to.equal(`${Version.V1}${Resource.ORDERS}/${order.id}`);
+        expect(actualOrder.fulfillments!.length).to.equal(1);
+        expect(actualOrder.fulfillments![0].lineItems.length).to.equal(2);
+        expect(actualOrder.fulfillments![0].lineItems[0].sku).to.equal('b4809155-1c5d-4b3b-affc-491ad5503007');
       });
     });
   });
 
   describe('Given some invalid rest client', () => {
-    const client: RequestClientWrapper =
-    new RequestClientWrapper(
-      request.defaults({
-        baseUrl: 'this-is-not-a-real-base-url',
-        timeout: 60000,
-        json: true,
-        headers: {
-          'X-Channel-Ape-Authorization-Token': 'valid-session-id'
-        }
-      }),
-      LogLevel.OFF,
-      Environment.STAGING,
-      maximumRequestRetryTimeout
-    );
-
     it(`And invalid orderId
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
-      // tslint:disable:no-trailing-whitespace
       const expectedErrorMessage =
-` /v1/orders/not-a-real-order-id
-  Status: 0 
+`get /v1/orders/not-a-real-order-id
+  Status: 401
   Response Body:
-  Invalid URI "this-is-not-a-real-base-url/v1/orders/not-a-real-order-id"
-Code: -1 Message: Invalid URI "this-is-not-a-real-base-url/v1/orders/not-a-real-order-id"`;
-      // tslint:enable:no-trailing-whitespace
+  Request failed with status code 401
+Code: 12 Message: Invalid authorization token. Please check the server logs and try again`;
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onGet().reply(401,
+        { errors:
+          [{ code: 12, message: 'Invalid authorization token. Please check the server logs and try again' }]
+        });
+      const client: RequestClientWrapper = new RequestClientWrapper({
+        endpoint: 'this-is-not-a-real-base-url',
+        maximumRequestRetryTimeout: 10000,
+        timeout: 60000,
+        session: 'valid-session-id',
+        logLevel: LogLevel.INFO,
+        minimumRequestRetryRandomDelay: 50,
+        maximumRequestRetryRandomDelay: 50
+      });
       const ordersService: OrdersService = new OrdersService(client);
       const orderId = 'not-a-real-order-id';
       return ordersService.get(orderId).then((actualOrder) => {
@@ -434,14 +338,21 @@ Code: -1 Message: Invalid URI "this-is-not-a-real-base-url/v1/orders/not-a-real-
 
     it(`And invalid businessId
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
-      // tslint:disable:no-trailing-whitespace
+      const client: RequestClientWrapper = new RequestClientWrapper({
+        endpoint: 'this-is-not-a-real-base-url',
+        maximumRequestRetryTimeout: 10000,
+        timeout: 60000,
+        session: 'valid-session-id',
+        logLevel: LogLevel.INFO,
+        minimumRequestRetryRandomDelay: 50,
+        maximumRequestRetryRandomDelay: 50
+      });
       const expectedErrorMessage =
-` /v1/orders
-  Status: 0 
+`get /v1/orders
+  Status: 401
   Response Body:
-  Invalid URI "this-is-not-a-real-base-url/v1/orders"
-Code: -1 Message: Invalid URI "this-is-not-a-real-base-url/v1/orders"`;
-      // tslint:enable:no-trailing-whitespace
+  Request failed with status code 401
+Code: 12 Message: Invalid authorization token. Please check the server logs and try again`;
       const ordersService: OrdersService = new OrdersService(client);
       const businessId = 'not-a-real-business-id';
       const requestOptions: OrdersQueryRequestByBusinessId = {

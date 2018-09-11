@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import * as request from 'request';
-import { LogLevel } from 'channelape-logger';
+import LogLevel from '../../../src/model/LogLevel';
 import ChannelsService from './../../../src/channels/service/ChannelsService';
 import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
@@ -14,16 +13,15 @@ describe('Channels Service', () => {
 
   describe('Given some rest client', () => {
     const client: RequestClientWrapper =
-      new RequestClientWrapper(
-        request.defaults({
-          baseUrl: Environment.STAGING,
-          timeout: 60000,
-          json: true
-        }),
-        LogLevel.OFF,
-        Environment.STAGING,
-        10000
-      );
+      new RequestClientWrapper({
+        endpoint: Environment.STAGING,
+        maximumRequestRetryTimeout: 10000,
+        timeout: 60000,
+        session: 'valid-session-id',
+        logLevel: LogLevel.INFO,
+        minimumRequestRetryRandomDelay: 50,
+        maximumRequestRetryRandomDelay: 50
+      });
 
     let sandbox: sinon.SinonSandbox;
 
@@ -55,7 +53,7 @@ describe('Channels Service', () => {
       updatedAt: new Date('2018-04-02T13:04:27.299Z')
     };
 
-    const expectedChannelApeErrorResponse : ChannelApeApiErrorResponse = {
+    const expectedChannelApeErrorResponse: ChannelApeApiErrorResponse = {
       statusCode: 404,
       errors: [
         {
@@ -70,7 +68,7 @@ describe('Channels Service', () => {
     };
 
     beforeEach((done) => {
-      sandbox = sinon.sandbox.create();
+      sandbox = sinon.createSandbox();
       done();
     });
 
@@ -83,10 +81,13 @@ describe('Channels Service', () => {
       'When retrieving channel Then return resolved promise with channel', () => {
 
       const response = {
-        statusCode: 200
+        status: 200,
+        config: {
+          method: 'GET'
+        }
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
-          .yields(null, response, expectedChannel);
+        .yields(null, response, expectedChannel);
 
       const channelsService: ChannelsService = new ChannelsService(client);
       return channelsService.get(expectedChannel.id).then((actualAction) => {
@@ -111,11 +112,14 @@ describe('Channels Service', () => {
     });
 
     it('And invalid channel ID ' +
-    'When retrieving channel Then return a rejected promise with 404 status code ' +
-    'And channel not found error message', () => {
+      'When retrieving channel Then return a rejected promise with 404 status code ' +
+      'And channel not found error message', () => {
 
       const response = {
-        statusCode: 404
+        status: 404,
+        config: {
+          method: 'GET'
+        }
       };
       const clientGetStub = sandbox.stub(client, 'get')
         .yields(null, response, expectedChannelApeErrorResponse);

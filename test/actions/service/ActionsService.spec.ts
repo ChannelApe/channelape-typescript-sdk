@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import * as request from 'request';
-import { LogLevel } from 'channelape-logger';
+import LogLevel from '../../../src/model/LogLevel';
 import ActionsService from './../../../src/actions/service/ActionsService';
 import ActionsQueryRequest from '../../../src/actions/model/ActionsQueryRequest';
 import Version from '../../../src/model/Version';
@@ -19,16 +18,15 @@ describe('Actions Service', () => {
 
   describe('Given some rest client', () => {
     const client: RequestClientWrapper =
-      new RequestClientWrapper(
-        request.defaults({
-          baseUrl: Environment.STAGING,
-          timeout: 60000,
-          json: true
-        }),
-        LogLevel.OFF,
-        Environment.STAGING,
-        10000
-      );
+      new RequestClientWrapper({
+        endpoint: Environment.STAGING,
+        maximumRequestRetryTimeout: 10000,
+        timeout: 60000,
+        session: 'valid-session-id',
+        logLevel: LogLevel.INFO,
+        minimumRequestRetryRandomDelay: 50,
+        maximumRequestRetryRandomDelay: 50
+      });
 
     let sandbox: sinon.SinonSandbox;
 
@@ -74,7 +72,7 @@ describe('Actions Service', () => {
     };
 
     beforeEach((done) => {
-      sandbox = sinon.sandbox.create();
+      sandbox = sinon.createSandbox();
       done();
     });
 
@@ -87,7 +85,8 @@ describe('Actions Service', () => {
       'When retrieving action Then return resolved promise with action', () => {
 
       const response = {
-        statusCode: 200
+        status: 200,
+        config: { method: 'GET' }
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
           .yields(null, response, expectedErrorAction);
@@ -120,7 +119,8 @@ describe('Actions Service', () => {
     'And action not found error message', () => {
 
       const response = {
-        statusCode: 404
+        status: 404,
+        config: { method: 'GET' }
       };
       const clientGetStub = sandbox.stub(client, 'get')
         .yields(null, response, expectedChannelApeErrorResponse);
@@ -138,7 +138,8 @@ describe('Actions Service', () => {
     'When updating action health check Then return resolved promise with action', () => {
 
       const response = {
-        statusCode: 200
+        status: 200,
+        config: { method: 'PUT' }
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'put')
           .yields(null, response, expectedCompletedAction);
@@ -179,7 +180,8 @@ describe('Actions Service', () => {
     'And action not found error message', () => {
 
       const response = {
-        statusCode: 404
+        status: 404,
+        config: { method: 'PUT' }
       };
 
       const clientGetStub = sandbox.stub(client, 'put')
@@ -199,7 +201,8 @@ describe('Actions Service', () => {
     'When completing action Then return resolved promise with action', () => {
 
       const response = {
-        statusCode: 200
+        status: 200,
+        config: { method: 'PUT' }
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'put')
           .yields(null, response, expectedCompletedAction);
@@ -236,7 +239,8 @@ describe('Actions Service', () => {
     'And action not found error message', () => {
 
       const response = {
-        statusCode: 404
+        status: 404,
+        config: { method: 'PUT' }
       };
 
       const clientGetStub = sandbox.stub(client, 'put')
@@ -256,7 +260,8 @@ describe('Actions Service', () => {
     'When updating action with error Then return resolved promise with action', () => {
 
       const response = {
-        statusCode: 200
+        status: 200,
+        config: { method: 'PUT' }
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'put')
           .yields(null, response, expectedErrorAction);
@@ -293,7 +298,8 @@ describe('Actions Service', () => {
     'And action not found error message', () => {
 
       const response = {
-        statusCode: 404
+        status: 404,
+        config: { method: 'PUT' }
       };
 
       const clientGetStub = sandbox.stub(client, 'put')
@@ -312,7 +318,8 @@ describe('Actions Service', () => {
     it(`And valid Business ID When retrieving actions Then expect multiple actions to be returned`, () => {
       const clientGetStub = sandbox.stub(client, 'get');
       const response = {
-        statusCode: 200
+        status: 200,
+        config: { method: 'GET' }
       };
       clientGetStub.onFirstCall()
         .yields(null, response, actionsFirstPageResponse);
@@ -329,12 +336,12 @@ describe('Actions Service', () => {
         expect(actualResponse).to.be.an('array');
         expect(actualResponse.length).to.equal(73);
         expect(clientGetStub.args[0][0]).to.equal('/v1/actions');
-        expect(clientGetStub.args[0][1].qs.startDate).to.equal('2018-05-01T18:07:58.009Z');
-        expect(clientGetStub.args[0][1].qs.endDate).to.equal('2018-05-07T18:07:58.009Z');
-        expect(clientGetStub.args[0][1].qs.size).to.equal(50);
-        expect(clientGetStub.args[1][1].qs.startDate).to.equal('2018-05-01T18:07:58.009Z');
-        expect(clientGetStub.args[1][1].qs.endDate).to.equal('2018-05-07T18:07:58.009Z');
-        expect(clientGetStub.args[1][1].qs.size).to.equal(50);
+        expect(clientGetStub.args[0][1].params.startDate).to.equal('2018-05-01T18:07:58.009Z');
+        expect(clientGetStub.args[0][1].params.endDate).to.equal('2018-05-07T18:07:58.009Z');
+        expect(clientGetStub.args[0][1].params.size).to.equal(50);
+        expect(clientGetStub.args[1][1].params.startDate).to.equal('2018-05-01T18:07:58.009Z');
+        expect(clientGetStub.args[1][1].params.endDate).to.equal('2018-05-07T18:07:58.009Z');
+        expect(clientGetStub.args[1][1].params.size).to.equal(50);
       });
     });
 
@@ -343,7 +350,8 @@ describe('Actions Service', () => {
         Then expect a single page of actions to be returned`, () => {
       const clientGetStub = sandbox.stub(client, 'get');
       const response = {
-        statusCode: 200
+        status: 200,
+        config: { method: 'GET' }
       };
       clientGetStub.onFirstCall()
         .yields(null, response, actionsFirstPageResponse);
@@ -358,16 +366,17 @@ describe('Actions Service', () => {
         expect(actualResponse.actions).to.be.an('array');
         expect(actualResponse.actions.length).to.equal(50);
         expect(clientGetStub.args[0][0]).to.equal('/v1/actions');
-        expect(clientGetStub.args[0][1].qs.startDate).to.equal('2018-05-01T18:07:58.009Z');
-        expect(clientGetStub.args[0][1].qs.endDate).to.equal('2018-05-07T18:07:58.009Z');
-        expect(clientGetStub.args[0][1].qs.size).to.equal(50);
+        expect(clientGetStub.args[0][1].params.startDate).to.equal('2018-05-01T18:07:58.009Z');
+        expect(clientGetStub.args[0][1].params.endDate).to.equal('2018-05-07T18:07:58.009Z');
+        expect(clientGetStub.args[0][1].params.size).to.equal(50);
       });
     });
 
     it(`And invalid Business ID when calling getByBusinessId() Then expect ChannelApeError to be returned`, () => {
       const clientGetStub = sandbox.stub(client, 'get');
       const response = {
-        statusCode: 404
+        status: 404,
+        config: { method: 'GET' }
       };
       clientGetStub.yields(null, response, {
         errors: [{
@@ -391,7 +400,8 @@ describe('Actions Service', () => {
     it(`And there is a request error Then expect an error to be returned`, () => {
       const clientGetStub = sandbox.stub(client, 'get');
       const response = {
-        statusCode: 500
+        status: 500,
+        config: { method: 'GET' }
       };
       clientGetStub.yields(new Error('server went away'), response, null);
       const actionsRequest: ActionsQueryRequest = {

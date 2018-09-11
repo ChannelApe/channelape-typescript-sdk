@@ -1,20 +1,29 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import request = require('request');
+import LogLevel from '../../../src/model/LogLevel';
+import axios from 'axios';
+
 import SessionsService from './../../../src/sessions/service/SessionsService';
 import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
-import Environment from '../../../src/model/Environment';
 import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
+import RequestClientWrapper from '../../../src/RequestClientWrapper';
+
+const endpoint = 'https://fake-api.test.com';
 
 describe('Sessions Service', () => {
 
   describe('Given some rest client and session ID ', () => {
-    const client = request.defaults({
-      baseUrl: Environment.STAGING,
-      timeout: 60000,
-      json: true
-    });
+    const client: RequestClientWrapper =
+      new RequestClientWrapper({
+        endpoint,
+        maximumRequestRetryTimeout: 10000,
+        timeout: 60000,
+        session: 'valid-session-id',
+        logLevel: LogLevel.INFO,
+        minimumRequestRetryRandomDelay: 50,
+        maximumRequestRetryRandomDelay: 50
+      });
     const sessionId = 'b40da0b8-a770-4de7-a496-361254bd7d6c';
     const userId = 'f6ed6f7a-47bf-4dd3-baed-71a8a9684e80';
     const sessionsService = new SessionsService(client, sessionId);
@@ -22,7 +31,7 @@ describe('Sessions Service', () => {
     let sandbox: sinon.SinonSandbox;
 
     beforeEach((done) => {
-      sandbox = sinon.sandbox.create();
+      sandbox = sinon.createSandbox();
       done();
     });
 
@@ -40,11 +49,12 @@ describe('Sessions Service', () => {
       };
 
       const response = {
-        statusCode: 200
+        status: 200,
+        config: {},
+        data: expectedResponse
       };
 
-      const clientGetStub = sandbox.stub(client, 'get')
-        .yields(null, response, expectedResponse);
+      const clientGetStub = sandbox.stub(axios, 'get').resolves(response);
 
       return sessionsService.get().then((actualResponse) => {
         expect(clientGetStub.args[0][0])
@@ -75,11 +85,8 @@ describe('Sessions Service', () => {
 
     it('And session ID is invalid ' +
       'When retrieving session Then return rejected promise with 401 ' +
-      'status code and invalid auth error message', (done) => {
+      'status code and invalid auth error message', () => {
 
-      const response = {
-        statusCode: 401
-      };
       const expectedChannelApeApiErrorResponse : ChannelApeApiErrorResponse = {
         statusCode: 401,
         errors: [
@@ -89,22 +96,24 @@ describe('Sessions Service', () => {
           }
         ]
       };
-      const clientGetStub = sandbox.stub(client, 'get')
-        .yields(null, response, expectedChannelApeApiErrorResponse);
+      const response = {
+        status: 401,
+        config: {},
+        data: expectedChannelApeApiErrorResponse
+      };
+      const clientGetStub = sandbox.stub(axios, 'get').resolves(response);
 
-      sessionsService.get().then((actualResponse) => {
+      return sessionsService.get().then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
-      }).catch((e) => {
+      }).catch((actualChannelApeErrorResponse) => {
         expect(clientGetStub.args[0][0])
-            .to.equal(`/${Version.V1}${Resource.SESSIONS}/${sessionId}`);
-        const actualChannelApeErrorResponse = e as ChannelApeApiErrorResponse;
-        expect(actualChannelApeErrorResponse.statusCode).to.equal(401);
-        expect(actualChannelApeErrorResponse.errors.length).to.equal(1);
-        expect(actualChannelApeErrorResponse.errors[0].code)
+          .to.equal(`/${Version.V1}${Resource.SESSIONS}/${sessionId}`);
+        expect(actualChannelApeErrorResponse.responseStatusCode).to.equal(401);
+        expect(actualChannelApeErrorResponse.ApiErrors.length).to.equal(1);
+        expect(actualChannelApeErrorResponse.ApiErrors[0].code)
           .to.equal(expectedChannelApeApiErrorResponse.errors[0].code);
-        expect(actualChannelApeErrorResponse.errors[0].message)
+        expect(actualChannelApeErrorResponse.ApiErrors[0].message)
           .to.equal(expectedChannelApeApiErrorResponse.errors[0].message);
-        done();
       });
     });
   });
