@@ -77,21 +77,68 @@ describe('RequestClientWrapper', () => {
       });
     });
 
-    it('When doing a get() with just options and call back expect data to be returned', (done) => {
-      const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
-      const requestUrl = `/v1/orders`;
-      const options: AxiosRequestConfig = {
-        url: requestUrl,
-        params: {
-          businessId,
-          status: 'OPEN'
-        }
-      };
-      mockedAxios.onAny().reply(200, { orders: multipleOrders });
-      requestClientWrapper.get(options.url!, options, (error, response, body) => {
-        expect(error).to.be.null;
-        expect(body.orders[0].businessId).to.equal(businessId);
-        done();
+    describe('When doing a get() with just options and call back', () => {
+      describe('given no network timeout', () => {
+        it('expect data to be returned', (done) => {
+          const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
+          const requestUrl = `/v1/orders`;
+          const options: AxiosRequestConfig = {
+            url: requestUrl,
+            params: {
+              businessId,
+              status: 'OPEN'
+            }
+          };
+          mockedAxios.onAny().reply(200, { orders: multipleOrders });
+          requestClientWrapper.get(options.url!, options, (error, response, body) => {
+            expect(error).to.be.null;
+            expect(body.orders[0].businessId).to.equal(businessId);
+            done();
+          });
+        });
+      });
+
+      describe('given ChannelApe API times out', () => {
+        it('expect the calls to be retried until config.timeout is exceeded', (done) => {
+          const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
+          const requestUrl = `/v1/orders`;
+          const options: AxiosRequestConfig = {
+            url: requestUrl,
+            params: {
+              businessId,
+              status: 'OPEN'
+            }
+          };
+          mockedAxios.onAny().timeout();
+          requestClientWrapper.get(options.url!, options, (error, response, body) => {
+            expect(error).not.to.be.null;
+            expect(error.message).includes('A problem with the ChannelApe API has been encountered.');
+            expect(error.message).includes('Your request was tried a total of ');
+            done();
+          });
+        });
+      });
+
+      describe('given a low level network error', () => {
+        it('expect the calls to be retried until config.timeout is exceeded', (done) => {
+          const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
+          const requestUrl = `/v1/orders`;
+          const options: AxiosRequestConfig = {
+            url: requestUrl,
+            params: {
+              businessId,
+              status: 'OPEN'
+            }
+          };
+          mockedAxios.onAny().networkError();
+          requestClientWrapper.get(options.url!, options, (error, response, body) => {
+            expect(error).not.to.be.null;
+            expect(error.message).includes('A problem with the ChannelApe API has been encountered.');
+            expect(error.message).includes('Your request was tried a total of ');
+            expect(warnLogSpy.args[0][0]).to.equal('get /v1/orders -- FAILED WITH STATUS: Network Error');
+            done();
+          });
+        });
       });
     });
 

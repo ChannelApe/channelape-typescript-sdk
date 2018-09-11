@@ -41,10 +41,22 @@ export default class RequestLogger {
     }
   }
 
-  public logResponse(error: any, response: AxiosResponse | undefined | null, body: any | undefined): void {
+  public logResponse(
+    error: any,
+    response: AxiosResponse | undefined | null,
+    body: any | undefined,
+    code?: string | undefined
+  ): void {
     let errorMessage: string;
     let infoMessage = '';
-    if (response != null && typeof response.config !== 'undefined') {
+    if (code && response) {
+      const errorMessage =
+        `${response.config.method} ${response.config.url} ` +
+        `-- FAILED WITH STATUS: ${code}`;
+      if (this.logger !== undefined) {
+        this.logger.warn(errorMessage);
+      }
+    } else if (response != null && typeof response.config !== 'undefined') {
       if (!this.responseIsLevel200(response.status)) {
         const errorMessage =
           `${response.config.method} ${response.config.url} ` +

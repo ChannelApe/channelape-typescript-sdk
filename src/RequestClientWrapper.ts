@@ -87,6 +87,13 @@ export default class RequestClientWrapper {
           this.handleResponse(requestResponse, callback, url, callDetails, method);
         })
         .catch((e) => {
+          if (e.code || e.message === 'Network Error') {
+            e.code = e.code ? e.code : e.message;
+            this.handleResponse(
+              { body: {}, error: undefined, response: { config: e.config } as any, code: e.code },
+              callback, url, callDetails, method);
+            return;
+          }
           if (this.shouldRequestBeRetried(e.error, e.response) && e.response) {
             this.handleResponse(e, callback, url, callDetails, method);
           } else {
@@ -119,14 +126,16 @@ export default class RequestClientWrapper {
     callDetails: CallDetails,
     method: HttpRequestMethod
   ): void {
-    this.requestLogger.logResponse(requestResponse.error, requestResponse.response, requestResponse.body);
+    this.requestLogger.logResponse(requestResponse.error, requestResponse.response, requestResponse.body,
+      requestResponse.code);
     let finalError: ChannelApeError | null = null;
     if (this.didRequestTimeout(callDetails.callStart)) {
       const maximumRetryLimitExceededMessage =
         this.getMaximumRetryLimitExceededMessage(callDetails.callStart, callDetails.callCountForThisRequest);
       finalError = new ChannelApeError(maximumRetryLimitExceededMessage, requestResponse.response, uri, []);
     } else if (
-      this.shouldRequestBeRetried(requestResponse.error, requestResponse.response) && requestResponse.response
+      this.shouldRequestBeRetried(
+        requestResponse.error, requestResponse.response, requestResponse.code)
     ) {
       this.retryRequest(method, uri, callback, callDetails);
       return;
@@ -160,7 +169,14 @@ export default class RequestClientWrapper {
     return totalElapsedTime > this.requestClientWrapperConfiguration.maximumRequestRetryTimeout;
   }
 
-  private shouldRequestBeRetried(error: Error | undefined, response: AxiosResponse | undefined): boolean {
+  private shouldRequestBeRetried(
+    error: Error | undefined,
+    response: AxiosResponse | undefined,
+    code?: string
+  ): boolean {
+    if (code && (code === 'ECONNABORTED' || code === 'Network Error')) {
+      return true;
+    }
     if (response == null) {
       return false;
     }
