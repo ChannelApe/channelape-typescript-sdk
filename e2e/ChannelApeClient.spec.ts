@@ -151,11 +151,17 @@ describe('ChannelApe Client', () => {
           const expectedOrderId = '3bc9120d-b706-49cd-ad81-6445ce77d8ad';
           return channelApeClient.orders().get(expectedOrderId).then((actualOrder) => {
             expect(actualOrder.id).to.equal(expectedOrderId);
-            const randomName = Math.random().toString();
-            actualOrder.customer!.name! = randomName;
+            const randomFirstName = Math.random().toString();
+            const randomLastName = Math.random().toString();
+            const fullName = `${randomFirstName} ${randomLastName}`;
+            actualOrder.customer!.firstName! = randomFirstName;
+            actualOrder.customer!.lastName! = randomLastName;
+            actualOrder.customer!.name! = fullName;
             return channelApeClient.orders().update(actualOrder).then((actualUpdatedOrder) => {
-              expect(actualUpdatedOrder.id).to.equal(actualUpdatedOrder);
-              expect(actualUpdatedOrder.customer!.name!).to.equal(randomName);
+              expect(actualUpdatedOrder.id).to.equal(actualUpdatedOrder.id);
+              expect(actualUpdatedOrder.customer!.firstName!).to.equal(randomFirstName);
+              expect(actualUpdatedOrder.customer!.lastName!).to.equal(randomLastName);
+              expect(actualUpdatedOrder.customer!.name!).to.equal(fullName);
             });
           });
         });
