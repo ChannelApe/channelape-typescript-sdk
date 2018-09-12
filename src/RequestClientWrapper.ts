@@ -72,7 +72,7 @@ export default class RequestClientWrapper {
           requestPromise = axios.get(url, options);
           break;
         case HttpRequestMethod.PUT:
-          requestPromise = axios.put(url, undefined, options);
+          requestPromise = axios.put(url, { body: options.data }, options);
           break;
         default:
           throw new ChannelApeError('HTTP Request Method could not be determined', {} as any, '', []);
