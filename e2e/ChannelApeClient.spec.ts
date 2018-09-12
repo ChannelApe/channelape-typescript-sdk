@@ -145,6 +145,23 @@ describe('ChannelApe Client', () => {
       });
     });
 
+    describe('And valid order', () => {
+      context('When updating order', () => {
+        it('Then update the order', () => {
+          const expectedOrderId = '3bc9120d-b706-49cd-ad81-6445ce77d8ad';
+          return channelApeClient.orders().get(expectedOrderId).then((actualOrder) => {
+            expect(actualOrder.id).to.equal(expectedOrderId);
+            const randomName = Math.random().toString();
+            actualOrder.customer!.name! = randomName;
+            return channelApeClient.orders().update(actualOrder).then((actualUpdatedOrder) => {
+              expect(actualUpdatedOrder.id).to.equal(actualUpdatedOrder);
+              expect(actualUpdatedOrder.customer!.name!).to.equal(randomName);
+            });
+          });
+        });
+      });
+    });
+
     describe('And valid business ID', () => {
       describe('And a startDate of "2018-03-29T17:00:51.000Z" and an endDate of "2018-08-23T12:41:33.000Z"', () => {
         context('When retrieving orders', () => {
