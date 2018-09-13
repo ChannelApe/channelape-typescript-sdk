@@ -90,6 +90,20 @@ describe('ChannelApe Client', () => {
       });
     });
 
+    describe('And valid action ID for action with completed processing status', () => {
+      context('When updating action', () => {
+        it('Then expect action already completed', () => {
+          const expectedActionId = '4da63571-a4c5-4774-ae20-4fee24ab98e5';
+          return channelApeClient.actions().updateHealthCheck(expectedActionId).then((actualAction) => {
+            throw new Error('Should not have succeeded');
+          })
+          .catch((e) => {
+            expect(e.message).includes('Action has already been completed');
+          });
+        });
+      });
+    });
+
     describe('And valid channel ID', () => {
       context('When retrieving channel', () => {
         it('Then return channel', () => {
@@ -140,6 +154,29 @@ describe('ChannelApe Client', () => {
             expect(actualOrder.lineItems[0].title).to.equal('Generic Steel Shirt');
             const expectedCreatedAt = new Date('2018-05-23T15:31:14.126Z');
             expect(actualOrder.createdAt.toISOString()).to.equal(expectedCreatedAt.toISOString());
+          });
+        });
+      });
+    });
+
+    describe('And valid order', () => {
+      context('When updating order', () => {
+        it('Then update the order', () => {
+          const expectedOrderId = '3bc9120d-b706-49cd-ad81-6445ce77d8ad';
+          return channelApeClient.orders().get(expectedOrderId).then((actualOrder) => {
+            expect(actualOrder.id).to.equal(expectedOrderId);
+            const randomFirstName = Math.random().toString();
+            const randomLastName = Math.random().toString();
+            const fullName = `${randomFirstName} ${randomLastName}`;
+            actualOrder.customer!.firstName! = randomFirstName;
+            actualOrder.customer!.lastName! = randomLastName;
+            actualOrder.customer!.name! = fullName;
+            return channelApeClient.orders().update(actualOrder).then((actualUpdatedOrder) => {
+              expect(actualUpdatedOrder.id).to.equal(actualUpdatedOrder.id);
+              expect(actualUpdatedOrder.customer!.firstName!).to.equal(randomFirstName);
+              expect(actualUpdatedOrder.customer!.lastName!).to.equal(randomLastName);
+              expect(actualUpdatedOrder.customer!.name!).to.equal(fullName);
+            });
           });
         });
       });
@@ -220,7 +257,7 @@ describe('ChannelApe Client', () => {
     if (Array.isArray(actualChannelApeErrors)) {
       expect(expectedChannelApeErrors.length).to.equal(actualChannelApeErrors.length,
         'expected and actual ChannelApeError arrays are different sizes, expected: '
-        + JSON.stringify(expectedChannelApeErrors) + ', actual: ' + JSON.stringify(actualChannelApeErrors));
+        + `${JSON.stringify(expectedChannelApeErrors)}, actual: ${JSON.stringify(actualChannelApeErrors)}`);
 
       expectedChannelApeErrors
         .sort((leftChannelApeError, rightChannelApeError) => leftChannelApeError.code - rightChannelApeError.code);
@@ -230,9 +267,9 @@ describe('ChannelApe Client', () => {
       expectedChannelApeErrors.forEach((expectedChannelApeError, index) => {
         const actualChannelApeError = actualChannelApeErrors[index];
         expect(actualChannelApeError.code).to.equal(expectedChannelApeError.code,
-          'Unexpected code for ChannelApeError at index ' + index);
+          `Unexpected code for ChannelApeError at index ${index}`);
         expect(actualChannelApeError.message).to.equal(expectedChannelApeError.message,
-          'Unexpected message for ChannelApeError at index ' + index);
+          `Unexpected message for ChannelApeError at index ${index}`);
       });
 
     } else if (expectedChannelApeErrors.length > 0) {

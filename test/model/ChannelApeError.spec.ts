@@ -46,7 +46,7 @@ Code: 99 Message: The API could not handle your request`;
     });
   });
 
-  context(`given an unrecoverable error occurred with the ChannelApe API`, () => {
+  context('given an unrecoverable error occurred with the ChannelApe API', () => {
     it('should return error with status code of -1 and status message of "There was an error with the API"', () => {
       const cae = new ChannelApeError('This is an error', undefined as any, 'www.ca.com', []);
       expect(cae.Response.statusCode).to.equal(-1);
@@ -54,7 +54,7 @@ Code: 99 Message: The API could not handle your request`;
     });
   });
 
-  context(`given an empty response from the ChannelApe API`, () => {
+  context('given an empty response from the ChannelApe API', () => {
     it('should return error with status code of -1 and status message of "There was an error with the API"', () => {
       const cae = new ChannelApeError('This is an error', {} as any, 'www.ca.com', []);
       expect(cae.Response.statusCode).to.equal(-1);

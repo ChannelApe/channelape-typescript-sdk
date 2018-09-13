@@ -315,7 +315,7 @@ describe('Actions Service', () => {
       });
     });
 
-    it(`And valid Business ID When retrieving actions Then expect multiple actions to be returned`, () => {
+    it('And valid Business ID When retrieving actions Then expect multiple actions to be returned', () => {
       const clientGetStub = sandbox.stub(client, 'get');
       const response = {
         status: 200,
@@ -372,7 +372,7 @@ describe('Actions Service', () => {
       });
     });
 
-    it(`And invalid Business ID when calling getByBusinessId() Then expect ChannelApeError to be returned`, () => {
+    it('And invalid Business ID when calling getByBusinessId() Then expect ChannelApeError to be returned', () => {
       const clientGetStub = sandbox.stub(client, 'get');
       const response = {
         status: 404,
@@ -397,7 +397,7 @@ describe('Actions Service', () => {
       });
     });
 
-    it(`And there is a request error Then expect an error to be returned`, () => {
+    it('And there is a request error Then expect an error to be returned', () => {
       const clientGetStub = sandbox.stub(client, 'get');
       const response = {
         status: 500,

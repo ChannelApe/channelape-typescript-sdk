@@ -160,7 +160,7 @@ maximumRequestRetryRandomDelay must be 2000 or greater`);
         expect(channelApeClient).to.be.undefined;
       } catch (e) {
         expect(e.message).to.equal(
-          `Invalid configuration. minimumRequestRetryRandomDelay cannot be greater than maximumRequestRetryRandomDelay`
+          'Invalid configuration. minimumRequestRetryRandomDelay cannot be greater than maximumRequestRetryRandomDelay'
         );
       }
     });
