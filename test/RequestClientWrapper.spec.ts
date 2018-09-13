@@ -52,7 +52,14 @@ describe('RequestClientWrapper', () => {
     it('When doing a get() with just a URI and call back expect data to be returned', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
-      mockedAxios.onGet(`${endpoint}${requestUrl}`).reply(200, singleOrder);
+      mockedAxios.onGet(`${endpoint}${requestUrl}`).reply((config) => {
+        expect(config.headers!['X-Channel-Ape-Authorization-Token']).to.equal('valid-session-id');
+        expect(config.headers!['Content-Type']).to.equal('application/json');
+        return [
+          200,
+          singleOrder
+        ];
+      });
       requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
         expect(error).to.be.null;
         expect(body.id).to.equal(orderId);
@@ -62,7 +69,7 @@ describe('RequestClientWrapper', () => {
 
     it('When doing a get() with a URI, options, and call back expect data to be returned', (done) => {
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
-      const requestUrl = `/v1/orders`;
+      const requestUrl = '/v1/orders';
       const options: AxiosRequestConfig = {
         params: {
           businessId,
@@ -81,7 +88,7 @@ describe('RequestClientWrapper', () => {
       describe('given no network timeout', () => {
         it('expect data to be returned', (done) => {
           const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
-          const requestUrl = `/v1/orders`;
+          const requestUrl = '/v1/orders';
           const options: AxiosRequestConfig = {
             url: requestUrl,
             params: {
@@ -101,7 +108,7 @@ describe('RequestClientWrapper', () => {
       describe('given ChannelApe API times out', () => {
         it('expect the calls to be retried until config.timeout is exceeded', (done) => {
           const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
-          const requestUrl = `/v1/orders`;
+          const requestUrl = '/v1/orders';
           const options: AxiosRequestConfig = {
             url: requestUrl,
             params: {
@@ -122,7 +129,7 @@ describe('RequestClientWrapper', () => {
       describe('given a low level network error', () => {
         it('expect the calls to be retried until config.timeout is exceeded', (done) => {
           const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
-          const requestUrl = `/v1/orders`;
+          const requestUrl = '/v1/orders';
           const options: AxiosRequestConfig = {
             url: requestUrl,
             params: {
@@ -239,10 +246,32 @@ Code: 0 Message: You didnt pass any body`;
         data: singleOrderToUpdate,
         method: 'PUT'
       };
-      mockedAxios.onPut(`${endpoint}${requestUrl}`).reply(201, singleOrderToUpdate);
+      mockedAxios.onPut(`${endpoint}${requestUrl}`).reply((config) => {
+        expect(JSON.parse(config.data).body.additionalFields[0].value).to.equal('RRR');
+        return [201, singleOrderToUpdate];
+      });
       requestClientWrapper.put(requestUrl, options, (error, response, body) => {
         expect(error).to.be.null;
         expect(body.additionalFields[0].value).to.equal('RRR');
+        done();
+      });
+    });
+
+    it('When doing a a bodiless put() with a URI, options, and call back expect data to be returned', (done) => {
+      const actionId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      const requestUrl = `/v1/actions/${actionId}/healthcheck`;
+      const options: AxiosRequestConfig = {
+        method: 'PUT'
+      };
+      mockedAxios.onPut(`${endpoint}${requestUrl}`).reply((config) => {
+        expect(JSON.parse(config.data).body).to.equal('');
+        return [
+          201,
+          ''
+        ];
+      });
+      requestClientWrapper.put(requestUrl, options, (error, response, body) => {
+        expect(error).to.be.null;
         done();
       });
     });
@@ -431,7 +460,7 @@ Code: 0 Message: You didnt pass any body`;
       });
     });
 
-    it(`When handling a GET response expect callback with an empty response to be handled gracefully`, (done) => {
+    it('When handling a GET response expect callback with an empty response to be handled gracefully', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
       mockedAxios.onGet().reply(() => Promise.resolve([200, null as any]));
@@ -444,7 +473,7 @@ Code: 0 Message: You didnt pass any body`;
       });
     });
 
-    it(`When handling an axios error ensure proper error handling`, (done) => {
+    it('When handling an axios error ensure proper error handling', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
       const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');

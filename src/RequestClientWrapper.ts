@@ -59,7 +59,10 @@ export default class RequestClientWrapper {
   ): void {
     const callDetails: CallDetails = { options, callStart, callCountForThisRequest: numberOfCalls };
     options.baseURL = this.requestClientWrapperConfiguration.endpoint;
-    options.headers = { 'X-Channel-Ape-Authorization-Token': this.requestClientWrapperConfiguration.session };
+    options.headers = {
+      'X-Channel-Ape-Authorization-Token': this.requestClientWrapperConfiguration.session,
+      'Content-Type': 'application/json'
+    };
     options.timeout = this.requestClientWrapperConfiguration.timeout;
     options.method = method;
     try {
@@ -72,7 +75,8 @@ export default class RequestClientWrapper {
           requestPromise = axios.get(url, options);
           break;
         case HttpRequestMethod.PUT:
-          requestPromise = axios.put(url, undefined, options);
+          const data = options.data === undefined ? '' : options.data;
+          requestPromise = axios.put(url, { body: data }, options);
           break;
         default:
           throw new ChannelApeError('HTTP Request Method could not be determined', {} as any, '', []);
