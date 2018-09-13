@@ -52,7 +52,14 @@ describe('RequestClientWrapper', () => {
     it('When doing a get() with just a URI and call back expect data to be returned', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
-      mockedAxios.onGet(`${endpoint}${requestUrl}`).reply(200, singleOrder);
+      mockedAxios.onGet(`${endpoint}${requestUrl}`).reply((config) => {
+        expect(config.headers!['X-Channel-Ape-Authorization-Token']).to.equal('valid-session-id');
+        expect(config.headers!['Content-Type']).to.equal('application/json');
+        return [
+          200,
+          singleOrder
+        ];
+      });
       requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
         expect(error).to.be.null;
         expect(body.id).to.equal(orderId);
@@ -239,7 +246,10 @@ Code: 0 Message: You didnt pass any body`;
         data: singleOrderToUpdate,
         method: 'PUT'
       };
-      mockedAxios.onPut(`${endpoint}${requestUrl}`).reply(201, singleOrderToUpdate);
+      mockedAxios.onPut(`${endpoint}${requestUrl}`).reply((config) => {
+        expect(JSON.parse(config.data).body.additionalFields[0].value).to.equal('RRR');
+        return [201, singleOrderToUpdate];
+      });
       requestClientWrapper.put(requestUrl, options, (error, response, body) => {
         expect(error).to.be.null;
         expect(body.additionalFields[0].value).to.equal('RRR');
@@ -253,7 +263,13 @@ Code: 0 Message: You didnt pass any body`;
       const options: AxiosRequestConfig = {
         method: 'PUT'
       };
-      mockedAxios.onPut(`${endpoint}${requestUrl}`).reply(201, '');
+      mockedAxios.onPut(`${endpoint}${requestUrl}`).reply((config) => {
+        expect(JSON.parse(config.data).body).to.equal('');
+        return [
+          201,
+          ''
+        ];
+      });
       requestClientWrapper.put(requestUrl, options, (error, response, body) => {
         expect(error).to.be.null;
         done();
