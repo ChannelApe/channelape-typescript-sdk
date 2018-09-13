@@ -257,7 +257,7 @@ describe('ChannelApe Client', () => {
     if (Array.isArray(actualChannelApeErrors)) {
       expect(expectedChannelApeErrors.length).to.equal(actualChannelApeErrors.length,
         'expected and actual ChannelApeError arrays are different sizes, expected: '
-        + JSON.stringify(expectedChannelApeErrors) + ', actual: ' + JSON.stringify(actualChannelApeErrors));
+        + `${JSON.stringify(expectedChannelApeErrors)}, actual: ${JSON.stringify(actualChannelApeErrors)}`);
 
       expectedChannelApeErrors
         .sort((leftChannelApeError, rightChannelApeError) => leftChannelApeError.code - rightChannelApeError.code);
@@ -267,9 +267,9 @@ describe('ChannelApe Client', () => {
       expectedChannelApeErrors.forEach((expectedChannelApeError, index) => {
         const actualChannelApeError = actualChannelApeErrors[index];
         expect(actualChannelApeError.code).to.equal(expectedChannelApeError.code,
-          'Unexpected code for ChannelApeError at index ' + index);
+          `Unexpected code for ChannelApeError at index ${index}`);
         expect(actualChannelApeError.message).to.equal(expectedChannelApeError.message,
-          'Unexpected message for ChannelApeError at index ' + index);
+          `Unexpected message for ChannelApeError at index ${index}`);
       });
 
     } else if (expectedChannelApeErrors.length > 0) {
