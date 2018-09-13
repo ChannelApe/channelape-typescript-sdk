@@ -247,6 +247,19 @@ Code: 0 Message: You didnt pass any body`;
       });
     });
 
+    it('When doing a a bodiless put() with a URI, options, and call back expect data to be returned', (done) => {
+      const actionId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      const requestUrl = `/v1/actions/${actionId}/healthcheck`;
+      const options: AxiosRequestConfig = {
+        method: 'PUT'
+      };
+      mockedAxios.onPut(`${endpoint}${requestUrl}`).reply(201, '');
+      requestClientWrapper.put(requestUrl, options, (error, response, body) => {
+        expect(error).to.be.null;
+        done();
+      });
+    });
+
     it('When doing a put() with just options and call back expect data to be returned', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
