@@ -90,6 +90,20 @@ describe('ChannelApe Client', () => {
       });
     });
 
+    describe.only('And valid action ID for action with completed processing status', () => {
+      context('When updating action', () => {
+        it('Then expect action already completed', () => {
+          const expectedActionId = '4da63571-a4c5-4774-ae20-4fee24ab98e5';
+          return channelApeClient.actions().updateHealthCheck(expectedActionId).then((actualAction) => {
+            throw new Error('Should not have succeeded');
+          })
+          .catch((e) => {
+            expect(e.message).includes('Action has already been completed');
+          });
+        });
+      });
+    });
+
     describe('And valid channel ID', () => {
       context('When retrieving channel', () => {
         it('Then return channel', () => {
