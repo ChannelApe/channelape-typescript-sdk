@@ -17,4 +17,8 @@ describe('OrderStatus', () => {
   it('CANCELED', () => {
     expect(OrderStatus.CANCELED).to.equal('CANCELED');
   });
+
+  it('PENDING', () => {
+    expect(OrderStatus.PENDING).to.equal('PENDING');
+  });
 });
