@@ -8,6 +8,7 @@ import Environment from '../../../src/model/Environment';
 import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import Channel from '../../../src/channels/model/Channel';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
+import { ChannelApeError } from '../../../src/index';
 
 describe('Channels Service', () => {
 
@@ -151,11 +152,10 @@ describe('Channels Service', () => {
       expect(actualChannel.updatedAt.toISOString()).to.equal(expectedChannel.updatedAt.toISOString());
     }
 
-    function expectChannelApeErrorResponse(error: any) {
-      const actualChannelApeErrorResponse = error as ChannelApeApiErrorResponse;
-      expect(actualChannelApeErrorResponse.statusCode).to.equal(404);
-      expect(actualChannelApeErrorResponse.errors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
-      expect(actualChannelApeErrorResponse.errors[0].message)
+    function expectChannelApeErrorResponse(error: ChannelApeError) {
+      expect(error.Response.statusCode).to.equal(404);
+      expect(error.ApiErrors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
+      expect(error.ApiErrors[0].message)
         .to.equal(expectedChannelApeErrorResponse.errors[0].message);
     }
 
