@@ -54,6 +54,7 @@ describe('Index', () => {
 
   it('Expect Channel to be exported', () => {
     const channel: ChannelApe.Channel = {
+      additionalFields: [],
       businessId: 'businessId',
       id: 'id',
       createdAt: new Date(),

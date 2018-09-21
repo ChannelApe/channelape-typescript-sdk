@@ -26,6 +26,7 @@ describe('Channels Service', () => {
     let sandbox: sinon.SinonSandbox;
 
     const expectedChannel: Channel = {
+      additionalFields: [],
       businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4',
       id: '9c728601-0286-457d-b0d6-ec19292d4485',
       enabled: true,
