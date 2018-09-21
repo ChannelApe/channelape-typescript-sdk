@@ -1,3 +1,5 @@
+import OutputFileSettings from './OutputFileSettings';
+
 export default interface ChannelSettings {
 
   allowCreate: boolean;
@@ -7,5 +9,6 @@ export default interface ChannelSettings {
   disableVariants: boolean;
   priceType: string;
   updateFields: string[];
+  outputFile?: OutputFileSettings;
 
 }
