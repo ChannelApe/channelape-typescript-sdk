@@ -1,5 +1,3 @@
-import PaginationQueryRequest from '../../model/PaginationQueryRequest';
-
-export default interface ChannelsQueryRequestByBusinessId extends PaginationQueryRequest {
+export default interface ChannelsQueryRequestByBusinessId {
   businessId: string;
 }
