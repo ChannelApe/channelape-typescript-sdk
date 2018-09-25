@@ -88,6 +88,13 @@ describe('Index', () => {
     expect(channelSettings.allowCreate).to.equal(true);
   });
 
+  it('Expect ChannelsQueryRequestByBusinessId to be exported', () => {
+    const channelsQueryRequestByBusinessId: ChannelApe.ChannelsQueryRequestByBusinessId = {
+      businessId: 'some-business-id'
+    };
+    expect(channelsQueryRequestByBusinessId.businessId).to.equal('some-business-id');
+  });
+
   it('Expect Address to be exported', () => {
     const address: ChannelApe.Address = {
       additionalFields: [],

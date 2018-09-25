@@ -5,6 +5,7 @@ export { default as ActionProcessingStatus } from './actions/model/ActionProcess
 export { default as ActionsQueryRequest } from './actions/model/ActionsQueryRequest';
 export { default as Channel } from './channels/model/Channel';
 export { default as ChannelSettings } from './channels/model/ChannelSettings';
+export { default as ChannelsQueryRequestByBusinessId } from './channels/model/ChannelsQueryRequestByBusinessId';
 export { default as Address } from './orders/model/Address';
 export { default as Customer } from './orders/model/Customer';
 export { default as Fulfillment } from './orders/model/Fulfillment';
