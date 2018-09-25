@@ -297,6 +297,9 @@ describe('ChannelApe Client', () => {
       'title',
       'tags'
     ]);
+    expect(channel.settings.outputFile!.columns).to.be.an('array');
+    expect(channel.settings.outputFile!.columns.length).to.equal(0);
+    expect(channel.settings.outputFile!.header).to.be.true;
     const expectedCreatedAt = new Date('2018-02-22T16:04:29.030Z');
     expect(channel.createdAt.toISOString()).to.equal(expectedCreatedAt.toISOString());
     expect(channel.updatedAt.getUTCMilliseconds())
