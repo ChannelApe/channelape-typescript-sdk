@@ -6,7 +6,7 @@ export default interface LineItem {
   id: string;
   price?: number;
   shippingPrice?: number;
-  shippingtax?: number;
+  shippingTax?: number;
   quantity: number;
   shippingMethod?: string;
   sku?: string;
