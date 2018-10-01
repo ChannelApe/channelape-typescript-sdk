@@ -122,15 +122,15 @@ describe('ChannelApe Client', () => {
           const actualChannelsPromise = channelApeClient.channels().get({
             businessId: expectedBusinessId
           });
-          return actualChannelsPromise.then((actualChannels) => {
-            expect(actualChannels.channels).to.be.an('array');
+          return actualChannelsPromise.then((channels) => {
+            expect(channels).to.be.an('array');
             let i: number;
-            for (i = 0; i < actualChannels.channels.length; i += 1) {
-              if (actualChannels.channels[i].id === '9c728601-0286-457d-b0d6-ec19292d4485') {
+            for (i = 0; i < channels.length; i += 1) {
+              if (channels[i].id === '9c728601-0286-457d-b0d6-ec19292d4485') {
                 break;
               }
             }
-            assertChannelEuropaSportsSnackFoods(actualChannels.channels[i]);
+            assertChannelEuropaSportsSnackFoods(channels[i]);
           });
         });
       });
