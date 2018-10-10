@@ -54,6 +54,7 @@ describe('Index', () => {
 
   it('Expect Channel to be exported', () => {
     const channel: ChannelApe.Channel = {
+      additionalFields: [],
       businessId: 'businessId',
       id: 'id',
       createdAt: new Date(),
@@ -85,6 +86,13 @@ describe('Index', () => {
       updateFields: []
     };
     expect(channelSettings.allowCreate).to.equal(true);
+  });
+
+  it('Expect ChannelsQueryRequestByBusinessId to be exported', () => {
+    const channelsQueryRequestByBusinessId: ChannelApe.ChannelsQueryRequestByBusinessId = {
+      businessId: 'some-business-id'
+    };
+    expect(channelsQueryRequestByBusinessId.businessId).to.equal('some-business-id');
   });
 
   it('Expect Address to be exported', () => {

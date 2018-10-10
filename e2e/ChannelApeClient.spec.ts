@@ -5,6 +5,7 @@ import OrderStatus from '../src/orders/model/OrderStatus';
 import { expect } from 'chai';
 import OrdersQueryRequestByBusinessId from '../src/orders/model/OrdersQueryRequestByBusinessId';
 import { LogLevel } from 'channelape-logger';
+import Channel from '../src/channels/model/Channel';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
@@ -109,32 +110,27 @@ describe('ChannelApe Client', () => {
         it('Then return channel', () => {
           const expectedChannelId = '9c728601-0286-457d-b0d6-ec19292d4485';
           const actualChannelPromise = channelApeClient.channels().get(expectedChannelId);
-          return actualChannelPromise.then((actualChannel) => {
-            expect(actualChannel.id).to.equal('9c728601-0286-457d-b0d6-ec19292d4485');
-            expect(actualChannel.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
-            expect(actualChannel.enabled).to.equal(true);
-            expect(actualChannel.integrationId).to.equal('02df0b31-a071-4791-b9c2-aa01e4fb0ce6');
-            expect(actualChannel.name).to.equal('EuropaSports Snacks / Foods');
-            expect(actualChannel.settings.allowCreate).to.equal(false);
-            expect(actualChannel.settings.allowRead).to.equal(true);
-            expect(actualChannel.settings.allowUpdate).to.equal(false);
-            expect(actualChannel.settings.allowDelete).to.equal(false);
-            expect(actualChannel.settings.disableVariants).to.equal(false);
-            expect(actualChannel.settings.priceType).to.equal('retail');
-            expect(actualChannel.settings.updateFields).to.have.same.members([
-              'images',
-              'inventoryQuantity',
-              'vendor',
-              'price',
-              'weight',
-              'description',
-              'title',
-              'tags'
-            ]);
-            const expectedCreatedAt = new Date('2018-02-22T16:04:29.030Z');
-            expect(actualChannel.createdAt.toISOString()).to.equal(expectedCreatedAt.toISOString());
-            expect(actualChannel.updatedAt.getUTCMilliseconds())
-              .to.be.greaterThan(expectedCreatedAt.getUTCMilliseconds());
+          return actualChannelPromise.then(assertChannelEuropaSportsSnackFoods);
+        });
+      });
+    });
+
+    describe('And valid business ID', () => {
+      context('When retrieving channels', () => {
+        it('Then return channels', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const actualChannelsPromise = channelApeClient.channels().get({
+            businessId: expectedBusinessId
+          });
+          return actualChannelsPromise.then((channels) => {
+            expect(channels).to.be.an('array');
+            let i: number;
+            for (i = 0; i < channels.length; i += 1) {
+              if (channels[i].id === '9c728601-0286-457d-b0d6-ec19292d4485') {
+                break;
+              }
+            }
+            assertChannelEuropaSportsSnackFoods(channels[i]);
           });
         });
       });
@@ -278,4 +274,35 @@ describe('ChannelApe Client', () => {
 
   }
 
+  function assertChannelEuropaSportsSnackFoods(channel: Channel) {
+    expect(channel.additionalFields.length).to.equal(0);
+    expect(channel.id).to.equal('9c728601-0286-457d-b0d6-ec19292d4485');
+    expect(channel.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
+    expect(channel.enabled).to.equal(true);
+    expect(channel.integrationId).to.equal('02df0b31-a071-4791-b9c2-aa01e4fb0ce6');
+    expect(channel.name).to.equal('EuropaSports Snacks / Foods');
+    expect(channel.settings.allowCreate).to.equal(false);
+    expect(channel.settings.allowRead).to.equal(true);
+    expect(channel.settings.allowUpdate).to.equal(false);
+    expect(channel.settings.allowDelete).to.equal(false);
+    expect(channel.settings.disableVariants).to.equal(false);
+    expect(channel.settings.priceType).to.equal('retail');
+    expect(channel.settings.updateFields).to.have.same.members([
+      'images',
+      'inventoryQuantity',
+      'vendor',
+      'price',
+      'weight',
+      'description',
+      'title',
+      'tags'
+    ]);
+    expect(channel.settings.outputFile!.columns).to.be.an('array');
+    expect(channel.settings.outputFile!.columns.length).to.equal(0);
+    expect(channel.settings.outputFile!.header).to.be.true;
+    const expectedCreatedAt = new Date('2018-02-22T16:04:29.030Z');
+    expect(channel.createdAt.toISOString()).to.equal(expectedCreatedAt.toISOString());
+    expect(channel.updatedAt.getUTCMilliseconds())
+      .to.be.greaterThan(expectedCreatedAt.getUTCMilliseconds());
+  }
 });

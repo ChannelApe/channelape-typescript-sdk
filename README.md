@@ -96,6 +96,14 @@ channelapeClient.channels().get(channelId)
   });
 ```
 
+#### Get all channels for a business
+```typescript
+channelapeClient.channels().get({ businessId: 'some-valid-business-id' })
+  .then((channels: Channel[]) => {
+    // do what you need to do with channel data here
+  });
+```
+
 ### Orders
 
 #### Get order
