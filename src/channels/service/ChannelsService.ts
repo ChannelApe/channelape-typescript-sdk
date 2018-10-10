@@ -17,9 +17,9 @@ export default class ChannelsService {
   constructor(private readonly client: RequestClientWrapper) { }
 
   public get(channelId: string): Promise<Channel>;
-  public get(channelsQueryRequestByBusinessId: ChannelsQueryRequestByBusinessId): Promise<ChannelsResponse>;
+  public get(channelsQueryRequestByBusinessId: ChannelsQueryRequestByBusinessId): Promise<Channel[]>;
   public get(channelIdOrRequest: string | ChannelsQueryRequestByBusinessId):
-    Promise<Channel> | Promise<ChannelsResponse> {
+    Promise<Channel> | Promise<Channel[]> {
     if (typeof channelIdOrRequest === 'string') {
       return this.getChannelById(channelIdOrRequest);
     }
@@ -35,7 +35,7 @@ export default class ChannelsService {
     return deferred.promise as any;
   }
 
-  private getChannelsByRequest(channelsRequest: ChannelsQueryRequestByBusinessId): Promise<ChannelsResponse> {
+  private getChannelsByRequest(channelsRequest: ChannelsQueryRequestByBusinessId): Promise<Channel[]> {
     return new Promise((resolve) => {
       const requestUrl = `/${Version.V1}${Resource.CHANNELS}`;
       const options: AxiosRequestConfig = {
@@ -69,16 +69,13 @@ export default class ChannelsService {
     requestUrl: string,
     requestCallbackParams: RequestCallbackParams,
     expectedStatusCode: number
-  ): Promise<ChannelsResponse> {
+  ): Promise<Channel[]> {
     return new Promise((resolve, reject) => {
       if (requestCallbackParams.error) {
         reject(requestCallbackParams.error);
       } else if (requestCallbackParams.response.status === expectedStatusCode) {
         const data: ChannelsResponse = requestCallbackParams.body as ChannelsResponse;
-        resolve({
-          channels: data.channels.map(channel => this.formatChannel(channel)),
-          errors: data.errors
-        });
+        resolve(data.channels.map(channel => this.formatChannel(channel)));
       } else {
         const channelApeErrorResponse =
           GenerateApiError(requestUrl, requestCallbackParams.response, requestCallbackParams.body,

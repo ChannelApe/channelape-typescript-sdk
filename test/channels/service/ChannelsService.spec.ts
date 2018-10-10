@@ -151,11 +151,11 @@ describe('Channels Service', () => {
       const channelsService: ChannelsService = new ChannelsService(client);
       return channelsService.get({
         businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4'
-      }).then((actualChannelResponse) => {
+      }).then((actualChannelsResponse) => {
         expect(clientGetStub.args[0][0])
           .to.equal(`/${Version.V1}${Resource.CHANNELS}`);
         expect(clientGetStub.args[0][1].params.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
-        expectChannel(actualChannelResponse.channels[0]);
+        expectChannel(actualChannelsResponse[0]);
       });
     });
 
