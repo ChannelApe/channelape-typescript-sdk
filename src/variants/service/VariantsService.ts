@@ -230,6 +230,6 @@ export default class OrdersService {
       upc: variantSearchDetails.upc,
       vendor: variantSearchDetails.vendor,
       wholesalePrice: parseFloat(variantSearchDetails.wholesalePrice)
-    }
+    };
   }
 }
