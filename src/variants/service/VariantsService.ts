@@ -7,16 +7,27 @@ import Version from '../../model/Version';
 import RequestCallbackParams from '../../model/RequestCallbackParams';
 import GenerateApiError from '../../utils/GenerateApiError';
 import Variant from '../model/Variant';
+import VariantSearchDetails from '../model/VariantSearchDetails';
 import VariantsRequest from '../model/VariantsRequest';
 import VariantsRequestByProductId from '../model/VariantsRequestByProductId';
 import VariantApiResponse from '../model/VariantApiResponse';
 import VariantsApiResponse from '../model/VariantsApiResponse';
+import VariantSearchApiResponse from '../model/VariantSearchApiResponse';
+import VariantSearchDetailsApiResponse from '../model/VariantSearchDetailsApiResponse';
+import VariantsSearchRequestByProductFilterId from '../model/VariantsSearchRequestByProductFilterId';
+import VariantsSearchRequestBySku from '../model/VariantsSearchRequestBySku';
+import VariantsSearchRequestByUpc from '../model/VariantsSearchRequestByUpc';
+import VariantsSearchRequestByVendor from '../model/VariantsSearchRequestByVendor';
 
 const EXPECTED_GET_STATUS = 200;
 const EXPECTED_UPDATE_STATUS = 202;
 const PARSE_INT_RADIX = 10;
 
 type GenericVariantsRequest = VariantsRequest & VariantsRequestByProductId;
+
+type GenericVariantsSearchRequest =
+  VariantsSearchRequestByProductFilterId & VariantsSearchRequestBySku &
+  VariantsSearchRequestByUpc & VariantsSearchRequestByVendor;
 
 export default class OrdersService {
 
@@ -31,6 +42,49 @@ export default class OrdersService {
     } else {
       this.getVariantsByRequest(variantRequest, [], deferred);
     }
+    return deferred.promise as any;
+  }
+
+  public search(variantsSearchRequestByProductFilterId: VariantsSearchRequestByProductFilterId):
+    Promise<VariantSearchDetails[]>;
+  public search(variantsSearchRequestBySku: VariantsSearchRequestBySku): Promise<VariantSearchDetails[]>;
+  public search(variantsSearchRequestByUpc: VariantsSearchRequestByUpc): Promise<VariantSearchDetails[]>;
+  public search(variantsSearchRequestByVendor: VariantsSearchRequestByVendor): Promise<VariantSearchDetails[]>;
+  public search(variantSearchRequest: GenericVariantsSearchRequest): Promise<VariantSearchDetails[]> {
+    const deferred: Q.Deferred<VariantSearchDetails[]> = Q.defer<VariantSearchDetails[]>();
+    const getSinglePage = false;
+    this.getVariantSearchResultsByRequest(variantSearchRequest, [], deferred, getSinglePage);
+    return deferred.promise as any;
+  }
+
+  private getVariantSearchResultsByRequest(
+    variantSearchRequest: GenericVariantsSearchRequest,
+    variantSearchDetails: VariantSearchDetails[],
+    deferred: Q.Deferred<VariantSearchDetails[]>,
+    getSinglePage: boolean
+  ): void {
+    let requestUrl = `${Version.V1}${Resource.PRODUCTS}${Resource.VARIANTS}`;
+    if (variantSearchRequest.vendor) {
+      requestUrl += Resource.VENDORS;
+    }
+    if (variantSearchRequest.sku) {
+      requestUrl += Resource.SKUS;
+    }
+    if (variantSearchRequest.upc) {
+      requestUrl += Resource.UPCS;
+    }
+    const options: AxiosRequestConfig = {
+      params: variantSearchRequest
+    };
+    this.client.get(requestUrl, options, (error, response, body) => {
+      const requestResponse: RequestCallbackParams = {
+        error,
+        response,
+        body
+      };
+      this.mapVariantsSearchPromise(requestUrl, deferred, requestResponse, variantSearchDetails, variantSearchRequest,
+        EXPECTED_GET_STATUS, getSinglePage);
+    });
     return deferred.promise as any;
   }
 
@@ -97,6 +151,43 @@ export default class OrdersService {
     }
   }
 
+  private mapVariantsSearchPromise(
+    requestUrl: string,
+    deferred: Q.Deferred<any>, requestCallbackParams: RequestCallbackParams,
+    variantDetails: VariantSearchDetails[],
+    variantsRequest: GenericVariantsSearchRequest,
+    expectedStatusCode: number,
+    getSinglePage: boolean
+  ): void {
+    if (requestCallbackParams.error) {
+      deferred.reject(requestCallbackParams.error);
+    } else if (requestCallbackParams.response.status === expectedStatusCode) {
+      const data: VariantSearchApiResponse = requestCallbackParams.body as VariantSearchApiResponse;
+      const variantSearchResults = data.variantSearchResults.map(vs => this.formatVariantSearchDetails(vs));
+      const mergedVariantDetails: VariantSearchDetails[] = variantDetails.concat(variantSearchResults);
+      if (getSinglePage) {
+        deferred.resolve({
+          variantSearchResults: mergedVariantDetails,
+          pagination: data.pagination
+        });
+      } else if (data.pagination.lastPage) {
+        const variantSearchDetailsToReturn = mergedVariantDetails;
+        deferred.resolve(variantSearchDetailsToReturn);
+      } else {
+        const newVariantsRequest: GenericVariantsSearchRequest = {
+          ...variantsRequest,
+          lastKey: data.pagination.lastKey
+        };
+        this.getVariantSearchResultsByRequest(newVariantsRequest, mergedVariantDetails, deferred, getSinglePage);
+      }
+    } else {
+      const channelApeErrorResponse =
+        GenerateApiError(requestUrl, requestCallbackParams.response, requestCallbackParams.body,
+            EXPECTED_GET_STATUS);
+      deferred.reject(channelApeErrorResponse);
+    }
+  }
+
   private formatVariant(variant: VariantApiResponse): Variant {
     return {
       additionalFields: variant.additionalFields,
@@ -120,5 +211,25 @@ export default class OrdersService {
       vendor: variant.vendor,
       wholesalePrice: parseFloat(variant.wholesalePrice)
     };
+  }
+
+  private formatVariantSearchDetails(variantSearchDetails: VariantSearchDetailsApiResponse): VariantSearchDetails {
+    return {
+      businessId: variantSearchDetails.businessId,
+      condition: variantSearchDetails.condition,
+      currencyCode: variantSearchDetails.currencyCode,
+      grams: parseInt(variantSearchDetails.grams, PARSE_INT_RADIX),
+      inventoryItemValue: variantSearchDetails.inventoryItemValue,
+      primaryCategory: variantSearchDetails.primaryCategory,
+      productId: variantSearchDetails.productId,
+      quantity: variantSearchDetails.quantity,
+      retailPrice: parseFloat(variantSearchDetails.retailPrice),
+      sku: variantSearchDetails.sku,
+      tags: variantSearchDetails.tags,
+      title: variantSearchDetails.title,
+      upc: variantSearchDetails.upc,
+      vendor: variantSearchDetails.vendor,
+      wholesalePrice: parseFloat(variantSearchDetails.wholesalePrice)
+    }
   }
 }

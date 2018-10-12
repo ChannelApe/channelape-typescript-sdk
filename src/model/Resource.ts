@@ -4,7 +4,10 @@ enum Resource {
   CHANNELS = '/channels',
   ORDERS = '/orders',
   PRODUCTS = '/products',
-  VARIANTS = '/variants'
+  VARIANTS = '/variants',
+  VENDORS = '/vendors',
+  SKUS = '/skus',
+  UPCS = '/upcs'
 }
 
 export default Resource;
