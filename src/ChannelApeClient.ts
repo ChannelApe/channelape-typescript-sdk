@@ -4,6 +4,7 @@ import ActionsService from './actions/service/ActionsService';
 import ChannelsService from './channels/service/ChannelsService';
 import ClientConfiguration from './model/ClientConfiguration';
 import OrdersService from './orders/service/OrdersService';
+import VariantsService from './variants/service/VariantsService';
 import Environment from './model/Environment';
 
 const MISSING_SESSION_ID_ERROR_MESSAGE = 'sessionId is required.';
@@ -30,6 +31,7 @@ export default class ChannelApeClient {
   private readonly actionsService: ActionsService;
   private readonly channelsService: ChannelsService;
   private readonly ordersService: OrdersService;
+  private readonly variantsService: VariantsService;
 
   constructor(clientConfiguration: ClientConfiguration) {
     const configurationErrors = this.validateConfiguration(clientConfiguration);
@@ -65,6 +67,7 @@ export default class ChannelApeClient {
     this.actionsService = new ActionsService(this.requestClientWrapper);
     this.channelsService = new ChannelsService(this.requestClientWrapper);
     this.ordersService = new OrdersService(this.requestClientWrapper);
+    this.variantsService = new VariantsService(this.requestClientWrapper);
   }
 
   get SessionId(): string {
@@ -97,6 +100,10 @@ export default class ChannelApeClient {
 
   orders(): OrdersService {
     return this.ordersService;
+  }
+
+  variants(): VariantsService {
+    return this.variantsService;
   }
 
   private validateConfiguration(clientConfiguration: ClientConfiguration): string | undefined {
