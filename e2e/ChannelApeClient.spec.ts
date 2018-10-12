@@ -6,6 +6,8 @@ import { expect } from 'chai';
 import OrdersQueryRequestByBusinessId from '../src/orders/model/OrdersQueryRequestByBusinessId';
 import { LogLevel } from 'channelape-logger';
 import Channel from '../src/channels/model/Channel';
+import VariantsRequestByProductId from '../src/variants/model/VariantsRequestByProductId';
+import VariantsRequest from '../src/variants/model/VariantsRequest';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
@@ -232,6 +234,42 @@ describe('ChannelApe Client', () => {
                 expect(actualOrders.pagination.lastPage).to.equal(true);
               });
             });
+          });
+        });
+      });
+    });
+
+    describe('And valid productId', () => {
+      context('When retrieving a products variants', () => {
+        it('Then return variants for that product', () => {
+          const expectedProductId = '0744f2de-c62c-4b04-907f-26699463c0bd';
+          const variantsRequestByProductId: VariantsRequestByProductId = {
+            productId: expectedProductId
+          };
+          const actualVariantsPromise = channelApeClient.variants().get(variantsRequestByProductId);
+          return actualVariantsPromise.then((actualVariants) => {
+            expect(actualVariants).to.be.an('array');
+            expect(actualVariants.length).to.equal(6);
+          });
+        });
+      });
+    });
+
+    describe('And valid productId and valid variantId', () => {
+      context('When retrieving a variant', () => {
+        it('Then return that variant', () => {
+          const expectedProductId = '0744f2de-c62c-4b04-907f-26699463c0bd';
+          const expectedSku = '4820203';
+          const variantsRequest: VariantsRequest = {
+            productId: expectedProductId,
+            skuOrUpc: expectedSku
+          };
+          const actualVariantPromise = channelApeClient.variants().get(variantsRequest);
+          return actualVariantPromise.then((actualVariant) => {
+            expect(actualVariant.options.Flavor).to.equal('Chocolate');
+            expect(actualVariant.additionalFields.walmartBrand).to.equal('MusclePharm');
+            expect(actualVariant.retailPrice).to.equal(59.99);
+            expect(actualVariant.title).to.equal('MusclePharm Sport Series Combat XL Mass Gainer');
           });
         });
       });
