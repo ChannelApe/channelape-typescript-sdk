@@ -319,7 +319,7 @@ describe('ChannelApe Client', () => {
             expect(variant!.vendor).to.equal('Caveman Foods');
             expect(variant!.title).to.equal('Caveman Foods Chicken Jerky');
           });
-        }).timeout(10000);
+        }).timeout(25000);
       });
     });
 
@@ -370,11 +370,12 @@ describe('ChannelApe Client', () => {
   });
 
   function getSessionId(): string {
-    const sessionIdEnvironmentVariable = process.env.CHANNEL_APE_SESSION_ID;
-    if (sessionIdEnvironmentVariable == null) {
-      throw new Error('CHANNEL_APE_SESSION_ID environment variable is required.');
-    }
-    return sessionIdEnvironmentVariable;
+    return '2613678b-5900-44b7-b973-ad490c024e97';
+    // const sessionIdEnvironmentVariable = process.env.CHANNEL_APE_SESSION_ID;
+    // if (sessionIdEnvironmentVariable == null) {
+    //   throw new Error('CHANNEL_APE_SESSION_ID environment variable is required.');
+    // }
+    // return sessionIdEnvironmentVariable;
   }
 
   function assertChannelApeErrors(expectedChannelApeErrors: ChannelApeApiError[],
