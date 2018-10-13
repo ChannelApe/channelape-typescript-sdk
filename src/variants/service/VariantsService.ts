@@ -20,7 +20,6 @@ import VariantsSearchRequestByUpc from '../model/VariantsSearchRequestByUpc';
 import VariantsSearchRequestByVendor from '../model/VariantsSearchRequestByVendor';
 
 const EXPECTED_GET_STATUS = 200;
-const EXPECTED_UPDATE_STATUS = 202;
 const PARSE_INT_RADIX = 10;
 
 type GenericVariantsRequest = VariantsRequest & VariantsRequestByProductId;
@@ -125,7 +124,7 @@ export default class OrdersService {
       deferred.resolve(variant);
     } else {
       const channelApeErrorResponse = GenerateApiError(requestUrl, requestResponse.response, requestResponse.body,
-        EXPECTED_UPDATE_STATUS);
+        EXPECTED_GET_STATUS);
       deferred.reject(channelApeErrorResponse);
     }
   }
@@ -146,7 +145,7 @@ export default class OrdersService {
     } else {
       const channelApeErrorResponse =
         GenerateApiError(requestUrl, requestCallbackParams.response, requestCallbackParams.body,
-            EXPECTED_UPDATE_STATUS);
+          EXPECTED_GET_STATUS);
       deferred.reject(channelApeErrorResponse);
     }
   }
