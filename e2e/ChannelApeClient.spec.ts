@@ -319,7 +319,7 @@ describe('ChannelApe Client', () => {
             expect(variant!.vendor).to.equal('Caveman Foods');
             expect(variant!.title).to.equal('Caveman Foods Chicken Jerky');
           });
-        }).timeout(10000);
+        }).timeout(25000);
       });
     });
 
