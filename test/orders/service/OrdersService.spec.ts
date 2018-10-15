@@ -21,7 +21,6 @@ import singleClosedOrderWithFulfillments from '../resources/singleClosedOrderWit
 import singleOrderToUpdate from '../resources/singleOrderToUpdate';
 import singleOrderToUpdateResponse from '../resources/singleOrderToUpdateResponse';
 import multipleOrders from '../resources/multipleOrders';
-import { create } from 'domain';
 
 const maximumRequestRetryTimeout = 3000;
 
