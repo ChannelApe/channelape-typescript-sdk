@@ -8,6 +8,7 @@ import Environment from '../../../src/model/Environment';
 import ChannelApeError from '../../../src/model/ChannelApeError';
 import OrdersQueryRequestByBusinessId from '../../../src/orders/model/OrdersQueryRequestByBusinessId';
 import OrdersQueryRequestByChannelOrderId from '../../../src/orders/model/OrdersQueryRequestByChannelOrderId';
+import OrderCreateRequest from '../../../src/orders/model/OrderCreateRequest';
 import FulfillmentStatus from '../../../src/orders/model/FulfillmentStatus';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import Resource from '../../../src/model/Resource';
@@ -20,6 +21,7 @@ import singleClosedOrderWithFulfillments from '../resources/singleClosedOrderWit
 import singleOrderToUpdate from '../resources/singleOrderToUpdate';
 import singleOrderToUpdateResponse from '../resources/singleOrderToUpdateResponse';
 import multipleOrders from '../resources/multipleOrders';
+import { create } from 'domain';
 
 const maximumRequestRetryTimeout = 3000;
 
@@ -299,6 +301,33 @@ Code: 15 Message: Requested business cannot be found.`;
         expect(actualOrder.fulfillments!.length).to.equal(1);
         expect(actualOrder.fulfillments![0].lineItems.length).to.equal(2);
         expect(actualOrder.fulfillments![0].lineItems[0].sku).to.equal('b4809155-1c5d-4b3b-affc-491ad5503007');
+      });
+    });
+
+    it('And valid OrderCreateRequest when creating an order, Then return created order', () => {
+      const orderCreateRequest: OrderCreateRequest = singleOrder;
+      orderCreateRequest.fulfillments!.push({
+        additionalFields: [
+          {
+            name: 'some-addtl-field',
+            value: 'some-value'
+          }
+        ],
+        id: 'fulfillment-id',
+        lineItems: orderCreateRequest.lineItems,
+        status: FulfillmentStatus.OPEN
+      });
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onPost(`${Environment.STAGING}/${Version.V1}${Resource.ORDERS}`)
+        .reply(202, orderCreateRequest);
+
+      return ordersService.create(orderCreateRequest).then((createdOrder) => {
+        expect(createdOrder.id).to.equal('c0f45529-cbed-4e90-9a38-c208d409ef2a', 'order.id');
+        expect(createdOrder.totalPrice).to.equal(31.93, 'totalPrice');
+        expect(createdOrder.fulfillments!.length).to.equal(1, 'fulfillments.length');
+        expect(createdOrder.fulfillments![0].lineItems.length).to.equal(2, 'fulfillments.lineItems.length');
+        expect(createdOrder.fulfillments![0].lineItems[0].sku)
+          .to.equal('e67f1d90-824a-4941-8497-08d632763c93', 'fulfillments.lineItems.sku');
       });
     });
   });
