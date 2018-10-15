@@ -49,6 +49,17 @@ export default class RequestClientWrapper {
     );
   }
 
+  public post(url: string, params: AxiosRequestConfig, callback: RequestCallback): void {
+    this.makeRequest(
+      HttpRequestMethod.POST,
+      new Date(),
+      0,
+      url,
+      params,
+      callback
+    );
+  }
+
   private makeRequest(
     method: HttpRequestMethod,
     callStart: Date,
