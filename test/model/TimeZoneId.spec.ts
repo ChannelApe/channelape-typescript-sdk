@@ -1,7 +1,7 @@
 import TimeZoneId  from '../../src/model/TimeZoneId';
 import { expect } from 'chai';
 
-describe('Versions', () => {
+describe('TimeZoneId', () => {
   it('Pacific/Midway', () => {
     expect(TimeZoneId.PACIFIC_MIDWAY).to.equal('Pacific/Midway');
   });
