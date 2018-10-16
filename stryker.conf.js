@@ -23,7 +23,9 @@ module.exports = function(config) {
     },
     mutate: [
       "src/**/*.ts",
-      "!src/types/*d.ts"
+      "!src/types/*d.ts",
+      "!src/**/model/*.ts",
+      "!src/model/*.ts"
     ]
   });
 };
