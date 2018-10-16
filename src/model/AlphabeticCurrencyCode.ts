@@ -1,4 +1,4 @@
-const enum AlphabeticCurrencyCode {
+enum AlphabeticCurrencyCode {
   USD = 'USD',
   JPY = 'JPY',
   CNY = 'CNY',

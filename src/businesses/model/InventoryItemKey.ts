@@ -1,4 +1,4 @@
-const enum InventoryItemKey {
+enum InventoryItemKey {
   SKU = 'SKU',
   UPC = 'UPC'
 }

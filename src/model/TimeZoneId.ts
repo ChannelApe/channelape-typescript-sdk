@@ -1,4 +1,4 @@
-const enum TimeZoneId {
+enum TimeZoneId {
   PACIFIC_MIDWAY = 'Pacific/Midway',
   PACIFIC_NIUE = 'Pacific/Niue',
   PACIFIC_PAGO_PAGO = 'Pacific/Pago_Pago',
