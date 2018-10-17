@@ -28,7 +28,7 @@ type GenericVariantsSearchRequest =
   VariantsSearchRequestByProductFilterId & VariantsSearchRequestBySku &
   VariantsSearchRequestByUpc & VariantsSearchRequestByVendor;
 
-export default class OrdersService {
+export default class VariantsService {
 
   constructor(private readonly client: RequestClientWrapper) { }
 
