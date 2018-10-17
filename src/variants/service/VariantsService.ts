@@ -36,7 +36,7 @@ export default class VariantsService {
   public get(variantsRequestByProductId: VariantsRequestByProductId): Promise<Variant[]>;
   public get(variantRequest: GenericVariantsRequest): Promise<Variant> | Promise<Variant[]> {
     const deferred: Q.Deferred<Variant[]> = Q.defer<Variant[]>();
-    if (variantRequest.skuOrUpc) {
+    if (variantRequest.inventoryItemValue) {
       this.getVariantByRequest(variantRequest, deferred);
     } else {
       this.getVariantsByRequest(variantRequest, [], deferred);
@@ -88,8 +88,8 @@ export default class VariantsService {
   }
 
   private getVariantByRequest(variantRequest: VariantsRequest, deferred: Q.Deferred<any>): void {
-    const requestUrl =
-      `/${Version.V1}${Resource.PRODUCTS}/${variantRequest.productId}${Resource.VARIANTS}/${variantRequest.skuOrUpc}`;
+    const requestUrl = `/${Version.V1}${Resource.PRODUCTS}/${variantRequest.productId}${Resource.VARIANTS}/` +
+      `${variantRequest.inventoryItemValue}`;
     const options: AxiosRequestConfig = { };
     this.client.get(requestUrl, options, (error, response, body) => {
       const requestResponse: RequestCallbackParams = {
