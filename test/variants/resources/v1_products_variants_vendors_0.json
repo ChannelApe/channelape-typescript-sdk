@@ -1,0 +1,38 @@
+{
+  "errors": [],
+  "pagination": {
+    "lastPage": true,
+    "pageSize": 1
+  },
+  "variantSearchResults": [
+    {
+      "productId": "7c43735b-5688-4675-90e9-6bc0c396425a",
+      "inventoryItemValue": "2730117",
+      "businessId": "4baafa5b-4fbf-404e-9766-8a02ad45c3a4",
+      "sku": "2730117",
+      "upc": "748927024524",
+      "title": "Optimum Nutrition Opti-Women",
+      "vendor": "Optimum Nutrition",
+      "condition": "NEW",
+      "primaryCategory": "Vitamins / Minerals",
+      "secondaryCategory": "Supplements",
+      "tags": [
+        "FresnoCaliforniaQuantityOnHand_Yes",
+        "EuropaSports",
+        "WalmartCategoryParent_HealthAndBeauty",
+        "CharlotteNorthCarolinaQuantityOnHand_Yes",
+        "LasVegasNevadaQuantityOnHand_Yes",
+        "WindsorConnecticutQuantityOnHand_Yes",
+        "MesquiteTexasQuantityOnHand_Yes",
+        "StrongsvilleOhioQuantityOnHand_Yes",
+        "WalmartCategoryChild_MedicineAndSupplements",
+        "OrlandoFloridaQuantityOnHand_Yes"
+      ],
+      "grams": "172.3651006",
+      "currencyCode": "USD",
+      "retailPrice": "37.99",
+      "wholesalePrice": "18.69",
+      "quantity": 0
+    }
+  ]
+}

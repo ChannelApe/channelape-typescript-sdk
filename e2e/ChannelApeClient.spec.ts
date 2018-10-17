@@ -6,6 +6,13 @@ import { expect } from 'chai';
 import OrdersQueryRequestByBusinessId from '../src/orders/model/OrdersQueryRequestByBusinessId';
 import { LogLevel } from 'channelape-logger';
 import Channel from '../src/channels/model/Channel';
+import VariantsRequestByProductId from '../src/variants/model/VariantsRequestByProductId';
+import VariantsRequest from '../src/variants/model/VariantsRequest';
+import VariantsSearchRequestByProductFilterId from '../src/variants/model/VariantsSearchRequestByProductFilterId';
+import VariantsSearchRequestByVendor from '../src/variants/model/VariantsSearchRequestByVendor';
+import VariantsSearchRequestBySku from '../src/variants/model/VariantsSearchRequestBySku';
+import VariantsSearchRequestByUpc from '../src/variants/model/VariantsSearchRequestByUpc';
+import VariantsSearchRequestByTag from '../src/variants/model/VariantsSearchRequestByTag';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
@@ -237,6 +244,152 @@ describe('ChannelApe Client', () => {
       });
     });
 
+    describe('And valid productId', () => {
+      context('When retrieving a products variants', () => {
+        it('Then return variants for that product', () => {
+          const expectedProductId = '0744f2de-c62c-4b04-907f-26699463c0bd';
+          const variantsRequestByProductId: VariantsRequestByProductId = {
+            productId: expectedProductId
+          };
+          const actualVariantsPromise = channelApeClient.variants().get(variantsRequestByProductId);
+          return actualVariantsPromise.then((actualVariants) => {
+            expect(actualVariants).to.be.an('array');
+            expect(actualVariants.length).to.equal(6);
+          });
+        });
+      });
+    });
+
+    describe('And valid productId and valid variantId', () => {
+      context('When retrieving a variant', () => {
+        it('Then return that variant', () => {
+          const expectedProductId = '0744f2de-c62c-4b04-907f-26699463c0bd';
+          const expectedSku = '4820203';
+          const variantsRequest: VariantsRequest = {
+            productId: expectedProductId,
+            inventoryItemValue: expectedSku
+          };
+          const actualVariantPromise = channelApeClient.variants().get(variantsRequest);
+          return actualVariantPromise.then((actualVariant) => {
+            expect(actualVariant.options.Flavor).to.equal('Chocolate');
+            expect(actualVariant.additionalFields.walmartBrand).to.equal('MusclePharm');
+            expect(actualVariant.retailPrice).to.equal(59.99);
+            expect(actualVariant.title).to.equal('MusclePharm Sport Series Combat XL Mass Gainer');
+          });
+        });
+      });
+    });
+
+    describe('And valid businessId and valid vendor', () => {
+      context('When searching variants', () => {
+        it('Then return variant quick search results', () => {
+          const expectedVendor = 'Optimum Nutrition';
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const expectedSku = '2730117';
+          const variantsRequest: VariantsSearchRequestByVendor = {
+            vendor: expectedVendor,
+            businessId: expectedBusinessId
+          };
+          const actualVariantsPromise = channelApeClient.variants().search(variantsRequest);
+          return actualVariantsPromise.then((actualVariants) => {
+            expect(actualVariants).to.be.an('array');
+            const variant = actualVariants.find(v => v.sku === expectedSku);
+            expect(variant!.businessId).to.equal(expectedBusinessId);
+            expect(variant!.vendor).to.equal(expectedVendor);
+            expect(variant!.title).to.equal('Optimum Nutrition Opti-Women');
+          });
+        });
+      });
+    });
+
+    describe('And valid productFilterId', () => {
+      context('When searching variants', () => {
+        it('Then return variant quick search results', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const expectedProductFilterId = 'f4cf2afd-fc5f-424d-bf45-868b672d77a0';
+          const expectedSku = '6030038';
+          const variantsRequest: VariantsSearchRequestByProductFilterId = {
+            productFilterId: expectedProductFilterId
+          };
+          const actualVariantsPromise = channelApeClient.variants().search(variantsRequest);
+          return actualVariantsPromise.then((actualVariants) => {
+            expect(actualVariants).to.be.an('array');
+            expect(actualVariants.length).to.be.greaterThan(50);
+            const variant = actualVariants.find(v => v.sku === expectedSku);
+            expect(variant!.businessId).to.equal(expectedBusinessId);
+            expect(variant!.vendor).to.equal('Caveman Foods');
+            expect(variant!.title).to.equal('Caveman Foods Chicken Jerky');
+          });
+        }).timeout(25000);
+      });
+    });
+
+    describe('And valid businessId and valid sku', () => {
+      context('When searching variants', () => {
+        it('Then return variant quick search results', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const expectedSku = '6030038';
+          const variantsRequest: VariantsSearchRequestBySku = {
+            sku: expectedSku,
+            businessId: expectedBusinessId
+          };
+          const actualVariantsPromise = channelApeClient.variants().search(variantsRequest);
+          return actualVariantsPromise.then((actualVariants) => {
+            expect(actualVariants).to.be.an('array');
+            expect(actualVariants.length).to.equal(1);
+            const variant = actualVariants.find(v => v.sku === expectedSku);
+            expect(variant!.businessId).to.equal(expectedBusinessId);
+            expect(variant!.vendor).to.equal('Caveman Foods');
+            expect(variant!.title).to.equal('Caveman Foods Chicken Jerky');
+          });
+        });
+      });
+    });
+
+    describe('And valid businessId and valid upc', () => {
+      context('When searching variants', () => {
+        it('Then return variant quick search results', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const expectedUpc = '853385003971';
+          const variantsRequest: VariantsSearchRequestByUpc = {
+            upc: expectedUpc,
+            businessId: expectedBusinessId
+          };
+          const actualVariantsPromise = channelApeClient.variants().search(variantsRequest);
+          return actualVariantsPromise.then((actualVariants) => {
+            expect(actualVariants).to.be.an('array');
+            expect(actualVariants.length).to.equal(1);
+            const variant = actualVariants.find(v => v.upc === expectedUpc);
+            expect(variant!.businessId).to.equal(expectedBusinessId);
+            expect(variant!.vendor).to.equal('Caveman Foods');
+            expect(variant!.title).to.equal('Caveman Foods Chicken Jerky');
+          });
+        });
+      });
+    });
+
+    describe('And valid businessId and valid tag', () => {
+      context('When searching variants', () => {
+        it('Then return variant quick search results', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const expectedProductId = '00050387-9bb1-4587-becc-ff951981d0f8';
+          const expectedTag = 'FresnoCaliforniaQuantityOnHand_Yes';
+          const variantsRequest: VariantsSearchRequestByTag = {
+            tag: expectedTag,
+            businessId: expectedBusinessId
+          };
+          const actualVariantsPromise = channelApeClient.variants().search(variantsRequest);
+          return actualVariantsPromise.then((actualVariants) => {
+            expect(actualVariants).to.be.an('array');
+            const variant = actualVariants.find(v => v.productId === expectedProductId);
+            expect(variant!.businessId).to.equal(expectedBusinessId);
+            expect(variant!.vendor).to.equal('Caveman Foods');
+            expect(variant!.title).to.equal('Caveman Foods Chicken Jerky2');
+            expect(variant!.tags).to.include(expectedTag);
+          });
+        });
+      });
+    });
   });
 
   function getSessionId(): string {
