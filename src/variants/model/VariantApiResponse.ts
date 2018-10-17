@@ -17,7 +17,8 @@ export default interface VariantApiResponse {
   productId: string;
   quantity: number;
   retailPrice: string;
-  sku: string;
+  sku?: string;
+  upc?: string;
   tags: string[];
   title: string;
   updatedAt: string;

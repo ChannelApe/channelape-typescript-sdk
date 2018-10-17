@@ -18,6 +18,7 @@ export default interface Variant {
   quantity: number;
   retailPrice: number;
   sku: string;
+  upc: string;
   tags: string[];
   title: string;
   updatedAt: Date;
