@@ -140,7 +140,7 @@ describe('VariantsService', () => {
           const expectedSku = '4820203';
           const variantsRequest: VariantsRequest = {
             productId: expectedProductId,
-            skuOrUpc: expectedSku
+            inventoryItemValue: expectedSku
           };
 
           const mockedAxiosAdapter = new axiosMockAdapter(axios);
@@ -164,7 +164,7 @@ describe('VariantsService', () => {
           const expectedSku = '4820203';
           const variantsRequest: VariantsRequest = {
             productId: expectedProductId,
-            skuOrUpc: expectedSku
+            inventoryItemValue: expectedSku
           };
 
           const mockedAxiosAdapter = new axiosMockAdapter(axios);
@@ -185,7 +185,7 @@ describe('VariantsService', () => {
           const expectedSku = '4820203';
           const variantsRequest: VariantsRequest = {
             productId: expectedProductId,
-            skuOrUpc: expectedSku
+            inventoryItemValue: expectedSku
           };
 
           const mockedAxiosAdapter = new axiosMockAdapter(axios);

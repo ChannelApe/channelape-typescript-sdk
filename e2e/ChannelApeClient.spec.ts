@@ -266,7 +266,7 @@ describe('ChannelApe Client', () => {
           const expectedSku = '4820203';
           const variantsRequest: VariantsRequest = {
             productId: expectedProductId,
-            skuOrUpc: expectedSku
+            inventoryItemValue: expectedSku
           };
           const actualVariantPromise = channelApeClient.variants().get(variantsRequest);
           return actualVariantPromise.then((actualVariant) => {
