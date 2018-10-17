@@ -121,3 +121,87 @@ channelapeClient.orders().update(order)
     // do what you need to do with updatedOrder data here
   });
 ```
+
+### Variants
+
+#### Get Variant
+```typescript
+const variantsRequest: VariantsRequest = {
+  productId,
+  inventoryItemValue
+};
+channelApeClient.variants().get(variantsRequest)
+  .then((variant: Variant) => {
+    // do what you need to do with variant data here
+  });
+```
+
+#### Get Variants for a Product
+```typescript
+const variantsRequestByProductId: VariantsRequestByProductId = {
+  productId
+};
+channelApeClient.variants().get(variantsRequestByProductId)
+  .then((variants: Variant[]) => {
+    // do what you need to do with variant array
+  })
+```
+
+#### Get Variant Search Results for a Vendor
+````typescript
+const variantsRequest: VariantsSearchRequestByVendor = {
+  vendor,
+  businessId
+};
+channelApeClient.variants().search(variantsRequest)
+  .then((variantSearchResults: VariantSearchResults[]) => {
+    // do what you need to do with Variant Search Results array
+  });
+````
+
+#### Get Variant Search Results using a Product Filter
+````typescript
+const variantsRequest: VariantsSearchRequestByProductFilterId = {
+  productFilterId
+};
+channelApeClient.variants().search(variantsRequest)
+  .then((variantSearchResults: VariantSearchResults[]) => {
+    // do what you need to do with Variant Search Results array
+  });
+````
+
+#### Get Variant Search Results for a SKU
+````typescript
+const variantsRequest: VariantsSearchRequestBySku = {
+  sku,
+  businessId
+};
+channelApeClient.variants().search(variantsRequest)
+  .then((variantSearchResults: VariantSearchResults[]) => {
+    // do what you need to do with Variant Search Results array
+  });
+````
+
+#### Get Variant Search Results for a UPC
+````typescript
+const variantsRequest: VariantsSearchRequestByUpc = {
+  upc,
+  businessId
+};
+channelApeClient.variants().search(variantsRequest)
+  .then((variantSearchResults: VariantSearchResults[]) => {
+    // do what you need to do with Variant Search Results array
+  });
+````
+
+#### Get Variant Search Results for a Tag
+````typescript
+const variantsRequest: VariantsSearchRequestByTag = {
+  tag,
+  businessId
+};
+channelApeClient.variants().search(variantsRequest)
+  .then((variantSearchResults: VariantSearchResults[]) => {
+    // do what you need to do with Variant Search Results array
+  });
+````
