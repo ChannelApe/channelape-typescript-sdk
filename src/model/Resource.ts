@@ -7,7 +7,8 @@ enum Resource {
   VARIANTS = '/variants',
   VENDORS = '/vendors',
   SKUS = '/skus',
-  UPCS = '/upcs'
+  UPCS = '/upcs',
+  TAGS = '/tags'
 }
 
 export default Resource;

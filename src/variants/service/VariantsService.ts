@@ -18,6 +18,7 @@ import VariantsSearchRequestByProductFilterId from '../model/VariantsSearchReque
 import VariantsSearchRequestBySku from '../model/VariantsSearchRequestBySku';
 import VariantsSearchRequestByUpc from '../model/VariantsSearchRequestByUpc';
 import VariantsSearchRequestByVendor from '../model/VariantsSearchRequestByVendor';
+import VariantsSearchRequestByTag from '../model/VariantsSearchRequestByTag';
 
 const EXPECTED_GET_STATUS = 200;
 const PARSE_INT_RADIX = 10;
@@ -26,7 +27,7 @@ type GenericVariantsRequest = VariantsRequest & VariantsRequestByProductId;
 
 type GenericVariantsSearchRequest =
   VariantsSearchRequestByProductFilterId & VariantsSearchRequestBySku &
-  VariantsSearchRequestByUpc & VariantsSearchRequestByVendor;
+  VariantsSearchRequestByUpc & VariantsSearchRequestByVendor & VariantsSearchRequestByTag;
 
 export default class VariantsService {
 
@@ -49,6 +50,7 @@ export default class VariantsService {
   public search(variantsSearchRequestBySku: VariantsSearchRequestBySku): Promise<VariantSearchDetails[]>;
   public search(variantsSearchRequestByUpc: VariantsSearchRequestByUpc): Promise<VariantSearchDetails[]>;
   public search(variantsSearchRequestByVendor: VariantsSearchRequestByVendor): Promise<VariantSearchDetails[]>;
+  public search(variantsSearchRequestByTag: VariantsSearchRequestByTag): Promise<VariantSearchDetails[]>;
   public search(variantSearchRequest: GenericVariantsSearchRequest): Promise<VariantSearchDetails[]> {
     const deferred: Q.Deferred<VariantSearchDetails[]> = Q.defer<VariantSearchDetails[]>();
     const getSinglePage = false;
@@ -71,6 +73,9 @@ export default class VariantsService {
     }
     if (variantSearchRequest.upc) {
       requestUrl += Resource.UPCS;
+    }
+    if (variantSearchRequest.tag) {
+      requestUrl += Resource.TAGS;
     }
     const options: AxiosRequestConfig = {
       params: variantSearchRequest

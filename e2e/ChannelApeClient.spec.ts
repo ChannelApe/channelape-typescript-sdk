@@ -12,6 +12,7 @@ import VariantsSearchRequestByProductFilterId from '../src/variants/model/Varian
 import VariantsSearchRequestByVendor from '../src/variants/model/VariantsSearchRequestByVendor';
 import VariantsSearchRequestBySku from '../src/variants/model/VariantsSearchRequestBySku';
 import VariantsSearchRequestByUpc from '../src/variants/model/VariantsSearchRequestByUpc';
+import VariantsSearchRequestByTag from '../src/variants/model/VariantsSearchRequestByTag';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
@@ -367,6 +368,28 @@ describe('ChannelApe Client', () => {
       });
     });
 
+    describe('And valid businessId and valid tag', () => {
+      context('When searching variants', () => {
+        it('Then return variant quick search results', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const expectedProductId = '00050387-9bb1-4587-becc-ff951981d0f8';
+          const expectedTag = 'FresnoCaliforniaQuantityOnHand_Yes';
+          const variantsRequest: VariantsSearchRequestByTag = {
+            tag: expectedTag,
+            businessId: expectedBusinessId
+          };
+          const actualVariantsPromise = channelApeClient.variants().search(variantsRequest);
+          return actualVariantsPromise.then((actualVariants) => {
+            expect(actualVariants).to.be.an('array');
+            const variant = actualVariants.find(v => v.productId === expectedProductId);
+            expect(variant!.businessId).to.equal(expectedBusinessId);
+            expect(variant!.vendor).to.equal('Caveman Foods');
+            expect(variant!.title).to.equal('Caveman Foods Chicken Jerky2');
+            expect(variant!.tags).to.include(expectedTag);
+          });
+        });
+      });
+    });
   });
 
   function getSessionId(): string {
