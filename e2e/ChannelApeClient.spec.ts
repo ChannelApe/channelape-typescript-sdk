@@ -213,7 +213,6 @@ describe('ChannelApe Client', () => {
             totalPrice: faker.random.number({ min: 1, max: 700, precision: 2 }),
             alphabeticCurrencyCode: 'USD',
             channelId: expectedChannelId,
-            businessId: expectedBusinessId,
             channelOrderId: expectedChannelOrderId,
             customer: {
               firstName: expectedFirstName,
@@ -239,6 +238,7 @@ describe('ChannelApe Client', () => {
           }
 
           return channelApeClient.orders().create(orderToCreate).then((createdOrder) => {
+            expect(createdOrder.businessId).to.equal(expectedBusinessId);
             expect(createdOrder.totalPrice).to.equal(orderToCreate.totalPrice);
             expect(createdOrder.additionalFields![0].name).to.equal('name');
             expect(createdOrder.additionalFields![0].value)

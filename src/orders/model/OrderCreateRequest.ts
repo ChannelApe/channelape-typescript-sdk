@@ -8,7 +8,6 @@ export default interface OrderCreateRequest {
   additionalFields?: AdditionalField[];
   channelOrderId: string;
   channelId: string;
-  businessId: string;
   purchasedAt: Date;
   canceledAt?: Date;
   canceledReason?: string;
