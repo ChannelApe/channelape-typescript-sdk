@@ -1,4 +1,4 @@
-import InventoryItemKey from './InventoryItemKey';
+import InventoryItemKey from '../../model/InventoryItemKey';
 import ChannelApeApiError from '../../model/ChannelApeApiError';
 import TimeZoneId from '../../model/TimeZoneId';
 import AlphabeticCurrencyCode from '../../model/AlphabeticCurrencyCode';
