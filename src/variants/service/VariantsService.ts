@@ -94,7 +94,7 @@ export default class VariantsService {
 
   private getVariantByRequest(variantRequest: VariantsRequest, deferred: Q.Deferred<any>): void {
     const requestUrl = `/${Version.V1}${Resource.PRODUCTS}/${variantRequest.productId}${Resource.VARIANTS}/` +
-      `${variantRequest.inventoryItemValue}`;
+      `${encodeURIComponent(variantRequest.inventoryItemValue)}`;
     const options: AxiosRequestConfig = { };
     this.client.get(requestUrl, options, (error, response, body) => {
       const requestResponse: RequestCallbackParams = {
