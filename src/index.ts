@@ -3,7 +3,7 @@ export { default as Session } from './sessions/model/Session';
 export { default as Business } from './businesses/model/Business';
 export { default as AlphabeticCurrencyCode } from './model/AlphabeticCurrencyCode';
 export { default as TimeZoneId } from './model/TimeZoneId';
-export { default as InventoryItemKey } from './businesses/model/InventoryItemKey';
+export { default as InventoryItemKey } from './model/InventoryItemKey';
 export { default as Action } from './actions/model/Action';
 export { default as ActionProcessingStatus } from './actions/model/ActionProcessingStatus';
 export { default as ActionsQueryRequest } from './actions/model/ActionsQueryRequest';

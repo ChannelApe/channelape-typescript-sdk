@@ -1,4 +1,4 @@
-import InventoryItemKey from '../../src/businesses/model/InventoryItemKey';
+import InventoryItemKey from '../../src/model/InventoryItemKey';
 import { expect } from 'chai';
 
 describe('InventoryItemKey', () => {
