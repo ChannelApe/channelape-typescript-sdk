@@ -10,7 +10,7 @@ export default interface Variant {
   condition: VariantCondition;
   createdAt: Date;
   description: string;
-  errors: ChannelApeApiError;
+  errors: ChannelApeApiError[];
   grams: number;
   images: string[];
   inventoryItemValue: string;

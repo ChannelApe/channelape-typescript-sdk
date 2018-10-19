@@ -281,7 +281,7 @@ describe('ChannelApe Client', () => {
     describe('And valid business ID', () => {
       describe('And a startDate of "2018-03-29T17:00:51.000Z" and an endDate of "2018-08-23T12:41:33.000Z"', () => {
         context('When retrieving orders', () => {
-          it('Then return the 228 orders between those dates', () => {
+          it('Then return the 229 orders between those dates', () => {
             const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
             const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
               businessId: expectedBusinessId,
@@ -291,7 +291,7 @@ describe('ChannelApe Client', () => {
             const actualOrdersPromise = channelApeClient.orders().get(ordersQueryRequestByBusinessId);
             return actualOrdersPromise.then((actualOrders) => {
               expect(actualOrders).to.be.an('array');
-              expect(actualOrders.length).to.equal(228);
+              expect(actualOrders.length).to.equal(229);
               expect(actualOrders[0].id).to.equal('dda8a05f-d5dd-4535-9261-b55c501085ef');
             });
           });
