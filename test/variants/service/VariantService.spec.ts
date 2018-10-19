@@ -201,6 +201,33 @@ describe('VariantsService', () => {
       });
     });
 
+    describe('And valid productId and valid variantId that needs to be URL encoded', () => {
+      context('When retrieving a variant', () => {
+        it('Then URL encode the variantId and return that variant', () => {
+          const expectedProductId = '0744f2de-c62c-4b04-907f-26699463c0bd';
+          const sku = '317-01-549-10/12';
+          const urlEncodedSku = '317-01-549-10%2F12';
+          const variantsRequest: VariantsRequest = {
+            productId: expectedProductId,
+            inventoryItemValue: sku
+          };
+
+          const mockedAxiosAdapter = new axiosMockAdapter(axios);
+          const baseUrl = `${Environment.STAGING}/${Version.V1}${Resource.PRODUCTS}`;
+          mockedAxiosAdapter.onGet(`${baseUrl}/${expectedProductId}${Resource.VARIANTS}/${urlEncodedSku}`)
+            .reply(200, getVariantResult);
+
+          const actualVariantPromise = variantsService.get(variantsRequest);
+          return actualVariantPromise.then((actualVariant) => {
+            expect(actualVariant.options.Flavor).to.equal('Chocolate');
+            expect(actualVariant.additionalFields.walmartBrand).to.equal('MusclePharm');
+            expect(actualVariant.retailPrice).to.equal(59.99);
+            expect(actualVariant.title).to.equal('MusclePharm Sport Series Combat XL Mass Gainer');
+          });
+        });
+      });
+    });
+
     describe('And valid businessId and valid vendor', () => {
       context('When searching variants', () => {
         it('Then return variant quick search results', () => {
