@@ -10,6 +10,7 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Actions](#actions)
 - [Channels](#channels)
 - [Orders](#orders)
+- [Variants](#variants)
 
 ### Getting Started
 
@@ -121,3 +122,124 @@ channelapeClient.orders().update(order)
     // do what you need to do with updatedOrder data here
   });
 ```
+
+#### Create order
+````typescript
+const orderToCreate: OrderCreateRequest = {
+  additionalFields: [
+    { name: 'name', value: 'CA1001' },
+    { name: 'order_number', value: '1001' }
+  ],
+  totalPrice: 295.99,
+  alphabeticCurrencyCode: 'USD',
+  channelId: 'your-channel-id',
+  channelOrderId: 'specify-your-channel-order-id',
+  customer: {
+    firstName: 'John',
+    lastName: 'Smith',
+    name: 'John Smith',
+    additionalFields: [
+      { name: 'extraCustomerData', value: 'Put whatever you would like here' }
+    ]
+  },
+  status: OrderStatus.OPEN,
+  purchasedAt: new Date(),
+  lineItems: [{
+    id: 'some-line-item-id',
+    quantity: 1,
+    sku: 'NCC1701D',
+    title: 'A model space ship',
+    additionalFields: [
+      { name: 'extraLineItemData', value: 'Put whatever you would like here' }
+    ]
+  }]
+};
+channelapeClient.orders().create(orderCreateRequest)
+  .then((createdOrder: Order) => {
+    // do what you need to do with the createdOrder data here
+  });
+````
+
+### Variants
+
+#### Get Variant
+```typescript
+const variantsRequest: VariantsRequest = {
+  productId,
+  inventoryItemValue
+};
+channelApeClient.variants().get(variantsRequest)
+  .then((variant: Variant) => {
+    // do what you need to do with variant data here
+  });
+```
+
+#### Get Variants for a Product
+```typescript
+const variantsRequestByProductId: VariantsRequestByProductId = {
+  productId
+};
+channelApeClient.variants().get(variantsRequestByProductId)
+  .then((variants: Variant[]) => {
+    // do what you need to do with variant array
+  })
+```
+
+#### Get Variant Search Results for a Vendor
+````typescript
+const variantsRequest: VariantsSearchRequestByVendor = {
+  vendor,
+  businessId
+};
+channelApeClient.variants().search(variantsRequest)
+  .then((variantSearchResults: VariantSearchResults[]) => {
+    // do what you need to do with Variant Search Results array
+  });
+````
+
+#### Get Variant Search Results using a Product Filter
+````typescript
+const variantsRequest: VariantsSearchRequestByProductFilterId = {
+  productFilterId
+};
+channelApeClient.variants().search(variantsRequest)
+  .then((variantSearchResults: VariantSearchResults[]) => {
+    // do what you need to do with Variant Search Results array
+  });
+````
+
+#### Get Variant Search Results for a SKU
+````typescript
+const variantsRequest: VariantsSearchRequestBySku = {
+  sku,
+  businessId
+};
+channelApeClient.variants().search(variantsRequest)
+  .then((variantSearchResults: VariantSearchResults[]) => {
+    // do what you need to do with Variant Search Results array
+  });
+````
+
+#### Get Variant Search Results for a UPC
+````typescript
+const variantsRequest: VariantsSearchRequestByUpc = {
+  upc,
+  businessId
+};
+channelApeClient.variants().search(variantsRequest)
+  .then((variantSearchResults: VariantSearchResults[]) => {
+    // do what you need to do with Variant Search Results array
+  });
+````
+
+#### Get Variant Search Results for a Tag
+````typescript
+const variantsRequest: VariantsSearchRequestByTag = {
+  tag,
+  businessId
+};
+channelApeClient.variants().search(variantsRequest)
+  .then((variantSearchResults: VariantSearchResults[]) => {
+    // do what you need to do with Variant Search Results array
+  });
+````
