@@ -3,6 +3,7 @@ import Fulfillment from './Fulfillment';
 import AdditionalField from '../../model/AdditionalField';
 import OrderStatus from './OrderStatus';
 import Customer from './Customer';
+import Refund from './Refund';
 
 export default interface Order {
   additionalFields?: AdditionalField[];
@@ -26,4 +27,5 @@ export default interface Order {
   alphabeticCurrencyCode: string;
   lineItems: LineItem[];
   fulfillments?: Fulfillment[];
+  refunds?: Refund[];
 }
