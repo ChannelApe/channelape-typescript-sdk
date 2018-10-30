@@ -83,11 +83,30 @@ describe('Businesses Service', () => {
         .yields(null, response, { errors: [], businesses: [expectedBusiness, expectedBusiness2] });
 
       const businessService: BusinessesService = new BusinessesService(client);
-      return businessService.get('valid-user-id').then((actualBusinessesResponse) => {
+      return businessService.get({ userId: 'valid-user-id' }).then((actualBusinessesResponse) => {
         expect(clientGetStub.args[0][0])
           .to.equal(`/${Version.V1}${Resource.BUSINESSES}`);
         expect(clientGetStub.args[0][1].params.userId).to.equal('valid-user-id');
         expectBusiness(actualBusinessesResponse[0]);
+      });
+    });
+
+    it('And valid business ID ' +
+      'When retrieving businesses Then return resolved promise with business', () => {
+
+      const response = {
+        status: 200,
+        config: {
+          method: 'GET'
+        }
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+        .yields(null, response, expectedBusiness);
+
+      const businessService: BusinessesService = new BusinessesService(client);
+      return businessService.get({ businessId: 'valid-business-id' }).then((actualBusinessesResponse) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.BUSINESSES}/valid-business-id`);
+        expectBusiness(actualBusinessesResponse);
       });
     });
 
@@ -98,7 +117,7 @@ describe('Businesses Service', () => {
         .yields(expectedError, null, null);
 
       const businessService: BusinessesService = new BusinessesService(client);
-      return businessService.get('valid-user-id').then((actualResponse) => {
+      return businessService.get({ userId: 'valid-user-id' }).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.BUSINESSES}`);
@@ -120,10 +139,10 @@ describe('Businesses Service', () => {
         .yields(null, response, expectedChannelApeErrorResponse);
 
       const businessService: BusinessesService = new BusinessesService(client);
-      return businessService.get(expectedBusiness.id).then((actualResponse) => {
+      return businessService.get({ businessId: expectedBusiness.id }).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.BUSINESSES}`);
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.BUSINESSES}/${expectedBusiness.id}`);
         expectChannelApeErrorResponse(e);
       });
     });
@@ -142,7 +161,7 @@ describe('Businesses Service', () => {
         .yields(null, response, expectedChannelApeErrorResponse);
 
       const businessService: BusinessesService = new BusinessesService(client);
-      return businessService.get('invalid-user-id').then((actualResponse) => {
+      return businessService.get({ userId: 'invalid-user-id' }).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.BUSINESSES}`);
