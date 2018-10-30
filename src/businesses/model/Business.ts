@@ -5,7 +5,7 @@ import AlphabeticCurrencyCode from '../../model/AlphabeticCurrencyCode';
 
 export default interface Business {
   alphabeticCurrencyCode: AlphabeticCurrencyCode;
-  embeds: any[];
+  embeds: string[];
   errors?: ChannelApeApiError[];
   id: string;
   inventoryItemKey: InventoryItemKey;
