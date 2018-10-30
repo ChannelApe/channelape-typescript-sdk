@@ -163,6 +163,21 @@ describe('ChannelApe Client', () => {
           });
         });
       });
+
+      context('When retrieving order with a refund', () => {
+        it('Then return order', () => {
+          const expectedOrderId = '2a94d852-5b3e-4dd4-ba2b-cec8295f2318';
+          const actualOrderPromise = channelApeClient.orders().get(expectedOrderId);
+          return actualOrderPromise.then((actualOrder) => {
+            expect(actualOrder.id).to.equal(expectedOrderId);
+            expect(actualOrder.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
+            expect(actualOrder.status).to.equal(OrderStatus.OPEN);
+            expect(actualOrder.refunds![0].lineItems[0].quantity).to.equal(2);
+            expect(actualOrder.refunds![0].channelRefundId).to.equal('74273487234');
+            expect(actualOrder.refunds![0].supplierRefundId).to.equal('7348234');
+          });
+        });
+      });
     });
 
     describe('And valid order', () => {
