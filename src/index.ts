@@ -14,6 +14,7 @@ export { default as Address } from './orders/model/Address';
 export { default as Customer } from './orders/model/Customer';
 export { default as Fulfillment } from './orders/model/Fulfillment';
 export { default as LineItem } from './orders/model/LineItem';
+export { default as Refund } from './orders/model/Refund';
 export { default as Order } from './orders/model/Order';
 export { default as OrderCreateRequest } from './orders/model/OrderCreateRequest';
 export { default as OrdersQueryRequestByBusinessId } from './orders/model/OrdersQueryRequestByBusinessId';
