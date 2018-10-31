@@ -498,6 +498,34 @@ describe('ChannelApe Client', () => {
         });
       });
     });
+
+    describe('And valid businessId', () => {
+      context('When retrieving a business', () => {
+        it('Then return the business for that businessId', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const actualBusinessPromise = channelApeClient.businesses().get({ businessId: expectedBusinessId });
+          return actualBusinessPromise.then((actualBusiness) => {
+            expect(actualBusiness.id).to.equal(expectedBusinessId, '');
+          });
+        });
+      });
+    });
+
+    describe('And valid userId', () => {
+      context('When retrieving businesses', () => {
+        it('Then return businesses for that userId', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          return channelApeClient.sessions().get(channelApeClient.SessionId)
+            .then((session) => {
+              const actualBusinessesPromise = channelApeClient.businesses().get({ userId: session.userId });
+              return actualBusinessesPromise.then((actualBusinesses) => {
+                expect(actualBusinesses).to.be.an('array');
+                expect(actualBusinesses.find(b => b.id === expectedBusinessId)!.id).to.equal(expectedBusinessId);
+              });
+            });
+        });
+      });
+    });
   });
 
   function getSessionId(): string {
