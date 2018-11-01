@@ -1,4 +1,5 @@
 import Order from '../model/Order';
+import OrderCreateRequest from '../model/OrderCreateRequest';
 import OrderStatus from '../model/OrderStatus';
 import OrdersPage from '../model/OrdersPage';
 import OrdersQueryRequest from '../model/OrdersQueryRequest';
@@ -16,6 +17,7 @@ import GenerateApiError from '../../utils/GenerateApiError';
 import * as Q from 'q';
 
 const EXPECTED_GET_STATUS = 200;
+const EXPECTED_CREATE_STATUS = 202;
 const EXPECTED_UPDATE_STATUS = 202;
 
 type GenericOrdersQueryRequest =
@@ -62,6 +64,18 @@ export default class OrdersService {
     return deferred.promise as any;
   }
 
+  public create(order: OrderCreateRequest): Promise<Order> {
+    const deferred = Q.defer<Order>();
+    const requestUrl = `${Version.V1}${Resource.ORDERS}`;
+    const options: AxiosRequestConfig = {
+      data: order
+    };
+    this.client.post(requestUrl, options, (error, response, body) => {
+      this.mapOrderPromise(requestUrl, deferred, error, response, body, EXPECTED_CREATE_STATUS);
+    });
+    return deferred.promise as any;
+  }
+
   private getByOrderId(orderId: string): Promise<Order> {
     const deferred = Q.defer<Order>();
     const requestUrl = `/${Version.V1}${Resource.ORDERS}/${orderId}`;
@@ -103,7 +117,7 @@ export default class OrdersService {
       const order: Order = this.formatOrder(body);
       deferred.resolve(order);
     } else {
-      const channelApeErrorResponse = GenerateApiError(requestUrl, response, body, EXPECTED_UPDATE_STATUS);
+      const channelApeErrorResponse = GenerateApiError(requestUrl, response, body, expectedStatusCode);
       deferred.reject(channelApeErrorResponse);
     }
   }
@@ -139,8 +153,7 @@ export default class OrdersService {
       }
     } else {
       const channelApeErrorResponse =
-        GenerateApiError(requestUrl, requestCallbackParams.response, requestCallbackParams.body,
-            EXPECTED_UPDATE_STATUS);
+        GenerateApiError(requestUrl, requestCallbackParams.response, requestCallbackParams.body, expectedStatusCode);
       deferred.reject(channelApeErrorResponse);
     }
   }

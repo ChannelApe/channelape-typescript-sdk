@@ -1,0 +1,65 @@
+{
+  "errors": [],
+  "pagination": {
+    "lastPage": true,
+    "pageSize": 2
+  },
+  "variantSearchResults": [
+    {
+      "productId": "fecb1b98-3b84-4fb7-9eda-36c577987eba",
+      "inventoryItemValue": "9580001",
+      "businessId": "4baafa5b-4fbf-404e-9766-8a02ad45c3a4",
+      "sku": "9580001",
+      "upc": "40858959005830",
+      "title": "Chef's Cut Real Jerky Chicken Stick Real Snack Sticks",
+      "vendor": "Chef's Cut Real Jerky",
+      "condition": "NEW",
+      "primaryCategory": "Snacks / Foods",
+      "secondaryCategory": "Snacks / Foods",
+      "tags": [
+        "FresnoCaliforniaQuantityOnHand_Yes",
+        "MesquiteTexasQuantityOnHand_No",
+        "LasVegasNevadaQuantityOnHand_No",
+        "EuropaSports",
+        "CharlotteNorthCarolinaQuantityOnHand_Yes",
+        "StrongsvilleOhioQuantityOnHand_Yes",
+        "WindsorConnecticutQuantityOnHand_No",
+        "WalmartCategoryParent_FoodAndBeverage",
+        "OrlandoFloridaQuantityOnHand_Yes"
+      ],
+      "grams": "544.310844",
+      "currencyCode": "USD",
+      "retailPrice": "31.84",
+      "wholesalePrice": "21.60",
+      "quantity": 0
+    },
+    {
+      "productId": "fecb1b98-3b84-4fb7-9eda-36c577987eba",
+      "inventoryItemValue": "9580002",
+      "businessId": "4baafa5b-4fbf-404e-9766-8a02ad45c3a4",
+      "sku": "9580002",
+      "upc": "40858959005380",
+      "title": "Chef's Cut Real Jerky Chicken Stick Real Snack Sticks",
+      "vendor": "Chef's Cut Real Jerky",
+      "condition": "NEW",
+      "primaryCategory": "Snacks / Foods",
+      "secondaryCategory": "Snacks / Foods",
+      "tags": [
+        "FresnoCaliforniaQuantityOnHand_Yes",
+        "LasVegasNevadaQuantityOnHand_No",
+        "EuropaSports",
+        "CharlotteNorthCarolinaQuantityOnHand_Yes",
+        "MesquiteTexasQuantityOnHand_Yes",
+        "StrongsvilleOhioQuantityOnHand_Yes",
+        "WindsorConnecticutQuantityOnHand_No",
+        "OrlandoFloridaQuantityOnHand_No",
+        "WalmartCategoryParent_FoodAndBeverage"
+      ],
+      "grams": "544.310844",
+      "currencyCode": "USD",
+      "retailPrice": "31.84",
+      "wholesalePrice": "21.60",
+      "quantity": 0
+    }
+  ]
+}

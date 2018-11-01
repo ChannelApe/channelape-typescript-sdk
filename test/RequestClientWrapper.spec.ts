@@ -311,6 +311,60 @@ Code: 0 Message: You didnt pass any body`;
       });
     });
 
+    it('When doing a post() with a URI, options, and call back expect data to be returned', (done) => {
+      const requestUrl = '/v1/orders/';
+      if (typeof singleOrderToUpdate.additionalFields === 'undefined') {
+        throw new Error('additionalFields should be defined');
+      }
+      singleOrderToUpdate.additionalFields[0].value = 'RRR';
+      const options: AxiosRequestConfig = {
+        data: singleOrderToUpdate,
+        method: 'POST'
+      };
+      mockedAxios.onPost(`${endpoint}${requestUrl}`).reply((config) => {
+        expect(JSON.parse(config.data).body.additionalFields[0].value).to.equal('RRR');
+        return [202, singleOrderToUpdate];
+      });
+      requestClientWrapper.post(requestUrl, options, (error, response, body) => {
+        expect(error).to.be.null;
+        expect(body.additionalFields[0].value).to.equal('RRR');
+        done();
+      });
+    });
+
+    it('When doing a post() with just options and call back expect data to be returned', (done) => {
+      const requestUrl = '/v1/orders/';
+      if (typeof singleOrderToUpdate.additionalFields === 'undefined') {
+        throw new Error('additionalFields should be defined');
+      }
+      singleOrderToUpdate.additionalFields[0].value = 'RRR';
+      const options: AxiosRequestConfig = {
+        url: requestUrl,
+        data: singleOrderToUpdate
+      };
+      mockedAxios.onPost(`${endpoint}${requestUrl}`).reply(200, singleOrderToUpdate);
+
+      requestClientWrapper.post(options.url!, options, (error, response, body) => {
+        expect(error).to.be.null;
+        expect(body.additionalFields[0].value).to.equal('RRR');
+        done();
+      });
+    });
+
+    it('When doing a post() expect the call to be logged', (done) => {
+      const requestUrl = '/v1/orders/';
+      const options: AxiosRequestConfig = {
+        url: requestUrl,
+        data: singleOrderToUpdate
+      };
+      mockedAxios.onPost(`${endpoint}${requestUrl}`).reply(201, singleOrderToUpdate);
+      requestClientWrapper.post(options.url!, options, () => {
+        expect(infoLogSpy.called).to.be.true;
+        expect(infoLogSpy.args[0][0]).to.equal(`POST ${endpoint}${requestUrl} -- STARTED`);
+        done();
+      });
+    });
+
     it('When handling a GET response expect the call to be retried on 500 level status codes and 429s', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;

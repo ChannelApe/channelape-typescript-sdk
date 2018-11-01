@@ -3,19 +3,14 @@ import Fulfillment from './Fulfillment';
 import AdditionalField from '../../model/AdditionalField';
 import OrderStatus from './OrderStatus';
 import Customer from './Customer';
-import Refund from './Refund';
 
-export default interface Order {
+export default interface OrderCreateRequest {
   additionalFields?: AdditionalField[];
-  id: string;
   channelOrderId: string;
   channelId: string;
-  businessId: string;
   purchasedAt: Date;
   canceledAt?: Date;
   canceledReason?: string;
-  updatedAt: Date;
-  createdAt: Date;
   customer?: Customer;
   status: OrderStatus;
   totalPrice?: number;
@@ -27,5 +22,4 @@ export default interface Order {
   alphabeticCurrencyCode: string;
   lineItems: LineItem[];
   fulfillments?: Fulfillment[];
-  refunds?: Refund[];
 }

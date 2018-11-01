@@ -1,11 +1,21 @@
+import { expect } from 'chai';
+import { LogLevel } from 'channelape-logger';
+import * as faker from 'faker';
+
 import ChannelApeError from '../src/model/ChannelApeError';
 import ChannelApeApiError from '../src/model/ChannelApeApiError';
 import ChannelApeClient from '../src/ChannelApeClient';
 import OrderStatus from '../src/orders/model/OrderStatus';
-import { expect } from 'chai';
 import OrdersQueryRequestByBusinessId from '../src/orders/model/OrdersQueryRequestByBusinessId';
-import { LogLevel } from 'channelape-logger';
 import Channel from '../src/channels/model/Channel';
+import VariantsRequestByProductId from '../src/variants/model/VariantsRequestByProductId';
+import VariantsRequest from '../src/variants/model/VariantsRequest';
+import VariantsSearchRequestByProductFilterId from '../src/variants/model/VariantsSearchRequestByProductFilterId';
+import VariantsSearchRequestByVendor from '../src/variants/model/VariantsSearchRequestByVendor';
+import VariantsSearchRequestBySku from '../src/variants/model/VariantsSearchRequestBySku';
+import VariantsSearchRequestByUpc from '../src/variants/model/VariantsSearchRequestByUpc';
+import VariantsSearchRequestByTag from '../src/variants/model/VariantsSearchRequestByTag';
+import OrderCreateRequest from '../src/orders/model/OrderCreateRequest';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
@@ -153,6 +163,21 @@ describe('ChannelApe Client', () => {
           });
         });
       });
+
+      context('When retrieving order with a refund', () => {
+        it('Then return order', () => {
+          const expectedOrderId = '2a94d852-5b3e-4dd4-ba2b-cec8295f2318';
+          const actualOrderPromise = channelApeClient.orders().get(expectedOrderId);
+          return actualOrderPromise.then((actualOrder) => {
+            expect(actualOrder.id).to.equal(expectedOrderId);
+            expect(actualOrder.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
+            expect(actualOrder.status).to.equal(OrderStatus.OPEN);
+            expect(actualOrder.refunds![0].lineItems[0].quantity).to.equal(2);
+            expect(actualOrder.refunds![0].channelRefundId).to.equal('74273487234');
+            expect(actualOrder.refunds![0].supplierRefundId).to.equal('7348234');
+          });
+        });
+      });
     });
 
     describe('And valid order', () => {
@@ -178,10 +203,100 @@ describe('ChannelApe Client', () => {
       });
     });
 
+    describe('And valid order create request', () => {
+      context('When creating an order', () => {
+        it('Then create the order', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const expectedChannelId = '1b45b1a5-931c-454d-9385-23228b750faf';
+          const expectedFirstName = faker.name.firstName();
+          const expectedLastName = faker.name.lastName();
+          const expectedChannelOrderId = Math.random().toString();
+          const fullName = `${expectedFirstName} ${expectedLastName}`;
+          const expectedLineItemQuantities = [
+            faker.random.number(20) + 1,
+            faker.random.number(20) + 1,
+            faker.random.number(20) + 1,
+            faker.random.number(20) + 1,
+          ];
+          const expectedLineItemTitles = [
+            faker.commerce.productName(),
+            faker.commerce.productName(),
+            faker.commerce.productName(),
+            faker.commerce.productName()
+          ];
+          const expectedOrderStatus = OrderStatus.OPEN;
+          const expectedPurchasedAtDate = new Date();
+
+          const orderToCreate: OrderCreateRequest = {
+            additionalFields: [
+              { name: 'name', value: `SDK${parseInt((Math.random() * 100000).toString(), 10).toString()}` },
+              { name: 'order_number', value: parseInt((Math.random() * 100000).toString(), 10).toString() }
+            ],
+            totalPrice: faker.random.number({ min: 1, max: 700, precision: 2 }),
+            alphabeticCurrencyCode: 'USD',
+            channelId: expectedChannelId,
+            channelOrderId: expectedChannelOrderId,
+            customer: {
+              firstName: expectedFirstName,
+              lastName: expectedLastName,
+              name: fullName,
+              additionalFields: [
+                { name: 'extraCustomerData', value: faker.random.words(5) }
+              ]
+            },
+            status: expectedOrderStatus,
+            purchasedAt: expectedPurchasedAtDate,
+            lineItems: []
+          };
+          for (let i = 0; i < 4; i += 1) {
+            orderToCreate.lineItems.push({
+              id: (i + 1).toString(),
+              quantity: expectedLineItemQuantities[i],
+              title: expectedLineItemTitles[i],
+              additionalFields: [
+                { name: 'extraLineItemData', value: faker.random.words(5) }
+              ]
+            });
+          }
+
+          return channelApeClient.orders().create(orderToCreate).then((createdOrder) => {
+            expect(createdOrder.businessId).to.equal(expectedBusinessId);
+            expect(createdOrder.totalPrice).to.equal(orderToCreate.totalPrice);
+            expect(createdOrder.additionalFields![0].name).to.equal('name');
+            expect(createdOrder.additionalFields![0].value)
+              .to.equal(orderToCreate.additionalFields![0].value);
+            expect(createdOrder.additionalFields![1].name).to.equal('order_number');
+            expect(createdOrder.additionalFields![1].value)
+              .to.equal(orderToCreate.additionalFields![1].value);
+            expect(createdOrder.channelId).to.equal(expectedChannelId, 'channelId');
+            expect(createdOrder.customer!.firstName!).to.equal(expectedFirstName, 'customer.firstName');
+            expect(createdOrder.customer!.lastName!).to.equal(expectedLastName, 'customer.lastName');
+            expect(createdOrder.customer!.additionalFields![0].name)
+              .to.equal(orderToCreate.customer!.additionalFields![0].name);
+            expect(createdOrder.customer!.additionalFields![0].value)
+              .to.equal(orderToCreate.customer!.additionalFields![0].value);
+            expect(createdOrder.customer!.name!).to.equal(fullName, 'customer.name');
+            expect(createdOrder.lineItems.length).to.equal(4, 'line item length');
+            expect(createdOrder.channelOrderId).to.equal(expectedChannelOrderId);
+            for (let i = 0; i < 4; i += 1) {
+              expect(createdOrder.lineItems[i].id).to.equal((i + 1).toString(), `lineItem[${i}].id`);
+              expect(createdOrder.lineItems[i].quantity).to.equal(expectedLineItemQuantities[i],
+                `lineItem[${i}].quantity`);
+              expect(createdOrder.lineItems[i].title).to.equal(expectedLineItemTitles[i], `lineItem[${i}].title`);
+              expect(createdOrder.lineItems[i].additionalFields![0].name)
+                .to.equal(orderToCreate.lineItems[i].additionalFields![0].name);
+              expect(createdOrder.lineItems[i].additionalFields![0].value)
+                .to.equal(orderToCreate.lineItems[i].additionalFields![0].value);
+            }
+          });
+        });
+      });
+    });
+
     describe('And valid business ID', () => {
       describe('And a startDate of "2018-03-29T17:00:51.000Z" and an endDate of "2018-08-23T12:41:33.000Z"', () => {
         context('When retrieving orders', () => {
-          it('Then return the 228 orders between those dates', () => {
+          it('Then return the 229 orders between those dates', () => {
             const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
             const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
               businessId: expectedBusinessId,
@@ -191,7 +306,7 @@ describe('ChannelApe Client', () => {
             const actualOrdersPromise = channelApeClient.orders().get(ordersQueryRequestByBusinessId);
             return actualOrdersPromise.then((actualOrders) => {
               expect(actualOrders).to.be.an('array');
-              expect(actualOrders.length).to.equal(228);
+              expect(actualOrders.length).to.equal(229);
               expect(actualOrders[0].id).to.equal('dda8a05f-d5dd-4535-9261-b55c501085ef');
             });
           });
@@ -237,6 +352,152 @@ describe('ChannelApe Client', () => {
       });
     });
 
+    describe('And valid productId', () => {
+      context('When retrieving a products variants', () => {
+        it('Then return variants for that product', () => {
+          const expectedProductId = '0744f2de-c62c-4b04-907f-26699463c0bd';
+          const variantsRequestByProductId: VariantsRequestByProductId = {
+            productId: expectedProductId
+          };
+          const actualVariantsPromise = channelApeClient.variants().get(variantsRequestByProductId);
+          return actualVariantsPromise.then((actualVariants) => {
+            expect(actualVariants).to.be.an('array');
+            expect(actualVariants.length).to.equal(6);
+          });
+        });
+      });
+    });
+
+    describe('And valid productId and valid variantId', () => {
+      context('When retrieving a variant', () => {
+        it('Then return that variant', () => {
+          const expectedProductId = '0744f2de-c62c-4b04-907f-26699463c0bd';
+          const expectedSku = '4820203';
+          const variantsRequest: VariantsRequest = {
+            productId: expectedProductId,
+            inventoryItemValue: expectedSku
+          };
+          const actualVariantPromise = channelApeClient.variants().get(variantsRequest);
+          return actualVariantPromise.then((actualVariant) => {
+            expect(actualVariant.options.Flavor).to.equal('Chocolate');
+            expect(actualVariant.additionalFields.walmartBrand).to.equal('MusclePharm');
+            expect(actualVariant.retailPrice).to.equal(59.99);
+            expect(actualVariant.title).to.equal('MusclePharm Sport Series Combat XL Mass Gainer');
+          });
+        });
+      });
+    });
+
+    describe('And valid businessId and valid vendor', () => {
+      context('When searching variants', () => {
+        it('Then return variant quick search results', () => {
+          const expectedVendor = 'Optimum Nutrition';
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const expectedSku = '2730117';
+          const variantsRequest: VariantsSearchRequestByVendor = {
+            vendor: expectedVendor,
+            businessId: expectedBusinessId
+          };
+          const actualVariantsPromise = channelApeClient.variants().search(variantsRequest);
+          return actualVariantsPromise.then((actualVariants) => {
+            expect(actualVariants).to.be.an('array');
+            const variant = actualVariants.find(v => v.sku === expectedSku);
+            expect(variant!.businessId).to.equal(expectedBusinessId);
+            expect(variant!.vendor).to.equal(expectedVendor);
+            expect(variant!.title).to.equal('Optimum Nutrition Opti-Women');
+          });
+        });
+      });
+    });
+
+    describe('And valid productFilterId', () => {
+      context('When searching variants', () => {
+        it('Then return variant quick search results', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const expectedProductFilterId = 'f4cf2afd-fc5f-424d-bf45-868b672d77a0';
+          const expectedSku = '6030038';
+          const variantsRequest: VariantsSearchRequestByProductFilterId = {
+            productFilterId: expectedProductFilterId
+          };
+          const actualVariantsPromise = channelApeClient.variants().search(variantsRequest);
+          return actualVariantsPromise.then((actualVariants) => {
+            expect(actualVariants).to.be.an('array');
+            expect(actualVariants.length).to.be.greaterThan(50);
+            const variant = actualVariants.find(v => v.sku === expectedSku);
+            expect(variant!.businessId).to.equal(expectedBusinessId);
+            expect(variant!.vendor).to.equal('Caveman Foods');
+            expect(variant!.title).to.equal('Caveman Foods Chicken Jerky');
+          });
+        }).timeout(25000);
+      });
+    });
+
+    describe('And valid businessId and valid sku', () => {
+      context('When searching variants', () => {
+        it('Then return variant quick search results', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const expectedSku = '6030038';
+          const variantsRequest: VariantsSearchRequestBySku = {
+            sku: expectedSku,
+            businessId: expectedBusinessId
+          };
+          const actualVariantsPromise = channelApeClient.variants().search(variantsRequest);
+          return actualVariantsPromise.then((actualVariants) => {
+            expect(actualVariants).to.be.an('array');
+            expect(actualVariants.length).to.equal(1);
+            const variant = actualVariants.find(v => v.sku === expectedSku);
+            expect(variant!.businessId).to.equal(expectedBusinessId);
+            expect(variant!.vendor).to.equal('Caveman Foods');
+            expect(variant!.title).to.equal('Caveman Foods Chicken Jerky');
+          });
+        });
+      });
+    });
+
+    describe('And valid businessId and valid upc', () => {
+      context('When searching variants', () => {
+        it('Then return variant quick search results', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const expectedUpc = '853385003971';
+          const variantsRequest: VariantsSearchRequestByUpc = {
+            upc: expectedUpc,
+            businessId: expectedBusinessId
+          };
+          const actualVariantsPromise = channelApeClient.variants().search(variantsRequest);
+          return actualVariantsPromise.then((actualVariants) => {
+            expect(actualVariants).to.be.an('array');
+            expect(actualVariants.length).to.equal(1);
+            const variant = actualVariants.find(v => v.upc === expectedUpc);
+            expect(variant!.businessId).to.equal(expectedBusinessId);
+            expect(variant!.vendor).to.equal('Caveman Foods');
+            expect(variant!.title).to.equal('Caveman Foods Chicken Jerky');
+          });
+        });
+      });
+    });
+
+    describe('And valid businessId and valid tag', () => {
+      context('When searching variants', () => {
+        it('Then return variant quick search results', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const expectedProductId = '00050387-9bb1-4587-becc-ff951981d0f8';
+          const expectedTag = 'FresnoCaliforniaQuantityOnHand_Yes';
+          const variantsRequest: VariantsSearchRequestByTag = {
+            tag: expectedTag,
+            businessId: expectedBusinessId
+          };
+          const actualVariantsPromise = channelApeClient.variants().search(variantsRequest);
+          return actualVariantsPromise.then((actualVariants) => {
+            expect(actualVariants).to.be.an('array');
+            const variant = actualVariants.find(v => v.productId === expectedProductId);
+            expect(variant!.businessId).to.equal(expectedBusinessId);
+            expect(variant!.vendor).to.equal('Caveman Foods');
+            expect(variant!.title).to.equal('Caveman Foods Chicken Jerky2');
+            expect(variant!.tags).to.include(expectedTag);
+          });
+        });
+      });
+    });
   });
 
   function getSessionId(): string {

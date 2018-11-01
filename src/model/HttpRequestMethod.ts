@@ -1,5 +1,6 @@
 enum HttpRequestMethod {
   GET = 'GET',
-  PUT = 'PUT'
+  PUT = 'PUT',
+  POST = 'POST'
 }
 export default HttpRequestMethod;
