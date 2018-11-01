@@ -11,6 +11,7 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Channels](#channels)
 - [Orders](#orders)
 - [Variants](#variants)
+- [Businesses](#businesses)
 
 ### Getting Started
 
@@ -44,12 +45,13 @@ const channelApeClient = new ChannelApeClient({
 
 ### Sessions
 
-Retrieve session using sessionId passed into ChannelApeClient.
-
+#### Get Session
+A session will include your `userId` which is useful when retrieving [Businesses](#Businesses)
 ```typescript
-channelapeClient.sessions().get()
+channelApeClient.sessions().get(sessionId)
   .then((session: Session) => {
     // do what you need to do with session data here
+    // session will also include your userId
   });
 ```
 
@@ -243,3 +245,28 @@ channelApeClient.variants().search(variantsRequest)
     // do what you need to do with Variant Search Results array
   });
 ````
+
+### Businesses
+
+#### Get Business
+```typescript
+const businessesQueryRequestByBusinessId: BusinessesQueryRequestByBusinessId = {
+  businessId
+}
+channelApeClient.businesses().get(businessesQueryRequestByBusinessId)
+  .then((business: Business) => {
+    // do what you need to do with business data here
+  });
+```
+
+#### Get Businesses
+```typescript
+const businessesQueryRequestByUserId: BusinessesQueryRequestByUserId = {
+  userId
+}
+channelApeClient.businesses().get(businessesQueryRequestByUserId)
+  .then((businesses: Business[]) => {
+    // do what you need to do with businesses array data here
+  });
+```
+See [Sessions](#sessions) for how to retrieve your `userId`

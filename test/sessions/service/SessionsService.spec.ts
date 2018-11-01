@@ -26,7 +26,7 @@ describe('Sessions Service', () => {
       });
     const sessionId = 'b40da0b8-a770-4de7-a496-361254bd7d6c';
     const userId = 'f6ed6f7a-47bf-4dd3-baed-71a8a9684e80';
-    const sessionsService = new SessionsService(client, sessionId);
+    const sessionsService = new SessionsService(client);
 
     let sandbox: sinon.SinonSandbox;
 
@@ -56,7 +56,7 @@ describe('Sessions Service', () => {
 
       const clientGetStub = sandbox.stub(axios, 'get').resolves(response);
 
-      return sessionsService.get().then((actualResponse) => {
+      return sessionsService.get(sessionId).then((actualResponse) => {
         expect(clientGetStub.args[0][0])
             .to.equal(`/${Version.V1}${Resource.SESSIONS}/${sessionId}`);
         expect(actualResponse.userId).to.equal(expectedResponse.userId);
@@ -73,7 +73,7 @@ describe('Sessions Service', () => {
       const clientGetStub = sandbox.stub(client, 'get')
         .yields(expectedError, null, null);
 
-      sessionsService.get().then((actualResponse) => {
+      sessionsService.get(sessionId).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0])
@@ -103,7 +103,7 @@ describe('Sessions Service', () => {
       };
       const clientGetStub = sandbox.stub(axios, 'get').resolves(response);
 
-      return sessionsService.get().then((actualResponse) => {
+      return sessionsService.get(sessionId).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((actualChannelApeErrorResponse) => {
         expect(clientGetStub.args[0][0])

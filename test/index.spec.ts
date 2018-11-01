@@ -21,6 +21,45 @@ describe('Index', () => {
     expect(ChannelApe.Environment).to.equal(ChannelApe.Environment);
   });
 
+  it('Expect Business to be exported', () => {
+    const business: ChannelApe.Business = {
+      alphabeticCurrencyCode: ChannelApe.AlphabeticCurrencyCode.USD,
+      embeds: [],
+      errors: [],
+      id: 'business-id',
+      inventoryItemKey: ChannelApe.InventoryItemKey.SKU,
+      name: 'My Test Business',
+      timeZone: ChannelApe.TimeZoneId.US_EASTERN
+    };
+    expect(business.id).to.equal('business-id');
+  });
+
+  it('Expect BusinessesQueryRequestByUserId to be exported', () => {
+    const businessesQueryRequestByBusinessId: ChannelApe.BusinessesQueryRequestByBusinessId = {
+      businessId: 'businessId'
+    };
+    expect(businessesQueryRequestByBusinessId.businessId).to.equal('businessId');
+  });
+
+  it('Expect BusinessesQueryRequestByBusinessId to be exported', () => {
+    const businessQueryRequestByUserId: ChannelApe.BusinessesQueryRequestByUserId = {
+      userId: 'userId'
+    };
+    expect(businessQueryRequestByUserId.userId).to.equal('userId');
+  });
+
+  it('Expect AlphabeticCurrencyCode to be exported', () => {
+    expect(ChannelApe.AlphabeticCurrencyCode).to.equal(ChannelApe.AlphabeticCurrencyCode);
+  });
+
+  it('Expect TimeZoneId to be exported', () => {
+    expect(ChannelApe.TimeZoneId).to.equal(ChannelApe.TimeZoneId);
+  });
+
+  it('Expect InventoryItemKey to be exported', () => {
+    expect(ChannelApe.InventoryItemKey).to.equal(ChannelApe.InventoryItemKey);
+  });
+
   it('Expect Action to be exported', () => {
     const action: ChannelApe.Action = {
       action: 'actionId',
@@ -339,6 +378,14 @@ describe('Index', () => {
 
   it('Expect ChannelApeError to be exported', () => {
     expect(typeof ChannelApe.ChannelApeError).not.to.equal('undefined');
+  });
+
+  it('Expect VariantsSearchRequestByTag to be exported', () => {
+    const variantsSearchRequestByTag: ChannelApe.VariantsSearchRequestByTag = {
+      tag: 'tag',
+      businessId: 'businessId'
+    };
+    expect(variantsSearchRequestByTag.tag).to.equal('tag');
   });
 
 });

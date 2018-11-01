@@ -32,4 +32,7 @@ describe('Resources', () => {
   it('VENDORS', () => {
     expect(Resource.VENDORS).to.equal('/vendors');
   });
+  it('BUSINESSES', () => {
+    expect(Resource.BUSINESSES).to.equal('/businesses');
+  });
 });

@@ -1,5 +1,11 @@
 export { default as ClientConfiguration } from './model/ClientConfiguration';
 export { default as Session } from './sessions/model/Session';
+export { default as Business } from './businesses/model/Business';
+export { default as BusinessesQueryRequestByUserId } from './businesses/model/BusinessesQueryRequestByUserId';
+export { default as BusinessesQueryRequestByBusinessId } from './businesses/model/BusinessesQueryRequestByBusinessId';
+export { default as AlphabeticCurrencyCode } from './model/AlphabeticCurrencyCode';
+export { default as TimeZoneId } from './model/TimeZoneId';
+export { default as InventoryItemKey } from './model/InventoryItemKey';
 export { default as Action } from './actions/model/Action';
 export { default as ActionProcessingStatus } from './actions/model/ActionProcessingStatus';
 export { default as ActionsQueryRequest } from './actions/model/ActionsQueryRequest';
@@ -27,6 +33,7 @@ export { default as VariantsSearchRequestByBusinessId } from './variants/model/V
 export { default as VariantsSearchRequestByVendor } from './variants/model/VariantsSearchRequestByVendor';
 export { default as VariantsSearchRequestByUpc } from './variants/model/VariantsSearchRequestByUpc';
 export { default as VariantsSearchRequestBySku } from './variants/model/VariantsSearchRequestBySku';
+export { default as VariantsSearchRequestByTag } from './variants/model/VariantsSearchRequestByTag';
 export { default as AdditionalField } from './model/AdditionalField';
 export { default as ChannelApeClient } from './ChannelApeClient';
 export { default as LogLevel } from './model/LogLevel';
