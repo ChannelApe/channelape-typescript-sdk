@@ -34,6 +34,20 @@ describe('Index', () => {
     expect(business.id).to.equal('business-id');
   });
 
+  it('Expect BusinessesQueryRequestByUserId to be exported', () => {
+    const businessesQueryRequestByBusinessId: ChannelApe.BusinessesQueryRequestByBusinessId = {
+      businessId: 'businessId'
+    };
+    expect(businessesQueryRequestByBusinessId.businessId).to.equal('businessId');
+  });
+
+  it('Expect BusinessesQueryRequestByBusinessId to be exported', () => {
+    const businessQueryRequestByUserId: ChannelApe.BusinessesQueryRequestByUserId = {
+      userId: 'userId'
+    };
+    expect(businessQueryRequestByUserId.userId).to.equal('userId');
+  });
+
   it('Expect AlphabeticCurrencyCode to be exported', () => {
     expect(ChannelApe.AlphabeticCurrencyCode).to.equal(ChannelApe.AlphabeticCurrencyCode);
   });
@@ -364,6 +378,14 @@ describe('Index', () => {
 
   it('Expect ChannelApeError to be exported', () => {
     expect(typeof ChannelApe.ChannelApeError).not.to.equal('undefined');
+  });
+
+  it('Expect VariantsSearchRequestByTag to be exported', () => {
+    const variantsSearchRequestByTag: ChannelApe.VariantsSearchRequestByTag = {
+      tag: 'tag',
+      businessId: 'businessId'
+    };
+    expect(variantsSearchRequestByTag.tag).to.equal('tag');
   });
 
 });
