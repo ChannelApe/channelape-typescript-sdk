@@ -46,12 +46,12 @@ const channelApeClient = new ChannelApeClient({
 ### Sessions
 
 #### Get Session
-A session will include your `userId` which is useful when retrieving [Businesses](#Businesses)
+A User Account session will include your `userId` which is useful when retrieving [Businesses](#Businesses). API Account sessions will return an `apiAccountId` instead.
 ```typescript
 channelApeClient.sessions().get(sessionId)
   .then((session: Session) => {
     // do what you need to do with session data here
-    // session will also include your userId
+    // session will also include your userId or apiAccountId
   });
 ```
 
