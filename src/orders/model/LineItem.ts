@@ -13,4 +13,6 @@ export default interface LineItem {
   upc?: string;
   title: string;
   vendor?: string;
+  readonly giftCardCode?: string;
+  readonly giftCardId?: string;
 }

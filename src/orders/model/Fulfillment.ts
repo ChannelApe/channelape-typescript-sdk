@@ -4,7 +4,7 @@ import FulfillmentStatus from './FulfillmentStatus';
 
 export default interface Fulfillment {
   additionalFields?: AdditionalField[];
-  id?: string;
+  readonly id?: string;
   supplierId?: string;
   lineItems: LineItem[];
   status: FulfillmentStatus;
