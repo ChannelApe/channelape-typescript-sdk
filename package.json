@@ -1,6 +1,6 @@
 {
 	"name": "channelape-sdk",
-	"version": "1.6.0-develop.0",
+	"version": "1.6.0-develop.1",
 	"description": "A client for interacting with ChannelApe's API",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
