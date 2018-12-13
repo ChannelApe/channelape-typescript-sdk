@@ -296,7 +296,7 @@ describe('ChannelApe Client', () => {
     describe('And valid business ID', () => {
       describe('And a startDate of "2018-03-29T17:00:51.000Z" and an endDate of "2018-08-23T12:41:33.000Z"', () => {
         context('When retrieving orders', () => {
-          it('Then return the 229 orders between those dates', () => {
+          it('Then return the 230 orders between those dates', () => {
             const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
             const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
               businessId: expectedBusinessId,
@@ -306,7 +306,7 @@ describe('ChannelApe Client', () => {
             const actualOrdersPromise = channelApeClient.orders().get(ordersQueryRequestByBusinessId);
             return actualOrdersPromise.then((actualOrders) => {
               expect(actualOrders).to.be.an('array');
-              expect(actualOrders.length).to.equal(229);
+              expect(actualOrders.length).to.equal(230);
               expect(actualOrders[0].id).to.equal('dda8a05f-d5dd-4535-9261-b55c501085ef');
             });
           });
@@ -332,7 +332,7 @@ describe('ChannelApe Client', () => {
 
         describe('And lastKey of "1f557ede-3df5-4335-a64b-cb4181943965"', () => {
           context('When retrieving the next single page of orders', () => {
-            it('Then return the last single page of 51 orders for the business', () => {
+            it('Then return the last single page of 52 orders for the business', () => {
               const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
               const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
                 businessId: expectedBusinessId,
@@ -342,7 +342,7 @@ describe('ChannelApe Client', () => {
               const actualOrdersPromise = channelApeClient.orders().getPage(ordersQueryRequestByBusinessId);
               return actualOrdersPromise.then((actualOrders) => {
                 expect(actualOrders.orders).to.be.an('array');
-                expect(actualOrders.orders.length).to.equal(51);
+                expect(actualOrders.orders.length).to.equal(52);
                 expect(actualOrders.orders[0].id).to.equal('a6f23ae7-fae6-4cf3-b7b9-10eaa84d7ff2');
                 expect(actualOrders.pagination.lastPage).to.equal(true);
               });

@@ -17,13 +17,6 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 
 The ChannelApe SDK is asynchronous and all functions return promises.
 
-### Using in a browser based app?
-
-Make sure when you install the SDK you install with the *--no-optional* flag
-```
-npm i channelape-sdk --save --no-optional
-```
-
 #### Creating a client
 
 Create a new instance of the ChannelApeClient with your sessionId.
