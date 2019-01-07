@@ -1,6 +1,6 @@
 {
 	"name": "channelape-sdk",
-	"version": "1.5.0",
+	"version": "1.6.0",
 	"description": "A client for interacting with ChannelApe's API",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -66,10 +66,8 @@
 	],
 	"dependencies": {
 		"axios": "^0.18.0",
+		"channelape-logger": "^0.2.0",
 		"q": "1.5.1"
-	},
-	"optionalDependencies": {
-		"channelape-logger": "^0.1.6"
 	},
 	"devDependencies": {
 		"@types/app-root-path": "^1.2.4",
