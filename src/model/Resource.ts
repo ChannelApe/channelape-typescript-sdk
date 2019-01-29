@@ -1,5 +1,6 @@
 enum Resource {
   SESSIONS = '/sessions',
+  SUBSCRIPTIONS = '/subscriptions',
   ACTIONS = '/actions',
   CHANNELS = '/channels',
   ORDERS = '/orders',
