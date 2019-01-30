@@ -1,4 +1,4 @@
-import ChannelApeApiError from '../../../src/model/ChannelApeApiError';
+import ChannelApeApiError from '../../model/ChannelApeApiError';
 
 export default interface Subscription {
   active?: boolean;
