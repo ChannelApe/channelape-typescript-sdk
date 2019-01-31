@@ -1,5 +1,6 @@
 export { default as ClientConfiguration } from './model/ClientConfiguration';
 export { default as Session } from './sessions/model/Session';
+export { default as Subscription } from './subscriptions/model/Subscription';
 export { default as Business } from './businesses/model/Business';
 export { default as BusinessesQueryRequestByUserId } from './businesses/model/BusinessesQueryRequestByUserId';
 export { default as BusinessesQueryRequestByBusinessId } from './businesses/model/BusinessesQueryRequestByBusinessId';

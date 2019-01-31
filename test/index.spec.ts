@@ -388,4 +388,12 @@ describe('Index', () => {
     expect(variantsSearchRequestByTag.tag).to.equal('tag');
   });
 
+  it('Expect Subscription to be exported', () => {
+    const subscription: ChannelApe.Subscription = {
+      active: true,
+      errors: []
+    };
+    expect(subscription.active).to.equal(true);
+  });
+
 });

@@ -12,6 +12,7 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Orders](#orders)
 - [Variants](#variants)
 - [Businesses](#businesses)
+- [Subscriptions](#subscriptions)
 
 ### Getting Started
 
@@ -263,3 +264,14 @@ channelApeClient.businesses().get(businessesQueryRequestByUserId)
   });
 ```
 See [Sessions](#sessions) for how to retrieve your `userId`
+
+### Subscriptions
+
+#### Get Subscription
+```typescript
+const businessId = 'valid-business-id';
+channelApeClient.subscriptions().get(businessId)
+  .then((subscription: Subscription) => {
+    // do what you need to do with subscription data here
+  });
+```

@@ -498,6 +498,28 @@ describe('ChannelApe Client', () => {
         });
       });
     });
+
+    describe('And valid businessId with an active subscription', () => {
+      context('When getting subscription', () => {
+        it('Then return subscription result', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const actualSubscriptionsPromise = channelApeClient.subscriptions().get(expectedBusinessId);
+          return actualSubscriptionsPromise.then((actualSubscription) => {
+            expect(actualSubscription.active).to.equal(true);
+            expect(actualSubscription.businessId).to.equal(expectedBusinessId);
+            expect(actualSubscription.createdAt!.toISOString()).to.be.a('string');
+            expect(actualSubscription.errors).to.be.an('array');
+            expect(actualSubscription.errors.length).to.equal(0);
+            expect(actualSubscription.lastCompletedTaskUsageRecordingTime!.toISOString()).to.be.a('string');
+            expect(actualSubscription.periodEndsAt!.toISOString()).to.be.a('string');
+            expect(actualSubscription.periodStartedAt!.toISOString()).to.be.a('string');
+            expect(actualSubscription.subscriptionId).to.not.equal(undefined);
+            expect(actualSubscription.subscriptionProductHandle).to.not.equal(undefined);
+            expect(actualSubscription.updatedAt!.toISOString()).to.be.a('string');
+          });
+        });
+      });
+    });
   });
 
   function getSessionId(): string {
