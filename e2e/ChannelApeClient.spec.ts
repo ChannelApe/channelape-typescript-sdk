@@ -353,7 +353,7 @@ describe('ChannelApe Client', () => {
 
       describe('And a count parameter of "true"', () => {
         context('When retrieving a single page of orders', () => {
-          it.only('Then return a single page of 10 orders for the business and a totalItems count of "140"', () => {
+          it('Then return a single page of 10 orders for the business and a totalItems count of "140"', () => {
             const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
             const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
               businessId: expectedBusinessId,
