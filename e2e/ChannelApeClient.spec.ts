@@ -350,6 +350,29 @@ describe('ChannelApe Client', () => {
           });
         });
       });
+
+      describe('And a count parameter of "true"', () => {
+        context('When retrieving a single page of orders', () => {
+          it.only('Then return a single page of 10 orders for the business and a totalItems count of "140"', () => {
+            const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+            const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
+              businessId: expectedBusinessId,
+              size: 10,
+              count: true,
+              endDate: new Date('2018-06-03T16:59:54.000Z'),
+              status: OrderStatus.IN_PROGRESS
+            };
+            const actualOrdersPromise = channelApeClient.orders().getPage(ordersQueryRequestByBusinessId);
+            return actualOrdersPromise.then((actualOrders) => {
+              expect(actualOrders.orders).to.be.an('array');
+              expect(actualOrders.orders.length).to.equal(10);
+              expect(actualOrders.pagination.lastPage).to.equal(false);
+              expect(actualOrders.pagination.totalItems)
+                .to.equal(140, 'There should be 140 totalItems in the pagination response');
+            });
+          });
+        });
+      });
     });
 
     describe('And valid productId', () => {
