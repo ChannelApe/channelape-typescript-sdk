@@ -149,16 +149,19 @@ describe('ChannelApe Client', () => {
     describe('And valid order ID', () => {
       context('When retrieving order', () => {
         it('Then return order', () => {
-          const expectedOrderId = '3bc9120d-b706-49cd-ad81-6445ce77d8ad';
+          const expectedOrderId = '3ee243dc-d768-4ad6-8008-a14ccc834036';
           const actualOrderPromise = channelApeClient.orders().get(expectedOrderId);
           return actualOrderPromise.then((actualOrder) => {
             expect(actualOrder.id).to.equal(expectedOrderId);
             expect(actualOrder.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
             expect(actualOrder.status).to.equal(OrderStatus.OPEN);
-            expect(actualOrder.lineItems.length).to.equal(2);
-            expect(actualOrder.lineItems[0].sku).to.equal('e67f1d90-824a-4941-8497-08d632763c93');
-            expect(actualOrder.lineItems[0].title).to.equal('Generic Steel Shirt');
-            const expectedCreatedAt = new Date('2018-05-23T15:31:14.126Z');
+            expect(actualOrder.lineItems.length).to.equal(4);
+            expect(actualOrder.lineItems[0].sku).to.equal(undefined);
+            expect(actualOrder.lineItems[0].title).to.equal('Awesome Cotton Ball');
+            expect(actualOrder.fulfillments!.length).to.equal(1);
+            const expectedShippedAt = new Date('2019-02-11T22:39:11.407Z');
+            expect(actualOrder.fulfillments![0].shippedAt!.toISOString()).to.equal(expectedShippedAt.toISOString());
+            const expectedCreatedAt = new Date('2019-02-11T22:39:13.397Z');
             expect(actualOrder.createdAt.toISOString()).to.equal(expectedCreatedAt.toISOString());
           });
         });
