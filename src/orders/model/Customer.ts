@@ -7,6 +7,7 @@ export default interface Customer {
   email?: string;
   firstName?: string;
   lastName?: string;
+  phone?: string;
   name?: string;
   shippingAddress?: Address;
 }

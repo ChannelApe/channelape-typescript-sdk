@@ -181,6 +181,9 @@ export default class OrdersService {
 
   private formatFulfillment(fulfillment: Fulfillment): Fulfillment {
     fulfillment.lineItems = fulfillment.lineItems.map(this.formatLineItem);
+    if (fulfillment.shippedAt) {
+      fulfillment.shippedAt = new Date(fulfillment.shippedAt);
+    }
     return fulfillment;
   }
 

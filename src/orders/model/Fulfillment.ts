@@ -12,4 +12,5 @@ export default interface Fulfillment {
   shippingMethod?: string;
   trackingNumber?: string;
   trackingUrls?: string[];
+  shippedAt?: Date;
 }

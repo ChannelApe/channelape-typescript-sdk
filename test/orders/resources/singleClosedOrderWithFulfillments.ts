@@ -514,7 +514,8 @@ export default {
         }
       ],
       status: 'OPEN',
-      trackingUrls: ['https://ups1.com/tracking-url1', 'https://ups1.com/tracking-url2']
+      trackingUrls: ['https://ups1.com/tracking-url1', 'https://ups1.com/tracking-url2'],
+      shippedAt: '2018-05-05T17:03:03.582Z'
     }
   ],
   id: '9dc34b92-70d1-42d8-8b4e-ae7fb3deca70',
