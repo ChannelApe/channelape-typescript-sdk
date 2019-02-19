@@ -149,16 +149,19 @@ describe('ChannelApe Client', () => {
     describe('And valid order ID', () => {
       context('When retrieving order', () => {
         it('Then return order', () => {
-          const expectedOrderId = '3bc9120d-b706-49cd-ad81-6445ce77d8ad';
+          const expectedOrderId = '3ee243dc-d768-4ad6-8008-a14ccc834036';
           const actualOrderPromise = channelApeClient.orders().get(expectedOrderId);
           return actualOrderPromise.then((actualOrder) => {
             expect(actualOrder.id).to.equal(expectedOrderId);
             expect(actualOrder.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
             expect(actualOrder.status).to.equal(OrderStatus.OPEN);
-            expect(actualOrder.lineItems.length).to.equal(2);
-            expect(actualOrder.lineItems[0].sku).to.equal('e67f1d90-824a-4941-8497-08d632763c93');
-            expect(actualOrder.lineItems[0].title).to.equal('Generic Steel Shirt');
-            const expectedCreatedAt = new Date('2018-05-23T15:31:14.126Z');
+            expect(actualOrder.lineItems.length).to.equal(4);
+            expect(actualOrder.lineItems[0].sku).to.equal(undefined);
+            expect(actualOrder.lineItems[0].title).to.equal('Awesome Cotton Ball');
+            expect(actualOrder.fulfillments!.length).to.equal(1);
+            const expectedShippedAt = new Date('2019-02-11T22:39:11.407Z');
+            expect(actualOrder.fulfillments![0].shippedAt!.toISOString()).to.equal(expectedShippedAt.toISOString());
+            const expectedCreatedAt = new Date('2019-02-11T22:39:13.397Z');
             expect(actualOrder.createdAt.toISOString()).to.equal(expectedCreatedAt.toISOString());
           });
         });
@@ -346,6 +349,29 @@ describe('ChannelApe Client', () => {
                 expect(actualOrders.orders[0].id).to.equal('a6f23ae7-fae6-4cf3-b7b9-10eaa84d7ff2');
                 expect(actualOrders.pagination.lastPage).to.equal(true);
               });
+            });
+          });
+        });
+      });
+
+      describe('And a count parameter of "true"', () => {
+        context('When retrieving a single page of orders', () => {
+          it('Then return a single page of 10 orders for the business and a totalItems count of "140"', () => {
+            const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+            const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
+              businessId: expectedBusinessId,
+              size: 10,
+              count: true,
+              endDate: new Date('2018-06-03T16:59:54.000Z'),
+              status: OrderStatus.IN_PROGRESS
+            };
+            const actualOrdersPromise = channelApeClient.orders().getPage(ordersQueryRequestByBusinessId);
+            return actualOrdersPromise.then((actualOrders) => {
+              expect(actualOrders.orders).to.be.an('array');
+              expect(actualOrders.orders.length).to.equal(10);
+              expect(actualOrders.pagination.lastPage).to.equal(false);
+              expect(actualOrders.pagination.totalItems)
+                .to.equal(140, 'There should be 140 totalItems in the pagination response');
             });
           });
         });

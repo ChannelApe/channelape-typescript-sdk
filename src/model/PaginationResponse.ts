@@ -3,4 +3,5 @@ export default interface PaginationResponse {
   lastPage: boolean;
   nextPageRef?: string;
   pageSize: number;
+  totalItems?: number;
 }
