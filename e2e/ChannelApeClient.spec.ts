@@ -7,6 +7,7 @@ import ChannelApeApiError from '../src/model/ChannelApeApiError';
 import ChannelApeClient from '../src/ChannelApeClient';
 import OrderStatus from '../src/orders/model/OrderStatus';
 import OrdersQueryRequestByBusinessId from '../src/orders/model/OrdersQueryRequestByBusinessId';
+import OrdersQueryRequestByChannelOrderId from '../src/orders/model/OrdersQueryRequestByChannelOrderId';
 import Channel from '../src/channels/model/Channel';
 import VariantsRequestByProductId from '../src/variants/model/VariantsRequestByProductId';
 import VariantsRequest from '../src/variants/model/VariantsRequest';
@@ -372,6 +373,43 @@ describe('ChannelApe Client', () => {
               expect(actualOrders.pagination.lastPage).to.equal(false);
               expect(actualOrders.pagination.totalItems)
                 .to.equal(140, 'There should be 140 totalItems in the pagination response');
+            });
+          });
+        });
+      });
+
+      describe('And a valid channelOrderId of "0.5951056075648626"', () => {
+        context('When retrieving orders', () => {
+          it('Then return a single order with that channelOrderId', () => {
+            const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+            const expectedChannelOrderId = '0.5951056075648626';
+            const ordersQueryRequestByChannelOrderId: OrdersQueryRequestByChannelOrderId = {
+              businessId: expectedBusinessId,
+              channelOrderId: expectedChannelOrderId
+            };
+            const actualOrdersPromise = channelApeClient.orders().get(ordersQueryRequestByChannelOrderId);
+            return actualOrdersPromise.then((actualOrders) => {
+              expect(actualOrders).to.be.an('array');
+              expect(actualOrders.length).to.equal(1);
+              expect(actualOrders[0].channelOrderId).to.equal(expectedChannelOrderId);
+            });
+          });
+        });
+
+        context('When retrieving an orders page', () => {
+          it('Then return a single order page with one order with that channelOrderId', () => {
+            const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+            const expectedChannelOrderId = '0.5951056075648626';
+            const ordersQueryRequestByChannelOrderId: OrdersQueryRequestByChannelOrderId = {
+              businessId: expectedBusinessId,
+              channelOrderId: expectedChannelOrderId
+            };
+            const actualOrderPage = channelApeClient.orders().getPage(ordersQueryRequestByChannelOrderId);
+            return actualOrderPage.then((orderPage) => {
+              expect(orderPage.pagination.lastPage).to.equal(true);
+              expect(orderPage.orders).to.be.an('array');
+              expect(orderPage.orders.length).to.equal(1);
+              expect(orderPage.orders[0].channelOrderId).to.equal(expectedChannelOrderId);
             });
           });
         });
