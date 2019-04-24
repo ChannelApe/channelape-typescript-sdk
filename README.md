@@ -13,6 +13,7 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Variants](#variants)
 - [Businesses](#businesses)
 - [Subscriptions](#subscriptions)
+- [Activities](#activities) (Log arbitrary information on various ChannelApe objects)
 
 ### Getting Started
 
@@ -274,4 +275,57 @@ channelApeClient.subscriptions().get(businessId)
   .then((subscription: Subscription) => {
     // do what you need to do with subscription data here
   });
+```
+
+### Activities
+ChannelApe allows you to log any arbitrary action done to or information about an order through the Order Activities endpoint.
+
+#### Create Order Activities
+OrderActivityCreateRequestByOrderId
+OrderActivityCreateRequestByBusiness
+```typescript
+// Create an order activity if you know the channelId and channelOrderId of the order in question
+const orderActivityCreateRequest: OrderActivityCreateRequestByChannel = {
+  channelId: 'some-channel-id',
+  channelOrderId: 'some-channel-order-id-belonging-to-the-specified-channel-id',
+  operation: OrderActivityOperation.UPDATE,
+  result: OrderActivityResult.SUCCESS,
+  messages: [
+    {
+      description: 'Arbitrary text limited to 1000 characters',
+      title: 'Arbitrary text limited to 100 characters.' // Order activities are grouped by title in the ChannelApe dashboard
+    }
+  ]
+};
+
+// Create an order activity if you know the ChannelApe Order ID (i.e. order.id) of the order in question
+const orderActivityCreateRequest: OrderActivityCreateRequestByOrderId = {
+  orderId: 'some-order-id',
+  operation: OrderActivityOperation.CREATE,
+  result: OrderActivityResult.ERROR,
+  messages: [
+    {
+      description: 'Arbitrary text limited to 1000 characters',
+      title: 'Arbitrary text limited to 100 characters.' // Order activities are grouped by title in the ChannelApe dashboard
+    }
+  ]
+};
+
+// Create an order activity if you know the channelOrderId and the businessId of the order in question
+const orderActivityCreateRequest: OrderActivityCreateRequestByOrderId = {
+  channelOrderId: 'some-channel-order-id',
+  businessId: 'some-business-id-that-the-channel-order-id-belongs-to',
+  operation: OrderActivityOperation.CREATE,
+  result: OrderActivityResult.WARN,
+  messages: [
+    {
+      description: 'Arbitrary text limited to 1000 characters',
+      title: 'Arbitrary text limited to 100 characters.' // Order activities are grouped by title in the ChannelApe dashboard
+    }
+  ]
+};
+
+channelApeClient.orders().Activities.create(orderActivityCreateRequest).then((orderActivity) => {
+  // do what you need to do with orderActivity here
+});
 ```

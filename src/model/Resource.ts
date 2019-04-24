@@ -4,6 +4,7 @@ enum Resource {
   ACTIONS = '/actions',
   CHANNELS = '/channels',
   ORDERS = '/orders',
+  ORDERS_ACTIVITY = '/orders/activities',
   PRODUCTS = '/products',
   VARIANTS = '/variants',
   VENDORS = '/vendors',

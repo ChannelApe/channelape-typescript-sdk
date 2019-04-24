@@ -1,4 +1,4 @@
-import OrdersService from './../../../src/orders/service/OrdersService';
+import OrdersService from '../../../src/orders/service/OrdersService';
 import Order from '../../../src/orders/model/Order';
 import { expect } from 'chai';
 import axios from 'axios';
