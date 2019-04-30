@@ -1,10 +1,11 @@
 {
 	"name": "channelape-sdk",
-	"version": "1.7.1",
+	"version": "1.8.0-develop.0",
 	"description": "A client for interacting with ChannelApe's API",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {
+    "prepack": "npm run compile",
 		"prepublishOnly": "npm run compile",
 		"compile": "tsc && tsc -p test/tsconfig.json && tsc -p e2e/tsconfig.json",
 		"watch": "concurrently -k -p \"[{name}]\" -n \"src,test,e2e\" -c \"yellow.bold,cyan.bold,green.bold\" \"tsc --watch\" \"tsc -p test/tsconfig.json --watch\" \"tsc -p e2e/tsconfig.json --watch\"",
