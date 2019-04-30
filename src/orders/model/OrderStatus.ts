@@ -3,7 +3,8 @@ enum OrderStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   CLOSED = 'CLOSED',
   CANCELED = 'CANCELED',
-  PENDING = 'PENDING'
+  PENDING = 'PENDING',
+  HOLD = 'HOLD'
 }
 
 export default OrderStatus;
