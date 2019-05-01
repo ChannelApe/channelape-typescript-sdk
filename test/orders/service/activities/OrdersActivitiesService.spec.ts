@@ -38,18 +38,26 @@ describe('OrdersActivitiesService', () => {
         of "channel-order-id-1" when creating an order activity, Then return created order activity`, () => {
         const expectedChannelId = 'channel-id-1';
         const expectedChannelOrderId = 'channel-order-id-1';
+        const expectedActionId = 'action-id';
         const expectedCompletionDate = new Date();
         const orderActivityCreateRequest: OrderActivityCreateRequestByChannel = {
           channelId: expectedChannelId,
           channelOrderId: expectedChannelOrderId,
+          actionId: expectedActionId,
           operation: OrderActivityOperation.UPDATE,
           result: OrderActivityResult.SUCCESS,
           completionTime: expectedCompletionDate,
           messages: [{ description: 'Order was updated by ChannelApe SDK unit test.', title: 'CA SDK unit test' }]
         };
         const mockedAxiosAdapter = new axiosMockAdapter(axios);
-        mockedAxiosAdapter.onPost(`${Environment.STAGING}/${Version.V1}${Resource.ORDERS_ACTIVITY}`)
-          .reply(202, orderActivityCreateRequest);
+        mockedAxiosAdapter.onPost(
+          `${Environment.STAGING}/${Version.V1}${Resource.ORDERS_ACTIVITY}`
+        )
+          .reply((data) => {
+            expect(data.headers['X-Channel-Ape-Action-Id']).to.equal(expectedActionId);
+            expect(data.headers['X-Channel-Ape-Authorization-Token']).to.equal('valid-session-id');
+            return Promise.resolve([202, orderActivityCreateRequest]) as any;
+          });
 
         return ordersService.Activities.create(orderActivityCreateRequest).then((createdOrderActivity) => {
           expect(createdOrderActivity.channelId).to.equal(expectedChannelId);
@@ -82,13 +90,16 @@ describe('OrdersActivitiesService', () => {
             pagination: { lastPage: true }
           });
         mockedAxiosAdapter.onPost(`${Environment.STAGING}/${Version.V1}${Resource.ORDERS_ACTIVITY}`)
-          .reply(202, {
-            businessId: expectedBusinessId,
-            orderId: expectedOrderId,
-            operation: OrderActivityOperation.UPDATE,
-            result: OrderActivityResult.SUCCESS,
-            completionTime: expectedCompletionDate,
-            messages: [{ description: 'Order was updated by ChannelApe SDK unit test.', title: 'CA SDK unit test' }]
+          .reply((data) => {
+            expect(data.headers['X-Channel-Ape-Action-Id']).to.be.undefined;
+            return [202, {
+              businessId: expectedBusinessId,
+              orderId: expectedOrderId,
+              operation: OrderActivityOperation.UPDATE,
+              result: OrderActivityResult.SUCCESS,
+              completionTime: expectedCompletionDate,
+              messages: [{ description: 'Order was updated by ChannelApe SDK unit test.', title: 'CA SDK unit test' }]
+            }];
           });
 
         return ordersService.Activities.create(orderActivityCreateRequest).then((createdOrderActivity) => {
