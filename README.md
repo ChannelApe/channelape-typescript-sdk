@@ -281,8 +281,6 @@ channelApeClient.subscriptions().get(businessId)
 ChannelApe allows you to log any arbitrary action done to or information about an order through the Order Activities endpoint.
 
 #### Create Order Activities
-OrderActivityCreateRequestByOrderId
-OrderActivityCreateRequestByBusiness
 ```typescript
 // Create an order activity if you know the channelId and channelOrderId of the order in question
 const orderActivityCreateRequest: OrderActivityCreateRequestByChannel = {
@@ -312,7 +310,7 @@ const orderActivityCreateRequest: OrderActivityCreateRequestByOrderId = {
 };
 
 // Create an order activity if you know the channelOrderId and the businessId of the order in question
-const orderActivityCreateRequest: OrderActivityCreateRequestByOrderId = {
+const orderActivityCreateRequest: OrderActivityCreateRequestByBusiness = {
   channelOrderId: 'some-channel-order-id',
   businessId: 'some-business-id-that-the-channel-order-id-belongs-to',
   operation: OrderActivityOperation.CREATE,
