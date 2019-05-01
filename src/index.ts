@@ -23,6 +23,20 @@ export { default as OrderCreateRequest } from './orders/model/OrderCreateRequest
 export { default as OrdersQueryRequestByBusinessId } from './orders/model/OrdersQueryRequestByBusinessId';
 export { default as OrdersQueryRequestByChannel } from './orders/model/OrdersQueryRequestByChannel';
 export { default as OrdersQueryRequestByChannelOrderId } from './orders/model/OrdersQueryRequestByChannelOrderId';
+export { default as OrderActivityCreateRequestByChannel }
+  from './orders/service/activities/model/OrderActivityCreateRequestByChannel';
+export { default as OrderActivityCreateRequestByOrderId }
+  from './orders/service/activities/model/OrderActivityCreateRequestByOrderId';
+export { default as OrderActivityCreateRequestByBusiness }
+  from './orders/service/activities/model/OrderActivityCreateRequestByBusiness';
+export { default as OrderActivityOperation }
+  from './orders/service/activities/model/OrderActivityOperation';
+export { default as OrderActivityResult }
+  from './orders/service/activities/model/OrderActivityResult';
+export { default as OrderActivity }
+  from './orders/service/activities/model/OrderActivity';
+export { default as OrderActivityMessage }
+  from './orders/service/activities/model/OrderActivityMessage';
 export { default as Variant } from './variants/model/Variant';
 export { default as VariantCondition } from './variants/model/VariantCondition';
 export { default as VariantCategories } from './variants/model/VariantCategories';
