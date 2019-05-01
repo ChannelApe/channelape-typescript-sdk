@@ -301,7 +301,6 @@ describe('ChannelApe Client', () => {
     describe('And valid order activity create request with a channelOrderId', () => {
       context('When creating an order activity', () => {
         it('Then create the order activity', () => {
-          const orderId = '0133a9cd-006b-4140-a5bb-a9ee478930d0';
           const expectedChannelId = '1b45b1a5-931c-454d-9385-23228b750faf';
           const expectedChannelOrderId = '0.7331620496617428';
           return channelApeClient.orders().Activities.create({
