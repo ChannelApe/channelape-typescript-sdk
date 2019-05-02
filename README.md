@@ -13,7 +13,7 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Variants](#variants)
 - [Businesses](#businesses)
 - [Subscriptions](#subscriptions)
-- [Activities](#activities) (Log arbitrary information on various ChannelApe objects)
+- [Order Activities](#order-activities)
 
 ### Getting Started
 
@@ -277,10 +277,10 @@ channelApeClient.subscriptions().get(businessId)
   });
 ```
 
-### Activities
+### Order Activities
 ChannelApe allows you to log any arbitrary action done to or information about an order through the Order Activities endpoint.
 
-#### Create Order Activities
+#### Create order activities
 ```typescript
 // Create an order activity if you know the channelId and channelOrderId of the order in question
 const orderActivityCreateRequest: OrderActivityCreateRequestByChannel = {
