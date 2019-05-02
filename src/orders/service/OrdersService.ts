@@ -11,8 +11,8 @@ import GenericOrdersQueryRequest from './model/GenericOrdersQueryRequest';
 import OrdersCrudService from './OrdersCrudService';
 
 export default class OrdersService {
-  private ordersCrudService: OrdersCrudService;
-  private orderActivitiesService: OrderActivitiesService;
+  private readonly ordersCrudService: OrdersCrudService;
+  private readonly orderActivitiesService: OrderActivitiesService;
 
   constructor(client: RequestClientWrapper) {
     this.ordersCrudService = new OrdersCrudService(client);
