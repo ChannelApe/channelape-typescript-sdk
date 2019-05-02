@@ -1,6 +1,7 @@
 enum OrderActivityResult {
   SUCCESS = 'SUCCESS',
   WARNING = 'WARNING',
-  ERROR = 'ERROR'
+  ERROR = 'ERROR',
+  UNCHANGED = 'UNCHANGED'
 }
 export default OrderActivityResult;

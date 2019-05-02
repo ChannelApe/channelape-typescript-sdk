@@ -13,4 +13,8 @@ describe('OrderActivityResult', () => {
   it('WARNING', () => {
     expect(OrderActivityResult.WARNING).to.equal('WARNING');
   });
+
+  it('UNCHANGED', () => {
+    expect(OrderActivityResult.UNCHANGED).to.equal('UNCHANGED');
+  });
 });
