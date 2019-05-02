@@ -4,22 +4,22 @@ import OrdersPage from '../model/OrdersPage';
 import OrdersQueryRequestByBusinessId from '../model/OrdersQueryRequestByBusinessId';
 import OrdersQueryRequestByChannel from '../model/OrdersQueryRequestByChannel';
 import OrdersQueryRequestByChannelOrderId from '../model/OrdersQueryRequestByChannelOrderId';
-import OrdersActivitiesService from './activities/OrdersActivitiesService';
+import OrderActivitiesService from './activities/OrderActivitiesService';
 import RequestClientWrapper from '../../RequestClientWrapper';
 import GenericOrdersQueryRequest from './model/GenericOrdersQueryRequest';
 import OrdersCrudService from './OrdersCrudService';
 
 export default class OrdersService {
   private ordersCrudService: OrdersCrudService;
-  private ordersActivitiesService: OrdersActivitiesService;
+  private orderActivitiesService: OrderActivitiesService;
 
   constructor(client: RequestClientWrapper) {
     this.ordersCrudService = new OrdersCrudService(client);
-    this.ordersActivitiesService = new OrdersActivitiesService(client, this.ordersCrudService);
+    this.orderActivitiesService = new OrderActivitiesService(client, this.ordersCrudService);
   }
 
-  public get Activities(): OrdersActivitiesService {
-    return this.ordersActivitiesService;
+  public activities(): OrderActivitiesService {
+    return this.orderActivitiesService;
   }
 
   public get(orderId: string): Promise<Order>;

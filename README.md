@@ -323,7 +323,7 @@ const orderActivityCreateRequest: OrderActivityCreateRequestByBusiness = {
   ]
 };
 
-channelApeClient.orders().Activities.create(orderActivityCreateRequest).then((orderActivity) => {
+channelApeClient.orders().activities().create(orderActivityCreateRequest).then((orderActivity) => {
   // do what you need to do with orderActivity here
 });
 ```

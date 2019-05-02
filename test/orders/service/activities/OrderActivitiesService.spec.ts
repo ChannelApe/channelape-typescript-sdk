@@ -59,7 +59,7 @@ describe('OrdersActivitiesService', () => {
             return Promise.resolve([202, orderActivityCreateRequest]) as any;
           });
 
-        return ordersService.Activities.create(orderActivityCreateRequest).then((createdOrderActivity) => {
+        return ordersService.activities().create(orderActivityCreateRequest).then((createdOrderActivity) => {
           expect(createdOrderActivity.channelId).to.equal(expectedChannelId);
           expect(createdOrderActivity.completionTime.toString()).to.equal(expectedCompletionDate.toString());
         });
@@ -102,7 +102,7 @@ describe('OrdersActivitiesService', () => {
             }];
           });
 
-        return ordersService.Activities.create(orderActivityCreateRequest).then((createdOrderActivity) => {
+        return ordersService.activities().create(orderActivityCreateRequest).then((createdOrderActivity) => {
           expect(createdOrderActivity.orderId).to.equal(expectedOrderId);
           expect(createdOrderActivity.completionTime.toString()).to.equal(expectedCompletionDate.toString());
         });
@@ -143,7 +143,7 @@ describe('OrdersActivitiesService', () => {
             pagination: { lastPage: true }
           });
 
-        return ordersService.Activities.create(orderActivityCreateRequest).then(() => {
+        return ordersService.activities().create(orderActivityCreateRequest).then(() => {
           throw new Error('Create order activity did not through an error');
         }).catch((error) => {
           expect(error.message).to.equal(`Order could not be discerned,
@@ -176,7 +176,7 @@ describe('OrdersActivitiesService', () => {
             pagination: { lastPage: true }
           });
 
-        return ordersService.Activities.create(orderActivityCreateRequest).then(() => {
+        return ordersService.activities().create(orderActivityCreateRequest).then(() => {
           throw new Error('Create order activity did not through an error');
         }).catch((error) => {
           expect(error.message).to.equal(`Order could not be discerned,
@@ -220,7 +220,7 @@ Code: 167 Message: Channel order ID cannot be blank.`;
         maximumRequestRetryRandomDelay: 50
       });
       const ordersService: OrdersService = new OrdersService(client);
-      return ordersService.Activities.create({} as any).then((actualOrderActivity) => {
+      return ordersService.activities().create({} as any).then((actualOrderActivity) => {
         throw new Error('Test failed!');
       })
       .catch((e) => {
@@ -244,7 +244,7 @@ Code: 167 Message: Channel order ID cannot be blank.`;
       };
       const mockedAxiosAdapter = new axiosMockAdapter(axios);
       mockedAxiosAdapter.onPost().reply(200);
-      return ordersService.Activities.create(requestOptions).then(() => {
+      return ordersService.activities().create(requestOptions).then(() => {
         throw new Error('Test failed!');
       })
       .catch((e) => {

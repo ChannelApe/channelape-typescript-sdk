@@ -303,7 +303,7 @@ describe('ChannelApe Client', () => {
         it('Then create the order activity', () => {
           const expectedChannelId = '1b45b1a5-931c-454d-9385-23228b750faf';
           const expectedChannelOrderId = '0.7331620496617428';
-          return channelApeClient.orders().Activities.create({
+          return channelApeClient.orders().activities().create({
             channelId: expectedChannelId,
             channelOrderId: expectedChannelOrderId,
             operation: OrderActivityOperation.UPDATE,
@@ -325,7 +325,7 @@ describe('ChannelApe Client', () => {
       context('When creating an order activity', () => {
         it('Then create the order activity', () => {
           const orderId = '0133a9cd-006b-4140-a5bb-a9ee478930d0';
-          return channelApeClient.orders().Activities.create({
+          return channelApeClient.orders().activities().create({
             orderId,
             operation: OrderActivityOperation.UPDATE,
             result: OrderActivityResult.SUCCESS,
@@ -348,7 +348,7 @@ describe('ChannelApe Client', () => {
           const orderId = '0133a9cd-006b-4140-a5bb-a9ee478930d0';
           const expectedChannelOrderId = '0.7331620496617428';
           const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
-          return channelApeClient.orders().Activities.create({
+          return channelApeClient.orders().activities().create({
             businessId: expectedBusinessId,
             channelOrderId: expectedChannelOrderId,
             operation: OrderActivityOperation.UPDATE,
