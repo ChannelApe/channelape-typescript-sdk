@@ -70,10 +70,11 @@ export default class RequestClientWrapper {
   ): void {
     const callDetails: CallDetails = { options, callStart, callCountForThisRequest: numberOfCalls };
     options.baseURL = this.requestClientWrapperConfiguration.endpoint;
-    options.headers = {
-      'X-Channel-Ape-Authorization-Token': this.requestClientWrapperConfiguration.session,
-      'Content-Type': 'application/json'
-    };
+    if (options.headers === undefined) {
+      options.headers = {};
+    }
+    options.headers['X-Channel-Ape-Authorization-Token'] = this.requestClientWrapperConfiguration.session;
+    options.headers['Content-Type'] = 'application/json';
     options.timeout = this.requestClientWrapperConfiguration.timeout;
     options.method = method;
     try {

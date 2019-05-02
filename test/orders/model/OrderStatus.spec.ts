@@ -21,4 +21,8 @@ describe('OrderStatus', () => {
   it('PENDING', () => {
     expect(OrderStatus.PENDING).to.equal('PENDING');
   });
+
+  it('HOLD', () => {
+    expect(OrderStatus.HOLD).to.equal('HOLD');
+  });
 });
