@@ -1,5 +1,6 @@
 import Order from '../model/Order';
 import OrderCreateRequest from '../model/OrderCreateRequest';
+import OrderUpdateRequest from '../model/OrderUpdateRequest';
 import OrderStatus from '../model/OrderStatus';
 import OrdersPage from '../model/OrdersPage';
 import OrdersQueryRequest from '../model/OrdersQueryRequest';
@@ -50,12 +51,17 @@ export default class OrdersCrudService {
     return deferred.promise as any;
   }
 
-  public update(order: Order): Promise<Order> {
+  public update(order: OrderUpdateRequest): Promise<Order> {
     const deferred = Q.defer<Order>();
     const requestUrl = `${Version.V1}${Resource.ORDERS}/${order.id}`;
     const options: AxiosRequestConfig = {
       data: order
     };
+    if (order.actionId) {
+      options.headers = {
+        'X-Channel-Ape-Action-Id': order.actionId
+      };
+    }
     this.client.put(requestUrl, options, (error, response, body) => {
       this.mapOrderPromise(requestUrl, deferred, error, response, body, EXPECTED_UPDATE_STATUS);
     });
@@ -68,6 +74,11 @@ export default class OrdersCrudService {
     const options: AxiosRequestConfig = {
       data: order
     };
+    if (order.actionId) {
+      options.headers = {
+        'X-Channel-Ape-Action-Id': order.actionId
+      };
+    }
     this.client.post(requestUrl, options, (error, response, body) => {
       this.mapOrderPromise(requestUrl, deferred, error, response, body, EXPECTED_CREATE_STATUS);
     });

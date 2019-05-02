@@ -20,6 +20,7 @@ export { default as LineItem } from './orders/model/LineItem';
 export { default as Refund } from './orders/model/Refund';
 export { default as Order } from './orders/model/Order';
 export { default as OrderCreateRequest } from './orders/model/OrderCreateRequest';
+export { default as OrderUpdateRequest } from './orders/model/OrderUpdateRequest';
 export { default as OrdersQueryRequestByBusinessId } from './orders/model/OrdersQueryRequestByBusinessId';
 export { default as OrdersQueryRequestByChannel } from './orders/model/OrdersQueryRequestByChannel';
 export { default as OrdersQueryRequestByChannelOrderId } from './orders/model/OrdersQueryRequestByChannelOrderId';

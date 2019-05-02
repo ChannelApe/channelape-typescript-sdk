@@ -55,11 +55,6 @@ export default class OrdersActivitiesService {
     const options: AxiosRequestConfig = {
       data: orderActivityCreateRequest
     };
-    if (orderActivityCreateRequest.actionId) {
-      options.headers = {
-        'X-Channel-Ape-Action-Id': orderActivityCreateRequest.actionId
-      };
-    }
     this.client.post(requestUrl, options, (error, response, body) => {
       this.mapOrderActivityPromise(requestUrl, deferred, error, response, body, EXPECTED_CREATE_STATUS);
     });

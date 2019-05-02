@@ -1,5 +1,6 @@
 import Order from '../model/Order';
 import OrderCreateRequest from '../model/OrderCreateRequest';
+import OrderUpdateRequest from '../model/OrderUpdateRequest';
 import OrdersPage from '../model/OrdersPage';
 import OrdersQueryRequestByBusinessId from '../model/OrdersQueryRequestByBusinessId';
 import OrdersQueryRequestByChannel from '../model/OrdersQueryRequestByChannel';
@@ -38,7 +39,7 @@ export default class OrdersService {
     return this.ordersCrudService.getPage(orderRequest as any);
   }
 
-  public update(order: Order): Promise<Order> {
+  public update(order: OrderUpdateRequest): Promise<Order> {
     return this.ordersCrudService.update(order);
   }
 

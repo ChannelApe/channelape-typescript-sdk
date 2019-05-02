@@ -9,6 +9,7 @@ import ChannelApeError from '../../../src/model/ChannelApeError';
 import OrdersQueryRequestByBusinessId from '../../../src/orders/model/OrdersQueryRequestByBusinessId';
 import OrdersQueryRequestByChannelOrderId from '../../../src/orders/model/OrdersQueryRequestByChannelOrderId';
 import OrderCreateRequest from '../../../src/orders/model/OrderCreateRequest';
+import OrderUpdateRequest from '../../../src/orders/model/OrderUpdateRequest';
 import FulfillmentStatus from '../../../src/orders/model/FulfillmentStatus';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import Resource from '../../../src/model/Resource';
@@ -278,9 +279,10 @@ Code: 15 Message: Requested business cannot be found.`;
       });
     });
 
-    it(`And valid order when updating said order
+    it(`And valid order when updating said order with an actionId
           Then return updated order`, () => {
-      const order: Order = singleOrderToUpdate;
+      const order: OrderUpdateRequest = JSON.parse(JSON.stringify(singleOrderToUpdate));
+      order.actionId = 'some-action-id';
       order.id = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       order.fulfillments!.push({
         additionalFields: [
@@ -295,7 +297,11 @@ Code: 15 Message: Requested business cannot be found.`;
       });
       const mockedAxiosAdapter = new axiosMockAdapter(axios);
       mockedAxiosAdapter.onPut(`${Environment.STAGING}/${Version.V1}${Resource.ORDERS}/${order.id}`)
-        .reply(202, singleOrderToUpdateResponse);
+        .reply((data) => {
+          expect(data.headers['X-Channel-Ape-Action-Id']).to.equal('some-action-id');
+          expect(data.headers['X-Channel-Ape-Authorization-Token']).to.equal('valid-session-id');
+          return Promise.resolve([202, singleOrderToUpdateResponse]);
+        });
 
       return ordersService.update(order).then((actualOrder) => {
         expect(actualOrder.id).to.equal(order.id);
@@ -305,8 +311,41 @@ Code: 15 Message: Requested business cannot be found.`;
       });
     });
 
-    it('And valid OrderCreateRequest when creating an order, Then return created order', () => {
-      const orderCreateRequest: OrderCreateRequest = singleOrder;
+    it(`And valid order when updating said order with no actionId
+          Then return updated order`, () => {
+      const order: Order = JSON.parse(JSON.stringify(singleOrderToUpdate));
+      order.id = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      order.fulfillments!.push({
+        additionalFields: [
+          {
+            name: 'some-addtl-field',
+            value: 'some-value'
+          }
+        ],
+        id: 'fulfillment-id',
+        lineItems: order.lineItems,
+        status: FulfillmentStatus.OPEN
+      });
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onPut(`${Environment.STAGING}/${Version.V1}${Resource.ORDERS}/${order.id}`)
+        .reply((data) => {
+          expect(data.headers['X-Channel-Ape-Action-Id']).to.be.undefined;
+          expect(Object.keys(data.headers).length).to.equal(3);
+          expect(data.headers['X-Channel-Ape-Authorization-Token']).to.equal('valid-session-id');
+          return Promise.resolve([202, singleOrderToUpdateResponse]);
+        });
+
+      return ordersService.update(order).then((actualOrder) => {
+        expect(actualOrder.id).to.equal(order.id);
+        expect(actualOrder.fulfillments!.length).to.equal(1);
+        expect(actualOrder.fulfillments![0].lineItems.length).to.equal(2);
+        expect(actualOrder.fulfillments![0].lineItems[0].sku).to.equal('b4809155-1c5d-4b3b-affc-491ad5503007');
+      });
+    });
+
+    it('And valid OrderCreateRequest with an actionId when creating an order, Then return created order', () => {
+      const orderCreateRequest: OrderCreateRequest = JSON.parse(JSON.stringify(singleOrder));
+      orderCreateRequest.actionId = 'some-action-id';
       orderCreateRequest.fulfillments!.push({
         additionalFields: [
           {
@@ -320,7 +359,43 @@ Code: 15 Message: Requested business cannot be found.`;
       });
       const mockedAxiosAdapter = new axiosMockAdapter(axios);
       mockedAxiosAdapter.onPost(`${Environment.STAGING}/${Version.V1}${Resource.ORDERS}`)
-        .reply(202, orderCreateRequest);
+        .reply((data) => {
+          expect(data.headers['X-Channel-Ape-Action-Id']).to.equal('some-action-id');
+          expect(data.headers['X-Channel-Ape-Authorization-Token']).to.equal('valid-session-id');
+          return Promise.resolve([202, orderCreateRequest]);
+        });
+
+      return ordersService.create(orderCreateRequest).then((createdOrder) => {
+        expect(createdOrder.id).to.equal('c0f45529-cbed-4e90-9a38-c208d409ef2a', 'order.id');
+        expect(createdOrder.totalPrice).to.equal(31.93, 'totalPrice');
+        expect(createdOrder.fulfillments!.length).to.equal(1, 'fulfillments.length');
+        expect(createdOrder.fulfillments![0].lineItems.length).to.equal(2, 'fulfillments.lineItems.length');
+        expect(createdOrder.fulfillments![0].lineItems[0].sku)
+          .to.equal('e67f1d90-824a-4941-8497-08d632763c93', 'fulfillments.lineItems.sku');
+      });
+    });
+
+    it('And valid OrderCreateRequest with no actionId when creating an order, Then return created order', () => {
+      const orderCreateRequest: OrderCreateRequest = JSON.parse(JSON.stringify(singleOrder));
+      orderCreateRequest.fulfillments!.push({
+        additionalFields: [
+          {
+            name: 'some-addtl-field',
+            value: 'some-value'
+          }
+        ],
+        id: 'fulfillment-id',
+        lineItems: orderCreateRequest.lineItems,
+        status: FulfillmentStatus.OPEN
+      });
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onPost(`${Environment.STAGING}/${Version.V1}${Resource.ORDERS}`)
+        .reply((data) => {
+          expect(data.headers['X-Channel-Ape-Action-Id']).to.be.undefined;
+          expect(Object.keys(data.headers).length).to.equal(3);
+          expect(data.headers['X-Channel-Ape-Authorization-Token']).to.equal('valid-session-id');
+          return Promise.resolve([202, orderCreateRequest]);
+        });
 
       return ordersService.create(orderCreateRequest).then((createdOrder) => {
         expect(createdOrder.id).to.equal('c0f45529-cbed-4e90-9a38-c208d409ef2a', 'order.id');

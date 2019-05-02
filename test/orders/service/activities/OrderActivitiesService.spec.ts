@@ -54,7 +54,7 @@ describe('OrdersActivitiesService', () => {
           `${Environment.STAGING}/${Version.V1}${Resource.ORDERS_ACTIVITY}`
         )
           .reply((data) => {
-            expect(data.headers['X-Channel-Ape-Action-Id']).to.equal(expectedActionId);
+            expect(data.headers['X-Channel-Ape-Action-Id']).to.be.undefined;
             expect(data.headers['X-Channel-Ape-Authorization-Token']).to.equal('valid-session-id');
             return Promise.resolve([202, orderActivityCreateRequest]) as any;
           });
