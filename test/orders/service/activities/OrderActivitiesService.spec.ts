@@ -144,7 +144,7 @@ describe('OrdersActivitiesService', () => {
           });
 
         return ordersService.activities().create(orderActivityCreateRequest).then(() => {
-          throw new Error('Create order activity did not through an error');
+          throw new Error('Create order activity did not throw an error');
         }).catch((error) => {
           expect(error.message).to.equal(`Order could not be discerned,
           2 orders exist on businessId ${orderActivityCreateRequest.businessId} with channelOrderId of
@@ -177,7 +177,7 @@ describe('OrdersActivitiesService', () => {
           });
 
         return ordersService.activities().create(orderActivityCreateRequest).then(() => {
-          throw new Error('Create order activity did not through an error');
+          throw new Error('Create order activity did not throw an error');
         }).catch((error) => {
           expect(error.message).to.equal(`Order could not be discerned,
           no orders exist on businessId ${orderActivityCreateRequest.businessId} with channelOrderId of
