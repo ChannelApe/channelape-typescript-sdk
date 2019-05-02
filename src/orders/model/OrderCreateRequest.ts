@@ -22,4 +22,5 @@ export default interface OrderCreateRequest {
   alphabeticCurrencyCode: string;
   lineItems: LineItem[];
   fulfillments?: Fulfillment[];
+  actionId?: string;
 }

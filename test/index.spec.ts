@@ -252,6 +252,35 @@ describe('Index', () => {
     expect(ordersRequestByChannelOrderId.channelOrderId).to.equal('channelOrderId');
   });
 
+  it('Expect OrderActivityCreateRequestByChannel to be exported', () => {
+    const orderActivityCreateRequestByChannel: ChannelApe.OrderActivityCreateRequestByChannel = {
+      channelId: 'channelId',
+      channelOrderId: 'channelOrderId',
+      operation: ChannelApe.OrderActivityOperation.CREATE,
+      result: ChannelApe.OrderActivityResult.SUCCESS
+    };
+    expect(orderActivityCreateRequestByChannel.channelOrderId).to.equal('channelOrderId');
+  });
+
+  it('Expect OrderActivityCreateRequestByBusiness to be exported', () => {
+    const orderActivityCreateRequestByBusiness: ChannelApe.OrderActivityCreateRequestByBusiness = {
+      businessId: 'some-business-id',
+      channelOrderId: 'some-channel-order-id',
+      operation: ChannelApe.OrderActivityOperation.CREATE,
+      result: ChannelApe.OrderActivityResult.SUCCESS
+    };
+    expect(orderActivityCreateRequestByBusiness.businessId).to.equal('some-business-id');
+  });
+
+  it('Expect OrderActivityCreateRequestByOrderId to be exported', () => {
+    const orderActivityCreateRequestByOrderId: ChannelApe.OrderActivityCreateRequestByOrderId = {
+      orderId: 'orderId',
+      operation: ChannelApe.OrderActivityOperation.CREATE,
+      result: ChannelApe.OrderActivityResult.SUCCESS
+    };
+    expect(orderActivityCreateRequestByOrderId.orderId).to.equal('orderId');
+  });
+
   it('Expect OrderStatus to be exported', () => {
     expect(ChannelApe.OrderStatus).to.equal(ChannelApe.OrderStatus);
   });
