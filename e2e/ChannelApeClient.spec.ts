@@ -208,6 +208,38 @@ describe('ChannelApe Client', () => {
       });
     });
 
+    describe('And valid order', () => {
+      context('When patching order', () => {
+        it('Then patch the order', () => {
+          const expectedOrderId = '9f53ade6-5ed0-4fa1-8361-16bdf5852eab';
+          return channelApeClient.orders().get(expectedOrderId).then((actualOrder) => {
+            expect(actualOrder.id).to.equal(expectedOrderId);
+            const randomAddress1 = `${randomNumber(1, 999999)} ${randomWord(4, 12)} Street`;
+            const randomCity = `${randomWord(6, 12)} City`;
+            const randomProvince = `${randomWord(4, 10)}`;
+            const randomProvinceCode = `${randomWord(2, 2).toUpperCase()}`;
+            if (!actualOrder.customer) {
+              actualOrder.customer = {};
+            }
+            if (!actualOrder.customer.shippingAddress) {
+              actualOrder.customer.shippingAddress = {};
+            }
+            actualOrder.customer!.shippingAddress!.address1 = randomAddress1;
+            actualOrder.customer!.shippingAddress!.city = randomCity;
+            actualOrder.customer!.shippingAddress!.province = randomProvince;
+            actualOrder.customer!.shippingAddress!.provinceCode = randomProvinceCode;
+            return channelApeClient.orders().patch(actualOrder).then((actualUpdatedOrder) => {
+              expect(actualUpdatedOrder.id).to.equal(actualUpdatedOrder.id);
+              expect(actualUpdatedOrder.customer!.shippingAddress!.address1).to.equal(randomAddress1);
+              expect(actualUpdatedOrder.customer!.shippingAddress!.city).to.equal(randomCity);
+              expect(actualUpdatedOrder.customer!.shippingAddress!.province).to.equal(randomProvince);
+              expect(actualUpdatedOrder.customer!.shippingAddress!.provinceCode).to.equal(randomProvinceCode);
+            });
+          });
+        });
+      });
+    });
+
     describe('And valid order create request', () => {
       context('When creating an order', () => {
         it('Then create the order', () => {
@@ -683,5 +715,33 @@ describe('ChannelApe Client', () => {
     expect(channel.createdAt.toISOString()).to.equal(expectedCreatedAt.toISOString());
     expect(channel.updatedAt.getUTCMilliseconds())
       .to.be.greaterThan(expectedCreatedAt.getUTCMilliseconds());
+  }
+
+  /**
+   * Generates a random number based on the provided min and max values.
+   * @param {number} min Minimum number to generate (inclusive)
+   * @param {number} max Maximum number to generate (inclusive)
+   */
+  function randomNumber(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  /**
+   * Generates a random semi-readable word based on the provided min an max length values.
+   * @param {number} min Minium word length (inclusive)
+   * @param {number} max Maximum word length (inclusive)
+   */
+  function randomWord(min: number, max: number): string {
+    const consonantsArr = 'bcdfghjlmnpqrstv'.split('');
+    const vowelsArr = 'aeiou'.split('');
+    let word = '';
+    const length = randomNumber(min, max);
+    for (let i = 0; i < length / 2; i += 1) {
+      const randConsonant = consonantsArr[randomNumber(0, consonantsArr.length - 1)];
+      const randVowel = vowelsArr[randomNumber(0, vowelsArr.length - 1)];
+      word += (i === 0) ? randConsonant.toUpperCase() : randConsonant;
+      word += i * 2 < length - 1 ? randVowel : '';
+    }
+    return word;
   }
 });

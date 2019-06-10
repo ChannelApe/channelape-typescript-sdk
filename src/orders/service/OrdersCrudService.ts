@@ -17,6 +17,7 @@ import RequestCallbackParams from '../../model/RequestCallbackParams';
 import GenerateApiError from '../../utils/GenerateApiError';
 import * as Q from 'q';
 import GenericOrdersQueryRequest from './model/GenericOrdersQueryRequest';
+import OrderPatchRequest from '../model/OrderPatchRequest';
 
 const EXPECTED_GET_STATUS = 200;
 const EXPECTED_CREATE_STATUS = 202;
@@ -63,6 +64,23 @@ export default class OrdersCrudService {
       };
     }
     this.client.put(requestUrl, options, (error, response, body) => {
+      this.mapOrderPromise(requestUrl, deferred, error, response, body, EXPECTED_UPDATE_STATUS);
+    });
+    return deferred.promise as any;
+  }
+
+  public patch(order: OrderPatchRequest): Promise<Order> {
+    const deferred = Q.defer<Order>();
+    const requestUrl = `${Version.V1}${Resource.ORDERS}/${order.id}`;
+    const options: AxiosRequestConfig = {
+      data: order
+    };
+    if (order.actionId) {
+      options.headers = {
+        'X-Channel-Ape-Action-Id': order.actionId
+      };
+    }
+    this.client.patch(requestUrl, options, (error, response, body) => {
       this.mapOrderPromise(requestUrl, deferred, error, response, body, EXPECTED_UPDATE_STATUS);
     });
     return deferred.promise as any;

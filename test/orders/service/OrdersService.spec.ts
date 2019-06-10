@@ -10,6 +10,7 @@ import OrdersQueryRequestByBusinessId from '../../../src/orders/model/OrdersQuer
 import OrdersQueryRequestByChannelOrderId from '../../../src/orders/model/OrdersQueryRequestByChannelOrderId';
 import OrderCreateRequest from '../../../src/orders/model/OrderCreateRequest';
 import OrderUpdateRequest from '../../../src/orders/model/OrderUpdateRequest';
+import OrderPatchRequest from '../../../src/orders/model/OrderPatchRequest';
 import FulfillmentStatus from '../../../src/orders/model/FulfillmentStatus';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import Resource from '../../../src/model/Resource';
@@ -22,6 +23,9 @@ import singleClosedOrderWithFulfillments from '../resources/singleClosedOrderWit
 import singleOrderToUpdate from '../resources/singleOrderToUpdate';
 import singleOrderToUpdateResponse from '../resources/singleOrderToUpdateResponse';
 import multipleOrders from '../resources/multipleOrders';
+import singleOrderToPatchResponse from '../resources/singleOrderToPatchResponse';
+import singleOrderToPatch from '../resources/singleOrderToPatch';
+import { RecursivePartial } from '../../../src/model/RecursivePartial';
 
 const maximumRequestRetryTimeout = 3000;
 
@@ -340,6 +344,70 @@ Code: 15 Message: Requested business cannot be found.`;
         expect(actualOrder.fulfillments!.length).to.equal(1);
         expect(actualOrder.fulfillments![0].lineItems.length).to.equal(2);
         expect(actualOrder.fulfillments![0].lineItems[0].sku).to.equal('b4809155-1c5d-4b3b-affc-491ad5503007');
+      });
+    });
+
+    it(`And valid order when patching said order with an actionId
+          Then return patched order`, () => {
+      const newCity = 'Fargo';
+      const newAddress1 = '123 Test Lane';
+      const newProvince = 'North Dakota';
+
+      const order: RecursivePartial<OrderPatchRequest> = JSON.parse(JSON.stringify(singleOrderToPatch));
+      order.id = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      order.actionId = 'some-action-id';
+      order.customer = {
+        shippingAddress: {
+          address1: newAddress1,
+          city: newCity,
+          province: newProvince
+        }
+      };
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onPatch(`${Environment.STAGING}/${Version.V1}${Resource.ORDERS}/${order.id}`)
+        .reply((data) => {
+          expect(data.headers['X-Channel-Ape-Action-Id']).to.equal('some-action-id');
+          expect(data.headers['X-Channel-Ape-Authorization-Token']).to.equal('valid-session-id');
+          return Promise.resolve([202, singleOrderToPatchResponse]);
+        });
+
+      return ordersService.patch(order).then((actualOrder) => {
+        expect(actualOrder.id).to.equal(order.id);
+        expect(actualOrder.customer!.shippingAddress!.address1).to.equal(newAddress1);
+        expect(actualOrder.customer!.shippingAddress!.city).to.equal(newCity);
+        expect(actualOrder.customer!.shippingAddress!.province).to.equal(newProvince);
+      });
+    });
+
+    it(`And valid order when patching said order with no actionId
+          Then return patched order`, () => {
+      const newCity = 'Fargo';
+      const newAddress1 = '123 Test Lane';
+      const newProvince = 'North Dakota';
+
+      const order: RecursivePartial<OrderPatchRequest> = JSON.parse(JSON.stringify(singleOrderToPatch));
+      order.id = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      order.customer = {
+        shippingAddress: {
+          address1: newAddress1,
+          city: newCity,
+          province: newProvince
+        }
+      };
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onPatch(`${Environment.STAGING}/${Version.V1}${Resource.ORDERS}/${order.id}`)
+        .reply((data) => {
+          expect(data.headers['X-Channel-Ape-Action-Id']).to.be.undefined;
+          expect(Object.keys(data.headers).length).to.equal(3);
+          expect(data.headers['X-Channel-Ape-Authorization-Token']).to.equal('valid-session-id');
+          return Promise.resolve([202, singleOrderToPatchResponse]);
+        });
+
+      return ordersService.patch(order).then((actualOrder) => {
+        expect(actualOrder.id).to.equal(order.id);
+        expect(actualOrder.customer!.shippingAddress!.address1).to.equal(newAddress1);
+        expect(actualOrder.customer!.shippingAddress!.city).to.equal(newCity);
+        expect(actualOrder.customer!.shippingAddress!.province).to.equal(newProvince);
       });
     });
 

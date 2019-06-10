@@ -11,4 +11,7 @@ describe('HttpRequestMethod', () => {
   it('POST', () => {
     expect(HttpRequestMethod.POST).to.equal('POST');
   });
+  it('PATCH', () => {
+    expect(HttpRequestMethod.PATCH).to.equal('PATCH');
+  });
 });

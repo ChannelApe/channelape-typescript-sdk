@@ -49,6 +49,17 @@ export default class RequestClientWrapper {
     );
   }
 
+  public patch(url: string, params: AxiosRequestConfig, callback: RequestCallback): void {
+    this.makeRequest(
+      HttpRequestMethod.PATCH,
+      new Date(),
+      0,
+      url,
+      params,
+      callback
+    );
+  }
+
   public post(url: string, params: AxiosRequestConfig, callback: RequestCallback): void {
     this.makeRequest(
       HttpRequestMethod.POST,
@@ -93,6 +104,10 @@ export default class RequestClientWrapper {
         case HttpRequestMethod.POST:
           const postData = options.data === undefined ? '' : options.data;
           requestPromise = axios.post(url, { body: postData }, options);
+          break;
+        case HttpRequestMethod.PATCH:
+          const patchData = options.data === undefined ? '' : options.data;
+          requestPromise = axios.patch(url, { body: patchData }, options);
           break;
         default:
           throw new ChannelApeError('HTTP Request Method could not be determined', {} as any, '', []);
