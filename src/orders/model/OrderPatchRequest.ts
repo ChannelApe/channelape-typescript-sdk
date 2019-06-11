@@ -1,6 +1,6 @@
 import Order from './Order';
-import { RecursivePartial } from '../../model/RecursivePartial';
 
-export default interface OrderPatchRequest extends RecursivePartial<Order> {
+export default interface OrderPatchRequest extends Partial<Order> {
   actionId?: string;
+  channelSync?: boolean;
 }

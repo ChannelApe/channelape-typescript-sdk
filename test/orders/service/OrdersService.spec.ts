@@ -25,7 +25,6 @@ import singleOrderToUpdateResponse from '../resources/singleOrderToUpdateRespons
 import multipleOrders from '../resources/multipleOrders';
 import singleOrderToPatchResponse from '../resources/singleOrderToPatchResponse';
 import singleOrderToPatch from '../resources/singleOrderToPatch';
-import { RecursivePartial } from '../../../src/model/RecursivePartial';
 
 const maximumRequestRetryTimeout = 3000;
 
@@ -353,7 +352,7 @@ Code: 15 Message: Requested business cannot be found.`;
       const newAddress1 = '123 Test Lane';
       const newProvince = 'North Dakota';
 
-      const order: RecursivePartial<OrderPatchRequest> = JSON.parse(JSON.stringify(singleOrderToPatch));
+      const order: OrderPatchRequest = JSON.parse(JSON.stringify(singleOrderToPatch));
       order.id = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       order.actionId = 'some-action-id';
       order.customer = {
@@ -385,7 +384,7 @@ Code: 15 Message: Requested business cannot be found.`;
       const newAddress1 = '123 Test Lane';
       const newProvince = 'North Dakota';
 
-      const order: RecursivePartial<OrderPatchRequest> = JSON.parse(JSON.stringify(singleOrderToPatch));
+      const order: OrderPatchRequest = JSON.parse(JSON.stringify(singleOrderToPatch));
       order.id = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       order.customer = {
         shippingAddress: {
