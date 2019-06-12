@@ -120,6 +120,14 @@ channelapeClient.orders().update(order)
   });
 ```
 
+#### Patch order
+```typescript
+channelapeClient.orders().patch(order)
+  .then((patchedOrder: Order) => {
+    // do what you need to do with patchedOrder data here
+  });
+```
+
 #### Create order
 ````typescript
 const orderToCreate: OrderCreateRequest = {

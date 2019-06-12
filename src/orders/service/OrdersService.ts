@@ -9,6 +9,7 @@ import OrderActivitiesService from './activities/OrderActivitiesService';
 import RequestClientWrapper from '../../RequestClientWrapper';
 import GenericOrdersQueryRequest from './model/GenericOrdersQueryRequest';
 import OrdersCrudService from './OrdersCrudService';
+import OrderPatchRequest from '../model/OrderPatchRequest';
 
 export default class OrdersService {
   private readonly ordersCrudService: OrdersCrudService;
@@ -41,6 +42,10 @@ export default class OrdersService {
 
   public update(order: OrderUpdateRequest): Promise<Order> {
     return this.ordersCrudService.update(order);
+  }
+
+  public patch(order: OrderPatchRequest): Promise<Order> {
+    return this.ordersCrudService.patch(order);
   }
 
   public create(order: OrderCreateRequest): Promise<Order> {

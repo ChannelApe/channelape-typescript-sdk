@@ -208,6 +208,38 @@ describe('ChannelApe Client', () => {
       });
     });
 
+    describe('And valid order', () => {
+      context('When patching order', () => {
+        it('Then patch the order', () => {
+          const expectedOrderId = '9f53ade6-5ed0-4fa1-8361-16bdf5852eab';
+          return channelApeClient.orders().get(expectedOrderId).then((actualOrder) => {
+            expect(actualOrder.id).to.equal(expectedOrderId);
+            const fakeAddress = faker.address.streetAddress();
+            const fakeCity = faker.address.city();
+            const fakeProvince = faker.address.state();
+            const fakeProvinceCode = fakeCity.substr(0, 2).toUpperCase();
+            if (!actualOrder.customer) {
+              actualOrder.customer = {};
+            }
+            if (!actualOrder.customer.shippingAddress) {
+              actualOrder.customer.shippingAddress = {};
+            }
+            actualOrder.customer!.shippingAddress!.address1 = fakeAddress;
+            actualOrder.customer!.shippingAddress!.city = fakeCity;
+            actualOrder.customer!.shippingAddress!.province = fakeProvince;
+            actualOrder.customer!.shippingAddress!.provinceCode = fakeProvinceCode;
+            return channelApeClient.orders().patch(actualOrder).then((actualUpdatedOrder) => {
+              expect(actualUpdatedOrder.id).to.equal(actualUpdatedOrder.id);
+              expect(actualUpdatedOrder.customer!.shippingAddress!.address1).to.equal(fakeAddress);
+              expect(actualUpdatedOrder.customer!.shippingAddress!.city).to.equal(fakeCity);
+              expect(actualUpdatedOrder.customer!.shippingAddress!.province).to.equal(fakeProvince);
+              expect(actualUpdatedOrder.customer!.shippingAddress!.provinceCode).to.equal(fakeProvinceCode);
+            });
+          });
+        });
+      });
+    });
+
     describe('And valid order create request', () => {
       context('When creating an order', () => {
         it('Then create the order', () => {
@@ -684,4 +716,5 @@ describe('ChannelApe Client', () => {
     expect(channel.updatedAt.getUTCMilliseconds())
       .to.be.greaterThan(expectedCreatedAt.getUTCMilliseconds());
   }
+
 });
