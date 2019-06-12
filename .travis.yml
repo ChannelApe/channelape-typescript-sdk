@@ -14,7 +14,7 @@ install:
   - npm install
 script:
   - npm test
-  - npm run e2e
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then npm run e2e; fi
 after_success:
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash .travis/overwrite-sonar-project-version.sh; fi
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then sonar-scanner; fi
