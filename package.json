@@ -1,6 +1,6 @@
 {
 	"name": "channelape-sdk",
-	"version": "1.8.0",
+	"version": "1.9.0",
 	"description": "A client for interacting with ChannelApe's API",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -98,7 +98,7 @@
 		"ts-node": "^6.0.1",
 		"tslint": "^5.9.1",
 		"tslint-config-airbnb": "^5.8.0",
-		"typescript": "^2.7.2"
+		"typescript": "^2.8.4"
 	},
 	"nyc": {
 		"include": [
