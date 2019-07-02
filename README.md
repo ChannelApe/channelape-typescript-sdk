@@ -14,6 +14,7 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Businesses](#businesses)
 - [Subscriptions](#subscriptions)
 - [Order Activities](#order-activities)
+- [Analytics](#analytics)
 
 ### Getting Started
 
@@ -304,6 +305,7 @@ const orderActivityCreateRequest: OrderActivityCreateRequestByChannel = {
   ]
 };
 
+
 // Create an order activity if you know the ChannelApe Order ID (i.e. order.id) of the order in question
 const orderActivityCreateRequest: OrderActivityCreateRequestByOrderId = {
   orderId: 'some-order-id',
@@ -334,4 +336,18 @@ const orderActivityCreateRequest: OrderActivityCreateRequestByBusiness = {
 channelApeClient.orders().activities().create(orderActivityCreateRequest).then((orderActivity) => {
   // do what you need to do with orderActivity here
 });
+```
+
+
+### Analytics
+
+### Generate Analytics Embed
+This can only be done with an end user account that has access to ChannelApe analytics.
+```typescript
+const embedCode = 'valid-embed-code';
+const timezone = 'America/New_York';
+channelApeClient.analytics().generateEmbed(embedCode, timezone)
+  .then((embed: Embed) => {
+    // Render the embed in an iframe or in a browser.
+  });
 ```
