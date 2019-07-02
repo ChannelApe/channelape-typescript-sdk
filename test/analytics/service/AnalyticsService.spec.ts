@@ -59,7 +59,7 @@ describe('Analytics Service', () => {
       'When generating embed Then return resolved promise with embed', () => {
 
       const response = {
-        status: 200,
+        status: 201,
         config: {
           method: 'POST'
         }
