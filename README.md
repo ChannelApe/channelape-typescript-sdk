@@ -14,6 +14,7 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Businesses](#businesses)
 - [Subscriptions](#subscriptions)
 - [Order Activities](#order-activities)
+- [Analytics](#analytics)
 
 ### Getting Started
 

@@ -7,7 +7,7 @@ import RequestClientWrapper from '../../RequestClientWrapper';
 import GenerateApiError from '../../utils/GenerateApiError';
 import Embed from '../model/Embed';
 
-const EXPECTED_POST_STATUS = 200;
+const EXPECTED_POST_STATUS = 201;
 
 export default class AnalyticsService {
 
