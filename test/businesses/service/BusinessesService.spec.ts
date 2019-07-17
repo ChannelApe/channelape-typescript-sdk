@@ -9,6 +9,11 @@ import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorRes
 import Business from '../../../src/businesses/model/Business';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import { ChannelApeError, AlphabeticCurrencyCode, InventoryItemKey, TimeZoneId } from '../../../src/index';
+import axios from 'axios';
+import axiosMockAdapter from 'axios-mock-adapter';
+
+import singleBusiness from '../resources/singleBusiness';
+import BusinessCreateRequest from '../../../src/businesses/model/BusinessCreateRequest';
 
 describe('Businesses Service', () => {
 
@@ -23,6 +28,7 @@ describe('Businesses Service', () => {
         minimumRequestRetryRandomDelay: 50,
         maximumRequestRetryRandomDelay: 50
       });
+    const businessesService: BusinessesService = new BusinessesService(client);
 
     let sandbox: sinon.SinonSandbox;
 
@@ -166,6 +172,26 @@ describe('Businesses Service', () => {
       }).catch((e) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.BUSINESSES}`);
         expectChannelApeErrorResponse(e);
+      });
+    });
+
+    it('And valid Business when creating a business, Then return created business', () => {
+      const newBusiness: BusinessCreateRequest = JSON.parse(JSON.stringify(singleBusiness));
+
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onPost(`${Environment.STAGING}/${Version.V1}${Resource.ORDERS}`)
+        .reply((data) => {
+          expect(data.headers['X-Channel-Ape-Authorization-Token']).to.equal('valid-session-id');
+          return Promise.resolve([202, newBusiness]);
+        });
+
+      return businessesService.create(newBusiness).then((createdBusiness) => {
+        expect(createdBusiness.id).to.equal('62096199-0aa4-4ebb-bab0-8bd887507265', 'business.id');
+        expect(createdBusiness.timeZone).to.equal(TimeZoneId.AMERICA_NEW_YORK, 'timezone');
+        expect(createdBusiness.name).to.equal('Some Test Business Name', 'name');
+        expect(createdBusiness.inventoryItemKey).to.equal(InventoryItemKey.SKU, 'inventoryItemKey');
+        expect(createdBusiness.alphabeticCurrencyCode)
+          .to.equal(AlphabeticCurrencyCode.USD, 'alphabeticCurrencyCode');
       });
     });
 
