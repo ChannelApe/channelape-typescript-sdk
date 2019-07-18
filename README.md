@@ -275,6 +275,20 @@ channelApeClient.businesses().get(businessesQueryRequestByUserId)
 ```
 See [Sessions](#sessions) for how to retrieve your `userId`
 
+#### Create Business
+```typescript
+const businessToCreate: BusinessCreateRequest = {
+  name: 'Valid Business Name',
+  timeZone: TimeZoneId.AMERICA_NEW_YORK,
+  inventoryItemKey: InventoryItemKey.SKU,
+  alphabeticCurrencyCode: AlphabeticCurrencyCode.USD
+}
+channelApeClient.businesses().create(businessToCreate)
+  .then((business: Business) => {
+    // do what you need to do with the newly created business here 
+  });
+```
+
 ### Subscriptions
 
 #### Get Subscription

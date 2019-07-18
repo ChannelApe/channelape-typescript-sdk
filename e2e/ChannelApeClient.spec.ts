@@ -18,6 +18,10 @@ import VariantsSearchRequestByTag from '../src/variants/model/VariantsSearchRequ
 import OrderCreateRequest from '../src/orders/model/OrderCreateRequest';
 import OrderActivityOperation from '../src/orders/service/activities/model/OrderActivityOperation';
 import OrderActivityResult from '../src/orders/service/activities/model/OrderActivityResult';
+import BusinessCreateRequest from '../src/businesses/model/BusinessCreateRequest';
+import TimeZoneId from '../src/model/TimeZoneId';
+import InventoryItemKey from '../src/model/InventoryItemKey';
+import AlphabeticCurrencyCode from '../src/model/AlphabeticCurrencyCode';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
@@ -644,6 +648,29 @@ describe('ChannelApe Client', () => {
             expect(actualSubscription.subscriptionId).to.not.equal(undefined);
             expect(actualSubscription.subscriptionProductHandle).to.not.equal(undefined);
             expect(actualSubscription.updatedAt!.toISOString()).to.be.a('string');
+          });
+        });
+      });
+    });
+
+    describe('And valid business create request', () => {
+      context('When creating a business', () => {
+        it('Then create the business', () => {
+          const businessName = faker.company.companyName();
+
+          const businessToCreate: BusinessCreateRequest = {
+            name: businessName,
+            timeZone: TimeZoneId.AMERICA_NEW_YORK,
+            inventoryItemKey: InventoryItemKey.SKU,
+            alphabeticCurrencyCode: AlphabeticCurrencyCode.USD
+          };
+
+          return channelApeClient.businesses().create(businessToCreate).then((createdBusiness) => {
+            expect(createdBusiness.name).to.equal(businessName);
+            expect(createdBusiness.timeZone).to.equal(TimeZoneId.AMERICA_NEW_YORK);
+            expect(createdBusiness.inventoryItemKey).to.equal(InventoryItemKey.SKU);
+            expect(createdBusiness.alphabeticCurrencyCode)
+              .to.equal(AlphabeticCurrencyCode.USD);
           });
         });
       });

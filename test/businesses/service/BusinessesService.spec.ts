@@ -179,10 +179,10 @@ describe('Businesses Service', () => {
       const newBusiness: BusinessCreateRequest = JSON.parse(JSON.stringify(singleBusiness));
 
       const mockedAxiosAdapter = new axiosMockAdapter(axios);
-      mockedAxiosAdapter.onPost(`${Environment.STAGING}/${Version.V1}${Resource.ORDERS}`)
+      mockedAxiosAdapter.onPost(`${Environment.STAGING}/${Version.V1}${Resource.BUSINESSES}`)
         .reply((data) => {
           expect(data.headers['X-Channel-Ape-Authorization-Token']).to.equal('valid-session-id');
-          return Promise.resolve([202, newBusiness]);
+          return Promise.resolve([201, newBusiness]);
         });
 
       return businessesService.create(newBusiness).then((createdBusiness) => {

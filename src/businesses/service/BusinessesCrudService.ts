@@ -10,7 +10,7 @@ import * as Q from 'q';
 import BusinessCreateRequest from '../model/BusinessCreateRequest';
 
 const EXPECTED_GET_STATUS = 200;
-const EXPECTED_CREATE_STATUS = 202;
+const EXPECTED_CREATE_STATUS = 201;
 
 export default class BusinessesCrudService {
 
@@ -37,7 +37,7 @@ export default class BusinessesCrudService {
 
   public create(business: BusinessCreateRequest): Promise<Business> {
     const deferred = Q.defer<Business>();
-    const requestUrl = `${Version.V1}${Resource.ORDERS}`;
+    const requestUrl = `${Version.V1}${Resource.BUSINESSES}`;
     const options: AxiosRequestConfig = {
       data: business
     };
