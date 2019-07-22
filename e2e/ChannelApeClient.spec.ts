@@ -652,29 +652,6 @@ describe('ChannelApe Client', () => {
         });
       });
     });
-
-    describe('And valid business create request', () => {
-      context('When creating a business', () => {
-        it('Then create the business', () => {
-          const businessName = faker.company.companyName();
-
-          const businessToCreate: BusinessCreateRequest = {
-            name: businessName,
-            timeZone: TimeZoneId.AMERICA_NEW_YORK,
-            inventoryItemKey: InventoryItemKey.SKU,
-            alphabeticCurrencyCode: AlphabeticCurrencyCode.USD
-          };
-
-          return channelApeClient.businesses().create(businessToCreate).then((createdBusiness) => {
-            expect(createdBusiness.name).to.equal(businessName);
-            expect(createdBusiness.timeZone).to.equal(TimeZoneId.AMERICA_NEW_YORK);
-            expect(createdBusiness.inventoryItemKey).to.equal(InventoryItemKey.SKU);
-            expect(createdBusiness.alphabeticCurrencyCode)
-              .to.equal(AlphabeticCurrencyCode.USD);
-          });
-        });
-      });
-    });
   });
 
   function getSessionId(): string {
