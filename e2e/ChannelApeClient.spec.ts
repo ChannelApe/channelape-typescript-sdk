@@ -18,10 +18,6 @@ import VariantsSearchRequestByTag from '../src/variants/model/VariantsSearchRequ
 import OrderCreateRequest from '../src/orders/model/OrderCreateRequest';
 import OrderActivityOperation from '../src/orders/service/activities/model/OrderActivityOperation';
 import OrderActivityResult from '../src/orders/service/activities/model/OrderActivityResult';
-import BusinessCreateRequest from '../src/businesses/model/BusinessCreateRequest';
-import TimeZoneId from '../src/model/TimeZoneId';
-import InventoryItemKey from '../src/model/InventoryItemKey';
-import AlphabeticCurrencyCode from '../src/model/AlphabeticCurrencyCode';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
