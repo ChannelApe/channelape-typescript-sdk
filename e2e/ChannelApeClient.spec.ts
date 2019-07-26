@@ -648,6 +648,21 @@ describe('ChannelApe Client', () => {
         });
       });
     });
+
+    describe('And valid analytics report list get request', () => {
+      context('When getting report list', () => {
+        it('Then return report list', async () => {
+          const reports = await channelApeClient.analytics().get();
+          expect(reports.length).to.be.greaterThan(0);
+
+          for (const report of reports) {
+            expect(report.category).to.be.a('string');
+            expect(report.embedCode).to.be.a('string');
+            expect(report.name).to.be.a('string');
+          }
+        });
+      });
+    });
   });
 
   function getSessionId(): string {

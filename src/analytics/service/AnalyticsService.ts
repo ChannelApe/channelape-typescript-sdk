@@ -6,7 +6,9 @@ import Version from '../../model/Version';
 import RequestClientWrapper from '../../RequestClientWrapper';
 import GenerateApiError from '../../utils/GenerateApiError';
 import Embed from '../model/Embed';
+import Report from '../model/Report';
 
+const EXPECTED_GET_STATUS = 200;
 const EXPECTED_POST_STATUS = 201;
 
 export default class AnalyticsService {
@@ -15,6 +17,19 @@ export default class AnalyticsService {
 
   public generateEmbed(embedCode: string, timezone: string): Promise<Embed> {
     return this.getEmbed(embedCode, timezone);
+  }
+
+  public get(): Promise<Report[]> {
+    return this.getReports();
+  }
+
+  private getReports(): Promise<Report[]> {
+    const deferred = Q.defer<Report[]>();
+    const requestUrl = `/${Version.V2}${Resource.ANALYTICS}`;
+    this.client.get(requestUrl, {}, (error, response, body) => {
+      this.mapReportPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
+    });
+    return deferred.promise as any;
   }
 
   private getEmbed(embedCode: string, timezone: string): Promise<Embed> {
@@ -40,6 +55,18 @@ export default class AnalyticsService {
     } else if (response.status === expectedStatusCode) {
       const embed: Embed = this.formatEmbed(body);
       deferred.resolve(embed);
+    } else {
+      const channelApeErrorResponse = GenerateApiError(requestUrl, response, body, EXPECTED_POST_STATUS);
+      deferred.reject(channelApeErrorResponse);
+    }
+  }
+
+  private mapReportPromise(requestUrl: string, deferred: Q.Deferred<Report[]>, error: any, response: AxiosResponse,
+    body: any, expectedStatusCode: number) {
+    if (error) {
+      deferred.reject(error);
+    } else if (response.status === expectedStatusCode) {
+      deferred.resolve(body);
     } else {
       const channelApeErrorResponse = GenerateApiError(requestUrl, response, body, EXPECTED_POST_STATUS);
       deferred.reject(channelApeErrorResponse);
