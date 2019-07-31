@@ -1,3 +1,3 @@
-export default interface ChannelsQueryRequestByBusinessId {
+export default interface SuppliersQueryRequestByBusinessId {
   businessId: string;
 }
