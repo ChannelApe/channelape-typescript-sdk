@@ -8,6 +8,7 @@ import ChannelApeClient from '../src/ChannelApeClient';
 import OrderStatus from '../src/orders/model/OrderStatus';
 import OrdersQueryRequestByBusinessId from '../src/orders/model/OrdersQueryRequestByBusinessId';
 import Channel from '../src/channels/model/Channel';
+import Supplier from '../src/suppliers/model/Supplier';
 import VariantsRequestByProductId from '../src/variants/model/VariantsRequestByProductId';
 import VariantsRequest from '../src/variants/model/VariantsRequest';
 import VariantsSearchRequestByProductFilterId from '../src/variants/model/VariantsSearchRequestByProductFilterId';
@@ -143,6 +144,37 @@ describe('ChannelApe Client', () => {
               }
             }
             assertChannelEuropaSportsSnackFoods(channels[i]);
+          });
+        });
+      });
+    });
+
+    describe('And valid supplier ID', () => {
+      context('When retrieving supplier', () => {
+        it('Then return supplier', () => {
+          const expectedSupplierId = '1e4ebaa6-9796-4ccf-bd73-8765893a66bd';
+          const actualSupplierPromise = channelApeClient.suppliers().get(expectedSupplierId);
+          return actualSupplierPromise.then(assertSupplierEuropaSportsSnackFoods);
+        });
+      });
+    });
+
+    describe('And valid business ID', () => {
+      context('When retrieving suppliers', () => {
+        it('Then return suppliers', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const actualSuppliersPromise = channelApeClient.suppliers().get({
+            businessId: expectedBusinessId
+          });
+          return actualSuppliersPromise.then((suppliers) => {
+            expect(suppliers).to.be.an('array');
+            let i: number;
+            for (i = 0; i < suppliers.length; i += 1) {
+              if (suppliers[i].id === '1e4ebaa6-9796-4ccf-bd73-8765893a66bd') {
+                break;
+              }
+            }
+            assertSupplierEuropaSportsSnackFoods(suppliers[i]);
           });
         });
       });
@@ -717,4 +749,30 @@ describe('ChannelApe Client', () => {
       .to.be.greaterThan(expectedCreatedAt.getUTCMilliseconds());
   }
 
+  function assertSupplierEuropaSportsSnackFoods(supplier: Supplier) {
+    expect(supplier.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
+    expect(supplier.enabled).to.equal(true);
+    expect(supplier.fileSettings!.additionalFieldsMapping[0].columnIndex).to.equal(55);
+    expect(supplier.fileSettings!.additionalFieldsMapping[1].sourceId).to.equal('products');
+    expect(supplier.fileSettings!.descriptionMapping[0].columnIndex).to.equal(7);
+    expect(supplier.fileSettings!.descriptionMapping[1].prefix)
+      .to.equal('<div class="directions">Directions</div><p>');
+    expect(supplier.fileSettings!.imagesMapping[0].columnIndex).to.equal(49);
+    expect(supplier.fileSettings!.optionsMapping[0].key).to.equal('Flavor');
+    expect(supplier.fileSettings!.optionsMapping[0].columnIndex).to.equal(11);
+    expect(supplier.fileSettings!.primaryCategoryMapping.columnIndex).to.equal(16);
+    expect(supplier.fileSettings!.productMapping.columnIndex).to.equal(2);
+    expect(supplier.fileSettings!.retailPriceMapping.columnIndex).to.equal(19);
+    expect(supplier.fileSettings!.retailPriceMapping.currencyCode).to.equal('USD');
+    expect(supplier.fileSettings!.sources[0].id).to.equal('products');
+    expect(supplier.fileSettings!.sources[0].fileType).to.equal('CSV');
+    expect(supplier.fileSettings!.sources[0].joinIndex).to.equal(0);
+    expect(supplier.fileSettings!.sources[0].headers).to.equal(true);
+    expect(supplier.fileSettings!.sources[0].authorization!.passwordKey).to.equal('password');
+    expect(supplier.fileSettings!.sources[1].id).to.equal('nutrients');
+    expect(supplier.fileSettings!.weightMapping.unitOfMeasurement).to.equal('g');
+    expect(supplier.id).to.equal('1e4ebaa6-9796-4ccf-bd73-8765893a66bd');
+    expect(supplier.integrationId).to.equal('2eacfed0-46ce-46b5-b8c6-dd8e29672c8c');
+    expect(supplier.name).to.equal('Europa Sports');
+  }
 });
