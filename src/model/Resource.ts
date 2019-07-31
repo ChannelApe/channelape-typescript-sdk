@@ -3,6 +3,7 @@ enum Resource {
   SUBSCRIPTIONS = '/subscriptions',
   ACTIONS = '/actions',
   CHANNELS = '/channels',
+  SUPPLIERS = '/suppliers',
   ORDERS = '/orders',
   ORDERS_ACTIVITY = '/orders/activities',
   PRODUCTS = '/products',
