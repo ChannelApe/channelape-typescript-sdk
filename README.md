@@ -9,6 +9,7 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Sessions](#sessions)
 - [Actions](#actions)
 - [Channels](#channels)
+- [Suppliers](#suppliers)
 - [Orders](#orders)
 - [Variants](#variants)
 - [Businesses](#businesses)
