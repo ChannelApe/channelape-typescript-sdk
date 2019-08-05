@@ -384,3 +384,11 @@ channelApeClient.analytics().generateEmbed(embedCode, timezone)
     // Render the embed in an iframe or in a browser.
   });
 ```
+
+### Available Analytics Embeds
+```typescript
+channelApeClient.analytics().get()
+  .then((reports[]: Embed) => {
+    // Do what you need to with list of reports
+  });
+```
