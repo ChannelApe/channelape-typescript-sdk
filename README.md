@@ -366,7 +366,7 @@ channelApeClient.analytics().generateEmbed(embedCode, timezone)
   });
 ```
 
-### Get List of Available Analytics
+### Available Analytics Embeds
 ```typescript
 channelApeClient.analytics().get()
   .then((reports[]: Embed) => {

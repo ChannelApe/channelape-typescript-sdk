@@ -148,7 +148,7 @@ describe('Analytics Service', () => {
 
       const analyticsService: AnalyticsService = new AnalyticsService(client);
       const actualReportList = await analyticsService.get();
-      expect(clientGetStub.args[0][0]).to.equal(`/${Version.V2}${Resource.ANALYTICS}`);
+      expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ANALYTICS}`);
       expectReportList(actualReportList);
     });
 
@@ -161,7 +161,6 @@ describe('Analytics Service', () => {
       expect(actualReportList.length).to.equal(expectedReportList.length);
       for (const actualReport of actualReportList) {
         const expectedReport = expectedReportList.find(temp => temp.name === actualReport.name);
-        expect(expectedReport).not.to.equal(undefined);
         if (expectedReport) {
           expect(actualReport.category).to.equal(expectedReport.category);
           expect(actualReport.embedCode).to.equal(expectedReport.embedCode);

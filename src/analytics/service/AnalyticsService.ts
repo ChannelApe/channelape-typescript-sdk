@@ -25,9 +25,9 @@ export default class AnalyticsService {
 
   private getReports(): Promise<Report[]> {
     const deferred = Q.defer<Report[]>();
-    const requestUrl = `/${Version.V2}${Resource.ANALYTICS}`;
+    const requestUrl = `/${Version.V1}${Resource.ANALYTICS}`;
     this.client.get(requestUrl, {}, (error, response, body) => {
-      this.mapReportPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
+      this.mapReportsPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
     });
     return deferred.promise as any;
   }
@@ -61,7 +61,7 @@ export default class AnalyticsService {
     }
   }
 
-  private mapReportPromise(requestUrl: string, deferred: Q.Deferred<Report[]>, error: any, response: AxiosResponse,
+  private mapReportsPromise(requestUrl: string, deferred: Q.Deferred<Report[]>, error: any, response: AxiosResponse,
     body: any, expectedStatusCode: number) {
     if (error) {
       deferred.reject(error);
