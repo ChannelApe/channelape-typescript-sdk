@@ -65,8 +65,10 @@ export default class AnalyticsService {
     body: any, expectedStatusCode: number) {
     if (error) {
       deferred.reject(error);
+    } else if (body.errors.length > 0) {
+      deferred.reject(body.errors);
     } else if (response.status === expectedStatusCode) {
-      deferred.resolve(body);
+      deferred.resolve(body.reports);
     } else {
       const channelApeErrorResponse = GenerateApiError(requestUrl, response, body, EXPECTED_POST_STATUS);
       deferred.reject(channelApeErrorResponse);
