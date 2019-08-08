@@ -9,6 +9,7 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Sessions](#sessions)
 - [Actions](#actions)
 - [Channels](#channels)
+- [Suppliers](#suppliers)
 - [Orders](#orders)
 - [Variants](#variants)
 - [Businesses](#businesses)
@@ -100,6 +101,24 @@ channelapeClient.channels().get(channelId)
 channelapeClient.channels().get({ businessId: 'some-valid-business-id' })
   .then((channels: Channel[]) => {
     // do what you need to do with channel data here
+  });
+```
+
+### Suppliers
+
+#### Get supplier
+```typescript
+channelapeClient.suppliers().get(supplierId)
+  .then((supplier: Supplier) => {
+    // do what you need to do with supplier data here
+  });
+```
+
+#### Get all suppliers for a business
+```typescript
+channelapeClient.suppliers().get({ businessId: 'some-valid-business-id' })
+  .then((suppliers: Supplier[]) => {
+    // do what you need to do with supplier data here
   });
 ```
 
@@ -366,7 +385,7 @@ channelApeClient.analytics().generateEmbed(embedCode, timezone)
   });
 ```
 
-### Get List of Available Analytics
+### Available Analytics Embeds
 ```typescript
 channelApeClient.analytics().get()
   .then((reports[]: Embed) => {

@@ -134,6 +134,240 @@ describe('Index', () => {
     expect(channelsQueryRequestByBusinessId.businessId).to.equal('some-business-id');
   });
 
+  it('Expect Supplier to be exported', () => {
+    const supplier: ChannelApe.Supplier = {
+      businessId: 'business-id',
+      createdAt: new Date(),
+      enabled: true,
+      id: 'supplier-id',
+      integrationId: 'integration-id',
+      name: 'supplier-name',
+      updatedAt: new Date(),
+      fileSettings: {
+        additionalFieldsMapping: [],
+        descriptionMapping: [],
+        imagesMapping: [],
+        optionsMapping: [],
+        primaryCategoryMapping: {
+          columnIndex: 8,
+          sourceId: 'feed_1'
+        },
+        productMapping: {
+          columnIndex: 7,
+          sourceId: 'feed_1'
+        },
+        productTagsMapping: [],
+        quantityMapping: [],
+        removedFromFeedTag: 'some-tag',
+        retailPriceMapping: {
+          columnIndex: 0,
+          currencyCode: ChannelApe.AlphabeticCurrencyCode.USD,
+          sourceId: 'feed_1'
+        },
+        secondaryCategoryMapping: {
+          columnIndex: 1,
+          sourceId: 'feed_1'
+        },
+        skuMapping: {
+          columnIndex: 2,
+          sourceId: 'feed_2'
+        },
+        sources: [],
+        tagsMapping: [],
+        titleMapping: [],
+        upcMapping: {
+          columnIndex: 3,
+          sourceId: 'feed_1'
+        },
+        vendorMapping: {
+          columnIndex: 4,
+          sourceId: 'feed_1'
+        },
+        weightMapping: {
+          columnIndex: 5,
+          sourceId: 'feed_1',
+          unitOfMeasurement: ChannelApe.UnitOfMeasurement.OUNCES
+        },
+        wholesalePriceMapping: {
+          columnIndex: 6,
+          currencyCode: ChannelApe.AlphabeticCurrencyCode.USD,
+          sourceId: 'feed_1'
+        }
+      }
+    };
+    expect(supplier.id).to.equal('supplier-id');
+  });
+
+  it('Expect SuppliersQueryRequestByBusinessId to be exported', () => {
+    const suppliersQueryRequestByBusinessId: ChannelApe.SuppliersQueryRequestByBusinessId = {
+      businessId: 'business-id'
+    };
+    expect(suppliersQueryRequestByBusinessId.businessId).to.equal('business-id');
+  });
+
+  it('Expect FileSettings to be exported', () => {
+    const fileSettings: ChannelApe.FileSettings = {
+      additionalFieldsMapping: [],
+      descriptionMapping: [],
+      imagesMapping: [],
+      optionsMapping: [],
+      primaryCategoryMapping: {
+        columnIndex: 8,
+        sourceId: 'feed_1'
+      },
+      productMapping: {
+        columnIndex: 7,
+        sourceId: 'feed_1'
+      },
+      productTagsMapping: [],
+      quantityMapping: [],
+      removedFromFeedTag: 'some-tag',
+      retailPriceMapping: {
+        columnIndex: 0,
+        currencyCode: ChannelApe.AlphabeticCurrencyCode.USD,
+        sourceId: 'feed_1'
+      },
+      secondaryCategoryMapping: {
+        columnIndex: 1,
+        sourceId: 'feed_1'
+      },
+      skuMapping: {
+        columnIndex: 2,
+        sourceId: 'feed_2'
+      },
+      sources: [],
+      tagsMapping: [],
+      titleMapping: [],
+      upcMapping: {
+        columnIndex: 3,
+        sourceId: 'feed_1'
+      },
+      vendorMapping: {
+        columnIndex: 4,
+        sourceId: 'feed_1'
+      },
+      weightMapping: {
+        columnIndex: 5,
+        sourceId: 'feed_1',
+        unitOfMeasurement: ChannelApe.UnitOfMeasurement.OUNCES
+      },
+      wholesalePriceMapping: {
+        columnIndex: 6,
+        currencyCode: ChannelApe.AlphabeticCurrencyCode.USD,
+        sourceId: 'feed_1'
+      }
+    };
+    expect(fileSettings.primaryCategoryMapping.columnIndex).to.equal(8);
+  });
+
+  it('Expect FileSettingsAdditionalFields to be exported', () => {
+    const fileSettingsAdditionalFields: ChannelApe.FileSettingsAdditionalFields = {
+      columnIndex: 1,
+      key: 'some-key',
+      sourceId: 'feed_1'
+    };
+    expect(fileSettingsAdditionalFields.columnIndex).to.equal(1);
+  });
+
+  it('Expect FileSettingsAuthorization to be exported', () => {
+    const fileSettingsAuthorization: ChannelApe.FileSettingsAuthorization = {
+      passwordKey: 'password',
+      usernameKey: 'username'
+    };
+    expect(fileSettingsAuthorization.passwordKey).to.equal('password');
+    expect(fileSettingsAuthorization.usernameKey).to.equal('username');
+  });
+
+  it('Expect FileSettingsMapping to be exported', () => {
+    const fileSettingsMapping: ChannelApe.FileSettingsMapping = {
+      columnIndex: 0,
+      sourceId: 'feed_1'
+    };
+    expect(fileSettingsMapping.columnIndex).to.equal(0);
+    expect(fileSettingsMapping.sourceId).to.equal('feed_1');
+  });
+
+  it('Expect FileSettingsOptions to be exported', () => {
+    const fileSettingsOptions: ChannelApe.FileSettingsOptions = {
+      columnIndex: 0,
+      sourceId: 'feed_1',
+      key: 'option-key-1',
+      keyColumnIndex: 1
+    };
+    expect(fileSettingsOptions.columnIndex).to.equal(0);
+    expect(fileSettingsOptions.sourceId).to.equal('feed_1');
+    expect(fileSettingsOptions.key).to.equal('option-key-1');
+    expect(fileSettingsOptions.keyColumnIndex).to.equal(1);
+  });
+
+  it('Expect FileSettingsPrefixSuffix to be exported', () => {
+    const fileSettingsPrefixSuffix: ChannelApe.FileSettingsPrefixSuffix = {
+      columnIndex: 0,
+      sourceId: 'feed_1',
+      prefix: 'prefix',
+      suffix: 'suffix'
+    };
+    expect(fileSettingsPrefixSuffix.columnIndex).to.equal(0);
+    expect(fileSettingsPrefixSuffix.sourceId).to.equal('feed_1');
+    expect(fileSettingsPrefixSuffix.prefix).to.equal('prefix');
+    expect(fileSettingsPrefixSuffix.suffix).to.equal('suffix');
+  });
+
+  it('Expect FileSettingsPrice to be exported', () => {
+    const fileSettingsPrice: ChannelApe.FileSettingsPrice = {
+      columnIndex: 0,
+      sourceId: 'feed_1',
+      currencyCode: ChannelApe.AlphabeticCurrencyCode.USD
+    };
+    expect(fileSettingsPrice.columnIndex).to.equal(0);
+    expect(fileSettingsPrice.sourceId).to.equal('feed_1');
+    expect(fileSettingsPrice.currencyCode).to.equal(ChannelApe.AlphabeticCurrencyCode.USD);
+  });
+
+  it('Expect FileSettingsSources to be exported', () => {
+    const fileSettingsSources: ChannelApe.FileSettingsSources = {
+      authorization: {
+        passwordKey: 'password',
+        usernameKey: 'username'
+      },
+      fileType: 'csv',
+      headers: true,
+      id: 'file-settings-sources-id',
+      joinIndex: 5,
+      url: 'http://example.com'
+    };
+    expect(fileSettingsSources.authorization!.passwordKey).to.equal('password');
+    expect(fileSettingsSources.authorization!.usernameKey).to.equal('username');
+    expect(fileSettingsSources.fileType).to.equal('csv');
+    expect(fileSettingsSources.headers).to.equal(true);
+    expect(fileSettingsSources.id).to.equal('file-settings-sources-id');
+    expect(fileSettingsSources.joinIndex).to.equal(5);
+    expect(fileSettingsSources.url).to.equal('http://example.com');
+  });
+
+  it('Expect FileSettingsValue to be exported', () => {
+    const fileSettingsValue: ChannelApe.FileSettingsValue = {
+      value: 'any-value'
+    };
+    expect(fileSettingsValue.value).to.equal('any-value');
+  });
+
+  it('Expect FileSettingsWeight to be exported', () => {
+    const fileSettingsWeight: ChannelApe.FileSettingsWeight = {
+      columnIndex: 0,
+      sourceId: 'feed_1',
+      unitOfMeasurement: ChannelApe.UnitOfMeasurement.KILOGRAMS
+    };
+    expect(fileSettingsWeight.columnIndex).to.equal(0);
+    expect(fileSettingsWeight.sourceId).to.equal('feed_1');
+    expect(fileSettingsWeight.unitOfMeasurement).to.equal(ChannelApe.UnitOfMeasurement.KILOGRAMS);
+  });
+
+  it('Expect UnitOfMeasurement to be exported', () => {
+    const unitOfMeasurement: ChannelApe.UnitOfMeasurement = ChannelApe.UnitOfMeasurement.POUNDS;
+    expect(unitOfMeasurement).to.equal('lb');
+  });
+
   it('Expect Address to be exported', () => {
     const address: ChannelApe.Address = {
       additionalFields: [],

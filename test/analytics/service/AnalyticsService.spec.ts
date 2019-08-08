@@ -144,12 +144,15 @@ describe('Analytics Service', () => {
         }
       };
       const clientGetStub = sandbox.stub(client, 'get')
-        .yields(null, response, expectedReportList);
+        .yields(null, response, {
+          errors: [],
+          reports: expectedReportList
+        });
 
       const analyticsService: AnalyticsService = new AnalyticsService(client);
-      const actualReportList = await analyticsService.get();
-      expect(clientGetStub.args[0][0]).to.equal(`/${Version.V2}${Resource.ANALYTICS}`);
-      expectReportList(actualReportList);
+      const actualReportListResponse = await analyticsService.get();
+      expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ANALYTICS}`);
+      expectReportList(actualReportListResponse);
     });
 
     function expectEmbed(actualEmbed: Embed) {
@@ -157,11 +160,10 @@ describe('Analytics Service', () => {
       expect(actualEmbed.expiration.toISOString()).to.equal(expectedEmbed.expiration.toISOString());
     }
 
-    function expectReportList(actualReportList: Report[]) {
+    function expectReportList(actualReportList: any) {
       expect(actualReportList.length).to.equal(expectedReportList.length);
       for (const actualReport of actualReportList) {
         const expectedReport = expectedReportList.find(temp => temp.name === actualReport.name);
-        expect(expectedReport).not.to.equal(undefined);
         if (expectedReport) {
           expect(actualReport.category).to.equal(expectedReport.category);
           expect(actualReport.embedCode).to.equal(expectedReport.embedCode);
