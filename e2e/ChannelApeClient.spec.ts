@@ -19,6 +19,7 @@ import VariantsSearchRequestByTag from '../src/variants/model/VariantsSearchRequ
 import OrderCreateRequest from '../src/orders/model/OrderCreateRequest';
 import OrderActivityOperation from '../src/orders/service/activities/model/OrderActivityOperation';
 import OrderActivityResult from '../src/orders/service/activities/model/OrderActivityResult';
+import ProductsFilterRequest from '../src/products/filters/models/ProductsFilterRequest';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
@@ -692,6 +693,32 @@ describe('ChannelApe Client', () => {
             expect(report.embedCode).to.be.a('string');
             expect(report.name).to.be.a('string');
           }
+        });
+      });
+    });
+
+    describe('And valid products filter create request', () => {
+      context('When creating a products filter', () => {
+        it('Then create the products filter', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+
+          const productsFilterRequest: ProductsFilterRequest = {
+            businessId: expectedBusinessId
+          };
+
+          return channelApeClient.productsFilters().create(productsFilterRequest).then((createdFilter) => {
+            expect(createdFilter.businessId).to.equal(expectedBusinessId);
+            expect(createdFilter.alphabeticCurrencyCode).to.equal('USD');
+            expect(createdFilter.complement).to.equal(false);
+            expect(createdFilter.createdAt.toISOString()).to.be.a('string');
+            expect(createdFilter.errors.length).to.equal(0);
+            expect(createdFilter.id).to.be.a('string');
+            expect(createdFilter.skus.length).to.equal(0);
+            expect(createdFilter.tags.length).to.equal(0);
+            expect(createdFilter.upcs.length).to.equal(0);
+            expect(createdFilter.updatedAt.toISOString()).to.be.a('string');
+            expect(createdFilter.vendors.length).to.equal(0);
+          });
         });
       });
     });
