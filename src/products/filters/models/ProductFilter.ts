@@ -13,4 +13,17 @@ export default interface ProductFilter {
   upcs: string[];
   updatedAt: Date;
   vendors: any[];
+  label: string;
+  title: string;
+  condition: string;
+  primaryCondition: string;
+  secondaryCondition: string;
+  weightMin: string;
+  weightMax: string;
+  retailMin: string;
+  retailMax: string;
+  wholesaleMin: string;
+  wholesaleMax: string;
+  quantityMin: number;
+  quantityMax: number;
 }

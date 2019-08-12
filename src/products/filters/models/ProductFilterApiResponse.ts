@@ -13,4 +13,17 @@ export default interface ProductFilterApiResponse {
   upcs: string[];
   updatedAt: string;
   vendors: any[];
+  label: string;
+  title: string;
+  condition: string;
+  primaryCondition: string;
+  secondaryCondition: string;
+  weightMin: string;
+  weightMax: string;
+  retailMin: string;
+  retailMax: string;
+  wholesaleMin: string;
+  wholesaleMax: string;
+  quantityMin: number;
+  quantityMax: number;
 }
