@@ -43,7 +43,20 @@ describe('ProductFiltersService', () => {
             tags: [],
             upcs: [],
             updatedAt: '2019-08-07T16:16:50.064Z',
-            vendors: []
+            vendors: [],
+            label: '',
+            title: '',
+            condition: '',
+            primaryCondition: '',
+            secondaryCondition: '',
+            weightMin: '',
+            weightMax: '',
+            retailMin: '',
+            retailMax: '',
+            wholesaleMin: '',
+            wholesaleMax: '',
+            quantityMin: 0,
+            quantityMax: 0
           }]);
         });
 
