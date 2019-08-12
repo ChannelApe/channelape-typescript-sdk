@@ -60,15 +60,10 @@ export default class VariantsService {
   }
 
   public getPage(variantsSearchRequestByProductFilterId: VariantsSearchRequestByProductFilterId):
-    Promise<VariantsPage>;
-  public getPage(variantsSearchRequestBySku: VariantsSearchRequestBySku): Promise<VariantsPage>;
-  public getPage(variantsSearchRequestByUpc: VariantsSearchRequestByUpc): Promise<VariantsPage>;
-  public getPage(variantsSearchRequestByVendor: VariantsSearchRequestByVendor): Promise<VariantsPage>;
-  public getPage(variantsSearchRequestByTag: VariantsSearchRequestByTag): Promise<VariantsPage>;
-  public getPage(variantSearchRequest: GenericVariantsSearchRequest): Promise<VariantsPage> {
+    Promise<VariantsPage> {
     const deferred: Q.Deferred<VariantsPage> = Q.defer<VariantsPage>();
     const getSinglePage = true;
-    this.getVariantSearchResultsByRequest(variantSearchRequest, [], deferred, getSinglePage);
+    this.getVariantSearchResultsByProductFilterId(variantsSearchRequestByProductFilterId, [], deferred, getSinglePage);
     return deferred.promise as any;
   }
 
@@ -102,6 +97,28 @@ export default class VariantsService {
       };
       this.mapVariantsSearchPromise(requestUrl, deferred, requestResponse, variantSearchDetails, variantSearchRequest,
         EXPECTED_GET_STATUS, getSinglePage);
+    });
+    return deferred.promise as any;
+  }
+
+  private getVariantSearchResultsByProductFilterId(
+    variantSearchRequest: VariantsSearchRequestByProductFilterId,
+    variantSearchDetails: VariantSearchDetails[],
+    deferred: Q.Deferred<any>,
+    getSinglePage: boolean
+  ): void {
+    const requestUrl = `${Version.V1}${Resource.PRODUCTS}${Resource.VARIANTS}`;
+    const options: AxiosRequestConfig = {
+      params: variantSearchRequest
+    };
+    this.client.get(requestUrl, options, (error, response, body) => {
+      const requestResponse: RequestCallbackParams = {
+        error,
+        response,
+        body
+      };
+      this.mapVariantsSearchPromise(requestUrl, deferred, requestResponse, variantSearchDetails,
+        <GenericVariantsSearchRequest> variantSearchRequest, EXPECTED_GET_STATUS, getSinglePage);
     });
     return deferred.promise as any;
   }
