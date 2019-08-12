@@ -19,6 +19,7 @@ import VariantsSearchRequestBySku from '../model/VariantsSearchRequestBySku';
 import VariantsSearchRequestByUpc from '../model/VariantsSearchRequestByUpc';
 import VariantsSearchRequestByVendor from '../model/VariantsSearchRequestByVendor';
 import VariantsSearchRequestByTag from '../model/VariantsSearchRequestByTag';
+import VariantsPage from '../model/VariantsPage';
 
 const EXPECTED_GET_STATUS = 200;
 const PARSE_INT_RADIX = 10;
@@ -58,10 +59,23 @@ export default class VariantsService {
     return deferred.promise as any;
   }
 
+  public getPage(variantsSearchRequestByProductFilterId: VariantsSearchRequestByProductFilterId):
+    Promise<VariantsPage>;
+  public getPage(variantsSearchRequestBySku: VariantsSearchRequestBySku): Promise<VariantsPage>;
+  public getPage(variantsSearchRequestByUpc: VariantsSearchRequestByUpc): Promise<VariantsPage>;
+  public getPage(variantsSearchRequestByVendor: VariantsSearchRequestByVendor): Promise<VariantsPage>;
+  public getPage(variantsSearchRequestByTag: VariantsSearchRequestByTag): Promise<VariantsPage>;
+  public getPage(variantSearchRequest: GenericVariantsSearchRequest): Promise<VariantsPage> {
+    const deferred: Q.Deferred<VariantsPage> = Q.defer<VariantsPage>();
+    const getSinglePage = true;
+    this.getVariantSearchResultsByRequest(variantSearchRequest, [], deferred, getSinglePage);
+    return deferred.promise as any;
+  }
+
   private getVariantSearchResultsByRequest(
     variantSearchRequest: GenericVariantsSearchRequest,
     variantSearchDetails: VariantSearchDetails[],
-    deferred: Q.Deferred<VariantSearchDetails[]>,
+    deferred: Q.Deferred<any>,
     getSinglePage: boolean
   ): void {
     let requestUrl = `${Version.V1}${Resource.PRODUCTS}${Resource.VARIANTS}`;

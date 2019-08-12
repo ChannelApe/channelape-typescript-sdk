@@ -15,6 +15,7 @@ import VariantsSearchRequestByVendor from '../../../src/variants/model/VariantsS
 import VariantsSearchRequestBySku from '../../../src/variants/model/VariantsSearchRequestBySku';
 import VariantsSearchRequestByUpc from '../../../src/variants/model/VariantsSearchRequestByUpc';
 import VariantsSearchRequestByProductFilterId from '../../../src/variants/model/VariantsSearchRequestByProductFilterId';
+import VariantSearchDetails from '../../../src/variants/model/VariantSearchDetails';
 
 const maximumRequestRetryTimeout = 50;
 
@@ -425,5 +426,52 @@ describe('VariantsService', () => {
         });
       });
     });
+
+    it(`And valid businessId with multiple pages of variants
+        and the singlePage option set to true
+        When retrieving variants
+        Then return resolved promise with a single page of variants`, () => {
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onGet(`${Environment.STAGING}/${Version.V1}/products/variants`).reply(200, {
+        variantSearchResults: generateVariantSearchDetails(250),
+        pagination: {
+          lastPage: false
+        }
+      });
+
+      const requestOptions: (VariantsSearchRequestByProductFilterId) = {
+        productFilterId: 'something',
+        size: 250
+      };
+      return variantsService.getPage(requestOptions).then((actualVariantsResponse) => {
+        expect(actualVariantsResponse.variantSearchResults.length).to.equal(250);
+        expect(actualVariantsResponse.pagination.lastPage).to.be.false;
+      });
+    });
   });
 });
+
+function generateVariantSearchDetails(size: number): VariantSearchDetails[] {
+  const variants: VariantSearchDetails[] = [];
+
+  for (let i = 0; i < size; i += 1) {
+    variants.push({
+      productId: '',
+      inventoryItemValue: '',
+      businessId: '',
+      sku: '',
+      upc: '',
+      title: '',
+      vendor: '',
+      condition: '',
+      primaryCategory: '',
+      tags: [],
+      grams: 0,
+      currencyCode: '',
+      retailPrice: 0,
+      wholesalePrice: 0,
+      quantity: 0
+    });
+  }
+  return variants;
+}
