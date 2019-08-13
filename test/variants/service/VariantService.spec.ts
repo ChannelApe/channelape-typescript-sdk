@@ -435,7 +435,11 @@ describe('VariantsService', () => {
       mockedAxiosAdapter.onGet(`${Environment.STAGING}/${Version.V1}/products/variants`).reply(200, {
         variantSearchResults: generateVariantSearchDetails(250),
         pagination: {
-          lastPage: false
+          lastPage: false,
+          lastKey: '250_250',
+          nextPageRef: 'v1/products/variants?productFilterId=test&lastKey=250_250&size=250',
+          pageSize: 250,
+          totalItems: 300
         }
       });
 
@@ -456,8 +460,8 @@ function generateVariantSearchDetails(size: number): VariantSearchDetails[] {
 
   for (let i = 0; i < size; i += 1) {
     variants.push({
-      productId: '',
-      inventoryItemValue: '',
+      productId: `${i + 1}`,
+      inventoryItemValue: `${i + 1}`,
       businessId: '',
       sku: '',
       upc: '',

@@ -70,7 +70,7 @@ export default class VariantsService {
   private getVariantSearchResultsByRequest(
     variantSearchRequest: GenericVariantsSearchRequest,
     variantSearchDetails: VariantSearchDetails[],
-    deferred: Q.Deferred<any>,
+    deferred: Q.Deferred<VariantSearchDetails[]>,
     getSinglePage: boolean
   ): void {
     let requestUrl = `${Version.V1}${Resource.PRODUCTS}${Resource.VARIANTS}`;

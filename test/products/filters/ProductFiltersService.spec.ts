@@ -44,19 +44,19 @@ describe('ProductFiltersService', () => {
             upcs: [],
             updatedAt: '2019-08-07T16:16:50.064Z',
             vendors: [],
-            label: '',
-            title: '',
-            condition: '',
-            primaryCondition: '',
-            secondaryCondition: '',
-            weightMin: '',
-            weightMax: '',
-            retailMin: '',
-            retailMax: '',
-            wholesaleMin: '',
-            wholesaleMax: '',
-            quantityMin: 0,
-            quantityMax: 0
+            label: 'test-label',
+            title: 'test-title',
+            condition: 'test-condition',
+            primaryCondition: 'test-primary',
+            secondaryCondition: 'test-secondary',
+            weightMin: 'test-weight-min',
+            weightMax: 'test-weight-max',
+            retailMin: 'test-retail-min',
+            retailMax: 'test-retail-max',
+            wholesaleMin: 'test-wholesale-min',
+            wholesaleMax: 'test-wholesale-max',
+            quantityMin: 1,
+            quantityMax: 5
           }]);
         });
 
@@ -72,6 +72,19 @@ describe('ProductFiltersService', () => {
         expect(createdFilter.upcs.length).to.equal(0, 'upcs');
         expect(createdFilter.updatedAt.getTime()).to.equal(new Date('2019-08-07T16:16:50.064Z').getTime(), 'updatedAt');
         expect(createdFilter.vendors.length).to.equal(0, 'vendors');
+        expect(createdFilter.label).to.equal('test-label', 'label');
+        expect(createdFilter.title).to.equal('test-title', 'title');
+        expect(createdFilter.condition).to.equal('test-condition', 'condition');
+        expect(createdFilter.primaryCondition).to.equal('test-primary', 'primaryCondition');
+        expect(createdFilter.secondaryCondition).to.equal('test-secondary', 'secondaryCondition');
+        expect(createdFilter.weightMin).to.equal('test-weight-min', 'weightMin');
+        expect(createdFilter.weightMax).to.equal('test-weight-max', 'weightMax');
+        expect(createdFilter.retailMin).to.equal('test-retail-min', 'retailMin');
+        expect(createdFilter.retailMax).to.equal('test-retail-max', 'retailMax');
+        expect(createdFilter.wholesaleMin).to.equal('test-wholesale-min', 'wholesaleMin');
+        expect(createdFilter.wholesaleMax).to.equal('test-wholesale-max', 'wholesaleMax');
+        expect(createdFilter.quantityMin).to.equal(1, 'quantityMin');
+        expect(createdFilter.quantityMax).to.equal(5, 'quantityMax');
       });
     });
   });

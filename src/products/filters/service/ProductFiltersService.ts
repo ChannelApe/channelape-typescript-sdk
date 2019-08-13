@@ -58,7 +58,20 @@ export default class ProductFiltersService {
       tags: filterApiResponse.tags,
       upcs: filterApiResponse.upcs,
       updatedAt: new Date(filterApiResponse.updatedAt),
-      vendors: filterApiResponse.vendors
+      vendors: filterApiResponse.vendors,
+      label: filterApiResponse.label,
+      title: filterApiResponse.title,
+      condition: filterApiResponse.condition,
+      primaryCondition: filterApiResponse.primaryCondition,
+      secondaryCondition: filterApiResponse.secondaryCondition,
+      weightMin: filterApiResponse.weightMin,
+      weightMax: filterApiResponse.weightMax,
+      retailMin: filterApiResponse.retailMin,
+      retailMax: filterApiResponse.retailMax,
+      wholesaleMin: filterApiResponse.wholesaleMin,
+      wholesaleMax: filterApiResponse.wholesaleMax,
+      quantityMin: filterApiResponse.quantityMin,
+      quantityMax: filterApiResponse.quantityMax
     };
   }
 
