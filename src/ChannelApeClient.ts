@@ -11,6 +11,7 @@ import SessionsService from './sessions/service/SessionsService';
 import SubscriptionsService from './subscriptions/service/SubscriptionsService';
 import AnalyticsService from './analytics/service/AnalyticsService';
 import SuppliersService from './suppliers/service/SuppliersService';
+import ProductFiltersService from './products/filters/service/ProductFiltersService';
 
 const MISSING_SESSION_ID_ERROR_MESSAGE = 'sessionId is required.';
 const MINIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_SMALL_ERROR_MESSAGE =
@@ -42,6 +43,7 @@ export default class ChannelApeClient {
   private readonly sessionsService: SessionsService;
   private readonly subscriptionsService: SubscriptionsService;
   private readonly analyticsService: AnalyticsService;
+  private readonly productFiltersService: ProductFiltersService;
 
   constructor(clientConfiguration: ClientConfiguration) {
     const configurationErrors = this.validateConfiguration(clientConfiguration);
@@ -83,6 +85,7 @@ export default class ChannelApeClient {
     this.sessionsService = new SessionsService(this.requestClientWrapper);
     this.subscriptionsService = new SubscriptionsService(this.requestClientWrapper);
     this.analyticsService = new AnalyticsService(this.requestClientWrapper);
+    this.productFiltersService = new ProductFiltersService(this.requestClientWrapper);
   }
 
   get SessionId(): string {
@@ -139,6 +142,10 @@ export default class ChannelApeClient {
 
   analytics(): AnalyticsService {
     return this.analyticsService;
+  }
+
+  productFilters(): ProductFiltersService {
+    return this.productFiltersService;
   }
 
   private validateConfiguration(clientConfiguration: ClientConfiguration): string | undefined {
