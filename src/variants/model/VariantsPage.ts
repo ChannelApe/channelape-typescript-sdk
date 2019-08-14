@@ -1,5 +1,5 @@
 import VariantSearchDetails from '../model/VariantSearchDetails';
-import PaginationResponse from '../../../src/model/PaginationResponse';
+import PaginationResponse from '../../model/PaginationResponse';
 export default interface VariantsPage {
   variantSearchResults: VariantSearchDetails[];
   pagination: PaginationResponse;
