@@ -4,6 +4,8 @@ import BusinessesQueryRequestByUserId from '../model/BusinessesQueryRequestByUse
 import BusinessesQueryRequestByBusinessId from '../model/BusinessesQueryRequestByBusinessId';
 import BusinessesCrudService from './BusinessesCrudService';
 import BusinessCreateRequest from '../model/BusinessCreateRequest';
+import { UserBusinessPermissionsQueryRequest } from '../model/UserBusinessPermissionsQueryRequest';
+import { UserBusinessPermissions } from '../model/UserBusinessPermissions';
 
 export default class BusinessesService {
 
@@ -19,6 +21,10 @@ export default class BusinessesService {
     request: BusinessesQueryRequestByUserId & BusinessesQueryRequestByBusinessId
   ): Promise<Business[]> | Promise<Business> {
     return this.businessesCrudService.get(request);
+  }
+
+  public getUserBusinessPermissions(request: UserBusinessPermissionsQueryRequest): Promise<UserBusinessPermissions> {
+    return this.businessesCrudService.getUserBusinessPermissions(request);
   }
 
   public create(business: BusinessCreateRequest): Promise<Business> {

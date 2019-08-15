@@ -695,6 +695,28 @@ describe('ChannelApe Client', () => {
         });
       });
     });
+
+    describe('And valid user business permissions get request', () => {
+      context('When getting user business permissions', () => {
+        it('Then return user business permissions', async () => {
+          const businessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const userId = await getUserId();
+          const request = {
+            businessId,
+            userId
+          };
+          const permissions = await channelApeClient.businesses().getUserBusinessPermissions(request);
+          expect(permissions.businessId).to.equal(businessId);
+          expect(permissions.userId).to.equal(userId);
+          expect(permissions.owner).to.be.a('boolean');
+        });
+      });
+    });
+
+    async function getUserId(): Promise<string> {
+      const session = await channelApeClient.sessions().get(sessionId);
+      return session.userId;
+    }
   });
 
   function getSessionId(): string {

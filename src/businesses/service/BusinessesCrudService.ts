@@ -8,6 +8,8 @@ import BusinessesQueryRequestByUserId from '../model/BusinessesQueryRequestByUse
 import BusinessesQueryRequestByBusinessId from '../model/BusinessesQueryRequestByBusinessId';
 import * as Q from 'q';
 import BusinessCreateRequest from '../model/BusinessCreateRequest';
+import { UserBusinessPermissionsQueryRequest } from '../model/UserBusinessPermissionsQueryRequest';
+import { UserBusinessPermissions } from '../model/UserBusinessPermissions';
 
 const EXPECTED_GET_STATUS = 200;
 const EXPECTED_CREATE_STATUS = 201;
@@ -31,6 +33,21 @@ export default class BusinessesCrudService {
     }
     this.client.get(requestUrl, requestOptions, (error, response, body) => {
       this.mapBusinessesPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
+    });
+    return deferred.promise as any;
+  }
+
+  public getUserBusinessPermissions(request: UserBusinessPermissionsQueryRequest): Promise<UserBusinessPermissions> {
+    const deferred = Q.defer<UserBusinessPermissions>();
+    const requestUrl = `/${Version.V1}${Resource.BUSINESSES}`;
+    const requestOptions: AxiosRequestConfig = {
+      params: {
+        businessId: request.businessId,
+        userId: request.userId
+      }
+    };
+    this.client.get(requestUrl, requestOptions, (error, response, body) => {
+      this.mapUserBusinessPermissionsPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
     });
     return deferred.promise as any;
   }
@@ -67,6 +84,24 @@ export default class BusinessesCrudService {
 
   private mapBusinessPromise(requestUrl: string, deferred: Q.Deferred<Business>, error: any, response: AxiosResponse,
     body: any, expectedStatusCode: number) {
+    if (error) {
+      deferred.reject(error);
+    } else if (response.status === expectedStatusCode) {
+      deferred.resolve(body);
+    } else {
+      const channelApeErrorResponse = GenerateApiError(requestUrl, response, body, expectedStatusCode);
+      deferred.reject(channelApeErrorResponse);
+    }
+  }
+
+  private mapUserBusinessPermissionsPromise(
+    requestUrl: string,
+    deferred: Q.Deferred<UserBusinessPermissions>,
+    error: any,
+    response: AxiosResponse,
+    body: any,
+    expectedStatusCode: number
+  ) {
     if (error) {
       deferred.reject(error);
     } else if (response.status === expectedStatusCode) {
