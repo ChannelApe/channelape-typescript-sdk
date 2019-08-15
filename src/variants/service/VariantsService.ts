@@ -19,6 +19,7 @@ import VariantsSearchRequestBySku from '../model/VariantsSearchRequestBySku';
 import VariantsSearchRequestByUpc from '../model/VariantsSearchRequestByUpc';
 import VariantsSearchRequestByVendor from '../model/VariantsSearchRequestByVendor';
 import VariantsSearchRequestByTag from '../model/VariantsSearchRequestByTag';
+import VariantsPage from '../model/VariantsPage';
 
 const EXPECTED_GET_STATUS = 200;
 const PARSE_INT_RADIX = 10;
@@ -58,6 +59,14 @@ export default class VariantsService {
     return deferred.promise as any;
   }
 
+  public getPage(variantsSearchRequestByProductFilterId: VariantsSearchRequestByProductFilterId):
+    Promise<VariantsPage> {
+    const deferred: Q.Deferred<VariantsPage> = Q.defer<VariantsPage>();
+    const getSinglePage = true;
+    this.getVariantSearchResultsByProductFilterId(variantsSearchRequestByProductFilterId, [], deferred, getSinglePage);
+    return deferred.promise as any;
+  }
+
   private getVariantSearchResultsByRequest(
     variantSearchRequest: GenericVariantsSearchRequest,
     variantSearchDetails: VariantSearchDetails[],
@@ -88,6 +97,28 @@ export default class VariantsService {
       };
       this.mapVariantsSearchPromise(requestUrl, deferred, requestResponse, variantSearchDetails, variantSearchRequest,
         EXPECTED_GET_STATUS, getSinglePage);
+    });
+    return deferred.promise as any;
+  }
+
+  private getVariantSearchResultsByProductFilterId(
+    variantSearchRequest: VariantsSearchRequestByProductFilterId,
+    variantSearchDetails: VariantSearchDetails[],
+    deferred: Q.Deferred<any>,
+    getSinglePage: boolean
+  ): void {
+    const requestUrl = `${Version.V1}${Resource.PRODUCTS}${Resource.VARIANTS}`;
+    const options: AxiosRequestConfig = {
+      params: variantSearchRequest
+    };
+    this.client.get(requestUrl, options, (error, response, body) => {
+      const requestResponse: RequestCallbackParams = {
+        error,
+        response,
+        body
+      };
+      this.mapVariantsSearchPromise(requestUrl, deferred, requestResponse, variantSearchDetails,
+        <GenericVariantsSearchRequest> variantSearchRequest, EXPECTED_GET_STATUS, getSinglePage);
     });
     return deferred.promise as any;
   }
