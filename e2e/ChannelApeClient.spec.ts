@@ -19,6 +19,8 @@ import VariantsSearchRequestByTag from '../src/variants/model/VariantsSearchRequ
 import OrderCreateRequest from '../src/orders/model/OrderCreateRequest';
 import OrderActivityOperation from '../src/orders/service/activities/model/OrderActivityOperation';
 import OrderActivityResult from '../src/orders/service/activities/model/OrderActivityResult';
+import ProductFilterRequest from '../src/products/filters/models/ProductFilterRequest';
+import VariantsPage from '../src/variants/model/VariantsPage';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
@@ -590,6 +592,22 @@ describe('ChannelApe Client', () => {
           });
         }).timeout(25000);
       });
+
+      context(`When searching variants
+        and a size is specified`, () => {
+        it('Then return variant quick search results according to size', () => {
+          const expectedProductFilterId = 'f4cf2afd-fc5f-424d-bf45-868b672d77a0';
+          const variantsRequest: VariantsSearchRequestByProductFilterId = {
+            productFilterId: expectedProductFilterId,
+            size: 10
+          };
+          const actualVariantsPromise = channelApeClient.variants().getPage(variantsRequest);
+          return actualVariantsPromise.then((variantsPage: VariantsPage) => {
+            expect(variantsPage.variantSearchResults).to.be.an('array');
+            expect(variantsPage.variantSearchResults.length).to.be.equal(10);
+          });
+        }).timeout(25000);
+      });
     });
 
     describe('And valid businessId and valid sku', () => {
@@ -692,6 +710,32 @@ describe('ChannelApe Client', () => {
             expect(report.embedCode).to.be.a('string');
             expect(report.name).to.be.a('string');
           }
+        });
+      });
+    });
+
+    describe('And valid products filter create request', () => {
+      context('When creating a products filter', () => {
+        it('Then create the products filter', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+
+          const productFilterRequest: ProductFilterRequest = {
+            businessId: expectedBusinessId
+          };
+
+          return channelApeClient.productFilters().create(productFilterRequest).then((createdFilter) => {
+            expect(createdFilter.businessId).to.equal(expectedBusinessId);
+            expect(createdFilter.alphabeticCurrencyCode).to.equal('USD');
+            expect(createdFilter.complement).to.equal(false);
+            expect(createdFilter.createdAt.toISOString()).to.be.a('string');
+            expect(createdFilter.errors.length).to.equal(0);
+            expect(createdFilter.id).to.be.a('string');
+            expect(createdFilter.skus.length).to.equal(0);
+            expect(createdFilter.tags.length).to.equal(0);
+            expect(createdFilter.upcs.length).to.equal(0);
+            expect(createdFilter.updatedAt.toISOString()).to.be.a('string');
+            expect(createdFilter.vendors.length).to.equal(0);
+          });
         });
       });
     });

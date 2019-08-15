@@ -16,6 +16,7 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Subscriptions](#subscriptions)
 - [Order Activities](#order-activities)
 - [Analytics](#analytics)
+- [Product Filters](#product-filters)
 
 ### Getting Started
 
@@ -402,5 +403,19 @@ channelApeClient.analytics().generateEmbed(embedCode, timezone)
 channelApeClient.analytics().get()
   .then((reports[]: Embed) => {
     // Do what you need to with list of reports
+  });
+```
+
+
+### Product Filters
+
+### Create Product Filter
+```typescript
+const productFilterRequest: ProductFilterRequest = {
+  businessId: 'valid-business-id'
+};
+channelApeClient.productFilter().create({}, productFilterRequest)
+  .then((productFilter: ProductFilter) => {
+    // Do what you need with the filter
   });
 ```
