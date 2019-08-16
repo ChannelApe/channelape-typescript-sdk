@@ -739,35 +739,6 @@ describe('ChannelApe Client', () => {
         });
       });
     });
-
-    describe('And valid user business permissions get request', () => {
-      context('When getting user business permissions', () => {
-        it.only('Then return user business permissions', async () => {
-          const businessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
-          const userId = await getUserId();
-          const request = {
-            businessId,
-            userId
-          };
-          console.log('userId: ' + userId);
-          const permissions = await channelApeClient.businesses().getUserBusinessPermissions(request);
-          console.log('permissions: ' + JSON.stringify(permissions));
-          expect(permissions.businessId).to.equal(businessId);
-          expect(permissions.userId).to.equal(userId);
-          expect(permissions.owner).to.be.a('boolean');
-        });
-      });
-    });
-
-    async function getUserId(): Promise<string> {
-      console.log('session id exists: ' + !!sessionId);
-      const session = await channelApeClient.sessions().get(sessionId);
-      if (session.sessionId) {
-        delete session.sessionId;
-      }
-      console.log('session', JSON.stringify(session));
-      return session.userId;
-    }
   });
 
   function getSessionId(): string {
