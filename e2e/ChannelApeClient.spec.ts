@@ -760,7 +760,12 @@ describe('ChannelApe Client', () => {
     });
 
     async function getUserId(): Promise<string> {
+      console.log('session id exists: ' + !!sessionId);
       const session = await channelApeClient.sessions().get(sessionId);
+      if (session.sessionId) {
+        delete session.sessionId;
+      }
+      console.log('session', JSON.stringify(session));
       return session.userId;
     }
   });
