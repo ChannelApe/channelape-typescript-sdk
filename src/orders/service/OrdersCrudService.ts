@@ -1,14 +1,11 @@
 import Order from '../model/Order';
 import OrderCreateRequest from '../model/OrderCreateRequest';
 import OrderUpdateRequest from '../model/OrderUpdateRequest';
-import OrderStatus from '../model/OrderStatus';
 import OrdersPage from '../model/OrdersPage';
 import OrdersQueryRequest from '../model/OrdersQueryRequest';
 import OrdersQueryRequestByBusinessId from '../model/OrdersQueryRequestByBusinessId';
 import OrdersQueryRequestByChannel from '../model/OrdersQueryRequestByChannel';
 import OrdersQueryRequestByChannelOrderId from '../model/OrdersQueryRequestByChannelOrderId';
-import LineItem from '../model/LineItem';
-import Fulfillment from '../model/Fulfillment';
 import RequestClientWrapper from '../../RequestClientWrapper';
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import Resource from '../../model/Resource';
@@ -18,6 +15,7 @@ import GenerateApiError from '../../utils/GenerateApiError';
 import * as Q from 'q';
 import GenericOrdersQueryRequest from './model/GenericOrdersQueryRequest';
 import OrderPatchRequest from '../model/OrderPatchRequest';
+import JsonOrderFormatterService from './JsonOrderFormatterService';
 
 const EXPECTED_GET_STATUS = 200;
 const EXPECTED_CREATE_STATUS = 202;
@@ -141,7 +139,7 @@ export default class OrdersCrudService {
     if (error) {
       deferred.reject(error);
     } else if (response.status === expectedStatusCode) {
-      const order: Order = this.formatOrder(body);
+      const order: Order = JsonOrderFormatterService.formatOrder(body);
       deferred.resolve(order);
     } else {
       const channelApeErrorResponse = GenerateApiError(requestUrl, response, body, expectedStatusCode);
@@ -164,11 +162,11 @@ export default class OrdersCrudService {
       const mergedOrders: Order[] = orders.concat(data.orders);
       if (getSinglePage) {
         deferred.resolve({
-          orders: mergedOrders.map(o => this.formatOrder(o)),
+          orders: mergedOrders.map(o => JsonOrderFormatterService.formatOrder(o)),
           pagination: data.pagination
         });
       } else if (data.pagination.lastPage) {
-        const ordersToReturn = mergedOrders.map(o => this.formatOrder(o));
+        const ordersToReturn = mergedOrders.map(o => JsonOrderFormatterService.formatOrder(o));
         deferred.resolve(ordersToReturn);
       } else {
         const newOrdersRequest: GenericOrdersQueryRequest |
@@ -183,40 +181,5 @@ export default class OrdersCrudService {
         GenerateApiError(requestUrl, requestCallbackParams.response, requestCallbackParams.body, expectedStatusCode);
       deferred.reject(channelApeErrorResponse);
     }
-  }
-
-  private formatOrder(order: any): Order {
-    order.purchasedAt = new Date(order.purchasedAt);
-    if (order.canceledAt != null) {
-      order.canceledAt = new Date(order.canceledAt);
-    }
-    order.updatedAt = new Date(order.updatedAt);
-    order.createdAt = new Date(order.createdAt);
-    order.status = order.status as OrderStatus;
-    order.totalPrice = Number(order.totalPrice);
-    order.subtotalPrice = Number(order.subtotalPrice);
-    order.totalShippingPrice = Number(order.totalShippingPrice);
-    if (typeof order.totalShippingTax !== 'undefined') {
-      order.totalShippingTax = Number(order.totalShippingTax);
-    }
-    order.totalTax = Number(order.totalTax);
-    order.totalGrams = Number(order.totalGrams);
-    order.lineItems = order.lineItems.map(this.formatLineItem);
-    order.fulfillments = order.fulfillments.map((f: any) => this.formatFulfillment(f));
-    return order as Order;
-  }
-
-  private formatFulfillment(fulfillment: Fulfillment): Fulfillment {
-    fulfillment.lineItems = fulfillment.lineItems.map(this.formatLineItem);
-    if (fulfillment.shippedAt) {
-      fulfillment.shippedAt = new Date(fulfillment.shippedAt);
-    }
-    return fulfillment;
-  }
-
-  private formatLineItem(lineItem: LineItem): LineItem {
-    lineItem.grams = Number(lineItem.grams);
-    lineItem.price = Number(lineItem.price);
-    return lineItem;
   }
 }
