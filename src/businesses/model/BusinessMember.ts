@@ -1,6 +1,6 @@
 import ChannelApeApiError from '../../model/ChannelApeApiError';
 
-export interface UserBusinessPermissions {
+export interface BusinessMember {
   userId: string;
   businessId: string;
   owner: boolean;

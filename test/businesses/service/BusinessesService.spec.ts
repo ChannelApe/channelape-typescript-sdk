@@ -217,10 +217,10 @@ describe('Businesses Service', () => {
         businessId,
         userId
       };
-      return businessesService.getUserBusinessPermissions(request).then((permissions) => {
-        expect(permissions.businessId).to.equal(businessId, 'businessId');
-        expect(permissions.userId).to.equal(userId, 'userId');
-        expect(permissions.owner).to.equal(expectedOwnerValue, 'owner');
+      return businessesService.getBusinessMember(request).then((member) => {
+        expect(member.businessId).to.equal(businessId, 'businessId');
+        expect(member.userId).to.equal(userId, 'userId');
+        expect(member.owner).to.equal(expectedOwnerValue, 'owner');
       });
     });
 

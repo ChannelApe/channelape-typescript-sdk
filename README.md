@@ -295,15 +295,15 @@ channelApeClient.businesses().get(businessesQueryRequestByUserId)
 ```
 See [Sessions](#sessions) for how to retrieve your `userId`
 
-#### Get User's Business Permissions
+#### Get Business Member
 ```typescript
-const userBusinessPermissionsQueryRequest: UserBusinessPermissionsQueryRequest = {
+const businessMemberRequest: BusinessMemberRequest = {
   userId,
   businessId
 }
-channelApeClient.businesses().getUserBusinessPermissions(userBusinessPermissionsQueryRequest)
-  .then((permissions: UserBusinessPermissions) => {
-    // do what you need to do with the permissions here
+channelApeClient.businesses().getBusinessMember(businessMemberQueryRequest)
+  .then((businessMember: BusinessMember) => {
+    // do what you need to do with the business member here
   });
 ```
 
