@@ -739,6 +739,23 @@ describe('ChannelApe Client', () => {
         });
       });
     });
+
+    describe('And valid business member get request', () => {
+      context('When getting business member', () => {
+        it('Then return business member', async () => {
+          const businessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const userId = 'd87e6d12-d7c2-47f7-a7c6-a16b6fcb82f1';
+          const request = {
+            businessId,
+            userId
+          };
+          const member = await channelApeClient.businesses().getBusinessMember(request);
+          expect(member.businessId).to.equal(businessId);
+          expect(member.userId).to.equal(userId);
+          expect(member.owner).to.equal(true);
+        });
+      });
+    });
   });
 
   function getSessionId(): string {

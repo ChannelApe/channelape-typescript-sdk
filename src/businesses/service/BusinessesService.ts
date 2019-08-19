@@ -4,6 +4,8 @@ import BusinessesQueryRequestByUserId from '../model/BusinessesQueryRequestByUse
 import BusinessesQueryRequestByBusinessId from '../model/BusinessesQueryRequestByBusinessId';
 import BusinessesCrudService from './BusinessesCrudService';
 import BusinessCreateRequest from '../model/BusinessCreateRequest';
+import { BusinessMemberRequest } from '../model/BusinessMemberRequest';
+import { BusinessMember } from '../model/BusinessMember';
 
 export default class BusinessesService {
 
@@ -19,6 +21,10 @@ export default class BusinessesService {
     request: BusinessesQueryRequestByUserId & BusinessesQueryRequestByBusinessId
   ): Promise<Business[]> | Promise<Business> {
     return this.businessesCrudService.get(request);
+  }
+
+  public getBusinessMember(request: BusinessMemberRequest): Promise<BusinessMember> {
+    return this.businessesCrudService.getBusinessMember(request);
   }
 
   public create(business: BusinessCreateRequest): Promise<Business> {
