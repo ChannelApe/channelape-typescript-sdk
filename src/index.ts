@@ -51,6 +51,7 @@ export { default as OrderActivity }
   from './orders/service/activities/model/OrderActivity';
 export { default as OrderActivityMessage }
   from './orders/service/activities/model/OrderActivityMessage';
+export { default as JsonOrderFormatterService } from './orders/service/JsonOrderFormatterService';
 export { default as Variant } from './variants/model/Variant';
 export { default as VariantCondition } from './variants/model/VariantCondition';
 export { default as VariantCategories } from './variants/model/VariantCategories';

@@ -195,6 +195,35 @@ describe('Businesses Service', () => {
       });
     });
 
+    it(`And valid business ID and user ID when retrieving user's business access configuration,
+      Then return user's business access configuration`, () => {
+      const businessId = 'valid-business-id';
+      const userId = 'valid-user-id';
+      const expectedOwnerValue = true;
+
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      const params = {
+        businessId,
+        userId
+      };
+      mockedAxiosAdapter.onGet(`${Environment.STAGING}/${Version.V1}${Resource.BUSINESSES}`, params)
+        .reply(200, {
+          businessId,
+          userId,
+          owner: expectedOwnerValue
+        });
+
+      const request = {
+        businessId,
+        userId
+      };
+      return businessesService.getBusinessMember(request).then((member) => {
+        expect(member.businessId).to.equal(businessId, 'businessId');
+        expect(member.userId).to.equal(userId, 'userId');
+        expect(member.owner).to.equal(expectedOwnerValue, 'owner');
+      });
+    });
+
     function expectBusiness(actualBusiness: Business) {
       expect(actualBusiness.id).to.equal(expectedBusiness.id);
       expect(actualBusiness.alphabeticCurrencyCode).to.equal(expectedBusiness.alphabeticCurrencyCode);

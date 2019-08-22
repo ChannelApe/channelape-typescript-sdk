@@ -295,6 +295,18 @@ channelApeClient.businesses().get(businessesQueryRequestByUserId)
 ```
 See [Sessions](#sessions) for how to retrieve your `userId`
 
+#### Get Business Member
+```typescript
+const businessMemberRequest: BusinessMemberRequest = {
+  userId,
+  businessId
+}
+channelApeClient.businesses().getBusinessMember(businessMemberQueryRequest)
+  .then((businessMember: BusinessMember) => {
+    // do what you need to do with the business member here
+  });
+```
+
 #### Create Business
 ```typescript
 const businessToCreate: BusinessCreateRequest = {
