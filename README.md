@@ -406,6 +406,14 @@ channelApeClient.analytics().get()
   });
 ```
 
+### Get Analytics Token
+```typescript
+channelApeClient.analytics().getToken()
+  .then((token: Token) => {
+    // Do what you need to with the token
+  });
+```
+
 
 ### Product Filters
 

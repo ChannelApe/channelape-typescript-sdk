@@ -10,6 +10,7 @@ import { ChannelApeError } from '../../../src/index';
 import Embed from './../../../src/analytics/model/Embed';
 import AnalyticsService from './../../../src/analytics/service/AnalyticsService';
 import Report from './../../../src/analytics/model/Report';
+import { Token } from './../../../src/analytics/model/Token';
 
 describe('Analytics Service', () => {
 
@@ -153,6 +154,26 @@ describe('Analytics Service', () => {
       const actualReportListResponse = await analyticsService.get();
       expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.ANALYTICS}`);
       expectReportList(actualReportListResponse);
+    });
+
+    it('When generating token Then return resolved promise with token', () => {
+      const expectedToken = {
+        accessToken: 'someAccessToken'
+      };
+      const response = {
+        status: 201,
+        config: {
+          method: 'GET'
+        }
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+        .yields(null, response, expectedToken);
+
+      const analyticsService: AnalyticsService = new AnalyticsService(client);
+      return analyticsService.getToken().then((token: Token) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V2}${Resource.ANALYTICS}/tokens`);
+        expect(token.accessToken).to.equal(expectedToken.accessToken);
+      });
     });
 
     function expectEmbed(actualEmbed: Embed) {
