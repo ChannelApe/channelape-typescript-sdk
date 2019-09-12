@@ -27,6 +27,10 @@ export default class BusinessesService {
     return this.businessesCrudService.getBusinessMember(request);
   }
 
+  public verifyBusinessMember(verificationCode: string): Promise<Business> {
+    return this.businessesCrudService.verifyBusinessMember(verificationCode);
+  }
+
   public create(business: BusinessCreateRequest): Promise<Business> {
     return this.businessesCrudService.create(business);
   }

@@ -307,6 +307,17 @@ channelApeClient.businesses().getBusinessMember(businessMemberQueryRequest)
   });
 ```
 
+#### Verify Business Member
+```typescript
+
+const verificationCode = '1234567';
+channelApeClient.businesses().verifyBusinessMember(verificationCode)
+  .then((business: Business) => {
+    // do what you need to do with the business here
+  });
+```
+
+
 #### Create Business
 ```typescript
 const businessToCreate: BusinessCreateRequest = {
