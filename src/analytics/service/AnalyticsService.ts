@@ -27,7 +27,7 @@ export default class AnalyticsService {
   public getToken(): Promise<Token> {
     const deferred = Q.defer<Token>();
     const requestUrl = `/${Version.V2}${Resource.ANALYTICS}/tokens`;
-    this.client.get(requestUrl, {}, (error, response, body) => {
+    this.client.post(requestUrl, {}, (error, response, body) => {
       this.mapTokenPromise(requestUrl, deferred, error, response, body, EXPECTED_POST_STATUS);
     });
     return deferred.promise as any;

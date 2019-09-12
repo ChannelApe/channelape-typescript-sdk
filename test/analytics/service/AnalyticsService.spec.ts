@@ -163,15 +163,15 @@ describe('Analytics Service', () => {
       const response = {
         status: 201,
         config: {
-          method: 'GET'
+          method: 'POST'
         }
       };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+      const stub: sinon.SinonStub = sandbox.stub(client, 'post')
         .yields(null, response, expectedToken);
 
       const analyticsService: AnalyticsService = new AnalyticsService(client);
       return analyticsService.getToken().then((token: Token) => {
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V2}${Resource.ANALYTICS}/tokens`);
+        expect(stub.args[0][0]).to.equal(`/${Version.V2}${Resource.ANALYTICS}/tokens`);
         expect(token.accessToken).to.equal(expectedToken.accessToken);
       });
     });
