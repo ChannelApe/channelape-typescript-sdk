@@ -4,7 +4,6 @@ import LogLevel from '../../../src/model/LogLevel';
 import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
 import Environment from '../../../src/model/Environment';
-import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import UsersService from './../../../src/users/service/UsersService';
 
