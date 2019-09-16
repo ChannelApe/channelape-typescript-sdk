@@ -33,7 +33,7 @@ describe('Users Service', () => {
       done();
     });
 
-    it.only('And valid userId ' +
+    it('And valid userId ' +
       'When getting user information Then return resolved promise with user', () => {
 
       const response = {
