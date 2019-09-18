@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import GenerateApiError from './utils/GenerateApiError';
 
-export default class DalService {
+export default abstract class DalService {
 
   constructor() { }
 
