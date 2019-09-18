@@ -7,7 +7,6 @@ import RequestClientWrapper from '../../RequestClientWrapper';
 import GenerateApiError from '../../utils/GenerateApiError';
 import Embed from '../model/Embed';
 import Report from '../model/Report';
-import { Token } from '../model/Token';
 
 const EXPECTED_GET_STATUS = 200;
 const EXPECTED_POST_STATUS = 201;
@@ -22,15 +21,6 @@ export default class AnalyticsService {
 
   public get(): Promise<Report[]> {
     return this.getReports();
-  }
-
-  public getToken(): Promise<Token> {
-    const deferred = Q.defer<Token>();
-    const requestUrl = `/${Version.V2}${Resource.ANALYTICS}/tokens`;
-    this.client.post(requestUrl, {}, (error, response, body) => {
-      this.mapTokenPromise(requestUrl, deferred, error, response, body, EXPECTED_POST_STATUS);
-    });
-    return deferred.promise as any;
   }
 
   private getReports(): Promise<Report[]> {
@@ -79,18 +69,6 @@ export default class AnalyticsService {
       deferred.reject(body.errors);
     } else if (response.status === expectedStatusCode) {
       deferred.resolve(body.reports);
-    } else {
-      const channelApeErrorResponse = GenerateApiError(requestUrl, response, body, EXPECTED_POST_STATUS);
-      deferred.reject(channelApeErrorResponse);
-    }
-  }
-
-  private mapTokenPromise(requestUrl: string, deferred: Q.Deferred<Token>, error: any, response: AxiosResponse,
-    body: any, expectedStatusCode: number) {
-    if (error) {
-      deferred.reject(error);
-    } else if (response.status === expectedStatusCode) {
-      deferred.resolve(body);
     } else {
       const channelApeErrorResponse = GenerateApiError(requestUrl, response, body, EXPECTED_POST_STATUS);
       deferred.reject(channelApeErrorResponse);
