@@ -17,6 +17,7 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Order Activities](#order-activities)
 - [Analytics](#analytics)
 - [Product Filters](#product-filters)
+- [Users](#users)
 
 ### Getting Started
 
@@ -406,6 +407,14 @@ channelApeClient.analytics().get()
   });
 ```
 
+### Get Analytics Token
+```typescript
+channelApeClient.analytics().getToken()
+  .then((token: Token) => {
+    // Do what you need to with the token
+  });
+```
+
 
 ### Product Filters
 
@@ -417,5 +426,17 @@ const productFilterRequest: ProductFilterRequest = {
 channelApeClient.productFilter().create({}, productFilterRequest)
   .then((productFilter: ProductFilter) => {
     // Do what you need with the filter
+  });
+```
+
+
+### Users
+
+#### Get User
+```typescript
+const userId: string = 'some-user-id';
+channelApeClient.users().get(userId)
+  .then((user: User) => {
+    // Do what you need with the user
   });
 ```
