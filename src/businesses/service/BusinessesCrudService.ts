@@ -52,6 +52,16 @@ export default class BusinessesCrudService {
     return deferred.promise as any;
   }
 
+  public verifyBusinessMember(verificationCode: string): Promise<Business> {
+    const deferred = Q.defer<Business | BusinessMember>();
+    const requestUrl = `/${Version.V1}${Resource.BUSINESS_MEMBER_VERIFICATIONS}/${verificationCode}`;
+    const requestOptions: AxiosRequestConfig = {};
+    this.client.get(requestUrl, requestOptions, (error, response, body) => {
+      this.mapBusinessPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
+    });
+    return deferred.promise as any;
+  }
+
   public create(business: BusinessCreateRequest): Promise<Business> {
     const deferred = Q.defer<Business | BusinessMember>();
     const requestUrl = `${Version.V1}${Resource.BUSINESSES}`;

@@ -14,7 +14,9 @@ enum Resource {
   TAGS = '/tags',
   BUSINESSES = '/businesses',
   ANALYTICS = '/analytics',
-  FILTERS = '/filters'
+  FILTERS = '/filters',
+  BUSINESS_MEMBER_VERIFICATIONS = '/businessmemberverifications',
+  USERS = '/users'
 }
 
 export default Resource;

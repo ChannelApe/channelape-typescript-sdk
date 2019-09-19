@@ -224,6 +224,23 @@ describe('Businesses Service', () => {
       });
     });
 
+    it(`And valid business verification code when verifying business member,
+      Then return business that user is now verified for`, () => {
+
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      const someValidVerificationCode = 'c92131e8-9d38-41c7-a80d-cbd7352b3f77';
+      // tslint:disable-next-line
+      mockedAxiosAdapter.onGet(`${Environment.STAGING}/${Version.V1}${Resource.BUSINESS_MEMBER_VERIFICATIONS}/${someValidVerificationCode}`)
+        .reply((data) => {
+          expect(data.headers['X-Channel-Ape-Authorization-Token']).to.equal('valid-session-id');
+          return Promise.resolve([200, expectedBusiness]);
+        });
+
+      return businessesService.verifyBusinessMember(someValidVerificationCode).then((business) => {
+        expectBusiness(business);
+      });
+    });
+
     function expectBusiness(actualBusiness: Business) {
       expect(actualBusiness.id).to.equal(expectedBusiness.id);
       expect(actualBusiness.alphabeticCurrencyCode).to.equal(expectedBusiness.alphabeticCurrencyCode);

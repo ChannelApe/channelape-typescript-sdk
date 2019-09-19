@@ -756,6 +756,7 @@ describe('ChannelApe Client', () => {
         });
       });
     });
+
   });
 
   function getSessionId(): string {
