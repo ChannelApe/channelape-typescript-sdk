@@ -4,6 +4,7 @@ import Version from '../../model/Version';
 import Resource from '../../model/Resource';
 import User from '../model/User';
 import DalService from '../../DalService';
+import Session from '../../sessions/model/Session';
 
 export default class UsersService extends DalService {
 
@@ -39,7 +40,7 @@ export default class UsersService extends DalService {
   }
 
   public verify(verficiationToken: string): Promise<void> {
-    const deferred = Q.defer<void>();
+    const deferred = Q.defer<Session>();
     const requestUrl = `${Resource.VERIFICATION}/${verficiationToken}`;
     this.client.get(requestUrl, {}, (error, response, body) => {
       this.mapResponseToPromise(requestUrl, deferred, error, response, body, this.EXPECTED_GET_STATUS);

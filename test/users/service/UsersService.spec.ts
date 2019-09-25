@@ -6,6 +6,7 @@ import Resource from '../../../src/model/Resource';
 import Environment from '../../../src/model/Environment';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import UsersService from './../../../src/users/service/UsersService';
+import Session from '../../../src/sessions/model/Session';
 
 describe('Users Service', () => {
 
@@ -101,7 +102,7 @@ describe('Users Service', () => {
     });
 
     it('And valid verification token ' +
-      'When verifying a user Then return resolved promise', () => {
+      'When verifying a user Then return resolved promise with session', () => {
 
       const response = {
         status: 200,
@@ -110,14 +111,25 @@ describe('Users Service', () => {
         }
       };
 
+      const expectedSession = {
+        sessionId: 'some-session-id-token',
+        creationTime: '2019-09-25T14:41:54.917Z',
+        errors: [],
+        userId: 'some-user-id'
+      };
+
       const verificationToken = 'some-verification-token';
 
       const clientStub: sinon.SinonStub = sandbox.stub(client, 'get')
-        .yields(null, response);
+        .yields(null, response, expectedSession);
 
       const usersService: UsersService = new UsersService(client);
-      return usersService.verify(verificationToken).then(() => {
+      return usersService.verify(verificationToken).then((actualSession: any) => {
         expect(clientStub.args[0][0]).to.equal(`${Resource.VERIFICATION}/${verificationToken}`);
+        expect(actualSession.sessionId).to.equal(expectedSession.sessionId);
+        expect(actualSession.userId).to.equal(expectedSession.userId);
+        expect(actualSession.creationTime).to.equal(expectedSession.creationTime);
+        expect(actualSession.errors.length).to.equal(expectedSession.errors.length);
       });
     });
 

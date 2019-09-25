@@ -466,7 +466,7 @@ channelApeClient.users().create(email, password)
 ```typescript
 const token: string = 'some-verification-token';
 channelApeClient.users().verify(token)
-  .then(() => {
-    // Do what you need after user is verified
+  .then((session: Session) => {
+    // Do what you need with the created session
   });
 ```
