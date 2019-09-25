@@ -8,6 +8,7 @@ import DalService from '../../DalService';
 export default class UsersService extends DalService {
 
   private readonly EXPECTED_GET_STATUS = 200;
+  private readonly EXPECTED_POST_STATUS = 201;
 
   constructor(private readonly client: RequestClientWrapper) {
     super();
@@ -18,6 +19,21 @@ export default class UsersService extends DalService {
     const requestUrl = `/${Version.V1}${Resource.USERS}/${userId}`;
     this.client.get(requestUrl, {}, (error, response, body) => {
       this.mapResponseToPromise(requestUrl, deferred, error, response, body, this.EXPECTED_GET_STATUS);
+    });
+    return deferred.promise as any;
+  }
+
+  public create(email: string, password: string): Promise<User> {
+    const deferred = Q.defer<User>();
+    const requestUrl = `/${Version.V1}${Resource.USERS}`;
+    const authTokenEncoded = Buffer.from(`${email}:${password}`).toString('base64');
+    const options = {
+      headers: {
+        Authorization: `Basic ${authTokenEncoded}`
+      }
+    };
+    this.client.post(requestUrl, options, (error, response, body) => {
+      this.mapResponseToPromise(requestUrl, deferred, error, response, body, this.EXPECTED_POST_STATUS);
     });
     return deferred.promise as any;
   }

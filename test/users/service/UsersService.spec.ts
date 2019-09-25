@@ -65,5 +65,40 @@ describe('Users Service', () => {
       });
     });
 
+    it('And valid username and password ' +
+      'When creating a user Then return resolved promise with user', () => {
+
+      const response = {
+        status: 201,
+        config: {
+          method: 'POST'
+        }
+      };
+
+      const email = 'jdoe@email.com';
+      const password = 'abc123';
+
+      const expectedUser = {
+        analyticsEnabled: false,
+        errors: [],
+        id: 'some-user-id',
+        username: email,
+        verified: false
+      };
+
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'post')
+        .yields(null, response, expectedUser);
+
+      const usersService: UsersService = new UsersService(client);
+      return usersService.create(email, password).then((actualUser: any) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.USERS}`);
+        expect(actualUser.id).to.equal(expectedUser.id);
+        expect(actualUser.errors.length).to.equal(expectedUser.errors.length);
+        expect(actualUser.username).to.equal(expectedUser.username);
+        expect(actualUser.verified).to.equal(expectedUser.verified);
+        expect(actualUser.analyticsEnabled).to.equal(expectedUser.analyticsEnabled);
+      });
+    });
+
   });
 });

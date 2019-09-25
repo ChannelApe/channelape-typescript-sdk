@@ -451,3 +451,13 @@ channelApeClient.users().get(userId)
     // Do what you need with the user
   });
 ```
+
+#### Create User
+```typescript
+const email: string = 'some-email@email.com';
+const password: string = 'Some!Password1';
+channelApeClient.users().create(email, password)
+  .then((user: User) => {
+    // Do what you need with the user
+  });
+```
