@@ -86,12 +86,12 @@ describe('Users Service', () => {
         verified: false
       };
 
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'post')
+      const clientStub: sinon.SinonStub = sandbox.stub(client, 'post')
         .yields(null, response, expectedUser);
 
       const usersService: UsersService = new UsersService(client);
       return usersService.create(email, password).then((actualUser: any) => {
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.USERS}`);
+        expect(clientStub.args[0][0]).to.equal(`/${Version.V1}${Resource.USERS}`);
         expect(actualUser.id).to.equal(expectedUser.id);
         expect(actualUser.errors.length).to.equal(expectedUser.errors.length);
         expect(actualUser.username).to.equal(expectedUser.username);
