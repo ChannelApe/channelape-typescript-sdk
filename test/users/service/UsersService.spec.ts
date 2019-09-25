@@ -100,5 +100,26 @@ describe('Users Service', () => {
       });
     });
 
+    it('And valid verification token ' +
+      'When verifying a user Then return resolved promise', () => {
+
+      const response = {
+        status: 200,
+        config: {
+          method: 'GET'
+        }
+      };
+
+      const verificationToken = 'some-verification-token';
+
+      const clientStub: sinon.SinonStub = sandbox.stub(client, 'get')
+        .yields(null, response);
+
+      const usersService: UsersService = new UsersService(client);
+      return usersService.verify(verificationToken).then(() => {
+        expect(clientStub.args[0][0]).to.equal(`${Resource.VERIFICATION}/${verificationToken}`);
+      });
+    });
+
   });
 });

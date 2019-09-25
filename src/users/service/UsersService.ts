@@ -38,4 +38,13 @@ export default class UsersService extends DalService {
     return deferred.promise as any;
   }
 
+  public verify(verficiationToken: string): Promise<void> {
+    const deferred = Q.defer<void>();
+    const requestUrl = `${Resource.VERIFICATION}/${verficiationToken}`;
+    this.client.get(requestUrl, {}, (error, response, body) => {
+      this.mapResponseToPromise(requestUrl, deferred, error, response, body, this.EXPECTED_GET_STATUS);
+    });
+    return deferred.promise as any;
+  }
+
 }

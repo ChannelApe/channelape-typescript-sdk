@@ -461,3 +461,12 @@ channelApeClient.users().create(email, password)
     // Do what you need with the user
   });
 ```
+
+#### Verify User
+```typescript
+const token: string = 'some-verification-token';
+channelApeClient.users().verify(token)
+  .then(() => {
+    // Do what you need after user is verified
+  });
+```
