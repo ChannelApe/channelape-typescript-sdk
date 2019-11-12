@@ -147,6 +147,38 @@ describe('RequestClientWrapper', () => {
           });
         });
       });
+
+      describe('given a low level network error: ECONNREFUSED', () => {
+        it('expect the calls to be retried until config.timeout is exceeded', (done) => {
+          const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
+          const requestUrl = '/v1/orders';
+          const options: AxiosRequestConfig = {
+            url: requestUrl,
+            params: {
+              businessId,
+              status: 'OPEN'
+            }
+          };
+            
+          const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
+          clientGetStub.rejects({
+            code: 'ECONNREFUSED',
+            message: 'ECONNREFUSED',
+            config: {
+              method: 'get',
+              url: requestUrl
+            }
+          });
+
+          requestClientWrapper.get(requestUrl!, options, (error, response, body) => {
+            expect(error).not.to.be.null;
+            expect(error.message).includes('A problem with the ChannelApe API has been encountered.');
+            expect(error.message).includes('Your request was tried a total of ');
+            expect(warnLogSpy.args[0][0]).to.equal('get /v1/orders -- FAILED WITH STATUS: ECONNREFUSED');
+            done();
+          });
+        });
+      });
     });
 
     it('When doing a get() with query params, expect the query params to be logged', (done) => {

@@ -17,7 +17,7 @@ import VariantsSearchRequestByUpc from '../../../src/variants/model/VariantsSear
 import VariantsSearchRequestByProductFilterId from '../../../src/variants/model/VariantsSearchRequestByProductFilterId';
 import VariantSearchDetails from '../../../src/variants/model/VariantSearchDetails';
 
-const maximumRequestRetryTimeout = 50;
+const maximumRequestRetryTimeout = 300;
 
 const quickSearchByProductFilterIdResults = [
   JSON.parse(fs.readFileSync(

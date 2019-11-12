@@ -209,7 +209,7 @@ export default class RequestClientWrapper {
     response: AxiosResponse | undefined,
     code?: string
   ): boolean {
-    if (code && (code === 'ECONNABORTED' || code === 'Network Error')) {
+    if (code) {
       return true;
     }
     if (response == null) {
