@@ -630,6 +630,23 @@ describe('ChannelApe Client', () => {
           });
         });
       });
+
+      context('When searching inventory items', () => {
+        it('Then return inventory item results', async () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const expectedSku = 'ZZZZ-123';
+
+          const actualInventoryItems = await channelApeClient.inventories().get(expectedBusinessId, expectedSku);
+          expect(actualInventoryItems.length).to.equal(1);
+          expect(actualInventoryItems[0].businessId).to.equal(expectedBusinessId);
+          expect(actualInventoryItems[0].id).to.equal('30');
+          expect(actualInventoryItems[0].sku).to.equal(expectedSku);
+          expect(actualInventoryItems[0].title).to.equal('Emmett Brown\'s Time Traveling Shoes - Mcfly 88\'s');
+          expect(actualInventoryItems[0].createdAt.toString())
+            .to.equal(new Date('2019-11-20T13:46:20.000Z').toString());
+          expect(actualInventoryItems[0].updatedAt).to.not.be.undefined;
+        });
+      });
     });
 
     describe('And valid businessId and valid upc', () => {
@@ -753,6 +770,22 @@ describe('ChannelApe Client', () => {
           expect(member.businessId).to.equal(businessId);
           expect(member.userId).to.equal(userId);
           expect(member.owner).to.equal(true);
+        });
+      });
+    });
+
+    describe('And valid inventory item id', () => {
+      context('When getting inventory item', () => {
+        it('Then return inventory item', async () => {
+          const businessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+
+          const inventoryItem = await channelApeClient.inventories().get('30');
+          expect(inventoryItem.businessId).to.equal(businessId);
+          expect(inventoryItem.createdAt).to.equal('2019-11-20T13:46:20.000Z');
+          expect(inventoryItem.updatedAt).to.not.be.undefined;
+          expect(inventoryItem.sku).to.equal('ZZZZ-123');
+          expect(inventoryItem.id).to.equal('30');
+          expect(inventoryItem.title).to.equal('Emmett Brown\'s Time Traveling Shoes - Mcfly 88\'s');
         });
       });
     });
