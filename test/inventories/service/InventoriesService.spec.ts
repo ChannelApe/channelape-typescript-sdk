@@ -393,7 +393,7 @@ describe('Inventories Service', () => {
 
       try {
         await inventoriesService.update(inventoryItemUpdateRequest);
-        fail('Successfully ran inventory creation but should have failed');
+        fail('Successfully ran inventory update but should have failed');
       } catch (error) {
         expect(clientPutStub.args[0][0]).to
         .equal(`/${Version.V1}${Resource.INVENTORIES}/${inventoryItemUpdateRequest.id}`);
@@ -426,7 +426,7 @@ describe('Inventories Service', () => {
 
       try {
         await inventoriesService.update(inventoryItemUpdateRequest);
-        fail('Successfully ran inventory creation but should have failed');
+        fail('Successfully ran inventory update but should have failed');
       } catch (error) {
         expect(clientPutStub.args[0][0]).to
         .equal(`/${Version.V1}${Resource.INVENTORIES}/${inventoryItemUpdateRequest.id}`);

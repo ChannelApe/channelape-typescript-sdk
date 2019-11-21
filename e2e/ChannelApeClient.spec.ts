@@ -23,6 +23,8 @@ import ProductFilterRequest from '../src/products/filters/models/ProductFilterRe
 import VariantsPage from '../src/variants/model/VariantsPage';
 import { InventoryItemCreateRequest } from './../src/inventories/model/InventoryItemCreateRequest';
 import { InventoryItemUpdateRequest } from './../src/inventories/model/InventoryItemUpdateRequest';
+import LocationCreateRequest from './../src/locations/model/LocationCreateRequest';
+import LocationUpdateRequest from './../src/locations/model/LocationUpdateRequest';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
@@ -514,6 +516,17 @@ describe('ChannelApe Client', () => {
           });
         });
       });
+
+      describe('and locations exist', () => {
+        context('When retrieving locations', () => {
+          it.only('Then return the locations', async () => {
+            const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+            const actualLocations = await channelApeClient.locations().getByBusiness(expectedBusinessId);
+            expect(actualLocations.length).to.be.greaterThan(0);
+
+          });
+        });
+      });
     });
 
     describe('And valid productId', () => {
@@ -832,6 +845,59 @@ describe('ChannelApe Client', () => {
           expect(inventoryItem.sku).to.equal(generatedSku);
           expect(inventoryItem.id).to.not.be.undefined;
           expect(inventoryItem.title).to.equal(generatedTitle);
+        });
+      });
+    });
+
+    describe('And valid location id', () => {
+      context('When getting location', () => {
+        it('Then return location', async () => {
+          const businessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+
+          const location = await channelApeClient.locations().get('26');
+          expect(location.businessId).to.equal(businessId);
+          expect(location.createdAt).to.not.be.undefined;
+          expect(location.updatedAt).to.not.be.undefined;
+          expect(location.name).to.equal('Some-Location-66276');
+
+        });
+      });
+    });
+
+    describe('And valid inventory item creation request', () => {
+      context('When creating inventory item', () => {
+        it('Then create and return inventory item', async () => {
+          const businessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const generatedName = `Some-Location-${Math.floor((Math.random() * 100000) + 1).toString()}`;
+          const locationCreateRequest: LocationCreateRequest = {
+            businessId,
+            name: generatedName
+          };
+          const location = await channelApeClient.locations().create(locationCreateRequest);
+          expect(location.businessId).to.equal(businessId);
+          expect(location.createdAt).to.not.be.undefined;
+          expect(location.updatedAt).to.not.be.undefined;
+          expect(location.name).to.equal(generatedName);
+          expect(location.id).to.not.be.undefined;
+        });
+      });
+    });
+
+    describe('And valid location update request', () => {
+      context('When update location', () => {
+        it.only('Then update and return location', async () => {
+          const businessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const generatedName = `Some-Location-${Math.floor((Math.random() * 100000) + 1).toString()}`;
+          const locationUpdateRequest: LocationUpdateRequest = {
+            id: '28',
+            name: generatedName
+          };
+          const location = await channelApeClient.locations().update(locationUpdateRequest);
+          expect(location.businessId).to.equal(businessId);
+          expect(location.createdAt).to.not.be.undefined;
+          expect(location.updatedAt).to.not.be.undefined;
+          expect(location.name).to.equal(generatedName);
+          expect(location.id).to.equal(locationUpdateRequest.id);
         });
       });
     });

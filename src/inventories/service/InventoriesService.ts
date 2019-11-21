@@ -90,7 +90,7 @@ export default class InventoriesService extends RestService {
         reject(requestCallbackParams.error);
       } else if (requestCallbackParams.response.status === expectedStatusCode) {
         const data: InventoryItemsResponse = requestCallbackParams.body as InventoryItemsResponse;
-        resolve(data.inventoryItems.map(inventoryItem => this.formatChannel(inventoryItem)));
+        resolve(data.inventoryItems.map(inventoryItem => this.formatInventoryItem(inventoryItem)));
       } else {
         const channelApeErrorResponse =
           GenerateApiError(requestUrl, requestCallbackParams.response, requestCallbackParams.body,
@@ -100,7 +100,7 @@ export default class InventoriesService extends RestService {
     });
   }
 
-  private formatChannel(inventoryItem: any): InventoryItem {
+  private formatInventoryItem(inventoryItem: any): InventoryItem {
     inventoryItem.createdAt = new Date(inventoryItem.createdAt);
     inventoryItem.updatedAt = new Date(inventoryItem.updatedAt);
     return inventoryItem as InventoryItem;
