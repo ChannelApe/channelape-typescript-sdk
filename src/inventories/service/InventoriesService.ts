@@ -8,10 +8,13 @@ import RequestCallbackParams from '../../model/RequestCallbackParams';
 import InventoryItemsResponse from '../model/InventoryItemsResponse';
 import GenerateApiError from '../../utils/GenerateApiError';
 import { AxiosRequestConfig } from 'axios';
+import { InventoryItemCreateRequest } from './../model/InventoryItemCreateRequest';
+import { InventoryItemUpdateRequest } from './../model/InventoryItemUpdateRequest';
 
 export default class InventoriesService extends RestService {
 
-  private readonly EXPECTED_GET_STATUS = 200;
+  private readonly EXPECTED_GET_OR_UPDATE_STATUS = 200;
+  private readonly EXPECTED_POST_STATUS = 201;
 
   constructor(private readonly client: RequestClientWrapper) {
     super();
@@ -26,11 +29,33 @@ export default class InventoriesService extends RestService {
     return this.retrieveInventoryItemById(inventoryItemIdOrBusinessId);
   }
 
+  public create(inventoryItemCreationRequest: InventoryItemCreateRequest): Promise<InventoryItem> {
+    const deferred = Q.defer<InventoryItem>();
+    const requestUrl = `/${Version.V1}${Resource.INVENTORIES}`;
+    const options: AxiosRequestConfig = {
+      data: inventoryItemCreationRequest
+    };
+    this.client.post(requestUrl, options, (error, response, body) =>
+      this.mapResponseToPromise(requestUrl, deferred, error, response, body, this.EXPECTED_POST_STATUS));
+    return deferred.promise as any;
+  }
+
+  public update(inventoryItemUpdateRequest: InventoryItemUpdateRequest): Promise<InventoryItem> {
+    const deferred = Q.defer<InventoryItem>();
+    const requestUrl = `/${Version.V1}${Resource.INVENTORIES}/${inventoryItemUpdateRequest.id}`;
+    const options: AxiosRequestConfig = {
+      data: inventoryItemUpdateRequest
+    };
+    this.client.put(requestUrl, options, (error, response, body) =>
+      this.mapResponseToPromise(requestUrl, deferred, error, response, body, this.EXPECTED_GET_OR_UPDATE_STATUS));
+    return deferred.promise as any;
+  }
+
   private retrieveInventoryItemById(inventoryItemIdOrBusinessId: string) {
     const deferred = Q.defer<InventoryItem>();
     const requestUrl = `/${Version.V1}${Resource.INVENTORIES}/${inventoryItemIdOrBusinessId}`;
     this.client.get(requestUrl, {}, (error, response, body) =>
-      this.mapResponseToPromise(requestUrl, deferred, error, response, body, this.EXPECTED_GET_STATUS));
+      this.mapResponseToPromise(requestUrl, deferred, error, response, body, this.EXPECTED_GET_OR_UPDATE_STATUS));
     return deferred.promise as any;
   }
 
@@ -50,7 +75,7 @@ export default class InventoriesService extends RestService {
           response,
           body
         };
-        resolve(this.mapInventoryItemsPromise(requestUrl, requestResponse, this.EXPECTED_GET_STATUS));
+        resolve(this.mapInventoryItemsPromise(requestUrl, requestResponse, this.EXPECTED_GET_OR_UPDATE_STATUS));
       });
     });
   }
@@ -69,7 +94,7 @@ export default class InventoriesService extends RestService {
       } else {
         const channelApeErrorResponse =
           GenerateApiError(requestUrl, requestCallbackParams.response, requestCallbackParams.body,
-            this.EXPECTED_GET_STATUS);
+            this.EXPECTED_GET_OR_UPDATE_STATUS);
         reject(channelApeErrorResponse);
       }
     });

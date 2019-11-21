@@ -21,6 +21,8 @@ import OrderActivityOperation from '../src/orders/service/activities/model/Order
 import OrderActivityResult from '../src/orders/service/activities/model/OrderActivityResult';
 import ProductFilterRequest from '../src/products/filters/models/ProductFilterRequest';
 import VariantsPage from '../src/variants/model/VariantsPage';
+import { InventoryItemCreateRequest } from './../src/inventories/model/InventoryItemCreateRequest';
+import { InventoryItemUpdateRequest } from './../src/inventories/model/InventoryItemUpdateRequest';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
@@ -786,6 +788,50 @@ describe('ChannelApe Client', () => {
           expect(inventoryItem.sku).to.equal('ZZZZ-123');
           expect(inventoryItem.id).to.equal('30');
           expect(inventoryItem.title).to.equal('Emmett Brown\'s Time Traveling Shoes - Mcfly 88\'s');
+        });
+      });
+    });
+
+    describe('And valid inventory item creation request', () => {
+      context('When creating inventory item', () => {
+        it('Then create and return inventory item', async () => {
+          const businessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const generatedSku = `ABC-${Math.floor((Math.random() * 100000) + 1).toString()}`;
+          const generatedTitle = `Some Testing title ${generatedSku}`;
+          const inventoryItemCreationRequest: InventoryItemCreateRequest = {
+            businessId,
+            sku: generatedSku,
+            title: generatedTitle
+          };
+          const inventoryItem = await channelApeClient.inventories().create(inventoryItemCreationRequest);
+          expect(inventoryItem.businessId).to.equal(businessId);
+          expect(inventoryItem.createdAt).to.not.be.undefined;
+          expect(inventoryItem.updatedAt).to.not.be.undefined;
+          expect(inventoryItem.sku).to.equal(generatedSku);
+          expect(inventoryItem.id).to.not.be.undefined;
+          expect(inventoryItem.title).to.equal(generatedTitle);
+        });
+      });
+    });
+
+    describe('And valid inventory item update request', () => {
+      context('When update inventory item', () => {
+        it('Then update and return inventory item', async () => {
+          const businessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const generatedSku = `ABC-${Math.floor((Math.random() * 100000) + 1).toString()}`;
+          const generatedTitle = `Some Testing title ${generatedSku}`;
+          const inventoryItemUpdateRequest: InventoryItemUpdateRequest = {
+            id: '33',
+            sku: generatedSku,
+            title: generatedTitle
+          };
+          const inventoryItem = await channelApeClient.inventories().update(inventoryItemUpdateRequest);
+          expect(inventoryItem.businessId).to.equal(businessId);
+          expect(inventoryItem.createdAt).to.not.be.undefined;
+          expect(inventoryItem.updatedAt).to.not.be.undefined;
+          expect(inventoryItem.sku).to.equal(generatedSku);
+          expect(inventoryItem.id).to.not.be.undefined;
+          expect(inventoryItem.title).to.equal(generatedTitle);
         });
       });
     });
