@@ -18,6 +18,8 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Analytics](#analytics)
 - [Product Filters](#product-filters)
 - [Users](#users)
+- [Inventories](#inventories)
+- [Locations](#locations)
 
 ### Getting Started
 
@@ -449,5 +451,97 @@ const userId: string = 'some-user-id';
 channelApeClient.users().get(userId)
   .then((user: User) => {
     // Do what you need with the user
+  });
+```
+
+### Inventories
+
+### Get inventory item
+```typescript
+const inventoryItemId: string = 'some-inventory-id';
+channelApeClient.inventories().get(inventoryItemId)
+  .then((inventoryItem: InventoryItem) => {
+    // Do what you need with the inventory item
+  });
+```
+
+### Get businesses inventory item by SKU
+```typescript
+const inventorySku: string = 'ABC-123';
+const businessId: string = '1';
+channelApeClient.inventories().get(businessId, inventorySku)
+  .then((inventoryItem: InventoryItem) => {
+    // Do what you need with the inventory item
+  });
+```
+
+### Create new Inventory Item
+```typescript
+const inventoryItemCreateRequest: InventoryItemCreateRequest = {
+  businessId: '1',
+  sku: 'ABC-123',
+  title: 'Cool inventory title'
+};
+channelApeClient.inventories().create(inventoryItemCreateRequest)
+  .then((inventoryItem: InventoryItem) => {
+    // Do what you need with the created inventory item
+  });
+```
+
+### Update Inventory Item
+```typescript
+const inventoryItemUpdateRequest: InventoryItemUpdateRequest = {
+  id: '123',
+  sku: 'ABC-123',
+  title: 'Cool inventory title'
+};
+channelApeClient.inventories().update(inventoryItemUpdateRequest)
+  .then((inventoryItem: InventoryItem) => {
+    // Do what you need with the updated inventory item
+  });
+```
+
+
+### Locations
+
+### Get location
+```typescript
+const locationId: string = 'some-location-id';
+channelApeClient.locations().get(locationId)
+  .then((location: Location) => {
+    // Do what you need with the location
+  });
+```
+
+### Get locations for a business
+```typescript
+const businessId: string = '1';
+channelApeClient.locations().getByBusinessId(businessId)
+  .then((location: Location) => {
+    // Do what you need with the locations
+  });
+```
+
+### Create new Location
+```typescript
+const locationCreationRequest: LocationCreateRequest = {
+  businessId: '1',
+  name: 'Some location Name'
+};
+channelApeClient.locations().create(locationCreationRequest)
+  .then((location: Location) => {
+    // Do what you need with the created location
+  });
+```
+
+### Update Location
+```typescript
+const locationUpdateRequest: LocationUpdateRequest = {
+  id: '123',
+  name: 'Some updated location Name'
+};
+channelApeClient.locations().update(locationUpdateRequest)
+  .then((location: Location) => {
+    // Do what you need with the updated location
   });
 ```

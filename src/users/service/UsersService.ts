@@ -3,9 +3,9 @@ import * as Q from 'q';
 import Version from '../../model/Version';
 import Resource from '../../model/Resource';
 import User from '../model/User';
-import DalService from '../../DalService';
+import RestService from '../../service/RestService';
 
-export default class UsersService extends DalService {
+export default class UsersService extends RestService {
 
   private readonly EXPECTED_GET_STATUS = 200;
 

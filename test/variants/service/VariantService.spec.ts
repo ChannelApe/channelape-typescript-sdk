@@ -276,7 +276,7 @@ describe('VariantsService', () => {
           return actualVariantsPromise
             .then(() => { throw new Error('Should not have resolved'); })
             .catch(e => expect(e.message).to.include('A problem with the ChannelApe API has been encountered.'));
-        });
+        }).timeout(2000);
       });
 
       context('When handling a non 200 response', () => {

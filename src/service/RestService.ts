@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
-import GenerateApiError from './utils/GenerateApiError';
+import GenerateApiError from '../utils/GenerateApiError';
 
-export default abstract class DalService {
+export default abstract class RestService {
 
   constructor() { }
 
@@ -10,7 +10,7 @@ export default abstract class DalService {
     deferred: Q.Deferred<T>,
     error: any,
     response: AxiosResponse,
-    body: any,
+    body: T,
     expectedStatusCode: number
   ): void {
     if (error) {
