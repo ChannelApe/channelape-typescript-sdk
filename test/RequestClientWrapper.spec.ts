@@ -150,6 +150,7 @@ describe('RequestClientWrapper', () => {
 
       describe('given a low level network error: ECONNREFUSED', () => {
         it('expect the calls to be retried until config.timeout is exceeded', (done) => {
+
           const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
           const requestUrl = '/v1/orders';
           const options: AxiosRequestConfig = {
@@ -159,7 +160,7 @@ describe('RequestClientWrapper', () => {
               status: 'OPEN'
             }
           };
-            
+
           const clientGetStub: sinon.SinonStub = sandbox.stub(axios, 'get');
           clientGetStub.rejects({
             code: 'ECONNREFUSED',
@@ -177,7 +178,7 @@ describe('RequestClientWrapper', () => {
             expect(warnLogSpy.args[0][0]).to.equal('get /v1/orders -- FAILED WITH STATUS: ECONNREFUSED');
             done();
           });
-        });
+        }).timeout(2000);
       });
     });
 
@@ -222,7 +223,7 @@ describe('RequestClientWrapper', () => {
       const requestUrl = `/v1/orders/${orderId}`;
       const options: AxiosRequestConfig = {
         url: requestUrl,
-        params: { }
+        params: {}
       };
       mockedAxios.onGet().reply(200);
       requestClientWrapper.get(options.url!, options, () => {
@@ -252,7 +253,7 @@ describe('RequestClientWrapper', () => {
       };
       // tslint:disable:no-trailing-whitespace
       const expectedErrorMessage =
-`put /v1/orders/c0f45529-cbed-4e90-9a38-c208d409ef2a
+        `put /v1/orders/c0f45529-cbed-4e90-9a38-c208d409ef2a
   Status: 404
   Response Body:
   Request failed with status code 404
@@ -428,7 +429,7 @@ Code: 0 Message: You didnt pass any body`;
           .to.equal(`GET ${endpoint}${requestUrl} -- STARTED`, 'should log correctly');
         done();
       });
-    });
+    }).timeout(2000);
 
     it('When handling a PUT response expect the call to be retried on 500 level status codes and 429s', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
@@ -470,6 +471,7 @@ Code: 0 Message: You didnt pass any body`;
       });
 
       requestClientWrapper.put(requestUrl, fakeRequest, (error, response, body) => {
+
         expect(error).to.be.null;
         expect(warnLogSpy.called).to.be.true;
         const delayMs1 = parseInt(warnLogSpy.args[1][0].match(/\s(\d*)ms/g)[0].trim().replace('ms', ''), 10);
@@ -491,8 +493,9 @@ Code: 0 Message: You didnt pass any body`;
         expect(infoLogSpy.args[0][0])
           .to.equal(`PUT ${endpoint}${requestUrl} -- STARTED`, 'should log correctly');
         done();
+
       });
-    });
+    }).timeout(2000);
 
     it(`When handling a GET response expect the call to be retried
       until the MaximumRequestRetryTimeout limit is exceeded`, (done) => {
@@ -506,7 +509,7 @@ Code: 0 Message: You didnt pass any body`;
         expect(error.message).to.include(expectedErrorMessage);
         done();
       });
-    });
+    }).timeout(5000);
 
     it(`When handling a GET response expect the call to be retried
       until a non 500 / 429 response is received`, (done) => {
@@ -577,4 +580,4 @@ Code: 0 Message: You didnt pass any body`;
       });
     });
   });
-});
+}).timeout(3000);
