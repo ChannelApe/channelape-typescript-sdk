@@ -521,7 +521,7 @@ describe('ChannelApe Client', () => {
         context('When retrieving locations', () => {
           it.only('Then return the locations', async () => {
             const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
-            const actualLocations = await channelApeClient.locations().getByBusiness(expectedBusinessId);
+            const actualLocations = await channelApeClient.locations().getByBusinessId(expectedBusinessId);
             expect(actualLocations.length).to.be.greaterThan(0);
 
           });
