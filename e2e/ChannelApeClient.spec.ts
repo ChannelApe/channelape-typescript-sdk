@@ -25,6 +25,7 @@ import { InventoryItemCreateRequest } from './../src/inventories/model/Inventory
 import { InventoryItemUpdateRequest } from './../src/inventories/model/InventoryItemUpdateRequest';
 import LocationCreateRequest from './../src/locations/model/LocationCreateRequest';
 import LocationUpdateRequest from './../src/locations/model/LocationUpdateRequest';
+import AdjustmentRequest from './../src/inventories/quantities/model/AdjustmentRequest';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
@@ -519,7 +520,7 @@ describe('ChannelApe Client', () => {
 
       describe('and locations exist', () => {
         context('When retrieving locations', () => {
-          it.only('Then return the locations', async () => {
+          it('Then return the locations', async () => {
             const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
             const actualLocations = await channelApeClient.locations().getByBusinessId(expectedBusinessId);
             expect(actualLocations.length).to.be.greaterThan(0);
@@ -885,7 +886,7 @@ describe('ChannelApe Client', () => {
 
     describe('And valid location update request', () => {
       context('When update location', () => {
-        it.only('Then update and return location', async () => {
+        it('Then update and return location', async () => {
           const businessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
           const generatedName = `Some-Location-${Math.floor((Math.random() * 100000) + 1).toString()}`;
           const locationUpdateRequest: LocationUpdateRequest = {
@@ -898,6 +899,50 @@ describe('ChannelApe Client', () => {
           expect(location.updatedAt).to.not.be.undefined;
           expect(location.name).to.equal(generatedName);
           expect(location.id).to.equal(locationUpdateRequest.id);
+        });
+      });
+    });
+
+    describe('And valid adjustment request', () => {
+      context('When adjusting quantities', () => {
+        it('Then update and return quantities', async () => {
+          const inventoryItemId = '34';
+          const locationId = '28';
+          const quantity = -148;
+          const inventoryStatus = 'AVAILABLE_TO_SELL';
+          const adjustmentRequest: AdjustmentRequest = {
+            inventoryItemId,
+            locationId,
+            quantity,
+            inventoryStatus
+          };
+          const actualAdjustment = await channelApeClient.inventories().quantities().adjust(adjustmentRequest);
+          expect(actualAdjustment.inventoryItemId).to.equal(inventoryItemId);
+          expect(actualAdjustment.createdAt).to.not.be.undefined;
+          expect(actualAdjustment.updatedAt).to.not.be.undefined;
+          expect(actualAdjustment.locationId).to.equal(locationId);
+          expect(actualAdjustment.inventoryStatus).to.equal(adjustmentRequest.inventoryStatus);
+        });
+      });
+
+      context('When setting quantities', () => {
+        it('Then update and return quantities', async () => {
+          const inventoryItemId = '33';
+          const locationId = '28';
+          const quantity = 29;
+          const inventoryStatus = 'ON_ORDER';
+          const adjustmentRequest: AdjustmentRequest = {
+            inventoryItemId,
+            locationId,
+            quantity,
+            inventoryStatus
+          };
+          const actualAdjustment = await channelApeClient.inventories().quantities().set(adjustmentRequest);
+          expect(actualAdjustment.inventoryItemId).to.equal(inventoryItemId);
+          expect(actualAdjustment.createdAt).to.not.be.undefined;
+          expect(actualAdjustment.updatedAt).to.not.be.undefined;
+          expect(actualAdjustment.locationId).to.equal(locationId);
+          expect(actualAdjustment.inventoryStatus).to.equal(adjustmentRequest.inventoryStatus);
         });
       });
     });
