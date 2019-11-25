@@ -116,7 +116,7 @@ describe('Inventory Quantities Service', () => {
 
       const inventoryQuantitiesService: InventoryItemQuantitiesService = new InventoryItemQuantitiesService(client);
       try {
-        const actualAdjustment = await inventoryQuantitiesService.adjust(adjustmentRequest);
+        await inventoryQuantitiesService.adjust(adjustmentRequest);
         fail('Expected inventory quantity adjustment to fail but it didn\'t.');
       } catch (e) {
         // tslint:disable-next-line:max-line-length
@@ -148,7 +148,7 @@ describe('Inventory Quantities Service', () => {
 
       const inventoryQuantitiesService: InventoryItemQuantitiesService = new InventoryItemQuantitiesService(client);
       try {
-        const actualAdjustment = await inventoryQuantitiesService.adjust(adjustmentRequest);
+        await inventoryQuantitiesService.adjust(adjustmentRequest);
         fail('Expected inventory quantity adjustment to fail but it didn\'t.');
       } catch (e) {
         // tslint:disable-next-line:max-line-length
@@ -225,7 +225,7 @@ describe('Inventory Quantities Service', () => {
 
       const inventoryQuantitiesService: InventoryItemQuantitiesService = new InventoryItemQuantitiesService(client);
       try {
-        const actualAdjustment = await inventoryQuantitiesService.set(adjustmentRequest);
+        await inventoryQuantitiesService.set(adjustmentRequest);
         fail('Expected inventory quantity adjustment to fail but it didn\'t.');
       } catch (e) {
         // tslint:disable-next-line:max-line-length
@@ -257,7 +257,7 @@ describe('Inventory Quantities Service', () => {
 
       const inventoryQuantitiesService: InventoryItemQuantitiesService = new InventoryItemQuantitiesService(client);
       try {
-        const actualAdjustment = await inventoryQuantitiesService.set(adjustmentRequest);
+        await inventoryQuantitiesService.set(adjustmentRequest);
         fail('Expected inventory quantity adjustment to fail but it didn\'t.');
       } catch (e) {
         // tslint:disable-next-line:max-line-length
