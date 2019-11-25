@@ -950,7 +950,6 @@ describe('ChannelApe Client', () => {
     describe('And valid inventory item id', () => {
       context('When retrieving inventory quantities', () => {
         it('Then return inventory quantities', async () => {
-          const businessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
 
           const quantities = await channelApeClient.inventories().quantities().retrieve('35');
           expect(quantities.length).to.be.greaterThan(0);
