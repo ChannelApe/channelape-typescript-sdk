@@ -19,6 +19,7 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Product Filters](#product-filters)
 - [Users](#users)
 - [Inventories](#inventories)
+- [Inventory Quantities](#inventory-quantities)
 - [Locations](#locations)
 
 ### Getting Started
@@ -501,6 +502,42 @@ channelApeClient.inventories().update(inventoryItemUpdateRequest)
   });
 ```
 
+### Inventory Quantities
+
+### Adjust Inventory Item Quantity
+```typescript
+const adjustmentRequest: AdjustmentRequest = {
+  locationId: '123',
+  inventoryStatus: 'ABC-123',
+  quantity: 31
+};
+channelApeClient.inventories().quantities().adjust(adjustmentRequest)
+  .then((adjustment: Adjustment) => {
+    // Do what you need with the adjustment
+  });
+```
+
+### Set Inventory Item Quantity
+```typescript
+const adjustmentRequest: AdjustmentRequest = {
+  locationId: '123',
+  inventoryStatus: 'ABC-123',
+  quantity: 31
+};
+channelApeClient.inventories().quantities().set(adjustmentRequest)
+  .then((adjustment: Adjustment) => {
+    // Do what you need with the adjustment
+  });
+```
+
+### Retrieve an inventory item's current quantities
+```typescript
+const inventoryItemId = '35';
+channelApeClient.inventories().quantities().retrieve(inventoryItemId);
+  .then((quantities: InventoryItemQuantity[]) => {
+    // Do what you need with the inventory item quantities
+  });
+```
 
 ### Locations
 
