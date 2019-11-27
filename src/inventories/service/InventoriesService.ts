@@ -10,14 +10,21 @@ import GenerateApiError from '../../utils/GenerateApiError';
 import { AxiosRequestConfig } from 'axios';
 import { InventoryItemCreateRequest } from './../model/InventoryItemCreateRequest';
 import { InventoryItemUpdateRequest } from './../model/InventoryItemUpdateRequest';
+import InventoryItemQuantitiesService from '../quantities/InventoryItemQuantitiesService';
 
 export default class InventoriesService extends RestService {
 
   private readonly EXPECTED_GET_OR_UPDATE_STATUS = 200;
   private readonly EXPECTED_POST_STATUS = 201;
 
+  private inventoryQuantitiesService: InventoryItemQuantitiesService;
   constructor(private readonly client: RequestClientWrapper) {
     super();
+    this.inventoryQuantitiesService = new InventoryItemQuantitiesService(client);
+  }
+
+  public quantities(): InventoryItemQuantitiesService {
+    return this.inventoryQuantitiesService;
   }
 
   public get(businessId: string, sku: string): Promise<InventoryItem[]>;
