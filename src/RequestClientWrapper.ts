@@ -188,6 +188,7 @@ export default class RequestClientWrapper {
     try {
       callback(finalError, requestResponse.response as any, requestResponse.body);
     } catch (e) {
+      callback(new Error('API Error'), e, {});
       this.requestLogger.logCallbackError(e);
     }
   }
