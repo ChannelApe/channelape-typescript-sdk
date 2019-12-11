@@ -14,7 +14,7 @@ export default abstract class RestService {
     expectedStatusCode: number
   ): void {
     if (error) {
-      throw error;
+      deferred.reject(error);
     } else if (response.status === expectedStatusCode) {
       deferred.resolve(body);
     } else {

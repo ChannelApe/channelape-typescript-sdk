@@ -109,6 +109,29 @@ describe('Inventories Service', () => {
       }
     });
 
+    it('And inventory item id but ChannelApe API returns a 500' +
+      'When searching inventory items then return reject promise with errors', async () => {
+
+      const response = {
+        status: 500,
+        config: {
+          method: 'GET'
+        }
+      };
+
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+          .yields(response, null, expectedChannelApeErrorResponse);
+
+      const inventoriesService: InventoriesService = new InventoriesService(client);
+      try {
+        await inventoriesService.get('1');
+        fail('Successfully ran inventory retrieval by id but should have failed with 500');
+      } catch (error) {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.INVENTORIES}/1`);
+        expect(error.status).to.equal(500);
+      }
+    });
+
     it('And exception is thrown' +
       'When searching inventory items then return reject promise with errors', async () => {
 
