@@ -37,6 +37,8 @@ export { default as OrderUpdateRequest } from './orders/model/OrderUpdateRequest
 export { default as OrdersQueryRequestByBusinessId } from './orders/model/OrdersQueryRequestByBusinessId';
 export { default as OrdersQueryRequestByChannel } from './orders/model/OrdersQueryRequestByChannel';
 export { default as OrdersQueryRequestByChannelOrderId } from './orders/model/OrdersQueryRequestByChannelOrderId';
+export { default as OrdersQueryRequestByPurchaseOrderNumber }
+  from './orders/model/OrdersQueryRequestByPurchaseOrderNumber';
 export { default as OrderActivityCreateRequestByChannel }
   from './orders/service/activities/model/OrderActivityCreateRequestByChannel';
 export { default as OrderActivityCreateRequestByOrderId }
