@@ -8,6 +8,7 @@ import Environment from '../../../src/model/Environment';
 import ChannelApeError from '../../../src/model/ChannelApeError';
 import OrdersQueryRequestByBusinessId from '../../../src/orders/model/OrdersQueryRequestByBusinessId';
 import OrdersQueryRequestByChannelOrderId from '../../../src/orders/model/OrdersQueryRequestByChannelOrderId';
+import OrdersQueryRequestByPurchaseOrderNumber from '../../../src/orders/model/OrdersQueryRequestByPurchaseOrderNumber';
 import OrderCreateRequest from '../../../src/orders/model/OrderCreateRequest';
 import OrderUpdateRequest from '../../../src/orders/model/OrderUpdateRequest';
 import OrderPatchRequest from '../../../src/orders/model/OrderPatchRequest';
@@ -50,6 +51,7 @@ describe('OrdersService', () => {
 
       return ordersService.get(orderId).then((actualOrder) => {
         expect(actualOrder.id).to.equal(orderId);
+        expect(actualOrder.purchaseOrderNumber).to.equal(singleOrder.purchaseOrderNumber);
         expect(typeof actualOrder.totalShippingTax).to.equal('undefined');
         expect(typeof actualOrder.canceledAt).to.equal('undefined');
       });
@@ -65,6 +67,7 @@ describe('OrdersService', () => {
 
       return ordersService.get(orderId).then((actualOrder) => {
         expect(actualOrder.id).to.equal(orderId);
+        expect(actualOrder.purchaseOrderNumber).to.equal(singleCanceledOrder.purchaseOrderNumber);
         expect(actualOrder.totalShippingTax).to.equal(2);
         expect(actualOrder.lineItems.length).to.equal(3);
         expect(actualOrder.lineItems[0].price).to.equal(15.99);
@@ -82,6 +85,8 @@ describe('OrdersService', () => {
         .reply(200, singleOrderWithOneLineItemAndOneFulfillment);
 
       return ordersService.get(orderId).then((actualOrder) => {
+        expect(actualOrder.purchaseOrderNumber)
+          .to.equal(singleOrderWithOneLineItemAndOneFulfillment.purchaseOrderNumber);
         expect(actualOrder.lineItems.length).to.equal(1);
         expect(actualOrder.fulfillments!.length).to.equal(1);
         const fulfillment1 = actualOrder.fulfillments![0];
@@ -100,6 +105,7 @@ describe('OrdersService', () => {
         .reply(200, singleClosedOrderWithFulfillments);
 
       return ordersService.get(orderId).then((actualOrder) => {
+        expect(actualOrder.purchaseOrderNumber).to.be.undefined;
         expect(actualOrder.fulfillments!.length).to.equal(1);
         expect(actualOrder.fulfillments![0].lineItems.length).to.equal(6);
         expect(actualOrder.fulfillments![0].lineItems[0].price).to.equal(15.91);
@@ -153,6 +159,30 @@ describe('OrdersService', () => {
         expect(actualOrders).to.be.an('array');
         expect(actualOrders.length).to.equal(1);
         expect(actualOrders[0].channelOrderId).to.equal(channelOrderId);
+        expect(actualOrders[0].businessId).to.equal(businessId);
+      });
+    });
+
+    it(`And valid businessId and purchaseORderNumber
+            When retrieving order Then return resolved promise with order`, () => {
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onGet(`${Environment.STAGING}/${Version.V1}/orders`).reply(200, {
+        orders: [singleOrder],
+        pagination: {
+          lastPage: true
+        }
+      });
+
+      const purchaseOrderNumber = '123456';
+      const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
+      const requestOptions: OrdersQueryRequestByPurchaseOrderNumber = {
+        businessId,
+        purchaseOrderNumber
+      };
+      return ordersService.get(requestOptions).then((actualOrders: Order[]) => {
+        expect(actualOrders).to.be.an('array');
+        expect(actualOrders.length).to.equal(1);
+        expect(actualOrders[0].purchaseOrderNumber).to.equal(purchaseOrderNumber);
         expect(actualOrders[0].businessId).to.equal(businessId);
       });
     });
@@ -434,6 +464,7 @@ Code: 15 Message: Requested business cannot be found.`;
 
       return ordersService.create(orderCreateRequest).then((createdOrder) => {
         expect(createdOrder.id).to.equal('c0f45529-cbed-4e90-9a38-c208d409ef2a', 'order.id');
+        expect(createdOrder.purchaseOrderNumber).to.equal('123456', 'order.purchaseOrderNumber');
         expect(createdOrder.totalPrice).to.equal(31.93, 'totalPrice');
         expect(createdOrder.fulfillments!.length).to.equal(1, 'fulfillments.length');
         expect(createdOrder.fulfillments![0].lineItems.length).to.equal(2, 'fulfillments.lineItems.length');
@@ -466,6 +497,7 @@ Code: 15 Message: Requested business cannot be found.`;
 
       return ordersService.create(orderCreateRequest).then((createdOrder) => {
         expect(createdOrder.id).to.equal('c0f45529-cbed-4e90-9a38-c208d409ef2a', 'order.id');
+        expect(createdOrder.purchaseOrderNumber).to.equal('123456', 'order.purchaseOrderNumber');
         expect(createdOrder.totalPrice).to.equal(31.93, 'totalPrice');
         expect(createdOrder.fulfillments!.length).to.equal(1, 'fulfillments.length');
         expect(createdOrder.fulfillments![0].lineItems.length).to.equal(2, 'fulfillments.lineItems.length');

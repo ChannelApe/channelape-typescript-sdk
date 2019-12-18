@@ -9,6 +9,7 @@ export default interface OrderCreateRequest {
   channelOrderId: string;
   channelId: string;
   purchasedAt: Date;
+  purchaseOrderNumber?: string;
   canceledAt?: Date;
   canceledReason?: string;
   customer?: Customer;

@@ -5,6 +5,8 @@ import OrdersPage from '../model/OrdersPage';
 import OrdersQueryRequestByBusinessId from '../model/OrdersQueryRequestByBusinessId';
 import OrdersQueryRequestByChannel from '../model/OrdersQueryRequestByChannel';
 import OrdersQueryRequestByChannelOrderId from '../model/OrdersQueryRequestByChannelOrderId';
+import OrdersQueryRequestByPurchaseOrderNumber from '../model/OrdersQueryRequestByPurchaseOrderNumber';
+
 import OrderActivitiesService from './activities/OrderActivitiesService';
 import RequestClientWrapper from '../../RequestClientWrapper';
 import GenericOrdersQueryRequest from './model/GenericOrdersQueryRequest';
@@ -28,6 +30,7 @@ export default class OrdersService {
   public get(ordersRequestByBusinessId: OrdersQueryRequestByBusinessId): Promise<Order[]>;
   public get(ordersRequestByChannel: OrdersQueryRequestByChannel): Promise<Order[]>;
   public get(ordersRequestByChannelOrderId: OrdersQueryRequestByChannelOrderId): Promise<Order[]>;
+  public get(ordersRequestByPurchaseOrderNumber: OrdersQueryRequestByPurchaseOrderNumber): Promise<Order[]>;
   public get(orderIdOrRequest: string | GenericOrdersQueryRequest): Promise<Order> | Promise<Order[]> {
     return this.ordersCrudService.get(orderIdOrRequest as any);
   }

@@ -120,6 +120,7 @@ export default {
   channelId: 'c815980f-2591-4be7-958c-0477c4cc6df5',
   channelOrderId: '347354628999',
   createdAt: '2018-05-05T16:39:00.590Z',
+  purchaseOrderNumber: '123456',
   customer: {
     additionalFields: [
       {

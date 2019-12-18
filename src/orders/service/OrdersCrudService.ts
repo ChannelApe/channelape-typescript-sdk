@@ -16,6 +16,7 @@ import * as Q from 'q';
 import GenericOrdersQueryRequest from './model/GenericOrdersQueryRequest';
 import OrderPatchRequest from '../model/OrderPatchRequest';
 import JsonOrderFormatterService from './JsonOrderFormatterService';
+import OrdersQueryRequestByPurchaseOrderNumber from '../model/OrdersQueryRequestByPurchaseOrderNumber';
 
 const EXPECTED_GET_STATUS = 200;
 const EXPECTED_CREATE_STATUS = 202;
@@ -29,6 +30,7 @@ export default class OrdersCrudService {
   public get(ordersRequestByBusinessId: OrdersQueryRequestByBusinessId): Promise<Order[]>;
   public get(ordersRequestByChannel: OrdersQueryRequestByChannel): Promise<Order[]>;
   public get(ordersRequestByChannelOrderId: OrdersQueryRequestByChannelOrderId): Promise<Order[]>;
+  public get(ordersQueryRequestByPurchaseOrderNumber: OrdersQueryRequestByPurchaseOrderNumber): Promise<Order[]>;
   public get(orderIdOrRequest: string | GenericOrdersQueryRequest): Promise<Order> | Promise<Order[]> {
     if (typeof orderIdOrRequest === 'string') {
       return this.getByOrderId(orderIdOrRequest);
@@ -111,7 +113,8 @@ export default class OrdersCrudService {
   }
 
   private getOrdersByRequest(ordersRequest: OrdersQueryRequestByBusinessId | OrdersQueryRequestByChannel |
-    OrdersQueryRequestByChannelOrderId, orders: Order[], deferred: Q.Deferred<any>, getSinglePage: boolean): void {
+    OrdersQueryRequestByChannelOrderId | OrdersQueryRequestByPurchaseOrderNumber,
+    orders: Order[], deferred: Q.Deferred<any>, getSinglePage: boolean): void {
     const requestUrl = `/${Version.V1}${Resource.ORDERS}`;
     const ordersQueryParams = ordersRequest as any;
     if (ordersQueryParams.startDate != null && typeof ordersQueryParams.startDate !== 'string') {
