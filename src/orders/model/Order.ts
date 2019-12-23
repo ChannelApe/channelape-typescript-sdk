@@ -12,6 +12,7 @@ export default interface Order {
   channelId: string;
   businessId: string;
   purchasedAt: Date;
+  purchaseOrderNumber?: string;
   canceledAt?: Date;
   canceledReason?: string;
   updatedAt: Date;

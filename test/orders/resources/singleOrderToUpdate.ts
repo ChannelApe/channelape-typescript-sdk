@@ -121,6 +121,7 @@ const singleOrderToUpdate: Order = {
   channelId: '0d134d16-ad7e-4724-841e-7d46e0f128bd',
   channelOrderId: '314980073478',
   createdAt: new Date('2018-05-03T18:07:58.009Z'),
+  purchaseOrderNumber: '123456',
   customer: {
     additionalFields: [
       {

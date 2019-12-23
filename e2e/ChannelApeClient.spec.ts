@@ -7,6 +7,7 @@ import ChannelApeApiError from '../src/model/ChannelApeApiError';
 import ChannelApeClient from '../src/ChannelApeClient';
 import OrderStatus from '../src/orders/model/OrderStatus';
 import OrdersQueryRequestByBusinessId from '../src/orders/model/OrdersQueryRequestByBusinessId';
+import OrdersQueryRequestByPurchaseOrderNumber from '../src/orders/model/OrdersQueryRequestByPurchaseOrderNumber';
 import Channel from '../src/channels/model/Channel';
 import Supplier from '../src/suppliers/model/Supplier';
 import VariantsRequestByProductId from '../src/variants/model/VariantsRequestByProductId';
@@ -287,6 +288,7 @@ describe('ChannelApe Client', () => {
           const expectedFirstName = faker.name.firstName();
           const expectedLastName = faker.name.lastName();
           const expectedChannelOrderId = Math.random().toString();
+          const expectedPurchaseOrderNumber = Math.random().toString();
           const fullName = `${expectedFirstName} ${expectedLastName}`;
           const expectedLineItemQuantities = [
             faker.random.number(20) + 1,
@@ -308,6 +310,7 @@ describe('ChannelApe Client', () => {
               { name: 'name', value: `SDK${parseInt((Math.random() * 100000).toString(), 10).toString()}` },
               { name: 'order_number', value: parseInt((Math.random() * 100000).toString(), 10).toString() }
             ],
+            purchaseOrderNumber: expectedPurchaseOrderNumber,
             totalPrice: faker.random.number({ min: 1, max: 700, precision: 2 }),
             alphabeticCurrencyCode: 'USD',
             channelId: expectedChannelId,
@@ -336,6 +339,7 @@ describe('ChannelApe Client', () => {
           }
 
           return channelApeClient.orders().create(orderToCreate).then((createdOrder) => {
+            expect(createdOrder.purchaseOrderNumber).to.equal(expectedPurchaseOrderNumber);
             expect(createdOrder.businessId).to.equal(expectedBusinessId);
             expect(createdOrder.totalPrice).to.equal(orderToCreate.totalPrice);
             expect(createdOrder.additionalFields![0].name).to.equal('name');
@@ -452,6 +456,25 @@ describe('ChannelApe Client', () => {
               expect(actualOrders).to.be.an('array');
               expect(actualOrders.length).to.equal(230);
               expect(actualOrders[0].id).to.equal('dda8a05f-d5dd-4535-9261-b55c501085ef');
+            });
+          });
+        });
+      });
+
+      describe('And a valid purchase order number', () => {
+        context('When retrieving orders', () => {
+          it('Then expect 1 matching order to be returned', () => {
+            const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+            const ordersQueryRequestByBusinessId: OrdersQueryRequestByPurchaseOrderNumber = {
+              businessId: expectedBusinessId,
+              purchaseOrderNumber: '0.3354796505578477'
+            };
+            const actualOrdersPromise = channelApeClient.orders().get(ordersQueryRequestByBusinessId);
+            return actualOrdersPromise.then((actualOrders) => {
+              expect(actualOrders).to.be.an('array');
+              expect(actualOrders.length).to.equal(1);
+              expect(actualOrders[0].id).to.equal('36d00c15-a2a8-43d3-8c4c-f62bba7ade53');
+              expect(actualOrders[0].purchaseOrderNumber).to.equal(ordersQueryRequestByBusinessId.purchaseOrderNumber);
             });
           });
         });
