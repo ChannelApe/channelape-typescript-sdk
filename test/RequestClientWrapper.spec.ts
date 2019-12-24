@@ -11,8 +11,6 @@ import singleOrderToUpdate from './orders/resources/singleOrderToUpdate';
 import multipleOrders from './orders/resources/multipleOrders';
 import ChannelApeApiError from '../src/model/ChannelApeApiError';
 import { ChannelApeError, LogLevel } from '../src';
-import { request } from 'http';
-import { start } from 'repl';
 
 const maximumRequestRetryTimeout = 600;
 
