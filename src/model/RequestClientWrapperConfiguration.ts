@@ -8,4 +8,5 @@ export default interface RequestClientWrapperConfiguration {
   readonly maximumRequestRetryTimeout: number;
   readonly minimumRequestRetryRandomDelay: number;
   readonly maximumRequestRetryRandomDelay: number;
+  readonly maximumConcurrentConnections: number;
 }

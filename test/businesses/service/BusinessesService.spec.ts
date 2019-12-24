@@ -26,7 +26,8 @@ describe('Businesses Service', () => {
         session: 'valid-session-id',
         logLevel: LogLevel.INFO,
         minimumRequestRetryRandomDelay: 50,
-        maximumRequestRetryRandomDelay: 50
+        maximumRequestRetryRandomDelay: 50,
+        maximumConcurrentConnections: 5
       });
     const businessesService: BusinessesService = new BusinessesService(client);
 

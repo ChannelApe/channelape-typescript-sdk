@@ -11,6 +11,8 @@ import singleOrderToUpdate from './orders/resources/singleOrderToUpdate';
 import multipleOrders from './orders/resources/multipleOrders';
 import ChannelApeApiError from '../src/model/ChannelApeApiError';
 import { ChannelApeError, LogLevel } from '../src';
+import { request } from 'http';
+import { start } from 'repl';
 
 const maximumRequestRetryTimeout = 600;
 
@@ -39,7 +41,8 @@ describe('RequestClientWrapper', () => {
         session: 'valid-session-id',
         logLevel: LogLevel.INFO,
         minimumRequestRetryRandomDelay: JITTER_DELAY_MIN,
-        maximumRequestRetryRandomDelay: JITTER_DELAY_MAX
+        maximumRequestRetryRandomDelay: JITTER_DELAY_MAX,
+        maximumConcurrentConnections: 5
       });
       done();
     });
@@ -579,5 +582,142 @@ Code: 0 Message: You didnt pass any body`;
         done();
       });
     });
+
+    describe('Which has a maxConcurrentConnections config of 1', () => {
+      it('When making a single request', (done) => {
+        const TIMEOUT = 100;
+        sandbox
+          .stub(axios, 'get')
+          .callsFake(() => {
+            return new Promise((resolve) => {
+              setTimeout(resolve, 100);
+            });
+          });
+
+        requestClientWrapper = buildRequestClientWrapper(1);
+
+        const requestStartTime = new Date().getTime();
+        requestClientWrapper.get('/v1/orders/1', {}, (error, response, body) => {
+          const requestCompletionTime = new Date().getTime();
+          const requestTotalTime = requestCompletionTime - requestStartTime;
+          expect(requestTotalTime).to.be.lessThan(TIMEOUT + 25);
+          done();
+        });
+      });
+
+      it('When making 2 requests at the same time', (done) => {
+        const TIMEOUT = 100;
+        sandbox
+          .stub(axios, 'get')
+          .callsFake(() => {
+            return new Promise((resolve) => {
+              setTimeout(resolve, 100);
+            });
+          });
+
+        requestClientWrapper = buildRequestClientWrapper(1);
+
+        const request1StartTime = new Date().getTime();
+        requestClientWrapper.get('/v1/orders/1', {}, (error, response, body) => {
+          const request1CompletionTime = new Date().getTime();
+          const request1TotalTime = request1CompletionTime - request1StartTime;
+          expect(request1TotalTime).to.be.lessThan(TIMEOUT + 25);
+        });
+
+        createQueuedRequests(1, 1, done, [100]);
+      });
+
+      it('When making 10 requests at the same time', function (done) {
+        this.timeout(2000);
+        const TIMEOUT = 100;
+        sandbox
+          .stub(axios, 'get')
+          .callsFake(() => {
+            return new Promise((resolve) => {
+              setTimeout(resolve, 100);
+            });
+          });
+
+        requestClientWrapper = buildRequestClientWrapper(1);
+
+        const requestStartTime = new Date().getTime();
+        requestClientWrapper.get('/v1/orders/1', {}, (error, response, body) => {
+          const requestCompletionTime = new Date().getTime();
+          const requestTotalTime = requestCompletionTime - requestStartTime;
+          expect(requestTotalTime).to.be.lessThan(TIMEOUT + 25);
+        });
+
+        createQueuedRequests(1, 5, done, [100, 200, 300, 400, 500]);
+      });
+    });
+
+    describe('Which has a maxConcurrentConnections config of 5', () => {
+      it('When making 10 requests at the same time', function (done) {
+        this.timeout(2000);
+        const TIMEOUT = 100;
+        sandbox
+          .stub(axios, 'get')
+          .callsFake(() => {
+            return new Promise((resolve) => {
+              setTimeout(resolve, 100);
+            });
+          });
+
+        requestClientWrapper = buildRequestClientWrapper(5);
+
+        const instantRequestCount = 5;
+        createInstantRequests(instantRequestCount, TIMEOUT);
+        createQueuedRequests(instantRequestCount, 5, done, [100, 100, 100, 100, 100]);
+      });
+    });
+
+    function createQueuedRequests(
+      instantRequestCount: number,
+      count: number,
+      done: any,
+      expectedEndTimes: number[]
+    ) {
+      const totalRequests = count + instantRequestCount;
+      const startingRequestNumber = instantRequestCount + 1;
+      for (
+        let i = 0, requestNumber = startingRequestNumber;
+        requestNumber <= totalRequests;
+        requestNumber = requestNumber + 1, i = i + 1
+      ) {
+        const requestStartTime = new Date().getTime();
+        requestClientWrapper.get(`/v1/orders/${requestNumber}`, {}, (error, response, body) => {
+          const requestCompletionTime = new Date().getTime();
+          const requestTotalTime = requestCompletionTime - requestStartTime;
+          expect(requestTotalTime).to.be.greaterThan(expectedEndTimes[i] - 25);
+          if (requestNumber === totalRequests) {
+            done();
+          }
+        });
+      }
+    }
+
+    function createInstantRequests(count: number, timeout: number) {
+      for (let requestNumber = 1; requestNumber <= count; requestNumber = requestNumber + 1) {
+        const requestStartTime = new Date().getTime();
+        requestClientWrapper.get(`/v1/orders/${requestNumber}`, {}, (error, response, body) => {
+          const requestCompletionTime = new Date().getTime();
+          const requestTotalTime = requestCompletionTime - requestStartTime;
+          expect(requestTotalTime).to.be.lessThan((timeout * requestNumber) + 25);
+        });
+      }
+    }
+
+    function buildRequestClientWrapper(maximumConcurrentConnections: number) {
+      return new RequestClientWrapper({
+        maximumConcurrentConnections,
+        endpoint,
+        maximumRequestRetryTimeout,
+        timeout: 60000,
+        session: 'valid-session-id',
+        logLevel: LogLevel.INFO,
+        minimumRequestRetryRandomDelay: JITTER_DELAY_MIN,
+        maximumRequestRetryRandomDelay: JITTER_DELAY_MAX
+      });
+    }
   });
 }).timeout(3000);

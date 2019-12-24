@@ -24,7 +24,8 @@ const clientWrapper: RequestClientWrapper = new RequestClientWrapper({
   session: 'valid-session-id',
   logLevel: LogLevel.INFO,
   minimumRequestRetryRandomDelay: 50,
-  maximumRequestRetryRandomDelay: 50
+  maximumRequestRetryRandomDelay: 50,
+  maximumConcurrentConnections: 5
 });
 
 const ordersService: OrdersService = new OrdersService(clientWrapper);
@@ -217,7 +218,8 @@ Code: 167 Message: Channel order ID cannot be blank.`;
         session: 'valid-session-id',
         logLevel: LogLevel.INFO,
         minimumRequestRetryRandomDelay: 50,
-        maximumRequestRetryRandomDelay: 50
+        maximumRequestRetryRandomDelay: 50,
+        maximumConcurrentConnections: 5
       });
       const ordersService: OrdersService = new OrdersService(client);
       return ordersService.activities().create({} as any).then((actualOrderActivity) => {

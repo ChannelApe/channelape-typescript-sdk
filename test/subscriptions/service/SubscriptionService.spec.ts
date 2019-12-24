@@ -22,7 +22,8 @@ describe('Subscriptions Service', () => {
         session: 'valid-session-id',
         logLevel: LogLevel.INFO,
         minimumRequestRetryRandomDelay: 50,
-        maximumRequestRetryRandomDelay: 50
+        maximumRequestRetryRandomDelay: 50,
+        maximumConcurrentConnections: 5
       });
     const active = true;
     const businessId = 'f6ed6f7a-47bf-4dd3-baed-71a8a9684e80';
