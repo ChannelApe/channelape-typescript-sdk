@@ -641,15 +641,16 @@ Code: 0 Message: You didnt pass any body`;
         done();
       });
 
-      it('When making a request when queue is not full, then make request and pop the rest off queue',  (done) => {
+      it.only('When making a request when queue is not full, then make request and pop the rest off queue',  (done) => {
 
         requestClientWrapper = buildRequestClientWrapper(11);
-        const requestClientWrapperSpyPrepareRequestSpy = sandbox.spy(requestClientWrapper, 'prepareRequest');
+        const requestClientWrapperPrepareRequestSpy = sandbox.spy(requestClientWrapper, 'prepareRequest');
         createQueuedRequestsAsync(10, requestClientWrapper, done);
         mockedAxios.onGet('/v1/orders/9999').reply(200, { request: 9999 });
         requestClientWrapper.get('/v1/orders/9999', {}, (error, response, body) => {
 
         });
+        expect(requestClientWrapperPrepareRequestSpy.callCount).to.equal(1);
       });
     });
 
