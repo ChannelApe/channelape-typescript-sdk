@@ -19,8 +19,8 @@ export default class RequestClientWrapper {
 
   private readonly maximumConcurrentConnections: number;
   private readonly requestLogger: RequestLogger;
-  private requestQueue: any;
-  private pendingRequests: number;
+  requestQueue: RequestConfig[];
+  pendingRequests: number;
 
   constructor(
     private readonly requestClientWrapperConfiguration: RequestClientWrapperConfiguration
@@ -78,7 +78,7 @@ export default class RequestClientWrapper {
     }
   }
 
-  private prepareRequest(requestConfig: RequestConfig): void {
+  prepareRequest(requestConfig: RequestConfig): void {
     this.pendingRequests = this.pendingRequests + 1;
     this.makeRequest(
       requestConfig.method,
@@ -231,7 +231,9 @@ export default class RequestClientWrapper {
     this.pendingRequests = this.pendingRequests - 1;
     if (this.requestQueue.length > 0) {
       const nextRequestConfig = this.requestQueue.pop();
-      this.prepareRequest(nextRequestConfig);
+      if (nextRequestConfig) {
+        this.prepareRequest(nextRequestConfig);
+      }
     }
   }
 

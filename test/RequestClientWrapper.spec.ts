@@ -1,7 +1,7 @@
 // tslint:disable:no-trailing-whitespace
 import * as sinon from 'sinon';
 import { expect } from 'chai';
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import axiosMockAdapter from 'axios-mock-adapter';
 import { Logger } from 'channelape-logger';
 
@@ -11,6 +11,9 @@ import singleOrderToUpdate from './orders/resources/singleOrderToUpdate';
 import multipleOrders from './orders/resources/multipleOrders';
 import ChannelApeApiError from '../src/model/ChannelApeApiError';
 import { ChannelApeError, LogLevel } from '../src';
+import { RequestConfig } from '../src/model/RequestConfig';
+import HttpRequestMethod from '../src/model/HttpRequestMethod';
+import { fail } from 'assert';
 
 const maximumRequestRetryTimeout = 600;
 
@@ -413,24 +416,25 @@ Code: 0 Message: You didnt pass any body`;
         if (response && response.data) {
           return [response.status, response.data];
         }
-        return [500, {}];
+        return [500, { error: 'stupid' }];
       });
 
       requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
         expect(warnLogSpy.called).to.be.true;
         expect(warnLogSpy.args[1][0])
-          .to.include(`DELAYING GET ${endpoint}${requestUrl} for `, 'should log 1st delay correctly');
+            .to.include(`DELAYING GET ${endpoint}${requestUrl} for `, 'should log 1st delay correctly');
         expect(warnLogSpy.args[3][0])
-          .to.include(`DELAYING GET ${endpoint}${requestUrl} for `, 'should log 2nd delay correctly');
+            .to.include(`DELAYING GET ${endpoint}${requestUrl} for `, 'should log 2nd delay correctly');
         expect(warnLogSpy.args[5][0])
-          .to.include(`DELAYING GET ${endpoint}${requestUrl} for `, 'should log 3rd delay correctly');
+            .to.include(`DELAYING GET ${endpoint}${requestUrl} for `, 'should log 3rd delay correctly');
         expect(error).to.be.null;
         expect(body.id).to.equal(orderId);
         expect(infoLogSpy.args[0][0])
-          .to.equal(`GET ${endpoint}${requestUrl} -- STARTED`, 'should log correctly');
+            .to.equal(`GET ${endpoint}${requestUrl} -- STARTED`, 'should log correctly');
         done();
+
       });
-    }).timeout(2000);
+    }).timeout(5000);
 
     it('When handling a PUT response expect the call to be retried on 500 level status codes and 429s', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
@@ -548,7 +552,7 @@ Code: 0 Message: You didnt pass any body`;
         expect(error).to.be.null;
         done();
       });
-    });
+    }).timeout(5000);
 
     it('When handling a GET response expect callback with an empty response to be handled gracefully', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
@@ -622,86 +626,66 @@ Code: 0 Message: You didnt pass any body`;
           expect(request1TotalTime).to.be.lessThan(TIMEOUT + 25);
         });
 
-        createQueuedRequests(1, 1, done, [100]);
       });
 
-      it('When making 10 requests at the same time', function (done) {
-        this.timeout(2000);
-        const TIMEOUT = 100;
-        sandbox
-          .stub(axios, 'get')
-          .callsFake(() => {
-            return new Promise((resolve) => {
-              setTimeout(resolve, 100);
-            });
-          });
+      it('When making a request when queue is full, then dont make request yet',  (done) => {
 
         requestClientWrapper = buildRequestClientWrapper(1);
-
-        const requestStartTime = new Date().getTime();
-        requestClientWrapper.get('/v1/orders/1', {}, (error, response, body) => {
-          const requestCompletionTime = new Date().getTime();
-          const requestTotalTime = requestCompletionTime - requestStartTime;
-          expect(requestTotalTime).to.be.lessThan(TIMEOUT + 25);
+        const requestClientWrapperPrepareRequestSpy = sandbox.spy(requestClientWrapper, 'prepareRequest');
+        createQueuedRequests(10, requestClientWrapper);
+        requestClientWrapper.get('/v1/orders/9999', {}, (error, response, body) => {
+          fail('Call should have not been made.');
         });
 
-        createQueuedRequests(1, 5, done, [100, 200, 300, 400, 500]);
+        expect(requestClientWrapperPrepareRequestSpy.callCount).to.equal(0);
+        done();
+      });
+
+      it('When making a request when queue is not full, then make request and pop the rest off queue',  (done) => {
+
+        requestClientWrapper = buildRequestClientWrapper(11);
+        const requestClientWrapperSpyPrepareRequestSpy = sandbox.spy(requestClientWrapper, 'prepareRequest');
+        createQueuedRequestsAsync(10, requestClientWrapper, done);
+        mockedAxios.onGet('/v1/orders/9999').reply(200, { request: 9999 });
+        requestClientWrapper.get('/v1/orders/9999', {}, (error, response, body) => {
+
+        });
       });
     });
 
-    describe('Which has a maxConcurrentConnections config of 5', () => {
-      it('When making 10 requests at the same time', function (done) {
-        this.timeout(2000);
-        const TIMEOUT = 100;
-        sandbox
-          .stub(axios, 'get')
-          .callsFake(() => {
-            return new Promise((resolve) => {
-              setTimeout(resolve, 100);
-            });
-          });
-
-        requestClientWrapper = buildRequestClientWrapper(5);
-
-        const instantRequestCount = 5;
-        createInstantRequests(instantRequestCount, TIMEOUT);
-        createQueuedRequests(instantRequestCount, 5, done, [100, 100, 100, 100, 100]);
-      });
-    });
-
-    function createQueuedRequests(
-      instantRequestCount: number,
-      count: number,
-      done: any,
-      expectedEndTimes: number[]
-    ) {
-      const totalRequests = count + instantRequestCount;
-      const startingRequestNumber = instantRequestCount + 1;
-      for (
-        let i = 0, requestNumber = startingRequestNumber;
-        requestNumber <= totalRequests;
-        requestNumber = requestNumber + 1, i = i + 1
-      ) {
-        const requestStartTime = new Date().getTime();
-        requestClientWrapper.get(`/v1/orders/${requestNumber}`, {}, (error, response, body) => {
-          const requestCompletionTime = new Date().getTime();
-          const requestTotalTime = requestCompletionTime - requestStartTime;
-          expect(requestTotalTime).to.be.greaterThan(expectedEndTimes[i] - 25);
-          if (requestNumber === totalRequests) {
-            done();
-          }
-        });
+    function createQueuedRequests(count: number, requestClientWrapper: RequestClientWrapper) {
+      for (let requestNumber = 1; requestNumber <= count; requestNumber = requestNumber + 1) {
+        mockedAxios.onGet(`/v1/orders/${requestNumber}`).reply(200, { request: requestNumber });
+        const requestConfig: RequestConfig = {
+          url: `/v1/orders/${requestNumber}`,
+          params: {},
+          callback: (error: any, response: any, body: any) => {
+            expect(body).to.deep.equals('{ request: 1 }');
+          },
+          method: HttpRequestMethod.GET
+        };
+        requestClientWrapper.requestQueue.push(requestConfig);
+        requestClientWrapper.pendingRequests += 1;
       }
     }
 
-    function createInstantRequests(count: number, timeout: number) {
+    function createQueuedRequestsAsync(count: number, requestClientWrapper: RequestClientWrapper, done: any) {
       for (let requestNumber = 1; requestNumber <= count; requestNumber = requestNumber + 1) {
-        const requestStartTime = new Date().getTime();
-        requestClientWrapper.get(`/v1/orders/${requestNumber}`, {}, (error, response, body) => {
-          const requestCompletionTime = new Date().getTime();
-          const requestTotalTime = requestCompletionTime - requestStartTime;
-          expect(requestTotalTime).to.be.lessThan((timeout * requestNumber) + 25);
-        });
+        mockedAxios.onGet(`/v1/orders/${requestNumber}`).reply(200, `{ abc: ${requestNumber} }`);
+        const requestConfig: RequestConfig = {
+          url: `/v1/orders/${requestNumber}`,
+          params: {},
+          callback: (error: any, response: AxiosResponse, body: any) => {
+            expect(response.status).to.equal(200);
+            expect(body).to.deep.equal(`{ abc: ${requestNumber} }`);
+            if (requestNumber === 1) {
+              done();
+            }
+          },
+          method: HttpRequestMethod.GET
+        };
+        requestClientWrapper.requestQueue.push(requestConfig);
+        requestClientWrapper.pendingRequests += 1;
       }
     }
 
