@@ -146,10 +146,10 @@ describe('RequestClientWrapper', () => {
             expect(error).not.to.be.null;
             expect(error.message).includes('A problem with the ChannelApe API has been encountered.');
             expect(error.message).includes('Your request was tried a total of ');
-            expect(warnLogSpy.args[0][0]).to.equal('get /v1/orders -- FAILED WITH STATUS: Network Error');
+            expect(warnLogSpy.args[0][0]).to.equal(`get ${endpoint}/v1/orders -- FAILED WITH STATUS: Network Error`);
             done();
           });
-        }).timeout(2000);
+        }).timeout(3000);
       });
 
       describe('given a low level network error: ECONNREFUSED', () => {
