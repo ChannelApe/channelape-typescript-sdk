@@ -641,7 +641,7 @@ Code: 0 Message: You didnt pass any body`;
         done();
       });
 
-      it.only('When making a request when queue is not full, then make request and pop the rest off queue',  (done) => {
+      it('When making a request when queue is not full, then make request and pop the rest off queue',  (done) => {
 
         requestClientWrapper = buildRequestClientWrapper(11);
         const requestClientWrapperPrepareRequestSpy = sandbox.spy(requestClientWrapper, 'prepareRequest');
