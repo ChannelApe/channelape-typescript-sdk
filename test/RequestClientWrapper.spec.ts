@@ -586,47 +586,6 @@ Code: 0 Message: You didnt pass any body`;
     });
 
     describe('Which has a maxConcurrentConnections config of 1', () => {
-      it('When making a single request', (done) => {
-        const TIMEOUT = 100;
-        sandbox
-          .stub(axios, 'get')
-          .callsFake(() => {
-            return new Promise((resolve) => {
-              setTimeout(resolve, 100);
-            });
-          });
-
-        requestClientWrapper = buildRequestClientWrapper(1);
-
-        const requestStartTime = new Date().getTime();
-        requestClientWrapper.get('/v1/orders/1', {}, (error, response, body) => {
-          const requestCompletionTime = new Date().getTime();
-          const requestTotalTime = requestCompletionTime - requestStartTime;
-          expect(requestTotalTime).to.be.lessThan(TIMEOUT + 25);
-          done();
-        });
-      });
-
-      it('When making 2 requests at the same time', (done) => {
-        const TIMEOUT = 100;
-        sandbox
-          .stub(axios, 'get')
-          .callsFake(() => {
-            return new Promise((resolve) => {
-              setTimeout(resolve, 100);
-            });
-          });
-
-        requestClientWrapper = buildRequestClientWrapper(1);
-
-        const request1StartTime = new Date().getTime();
-        requestClientWrapper.get('/v1/orders/1', {}, (error, response, body) => {
-          const request1CompletionTime = new Date().getTime();
-          const request1TotalTime = request1CompletionTime - request1StartTime;
-          expect(request1TotalTime).to.be.lessThan(TIMEOUT + 25);
-        });
-
-      });
 
       it('When making a request when queue is full, then dont make request yet',  (done) => {
 
