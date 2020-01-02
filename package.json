@@ -73,9 +73,9 @@
 	"devDependencies": {
 		"@types/app-root-path": "^1.2.4",
 		"@types/axios": "^0.14.0",
-		"@types/chai": "^4.1.3",
+		"@types/chai": "4.1.3",
 		"@types/faker": "^4.1.4",
-		"@types/mocha": "^5.2.7",
+		"@types/mocha": "^5.2.0",
 		"@types/node": "^10.7.0",
 		"@types/q": "^1.5.0",
 		"@types/sinon": "^4.3.1",

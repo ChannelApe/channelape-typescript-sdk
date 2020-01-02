@@ -149,7 +149,7 @@ describe('RequestClientWrapper', () => {
             expect(warnLogSpy.args[0][0]).to.equal('get /v1/orders -- FAILED WITH STATUS: Network Error');
             done();
           });
-        });
+        }).timeout(2000);
       });
 
       describe('given a low level network error: ECONNREFUSED', () => {
