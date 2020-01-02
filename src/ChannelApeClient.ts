@@ -23,6 +23,8 @@ const MAXIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_SMALL_ERROR_MESSAGE =
   'maximumRequestRetryRandomDelay must be 2000 or greater';
 const MINIMUM_REQUEST_RETRY_RANDOM_DELAY_GREATER_THAN_MAXIMUM_REQUEST_RETRY_RANDOM_ERROR_MESSAGE =
   'minimumRequestRetryRandomDelay cannot be greater than maximumRequestRetryRandomDelay';
+const MAXIMUM_CONCURRENT_CONNECTIONS_MINIMUM_VALUE_MESSAGE =
+  'maximumConcurrentConnections must be 1 or greater';
 const THREE_MINUTES_IN_MS = 180000;
 const TWO_SECONDS_IN_MS = 2000;
 const ONE_SECOND_IN_MS = 1000;
@@ -34,6 +36,7 @@ export default class ChannelApeClient {
   private readonly maximumRequestRetryTimeout: number;
   private readonly minimumRequestRetryRandomDelay: number;
   private readonly maximumRequestRetryRandomDelay: number;
+  private readonly maximumConcurrentConnections: number;
   private readonly endpoint: string;
   private readonly logLevel: LogLevel;
   private readonly requestClientWrapper: RequestClientWrapper;
@@ -72,6 +75,9 @@ export default class ChannelApeClient {
     this.maximumRequestRetryRandomDelay =
       clientConfiguration.maximumRequestRetryRandomDelay ?
       clientConfiguration.maximumRequestRetryRandomDelay : FIVE_SECONDS_IN_MS;
+    this.maximumConcurrentConnections =
+      clientConfiguration.maximumConcurrentConnections ?
+      clientConfiguration.maximumConcurrentConnections : 5;
 
     this.requestClientWrapper = new RequestClientWrapper({
       timeout: this.timeout,
@@ -80,7 +86,8 @@ export default class ChannelApeClient {
       endpoint: this.endpoint,
       maximumRequestRetryTimeout: this.maximumRequestRetryTimeout,
       minimumRequestRetryRandomDelay: this.minimumRequestRetryRandomDelay,
-      maximumRequestRetryRandomDelay: this.maximumRequestRetryRandomDelay
+      maximumRequestRetryRandomDelay: this.maximumRequestRetryRandomDelay,
+      maximumConcurrentConnections: this.maximumConcurrentConnections
     });
     this.actionsService = new ActionsService(this.requestClientWrapper);
     this.channelsService = new ChannelsService(this.requestClientWrapper);
@@ -107,6 +114,10 @@ export default class ChannelApeClient {
 
   get MaximumRequestRetryTimeout(): number {
     return this.maximumRequestRetryTimeout;
+  }
+
+  get MaximumConcurrentConnections(): number {
+    return this.maximumConcurrentConnections;
   }
 
   get Endpoint(): string {
@@ -185,6 +196,10 @@ export default class ChannelApeClient {
     if (clientConfiguration.maximumRequestRetryRandomDelay && clientConfiguration.minimumRequestRetryRandomDelay &&
         clientConfiguration.minimumRequestRetryRandomDelay > clientConfiguration.maximumRequestRetryRandomDelay) {
       errors.push(MINIMUM_REQUEST_RETRY_RANDOM_DELAY_GREATER_THAN_MAXIMUM_REQUEST_RETRY_RANDOM_ERROR_MESSAGE);
+    }
+    if (clientConfiguration.maximumConcurrentConnections &&
+        clientConfiguration.maximumConcurrentConnections < 1) {
+      errors.push(MAXIMUM_CONCURRENT_CONNECTIONS_MINIMUM_VALUE_MESSAGE);
     }
     if (errors.length > 0) {
       return errors.join('\n');

@@ -22,7 +22,8 @@ describe('Inventory Quantities Service', () => {
         session: 'valid-session-id',
         logLevel: LogLevel.INFO,
         minimumRequestRetryRandomDelay: 50,
-        maximumRequestRetryRandomDelay: 50
+        maximumRequestRetryRandomDelay: 50,
+        maximumConcurrentConnections: 5
       });
 
     let sandbox: sinon.SinonSandbox;

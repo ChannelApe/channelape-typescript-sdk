@@ -5,6 +5,7 @@ import HttpRequestMethod from './model/HttpRequestMethod';
 import RequestResponse from './model/RequestResponse';
 import { RequestCallback } from './model/RequestCallback';
 import RequestClientWrapperConfiguration from './model/RequestClientWrapperConfiguration';
+import { RequestConfig } from './model/RequestConfig';
 
 const GENERIC_ERROR_CODE = -1;
 
@@ -16,58 +17,76 @@ interface CallDetails {
 
 export default class RequestClientWrapper {
 
+  private readonly maximumConcurrentConnections: number;
   private readonly requestLogger: RequestLogger;
+  requestQueue: RequestConfig[];
+  pendingRequests: number;
 
   constructor(
     private readonly requestClientWrapperConfiguration: RequestClientWrapperConfiguration
   ) {
+    this.requestQueue = [];
+    this.pendingRequests = 0;
     this.requestLogger = new RequestLogger(
       this.requestClientWrapperConfiguration.logLevel,
       this.requestClientWrapperConfiguration.endpoint
     );
+    this.maximumConcurrentConnections = requestClientWrapperConfiguration.maximumConcurrentConnections;
   }
 
   public get(url: string, params: AxiosRequestConfig, callback: RequestCallback): void {
-    this.makeRequest(
-      HttpRequestMethod.GET,
-      new Date(),
-      0,
+    this.handleRequest({
       url,
       params,
-      callback
-    );
+      callback,
+      method: HttpRequestMethod.GET
+    });
   }
 
   public put(url: string, params: AxiosRequestConfig, callback: RequestCallback): void {
-    this.makeRequest(
-      HttpRequestMethod.PUT,
-      new Date(),
-      0,
+    this.handleRequest({
       url,
       params,
-      callback
-    );
+      callback,
+      method: HttpRequestMethod.PUT
+    });
   }
 
   public patch(url: string, params: AxiosRequestConfig, callback: RequestCallback): void {
-    this.makeRequest(
-      HttpRequestMethod.PATCH,
-      new Date(),
-      0,
+    this.handleRequest({
       url,
       params,
-      callback
-    );
+      callback,
+      method: HttpRequestMethod.PATCH
+    });
   }
 
   public post(url: string, params: AxiosRequestConfig, callback: RequestCallback): void {
-    this.makeRequest(
-      HttpRequestMethod.POST,
-      new Date(),
-      0,
+    this.handleRequest({
       url,
       params,
-      callback
+      callback,
+      method: HttpRequestMethod.POST
+    });
+  }
+
+  private handleRequest(requestConfig: RequestConfig): void {
+    if (this.pendingRequests < this.maximumConcurrentConnections) {
+      this.prepareRequest(requestConfig);
+    } else {
+      this.requestQueue.unshift(requestConfig);
+    }
+  }
+
+  prepareRequest(requestConfig: RequestConfig): void {
+    this.pendingRequests = this.pendingRequests + 1;
+    this.makeRequest(
+      requestConfig.method,
+      new Date(),
+      0,
+      requestConfig.url,
+      requestConfig.params,
+      requestConfig.callback
     );
   }
 
@@ -185,6 +204,9 @@ export default class RequestClientWrapper {
         `${requestResponse.response.status} ${requestResponse.response.statusText}`,
         requestResponse.response, uri, requestResponse.body.errors);
     }
+
+    this.requestCompleted();
+
     try {
       callback(finalError, requestResponse.response as any, requestResponse.body);
     } catch (e) {
@@ -203,6 +225,16 @@ export default class RequestClientWrapper {
     const now = new Date();
     const totalElapsedTime = now.getTime() - callStart.getTime();
     return totalElapsedTime > this.requestClientWrapperConfiguration.maximumRequestRetryTimeout;
+  }
+
+  private requestCompleted(): void {
+    this.pendingRequests = this.pendingRequests - 1;
+    if (this.requestQueue.length > 0) {
+      const nextRequestConfig = this.requestQueue.pop();
+      if (nextRequestConfig) {
+        this.prepareRequest(nextRequestConfig);
+      }
+    }
   }
 
   private shouldRequestBeRetried(

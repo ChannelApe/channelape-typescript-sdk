@@ -22,7 +22,8 @@ describe('Sessions Service', () => {
         session: 'valid-session-id',
         logLevel: LogLevel.INFO,
         minimumRequestRetryRandomDelay: 50,
-        maximumRequestRetryRandomDelay: 50
+        maximumRequestRetryRandomDelay: 50,
+        maximumConcurrentConnections: 5
       });
     const sessionId = 'b40da0b8-a770-4de7-a496-361254bd7d6c';
     const userId = 'f6ed6f7a-47bf-4dd3-baed-71a8a9684e80';
