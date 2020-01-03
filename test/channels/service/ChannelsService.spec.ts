@@ -9,7 +9,7 @@ import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorRes
 import Channel from '../../../src/channels/model/Channel';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import { ChannelApeError } from '../../../src/index';
-
+import axios from 'axios';
 describe('Channels Service', () => {
 
   describe('Given some rest client', () => {
@@ -23,7 +23,7 @@ describe('Channels Service', () => {
         minimumRequestRetryRandomDelay: 50,
         maximumRequestRetryRandomDelay: 50,
         maximumConcurrentConnections: 5
-      });
+      }, axios);
 
     let sandbox: sinon.SinonSandbox;
 

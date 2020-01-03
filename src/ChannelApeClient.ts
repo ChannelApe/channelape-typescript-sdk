@@ -15,6 +15,9 @@ import ProductFiltersService from './products/filters/service/ProductFiltersServ
 import UsersService from './users/service/UsersService';
 import InventoriesService from './inventories/service/InventoriesService';
 import LocationsService from './locations/service/LocationsService';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosPromise } from 'axios';
+import * as https from 'https';
+import * as http from 'http';
 
 const MISSING_SESSION_ID_ERROR_MESSAGE = 'sessionId is required.';
 const MINIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_SMALL_ERROR_MESSAGE =
@@ -78,6 +81,14 @@ export default class ChannelApeClient {
     this.maximumConcurrentConnections =
       clientConfiguration.maximumConcurrentConnections ?
       clientConfiguration.maximumConcurrentConnections : 5;
+    const httpAgent = new http.Agent(
+      { keepAlive: true, maxSockets: this.maximumConcurrentConnections });
+    const httpsAgent = new https.Agent(
+      { keepAlive: true, maxSockets: this.maximumConcurrentConnections });
+    const axiosInstance = axios.create({
+      httpAgent,
+      httpsAgent
+    });
 
     this.requestClientWrapper = new RequestClientWrapper({
       timeout: this.timeout,
@@ -88,7 +99,7 @@ export default class ChannelApeClient {
       minimumRequestRetryRandomDelay: this.minimumRequestRetryRandomDelay,
       maximumRequestRetryRandomDelay: this.maximumRequestRetryRandomDelay,
       maximumConcurrentConnections: this.maximumConcurrentConnections
-    });
+    }, axiosInstance);
     this.actionsService = new ActionsService(this.requestClientWrapper);
     this.channelsService = new ChannelsService(this.requestClientWrapper);
     this.suppliersService = new SuppliersService(this.requestClientWrapper);

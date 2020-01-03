@@ -28,7 +28,7 @@ describe('Businesses Service', () => {
         minimumRequestRetryRandomDelay: 50,
         maximumRequestRetryRandomDelay: 50,
         maximumConcurrentConnections: 5
-      });
+      }, axios);
     const businessesService: BusinessesService = new BusinessesService(client);
 
     let sandbox: sinon.SinonSandbox;

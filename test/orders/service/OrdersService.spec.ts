@@ -38,7 +38,7 @@ const clientWrapper: RequestClientWrapper = new RequestClientWrapper({
   minimumRequestRetryRandomDelay: 50,
   maximumRequestRetryRandomDelay: 50,
   maximumConcurrentConnections: 5
-});
+}, axios);
 const ordersService: OrdersService = new OrdersService(clientWrapper);
 
 describe('OrdersService', () => {
@@ -531,7 +531,7 @@ Code: 12 Message: Invalid authorization token. Please check the server logs and 
         minimumRequestRetryRandomDelay: 50,
         maximumRequestRetryRandomDelay: 50,
         maximumConcurrentConnections: 5
-      });
+      }, axios);
       const ordersService: OrdersService = new OrdersService(client);
       const orderId = 'not-a-real-order-id';
       return ordersService.get(orderId).then((actualOrder) => {
@@ -553,7 +553,7 @@ Code: 12 Message: Invalid authorization token. Please check the server logs and 
         minimumRequestRetryRandomDelay: 50,
         maximumRequestRetryRandomDelay: 50,
         maximumConcurrentConnections: 5
-      });
+      }, axios);
       const expectedErrorMessage =
 `get /v1/orders
   Status: 401

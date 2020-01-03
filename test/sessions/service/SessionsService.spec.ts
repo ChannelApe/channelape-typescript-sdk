@@ -24,7 +24,7 @@ describe('Sessions Service', () => {
         minimumRequestRetryRandomDelay: 50,
         maximumRequestRetryRandomDelay: 50,
         maximumConcurrentConnections: 5
-      });
+      }, axios);
     const sessionId = 'b40da0b8-a770-4de7-a496-361254bd7d6c';
     const userId = 'f6ed6f7a-47bf-4dd3-baed-71a8a9684e80';
     const sessionsService = new SessionsService(client);

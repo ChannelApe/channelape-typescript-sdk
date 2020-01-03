@@ -24,7 +24,7 @@ describe('Subscriptions Service', () => {
         minimumRequestRetryRandomDelay: 50,
         maximumRequestRetryRandomDelay: 50,
         maximumConcurrentConnections: 5
-      });
+      }, axios);
     const active = true;
     const businessId = 'f6ed6f7a-47bf-4dd3-baed-71a8a9684e80';
     const createdAt = '2018-02-22T16:03:42.662Z';

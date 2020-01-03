@@ -26,7 +26,7 @@ const clientWrapper: RequestClientWrapper = new RequestClientWrapper({
   minimumRequestRetryRandomDelay: 50,
   maximumRequestRetryRandomDelay: 50,
   maximumConcurrentConnections: 5
-});
+}, axios);
 
 const ordersService: OrdersService = new OrdersService(clientWrapper);
 
@@ -220,7 +220,7 @@ Code: 167 Message: Channel order ID cannot be blank.`;
         minimumRequestRetryRandomDelay: 50,
         maximumRequestRetryRandomDelay: 50,
         maximumConcurrentConnections: 5
-      });
+      }, axios);
       const ordersService: OrdersService = new OrdersService(client);
       return ordersService.activities().create({} as any).then((actualOrderActivity) => {
         throw new Error('Test failed!');

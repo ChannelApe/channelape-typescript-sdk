@@ -6,6 +6,7 @@ import Resource from '../../../src/model/Resource';
 import Environment from '../../../src/model/Environment';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import UsersService from './../../../src/users/service/UsersService';
+import axios from 'axios';
 
 describe('Users Service', () => {
 
@@ -20,7 +21,7 @@ describe('Users Service', () => {
         minimumRequestRetryRandomDelay: 50,
         maximumRequestRetryRandomDelay: 50,
         maximumConcurrentConnections: 5
-      });
+      }, axios);
 
     let sandbox: sinon.SinonSandbox;
 

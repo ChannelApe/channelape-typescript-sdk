@@ -10,7 +10,7 @@ import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorRes
 import { fail } from 'assert';
 import { InventoryItemCreateRequest } from './../../../src/inventories/model/InventoryItemCreateRequest';
 import { InventoryItemUpdateRequest } from './../../../src/inventories/model/InventoryItemUpdateRequest';
-
+import axios from 'axios';
 describe('Inventories Service', () => {
 
   describe('Given some rest client', () => {
@@ -24,7 +24,7 @@ describe('Inventories Service', () => {
         minimumRequestRetryRandomDelay: 50,
         maximumRequestRetryRandomDelay: 50,
         maximumConcurrentConnections: 5
-      });
+      }, axios);
 
     let sandbox: sinon.SinonSandbox;
 

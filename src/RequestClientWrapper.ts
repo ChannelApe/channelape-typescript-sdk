@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosPromise } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosPromise } from 'axios';
 import RequestLogger from './utils/RequestLogger';
 import ChannelApeError from './model/ChannelApeError';
 import HttpRequestMethod from './model/HttpRequestMethod';
@@ -6,7 +6,6 @@ import RequestResponse from './model/RequestResponse';
 import { RequestCallback } from './model/RequestCallback';
 import RequestClientWrapperConfiguration from './model/RequestClientWrapperConfiguration';
 import { RequestConfig } from './model/RequestConfig';
-
 const GENERIC_ERROR_CODE = -1;
 
 interface CallDetails {
@@ -17,25 +16,21 @@ interface CallDetails {
 
 export default class RequestClientWrapper {
 
-  private readonly maximumConcurrentConnections: number;
   private readonly requestLogger: RequestLogger;
-  requestQueue: RequestConfig[];
-  pendingRequests: number;
 
   constructor(
-    private readonly requestClientWrapperConfiguration: RequestClientWrapperConfiguration
+    private readonly requestClientWrapperConfiguration: RequestClientWrapperConfiguration,
+    private readonly axios: AxiosInstance
   ) {
-    this.requestQueue = [];
-    this.pendingRequests = 0;
     this.requestLogger = new RequestLogger(
       this.requestClientWrapperConfiguration.logLevel,
       this.requestClientWrapperConfiguration.endpoint
     );
-    this.maximumConcurrentConnections = requestClientWrapperConfiguration.maximumConcurrentConnections;
+
   }
 
   public get(url: string, params: AxiosRequestConfig, callback: RequestCallback): void {
-    this.handleRequest({
+    this.prepareRequest({
       url,
       params,
       callback,
@@ -44,7 +39,7 @@ export default class RequestClientWrapper {
   }
 
   public put(url: string, params: AxiosRequestConfig, callback: RequestCallback): void {
-    this.handleRequest({
+    this.prepareRequest({
       url,
       params,
       callback,
@@ -53,7 +48,7 @@ export default class RequestClientWrapper {
   }
 
   public patch(url: string, params: AxiosRequestConfig, callback: RequestCallback): void {
-    this.handleRequest({
+    this.prepareRequest({
       url,
       params,
       callback,
@@ -62,7 +57,7 @@ export default class RequestClientWrapper {
   }
 
   public post(url: string, params: AxiosRequestConfig, callback: RequestCallback): void {
-    this.handleRequest({
+    this.prepareRequest({
       url,
       params,
       callback,
@@ -70,16 +65,7 @@ export default class RequestClientWrapper {
     });
   }
 
-  private handleRequest(requestConfig: RequestConfig): void {
-    if (this.pendingRequests < this.maximumConcurrentConnections) {
-      this.prepareRequest(requestConfig);
-    } else {
-      this.requestQueue.unshift(requestConfig);
-    }
-  }
-
   prepareRequest(requestConfig: RequestConfig): void {
-    this.pendingRequests = this.pendingRequests + 1;
     this.makeRequest(
       requestConfig.method,
       new Date(),
@@ -100,6 +86,7 @@ export default class RequestClientWrapper {
   ): void {
     const callDetails: CallDetails = { options, callStart, callCountForThisRequest: numberOfCalls };
     options.baseURL = this.requestClientWrapperConfiguration.endpoint;
+
     if (options.headers === undefined) {
       options.headers = {};
     }
@@ -114,19 +101,19 @@ export default class RequestClientWrapper {
 
       switch (method) {
         case HttpRequestMethod.GET:
-          requestPromise = axios.get(url, options);
+          requestPromise = this.axios.get(url, options);
           break;
         case HttpRequestMethod.PUT:
           const putData = options.data === undefined ? '' : options.data;
-          requestPromise = axios.put(url, { body: putData }, options);
+          requestPromise = this.axios.put(url, { body: putData }, options);
           break;
         case HttpRequestMethod.POST:
           const postData = options.data === undefined ? '' : options.data;
-          requestPromise = axios.post(url, { body: postData }, options);
+          requestPromise = this.axios.post(url, { body: postData }, options);
           break;
         case HttpRequestMethod.PATCH:
           const patchData = options.data === undefined ? '' : options.data;
-          requestPromise = axios.patch(url, { body: patchData }, options);
+          requestPromise = this.axios.patch(url, { body: patchData }, options);
           break;
         default:
           throw new ChannelApeError('HTTP Request Method could not be determined', {} as any, '', []);
@@ -205,8 +192,6 @@ export default class RequestClientWrapper {
         requestResponse.response, uri, requestResponse.body.errors);
     }
 
-    this.requestCompleted();
-
     try {
       callback(finalError, requestResponse.response as any, requestResponse.body);
     } catch (e) {
@@ -225,16 +210,6 @@ export default class RequestClientWrapper {
     const now = new Date();
     const totalElapsedTime = now.getTime() - callStart.getTime();
     return totalElapsedTime > this.requestClientWrapperConfiguration.maximumRequestRetryTimeout;
-  }
-
-  private requestCompleted(): void {
-    this.pendingRequests = this.pendingRequests - 1;
-    if (this.requestQueue.length > 0) {
-      const nextRequestConfig = this.requestQueue.pop();
-      if (nextRequestConfig) {
-        this.prepareRequest(nextRequestConfig);
-      }
-    }
   }
 
   private shouldRequestBeRetried(

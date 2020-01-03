@@ -11,6 +11,7 @@ import Embed from './../../../src/analytics/model/Embed';
 import AnalyticsService from './../../../src/analytics/service/AnalyticsService';
 import Report from './../../../src/analytics/model/Report';
 import { Token } from './../../../src/analytics/model/Token';
+import axios from 'axios';
 
 describe('Analytics Service', () => {
 
@@ -25,7 +26,7 @@ describe('Analytics Service', () => {
         minimumRequestRetryRandomDelay: 50,
         maximumRequestRetryRandomDelay: 50,
         maximumConcurrentConnections: 5
-      });
+      }, axios);
 
     let sandbox: sinon.SinonSandbox;
 

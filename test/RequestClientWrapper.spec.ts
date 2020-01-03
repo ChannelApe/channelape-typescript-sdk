@@ -11,9 +11,6 @@ import singleOrderToUpdate from './orders/resources/singleOrderToUpdate';
 import multipleOrders from './orders/resources/multipleOrders';
 import ChannelApeApiError from '../src/model/ChannelApeApiError';
 import { ChannelApeError, LogLevel } from '../src';
-import { RequestConfig } from '../src/model/RequestConfig';
-import HttpRequestMethod from '../src/model/HttpRequestMethod';
-import { fail } from 'assert';
 
 const maximumRequestRetryTimeout = 600;
 
@@ -44,7 +41,7 @@ describe('RequestClientWrapper', () => {
         minimumRequestRetryRandomDelay: JITTER_DELAY_MIN,
         maximumRequestRetryRandomDelay: JITTER_DELAY_MAX,
         maximumConcurrentConnections: 5
-      });
+      }, axios);
       done();
     });
 
@@ -585,81 +582,5 @@ Code: 0 Message: You didnt pass any body`;
       });
     });
 
-    describe('Which has a maxConcurrentConnections config of 1', () => {
-
-      it('When making a request when queue is full, then dont make request yet',  (done) => {
-
-        requestClientWrapper = buildRequestClientWrapper(1);
-        const requestClientWrapperPrepareRequestSpy = sandbox.spy(requestClientWrapper, 'prepareRequest');
-        createQueuedRequests(10, requestClientWrapper);
-        requestClientWrapper.get('/v1/orders/9999', {}, (error, response, body) => {
-          fail('Call should have not been made.');
-        });
-
-        expect(requestClientWrapperPrepareRequestSpy.callCount).to.equal(0);
-        done();
-      });
-
-      it('When making a request when queue is not full, then make request and pop the rest off queue',  (done) => {
-
-        requestClientWrapper = buildRequestClientWrapper(11);
-        const requestClientWrapperPrepareRequestSpy = sandbox.spy(requestClientWrapper, 'prepareRequest');
-        createQueuedRequestsAsync(10, requestClientWrapper, done);
-        mockedAxios.onGet('/v1/orders/9999').reply(200, { request: 9999 });
-        requestClientWrapper.get('/v1/orders/9999', {}, (error, response, body) => {
-
-        });
-        expect(requestClientWrapperPrepareRequestSpy.callCount).to.equal(1);
-      });
-    });
-
-    function createQueuedRequests(count: number, requestClientWrapper: RequestClientWrapper) {
-      for (let requestNumber = 1; requestNumber <= count; requestNumber = requestNumber + 1) {
-        mockedAxios.onGet(`/v1/orders/${requestNumber}`).reply(200, { request: requestNumber });
-        const requestConfig: RequestConfig = {
-          url: `/v1/orders/${requestNumber}`,
-          params: {},
-          callback: (error: any, response: any, body: any) => {
-            expect(body).to.deep.equals('{ request: 1 }');
-          },
-          method: HttpRequestMethod.GET
-        };
-        requestClientWrapper.requestQueue.push(requestConfig);
-        requestClientWrapper.pendingRequests += 1;
-      }
-    }
-
-    function createQueuedRequestsAsync(count: number, requestClientWrapper: RequestClientWrapper, done: any) {
-      for (let requestNumber = 1; requestNumber <= count; requestNumber = requestNumber + 1) {
-        mockedAxios.onGet(`/v1/orders/${requestNumber}`).reply(200, `{ abc: ${requestNumber} }`);
-        const requestConfig: RequestConfig = {
-          url: `/v1/orders/${requestNumber}`,
-          params: {},
-          callback: (error: any, response: AxiosResponse, body: any) => {
-            expect(response.status).to.equal(200);
-            expect(body).to.deep.equal(`{ abc: ${requestNumber} }`);
-            if (requestNumber === 1) {
-              done();
-            }
-          },
-          method: HttpRequestMethod.GET
-        };
-        requestClientWrapper.requestQueue.push(requestConfig);
-        requestClientWrapper.pendingRequests += 1;
-      }
-    }
-
-    function buildRequestClientWrapper(maximumConcurrentConnections: number) {
-      return new RequestClientWrapper({
-        maximumConcurrentConnections,
-        endpoint,
-        maximumRequestRetryTimeout,
-        timeout: 60000,
-        session: 'valid-session-id',
-        logLevel: LogLevel.INFO,
-        minimumRequestRetryRandomDelay: JITTER_DELAY_MIN,
-        maximumRequestRetryRandomDelay: JITTER_DELAY_MAX
-      });
-    }
   });
 }).timeout(3000);

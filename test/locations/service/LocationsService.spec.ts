@@ -10,7 +10,7 @@ import { fail } from 'assert';
 import LocationsService from './../../../src/locations/service/LocationsService';
 import LocationCreateRequest from './../../../src/locations/model/LocationCreateRequest';
 import LocationUpdateRequest from './../../../src/locations/model/LocationUpdateRequest';
-
+import axios from 'axios';
 describe('Locations Service', () => {
 
   describe('Given some rest client', () => {
@@ -24,7 +24,7 @@ describe('Locations Service', () => {
         minimumRequestRetryRandomDelay: 50,
         maximumRequestRetryRandomDelay: 50,
         maximumConcurrentConnections: 5
-      });
+      }, axios);
 
     let sandbox: sinon.SinonSandbox;
 

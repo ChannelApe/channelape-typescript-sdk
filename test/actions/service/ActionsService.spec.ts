@@ -10,6 +10,7 @@ import Environment from '../../../src/model/Environment';
 import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import ChannelApeError from '../../../src/model/ChannelApeError';
+import axios from 'axios';
 
 import actionsFirstPageResponse from '../resources/actionsFirstPageResponse';
 import actionsFinalPageResponse from '../resources/actionsFinalPageResponse';
@@ -27,7 +28,7 @@ describe('Actions Service', () => {
         minimumRequestRetryRandomDelay: 50,
         maximumRequestRetryRandomDelay: 50,
         maximumConcurrentConnections: 5
-      });
+      }, axios);
 
     let sandbox: sinon.SinonSandbox;
 

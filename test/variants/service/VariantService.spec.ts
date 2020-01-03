@@ -68,7 +68,7 @@ const clientWrapper: RequestClientWrapper = new RequestClientWrapper({
   minimumRequestRetryRandomDelay: 50,
   maximumRequestRetryRandomDelay: 50,
   maximumConcurrentConnections: 5
-});
+}, axios);
 const variantsService: VariantsService = new VariantsService(clientWrapper);
 
 describe('VariantsService', () => {

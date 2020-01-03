@@ -21,7 +21,7 @@ const clientWrapper: RequestClientWrapper = new RequestClientWrapper({
   minimumRequestRetryRandomDelay: 50,
   maximumRequestRetryRandomDelay: 50,
   maximumConcurrentConnections: 5
-});
+}, axios);
 const productFiltersService: ProductFiltersService = new ProductFiltersService(clientWrapper);
 
 describe('ProductFiltersService', () => {
