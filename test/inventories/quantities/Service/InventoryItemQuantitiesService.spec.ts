@@ -10,6 +10,7 @@ import AdjustmentRequest from '../../../../src/inventories/quantities/model/Adju
 import InventoryItemQuantitiesService from '../../../../src/inventories/quantities/InventoryItemQuantitiesService';
 import SubResource from '../../../../src/model/SubResource';
 import { fail } from 'assert';
+import axios from 'axios';
 
 describe('Inventory Quantities Service', () => {
 
@@ -24,7 +25,7 @@ describe('Inventory Quantities Service', () => {
         minimumRequestRetryRandomDelay: 50,
         maximumRequestRetryRandomDelay: 50,
         maximumConcurrentConnections: 5
-      });
+      }, axios);
 
     let sandbox: sinon.SinonSandbox;
 
