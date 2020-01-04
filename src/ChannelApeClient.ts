@@ -15,7 +15,7 @@ import ProductFiltersService from './products/filters/service/ProductFiltersServ
 import UsersService from './users/service/UsersService';
 import InventoriesService from './inventories/service/InventoriesService';
 import LocationsService from './locations/service/LocationsService';
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosPromise } from 'axios';
+import axios from 'axios';
 import * as https from 'https';
 import * as http from 'http';
 

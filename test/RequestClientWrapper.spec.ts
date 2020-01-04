@@ -1,7 +1,7 @@
 // tslint:disable:no-trailing-whitespace
 import * as sinon from 'sinon';
 import { expect } from 'chai';
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import axiosMockAdapter from 'axios-mock-adapter';
 import { Logger } from 'channelape-logger';
 
