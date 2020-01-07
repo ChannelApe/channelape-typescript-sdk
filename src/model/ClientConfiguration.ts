@@ -9,5 +9,6 @@ export default interface ClientConfiguration {
   maximumRequestRetryTimeout?: number;
   minimumRequestRetryRandomDelay?: number;
   maximumRequestRetryRandomDelay?: number;
+  maximumConcurrentConnections?: number;
 
 }

@@ -66,7 +66,8 @@ const clientWrapper: RequestClientWrapper = new RequestClientWrapper({
   session: 'valid-session-id',
   logLevel: LogLevel.INFO,
   minimumRequestRetryRandomDelay: 50,
-  maximumRequestRetryRandomDelay: 50
+  maximumRequestRetryRandomDelay: 50,
+  maximumConcurrentConnections: 5
 });
 const variantsService: VariantsService = new VariantsService(clientWrapper);
 
