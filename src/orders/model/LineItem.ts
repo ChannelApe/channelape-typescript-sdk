@@ -11,7 +11,7 @@ export default interface LineItem {
   shippingMethod?: string;
   sku?: string;
   upc?: string;
-  title: string;
+  title?: string;
   vendor?: string;
   readonly giftCardCode?: string;
   readonly giftCardId?: string;
