@@ -240,7 +240,7 @@ describe('OrdersService', () => {
           }
         }
       ).reply(200, {
-        orders: multipleOrdersStatus.filter(order => order.status === OrderStatus.OPEN),
+        orders: multipleOrdersStatus.filter(order => order.status === status),
         pagination: {
           lastPage: true
         }
@@ -272,8 +272,7 @@ describe('OrdersService', () => {
           }
         }
       ).reply(200, {
-        orders: multipleOrdersStatus
-          .filter(order => order.status === OrderStatus.OPEN || order.status === OrderStatus.CLOSED),
+        orders: multipleOrdersStatus.filter(order => status.includes(order.status)),
         pagination: {
           lastPage: true
         }

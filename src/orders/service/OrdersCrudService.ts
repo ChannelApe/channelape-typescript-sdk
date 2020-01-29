@@ -127,11 +127,7 @@ export default class OrdersCrudService {
 
     const options: AxiosRequestConfig = {
       params: ordersQueryParams,
-      paramsSerializer(params) {
-        // Remove brackets from duplicate query parameters
-        // e.g. ?foo[]=5&foo[]=2 becomes ?foo=5&foo=2
-        return Qs.stringify(params, { arrayFormat: 'repeat' });
-      }
+      paramsSerializer: this.paramsSerializer
     };
     this.client.get(requestUrl, options, (error, response, body) => {
       const requestResponse: RequestCallbackParams = {
@@ -191,5 +187,11 @@ export default class OrdersCrudService {
         GenerateApiError(requestUrl, requestCallbackParams.response, requestCallbackParams.body, expectedStatusCode);
       deferred.reject(channelApeErrorResponse);
     }
+  }
+
+  private paramsSerializer(params: any): string {
+    // Remove brackets from duplicate query parameters
+    // e.g. ?foo[]=5&foo[]=2 becomes ?foo=5&foo=2
+    return Qs.stringify(params, { arrayFormat: 'repeat' });
   }
 }
