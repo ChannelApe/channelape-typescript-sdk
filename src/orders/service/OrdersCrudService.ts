@@ -13,6 +13,7 @@ import Version from '../../model/Version';
 import RequestCallbackParams from '../../model/RequestCallbackParams';
 import GenerateApiError from '../../utils/GenerateApiError';
 import * as Q from 'q';
+import * as Qs from 'qs';
 import GenericOrdersQueryRequest from './model/GenericOrdersQueryRequest';
 import OrderPatchRequest from '../model/OrderPatchRequest';
 import JsonOrderFormatterService from './JsonOrderFormatterService';
@@ -123,8 +124,14 @@ export default class OrdersCrudService {
     if (ordersQueryParams.endDate != null && typeof ordersQueryParams.endDate !== 'string') {
       ordersQueryParams.endDate = ordersQueryParams.endDate.toISOString();
     }
+
     const options: AxiosRequestConfig = {
-      params: ordersQueryParams
+      params: ordersQueryParams,
+      paramsSerializer(params) {
+        // Remove brackets from duplicate query parameters
+        // e.g. ?foo[]=5&foo[]=2 becomes ?foo=5&foo=2
+        return Qs.stringify(params, { arrayFormat: 'repeat' });
+      }
     };
     this.client.get(requestUrl, options, (error, response, body) => {
       const requestResponse: RequestCallbackParams = {

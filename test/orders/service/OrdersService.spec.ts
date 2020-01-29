@@ -24,8 +24,10 @@ import singleClosedOrderWithFulfillments from '../resources/singleClosedOrderWit
 import singleOrderToUpdate from '../resources/singleOrderToUpdate';
 import singleOrderToUpdateResponse from '../resources/singleOrderToUpdateResponse';
 import multipleOrders from '../resources/multipleOrders';
+import multipleOrdersStatus from '../resources/multipleOrdersStatus';
 import singleOrderToPatchResponse from '../resources/singleOrderToPatchResponse';
 import singleOrderToPatch from '../resources/singleOrderToPatch';
+import { OrderStatus } from '../../../src';
 
 const maximumRequestRetryTimeout = 3000;
 
@@ -164,7 +166,7 @@ describe('OrdersService', () => {
       });
     });
 
-    it(`And valid businessId and purchaseORderNumber
+    it(`And valid businessId and purchaseOrderNumber
             When retrieving order Then return resolved promise with order`, () => {
       const mockedAxiosAdapter = new axiosMockAdapter(axios);
       mockedAxiosAdapter.onGet(`${Environment.STAGING}/${Version.V1}/orders`).reply(200, {
@@ -215,6 +217,71 @@ describe('OrdersService', () => {
         businessId,
         startDate: new Date(startDate),
         endDate: new Date(endDate)
+      };
+      return ordersService.get(requestOptions).then((actualOrders) => {
+        expect(actualOrders).to.be.an('array');
+        expect(actualOrders.length).to.equal(2);
+        expect(actualOrders[0].businessId).to.equal(businessId);
+      });
+    });
+
+    it(`And valid businessId and single status
+            When retrieving orders Then return resolved promise with orders`, () => {
+      const status = OrderStatus.OPEN;
+      const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
+
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onGet(
+        `${Environment.STAGING}/${Version.V1}/orders`,
+        {
+          params: {
+            status,
+            businessId
+          }
+        }
+      ).reply(200, {
+        orders: multipleOrdersStatus.filter(order => order.status === OrderStatus.OPEN),
+        pagination: {
+          lastPage: true
+        }
+      });
+
+      const requestOptions: OrdersQueryRequestByBusinessId = {
+        businessId,
+        status
+      };
+      return ordersService.get(requestOptions).then((actualOrders) => {
+        expect(actualOrders).to.be.an('array');
+        expect(actualOrders.length).to.equal(1);
+        expect(actualOrders[0].businessId).to.equal(businessId);
+      });
+    });
+
+    it(`And valid businessId and multiple statuses
+            When retrieving orders Then return resolved promise with orders`, () => {
+      const status = [OrderStatus.CANCELED, OrderStatus.OPEN];
+      const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
+
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onGet(
+        `${Environment.STAGING}/${Version.V1}/orders`,
+        {
+          params: {
+            status,
+            businessId
+          }
+        }
+      ).reply(200, {
+        orders: multipleOrdersStatus
+          .filter(order => order.status === OrderStatus.OPEN || order.status === OrderStatus.CLOSED),
+        pagination: {
+          lastPage: true
+        }
+      });
+
+      const requestOptions: OrdersQueryRequestByBusinessId = {
+        businessId,
+        status
       };
       return ordersService.get(requestOptions).then((actualOrders) => {
         expect(actualOrders).to.be.an('array');
