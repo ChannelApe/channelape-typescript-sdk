@@ -259,7 +259,7 @@ describe('OrdersService', () => {
 
     it(`And valid businessId and multiple statuses
             When retrieving orders Then return resolved promise with orders`, () => {
-      const status = [OrderStatus.CANCELED, OrderStatus.OPEN];
+      const status: OrderStatus[] = [OrderStatus.CLOSED, OrderStatus.OPEN];
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
 
       const mockedAxiosAdapter = new axiosMockAdapter(axios);
@@ -272,7 +272,7 @@ describe('OrdersService', () => {
           }
         }
       ).reply(200, {
-        orders: multipleOrdersStatus.filter(order => status.includes(order.status)),
+        orders: multipleOrdersStatus.filter(order => status.indexOf(order.status) > -1),
         pagination: {
           lastPage: true
         }
