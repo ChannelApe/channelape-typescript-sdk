@@ -25,19 +25,15 @@ cache:
 deploy:
   - provider: npm
     skip_cleanup: true
-    email:
-      - "$NPM_EMAIL"
-    api_key:
-      - "$NPM_TOKEN"
+    email: "$NPM_EMAIL"
+    api_key: "$NPM_TOKEN"
     tag: develop
     on:
       branch: develop
   - provider: npm
     skip_cleanup: true
-    email:
-      - "$NPM_EMAIL"
-    api_key:
-      - "$NPM_TOKEN"
+    email: "$NPM_EMAIL"
+    api_key: "$NPM_TOKEN"
     tag: latest
     on:
       branch: master
