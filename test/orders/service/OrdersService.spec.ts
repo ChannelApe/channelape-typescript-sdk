@@ -46,7 +46,7 @@ const ordersService: OrdersService = new OrdersService(clientWrapper);
 describe('OrdersService', () => {
   describe('Given some valid rest client', () => {
 
-    it.only(`And valid orderId
+    it(`And valid orderId
             When retrieving order Then return resolved promise with order`, () => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const mockedAxiosAdapter = new axiosMockAdapter(axios);
@@ -529,7 +529,7 @@ Code: 15 Message: Requested business cannot be found.`;
       });
     });
 
-    it.only('And valid OrderCreateRequest with an actionId when creating an order, Then return created order', () => {
+    it('And valid OrderCreateRequest with an actionId when creating an order, Then return created order', () => {
       const orderCreateRequest: OrderCreateRequest = JSON.parse(JSON.stringify(singleOrder));
       orderCreateRequest.actionId = 'some-action-id';
       orderCreateRequest.fulfillments!.push({

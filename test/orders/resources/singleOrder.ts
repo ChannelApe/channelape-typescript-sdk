@@ -277,20 +277,20 @@ const singleOrder: Order = {
   ],
   refunds: [
     {
-      supplierRefundId: "932",
-      channelRefundId: "123",
+      supplierRefundId: '932',
+      channelRefundId: '123',
       lineItems: [
         {
-          id: "123",
-          sku: "ABC-123",
+          id: '123',
+          sku: 'ABC-123',
           quantity: 6,
-          restockType: "CANCEL"
+          restockType: 'CANCEL'
         },
         {
-          id: "124",
-          sku: "ABC-124",
+          id: '124',
+          sku: 'ABC-124',
           quantity: 13,
-          restockType: "NO_RESTOCK"
+          restockType: 'NO_RESTOCK'
         }
       ]
     }
