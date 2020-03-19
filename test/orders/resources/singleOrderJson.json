@@ -159,6 +159,26 @@
       "provinceCode": "KS"
     }
   },
+  "refunds": [
+    {
+      "supplierRefundId": "932",
+      "channelRefundId": "123",
+      "lineItems": [
+        {
+          "id": "123",
+          "sku": "ABC-123",
+          "quantity": 6,
+          "restockType": "CANCEL"
+        },
+        {
+          "id": "124",
+          "sku": "ABC-124",
+          "quantity": 13,
+          "restockType": "NO_RESTOCK"
+        }
+      ]
+    }
+  ],
   "fulfillments": [],
   "id": "c0f45529-cbed-4e90-9a38-c208d409ef2a",
   "lineItems": [

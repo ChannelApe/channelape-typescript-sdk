@@ -45,7 +45,8 @@ const ordersService: OrdersService = new OrdersService(clientWrapper);
 
 describe('OrdersService', () => {
   describe('Given some valid rest client', () => {
-    it(`And valid orderId
+
+    it.only(`And valid orderId
             When retrieving order Then return resolved promise with order`, () => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const mockedAxiosAdapter = new axiosMockAdapter(axios);
@@ -57,6 +58,27 @@ describe('OrdersService', () => {
         expect(actualOrder.purchaseOrderNumber).to.equal(singleOrder.purchaseOrderNumber);
         expect(typeof actualOrder.totalShippingTax).to.equal('undefined');
         expect(typeof actualOrder.canceledAt).to.equal('undefined');
+        // @ts-ignore
+        expect(actualOrder.refunds.length).to.equal(1);
+        // @ts-ignore
+        const expectedRefund = singleOrder.refunds[0];
+        // @ts-ignore
+        const actualRefund1 = actualOrder.refunds[0];
+        expect(actualRefund1.channelRefundId).to.equal(expectedRefund.channelRefundId);
+        expect(actualRefund1.supplierRefundId).to.equal(expectedRefund.supplierRefundId);
+        expect(2).to.equal(expectedRefund.lineItems.length);
+        expect(actualRefund1.lineItems[0].sku).to.equal(expectedRefund.lineItems[0].sku);
+        expect(actualRefund1.lineItems[0].upc).to.equal(expectedRefund.lineItems[0].upc);
+        expect(actualRefund1.lineItems[0].quantity).to.equal(expectedRefund.lineItems[0].quantity);
+        expect(actualRefund1.lineItems[0].id).to.equal(expectedRefund.lineItems[0].id);
+        expect(actualRefund1.lineItems[0].price).to.equal(expectedRefund.lineItems[0].price);
+        expect(actualRefund1.lineItems[0].restockType).to.equal(expectedRefund.lineItems[0].restockType);
+        expect(actualRefund1.lineItems[1].sku).to.equal(expectedRefund.lineItems[1].sku);
+        expect(actualRefund1.lineItems[1].upc).to.equal(expectedRefund.lineItems[1].upc);
+        expect(actualRefund1.lineItems[1].quantity).to.equal(expectedRefund.lineItems[1].quantity);
+        expect(actualRefund1.lineItems[1].id).to.equal(expectedRefund.lineItems[1].id);
+        expect(actualRefund1.lineItems[1].price).to.equal(expectedRefund.lineItems[1].price);
+        expect(actualRefund1.lineItems[1].restockType).to.equal(expectedRefund.lineItems[1].restockType);
       });
     });
 
@@ -137,9 +159,9 @@ describe('OrdersService', () => {
       return ordersService.get(orderId).then((actualOrder) => {
         throw new Error('Test failed!');
       })
-      .catch((e: ChannelApeError) => {
-        expect(e.message).to.be.an('string');
-      });
+        .catch((e: ChannelApeError) => {
+          expect(e.message).to.be.an('string');
+        });
     });
 
     it(`And valid businessId and channelOrderId
@@ -355,7 +377,7 @@ describe('OrdersService', () => {
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
       // tslint:disable:no-trailing-whitespace
       const expectedErrorMessage =
-`get /v1/orders
+        `get /v1/orders
   Status: 404
   Response Body:
   Request failed with status code 404
@@ -364,7 +386,7 @@ Code: 15 Message: Requested business cannot be found.`;
       const mockedAxiosAdapter = new axiosMockAdapter(axios);
       mockedAxiosAdapter.onGet().reply(404, {
         statusCode: 404,
-        errors:[{ code: 15, message: 'Requested business cannot be found.' }]
+        errors: [{ code: 15, message: 'Requested business cannot be found.' }]
       });
 
       const businessId = 'not-a-real-business-id';
@@ -374,9 +396,9 @@ Code: 15 Message: Requested business cannot be found.`;
       return ordersService.get(requestOptions).then((actualOrders) => {
         throw new Error('Test failed!');
       })
-      .catch((e: ChannelApeError) => {
-        expect(e.message).to.equal(expectedErrorMessage);
-      });
+        .catch((e: ChannelApeError) => {
+          expect(e.message).to.equal(expectedErrorMessage);
+        });
     });
 
     it(`And valid order when updating said order with an actionId
@@ -507,7 +529,7 @@ Code: 15 Message: Requested business cannot be found.`;
       });
     });
 
-    it('And valid OrderCreateRequest with an actionId when creating an order, Then return created order', () => {
+    it.only('And valid OrderCreateRequest with an actionId when creating an order, Then return created order', () => {
       const orderCreateRequest: OrderCreateRequest = JSON.parse(JSON.stringify(singleOrder));
       orderCreateRequest.actionId = 'some-action-id';
       orderCreateRequest.fulfillments!.push({
@@ -537,6 +559,27 @@ Code: 15 Message: Requested business cannot be found.`;
         expect(createdOrder.fulfillments![0].lineItems.length).to.equal(2, 'fulfillments.lineItems.length');
         expect(createdOrder.fulfillments![0].lineItems[0].sku)
           .to.equal('e67f1d90-824a-4941-8497-08d632763c93', 'fulfillments.lineItems.sku');
+        // @ts-ignore
+        expect(createdOrder.refunds.length).to.equal(1);
+        // @ts-ignore
+        const expectedRefund = singleOrder.refunds[0];
+        // @ts-ignore
+        const actualRefund1 = createdOrder.refunds[0];
+        expect(actualRefund1.channelRefundId).to.equal(expectedRefund.channelRefundId);
+        expect(actualRefund1.supplierRefundId).to.equal(expectedRefund.supplierRefundId);
+        expect(2).to.equal(expectedRefund.lineItems.length);
+        expect(actualRefund1.lineItems[0].sku).to.equal(expectedRefund.lineItems[0].sku);
+        expect(actualRefund1.lineItems[0].upc).to.equal(expectedRefund.lineItems[0].upc);
+        expect(actualRefund1.lineItems[0].quantity).to.equal(expectedRefund.lineItems[0].quantity);
+        expect(actualRefund1.lineItems[0].id).to.equal(expectedRefund.lineItems[0].id);
+        expect(actualRefund1.lineItems[0].price).to.equal(expectedRefund.lineItems[0].price);
+        expect(actualRefund1.lineItems[0].restockType).to.equal(expectedRefund.lineItems[0].restockType);
+        expect(actualRefund1.lineItems[1].sku).to.equal(expectedRefund.lineItems[1].sku);
+        expect(actualRefund1.lineItems[1].upc).to.equal(expectedRefund.lineItems[1].upc);
+        expect(actualRefund1.lineItems[1].quantity).to.equal(expectedRefund.lineItems[1].quantity);
+        expect(actualRefund1.lineItems[1].id).to.equal(expectedRefund.lineItems[1].id);
+        expect(actualRefund1.lineItems[1].price).to.equal(expectedRefund.lineItems[1].price);
+        expect(actualRefund1.lineItems[1].restockType).to.equal(expectedRefund.lineItems[1].restockType);
       });
     });
 
@@ -578,15 +621,16 @@ Code: 15 Message: Requested business cannot be found.`;
     it(`And invalid orderId
             When retrieving order Then return rejected promise with ChannelApeError`, () => {
       const expectedErrorMessage =
-`get /v1/orders/not-a-real-order-id
+        `get /v1/orders/not-a-real-order-id
   Status: 401
   Response Body:
   Request failed with status code 401
 Code: 12 Message: Invalid authorization token. Please check the server logs and try again`;
       const mockedAxiosAdapter = new axiosMockAdapter(axios);
       mockedAxiosAdapter.onGet().reply(401,
-        { errors:
-          [{ code: 12, message: 'Invalid authorization token. Please check the server logs and try again' }]
+        {
+          errors:
+            [{ code: 12, message: 'Invalid authorization token. Please check the server logs and try again' }]
         });
       const client: RequestClientWrapper = new RequestClientWrapper({
         endpoint: 'this-is-not-a-real-base-url',
@@ -603,9 +647,9 @@ Code: 12 Message: Invalid authorization token. Please check the server logs and 
       return ordersService.get(orderId).then((actualOrder) => {
         throw new Error('Test failed!');
       })
-      .catch((e) => {
-        expect(e.message).to.equal(expectedErrorMessage);
-      });
+        .catch((e) => {
+          expect(e.message).to.equal(expectedErrorMessage);
+        });
     });
 
     it(`And invalid businessId
@@ -621,7 +665,7 @@ Code: 12 Message: Invalid authorization token. Please check the server logs and 
         maximumConcurrentConnections: 5
       });
       const expectedErrorMessage =
-`get /v1/orders
+        `get /v1/orders
   Status: 401
   Response Body:
   Request failed with status code 401
@@ -634,9 +678,9 @@ Code: 12 Message: Invalid authorization token. Please check the server logs and 
       return ordersService.get(requestOptions).then((actualOrders) => {
         throw new Error('Test failed!');
       })
-      .catch((e) => {
-        expect(e.message).to.equal(expectedErrorMessage);
-      });
+        .catch((e) => {
+          expect(e.message).to.equal(expectedErrorMessage);
+        });
     });
   });
 });
