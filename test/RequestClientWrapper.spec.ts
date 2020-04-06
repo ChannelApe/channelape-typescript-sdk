@@ -554,6 +554,84 @@ Code: 0 Message: You didnt pass any body`;
       });
     }).timeout(5000);
 
+    it(`When handling a GET response which has to retry
+      and takes longer than the maximumRequestRetryTimeout on a retry
+      but has a successful response
+      then expect the call to successfully return`, (done) => {
+      const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      const requestUrl = `/v1/orders/${orderId}`;
+      const fakeRequest = {
+        method: 'GET',
+        href: `${endpoint}${requestUrl}`
+      };
+      const responses = [{
+        status: 500,
+        method: 'GET',
+        url: `${endpoint}${requestUrl}`,
+        config: fakeRequest,
+        data: 'Im'
+      }, {
+        status: 429,
+        method: 'GET',
+        url: `${endpoint}${requestUrl}`,
+        config: fakeRequest,
+        data: 'teapot'
+      }, {
+        status: 200,
+        method: 'GET',
+        url: `${endpoint}${requestUrl}`,
+        config: fakeRequest,
+        data: singleOrder
+      }];
+
+      mockedAxios.onGet().reply(async () => {
+        const response = responses.shift();
+        if (response && response.status === 200) {
+          await timeout(650);
+        }
+        return [response!.status, response!.data];
+      });
+
+      requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
+        expect(error).to.be.null;
+        done();
+      });
+    }).timeout(5000);
+
+    it(`When handling a GET response which takes longer than the maximumRequestRetryTimeout on the first attempt
+      but has a successful response
+      then expect the call to successfully return`, (done) => {
+      const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      const requestUrl = `/v1/orders/${orderId}`;
+
+      mockedAxios.onGet().reply(async () => {
+        await timeout(650);
+        return [200, singleOrder];
+      });
+
+      requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
+        expect(error).to.be.null;
+        done();
+      });
+    }).timeout(5000);
+
+    it(`When handling a GET response which takes longer than the maximumRequestRetryTimeout on the first attempt
+      but has an error response
+      then expect the call to complete and return the error`, (done) => {
+      const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
+      const requestUrl = `/v1/orders/${orderId}`;
+
+      mockedAxios.onGet().reply(async () => {
+        await timeout(650);
+        return [500, 'invalid'];
+      });
+
+      requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
+        expect(error).to.not.be.null;
+        done();
+      });
+    }).timeout(5000);
+
     it('When handling a GET response expect callback with an empty response to be handled gracefully', (done) => {
       const orderId = 'c0f45529-cbed-4e90-9a38-c208d409ef2a';
       const requestUrl = `/v1/orders/${orderId}`;
@@ -660,6 +738,10 @@ Code: 0 Message: You didnt pass any body`;
         minimumRequestRetryRandomDelay: JITTER_DELAY_MIN,
         maximumRequestRetryRandomDelay: JITTER_DELAY_MAX
       });
+    }
+
+    function timeout(ms: number): Promise<void> {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
   });
 }).timeout(3000);

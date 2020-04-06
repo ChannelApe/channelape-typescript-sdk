@@ -183,26 +183,29 @@ export default class RequestClientWrapper {
     this.requestLogger.logResponse(requestResponse.error, requestResponse.response, requestResponse.body,
       requestResponse.code);
     let finalError: ChannelApeError | null = null;
-    if (this.didRequestTimeout(callDetails.callStart)) {
-      const maximumRetryLimitExceededMessage =
-        this.getMaximumRetryLimitExceededMessage(callDetails.callStart, callDetails.callCountForThisRequest);
-      finalError = new ChannelApeError(maximumRetryLimitExceededMessage, requestResponse.response, uri, []);
-    } else if (
-      this.shouldRequestBeRetried(
-        requestResponse.error, requestResponse.response, requestResponse.code)
-    ) {
-      this.retryRequest(method, uri, callback, callDetails);
-      return;
-    }
-    if (requestResponse.error) {
-      finalError = new ChannelApeError(requestResponse.error.message, requestResponse.response, uri, [{
-        code: GENERIC_ERROR_CODE,
-        message: requestResponse.error.message
-      }]);
-    } else if (this.isApiError(requestResponse.body) && requestResponse.response && requestResponse.body) {
-      finalError = new ChannelApeError(
-        `${requestResponse.response.status} ${requestResponse.response.statusText}`,
-        requestResponse.response, uri, requestResponse.body.errors);
+
+    if (this.didRequestFail(requestResponse)) {
+      if (this.didRequestTimeout(callDetails.callStart)) {
+        const maximumRetryLimitExceededMessage =
+          this.getMaximumRetryLimitExceededMessage(callDetails.callStart, callDetails.callCountForThisRequest);
+        finalError = new ChannelApeError(maximumRetryLimitExceededMessage, requestResponse.response, uri, []);
+      } else if (
+        this.shouldRequestBeRetried(
+          requestResponse.error, requestResponse.response, requestResponse.code)
+      ) {
+        this.retryRequest(method, uri, callback, callDetails);
+        return;
+      }
+      if (requestResponse.error) {
+        finalError = new ChannelApeError(requestResponse.error.message, requestResponse.response, uri, [{
+          code: GENERIC_ERROR_CODE,
+          message: requestResponse.error.message
+        }]);
+      } else if (this.isApiError(requestResponse.body) && requestResponse.response && requestResponse.body) {
+        finalError = new ChannelApeError(
+          `${requestResponse.response.status} ${requestResponse.response.statusText}`,
+          requestResponse.response, uri, requestResponse.body.errors);
+      }
     }
 
     this.requestCompleted();
@@ -287,5 +290,30 @@ export default class RequestClientWrapper {
       this.requestClientWrapperConfiguration.minimumRequestRetryRandomDelay) + 1;
     return (Math.floor(Math.random() * (range))) +
       this.requestClientWrapperConfiguration.minimumRequestRetryRandomDelay;
+  }
+
+  private didRequestFail(requestResponse: RequestResponse): boolean {
+    if (
+      (requestResponse.error || requestResponse instanceof Error) ||
+      (requestResponse.code && !doesValueStartWithNumber(requestResponse.code, 2)) ||
+      (requestResponse.response && !doesValueStartWithNumber(requestResponse.response.status, 2))
+    ) {
+      return true;
+    }
+
+    return false;
+
+    function doesValueStartWithNumber(value: any, number: number): boolean {
+      if (value === undefined || value === null || value === '') {
+        return false;
+      }
+
+      let stringValue = value;
+      if (Number.isInteger(value)) {
+        stringValue = value.toString();
+      }
+
+      return stringValue.startsWith(number.toString());
+    }
   }
 }
