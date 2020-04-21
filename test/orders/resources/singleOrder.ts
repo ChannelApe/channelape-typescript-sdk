@@ -275,6 +275,26 @@ const singleOrder: Order = {
       vendor: 'Hand, Swift and Langosh'
     }
   ],
+  refunds: [
+    {
+      supplierRefundId: '932',
+      channelRefundId: '123',
+      lineItems: [
+        {
+          id: '123',
+          sku: 'ABC-123',
+          quantity: 6,
+          restockType: 'CANCEL'
+        },
+        {
+          id: '124',
+          sku: 'ABC-124',
+          quantity: 13,
+          restockType: 'NO_RESTOCK'
+        }
+      ]
+    }
+  ],
   purchasedAt: new Date('2018-03-29T19:06:26.000Z'),
   status: OrderStatus.OPEN,
   subtotalPrice: 25.98,
