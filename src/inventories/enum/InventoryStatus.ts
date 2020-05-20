@@ -1,0 +1,6 @@
+export enum InventoryStatus {
+  AVAILABLE_TO_SELL = 'AVAILABLE_TO_SELL',
+  ON_HOLD = 'ON_HOLD',
+  ON_HAND = 'ON_HAND',
+  COMMITTED = 'COMMITTED'
+}

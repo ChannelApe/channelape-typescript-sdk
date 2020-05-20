@@ -11,6 +11,7 @@ import { AxiosRequestConfig } from 'axios';
 import { InventoryItemCreateRequest } from './../model/InventoryItemCreateRequest';
 import { InventoryItemUpdateRequest } from './../model/InventoryItemUpdateRequest';
 import InventoryItemQuantitiesService from '../quantities/InventoryItemQuantitiesService';
+import LocationsService from '../../locations/service/LocationsService';
 
 export default class InventoriesService extends RestService {
 
@@ -18,9 +19,16 @@ export default class InventoriesService extends RestService {
   private readonly EXPECTED_POST_STATUS = 201;
 
   private inventoryQuantitiesService: InventoryItemQuantitiesService;
-  constructor(private readonly client: RequestClientWrapper) {
+  constructor(
+    private readonly client: RequestClientWrapper,
+    private readonly locationsService: LocationsService
+  ) {
     super();
-    this.inventoryQuantitiesService = new InventoryItemQuantitiesService(client);
+    this.inventoryQuantitiesService = new InventoryItemQuantitiesService(
+      client,
+      this,
+      this.locationsService
+    );
   }
 
   public quantities(): InventoryItemQuantitiesService {

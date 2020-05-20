@@ -519,6 +519,53 @@ channelApeClient.inventories().quantities().adjust(adjustmentRequest)
   });
 ```
 
+### Batch Adjust Inventory Item Quantity
+
+- If at least one adjustment fails, the call will wait for all other pending requests
+to complete and then throw an error.
+- The deduplication key specifies a string which will be used to determine if an adjustment
+should be created.  If a key with the same string for a particular inventory item, location, 
+and status was already used, it will not perform the adjustment.  For example, this can be 
+used to allow only one adjustment per day so that if the batched adjustments are sent through 
+a second time, only the ones which failed will be recreated.
+Here is the generated key format: {deduplicationKey}_{locationId}_{inventoryItemId}_{status}
+
+Currently Allowed Inventory Statuses:
+- AVAILABLE_TO_SELL
+- ON_HOLD
+- ON_HAND
+- COMMITTED
+
+```typescript
+const batchAdjustmentRequest: BatchAdjustmentRequest = {
+  locationId: '123',
+  deduplicationKey: '05052020',
+  adjustmentsBySku: [{
+    sku: 'A1',
+    adjustments: [{
+      quantity: 1,
+      status: 'AVAILABLE_TO_SELL'
+    }, {
+      quantity: 3,
+      status: 'ON_HOLD'
+    }]
+  }, {
+    sku: 'B1',
+    adjustments: [{
+      quantity: 2,
+      status: 'AVAILABLE_TO_SELL'
+    }, {
+      quantity: 0,
+      status: 'ON_HOLD'
+    }]
+  }]
+};
+channelApeClient.inventories().quantities().adjustBatch(batchAdjustmentRequest)
+  .then(() => {
+    // All adjustments completed successfully
+  });
+```
+
 ### Set Inventory Item Quantity
 ```typescript
 const adjustmentRequest: AdjustmentRequest = {
