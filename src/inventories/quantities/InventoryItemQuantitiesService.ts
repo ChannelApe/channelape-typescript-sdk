@@ -44,6 +44,10 @@ export default class InventoryQuantitiesService extends RestService {
     return this.inventoryBatchAdjustmentsService.adjustBatch(batchAdjustmentRequest);
   }
 
+  public setBatch(batchAdjustmentRequest: BatchAdjustmentRequest) {
+    return this.inventoryBatchAdjustmentsService.setBatch(batchAdjustmentRequest);
+  }
+
   public set(adjustmentRequest: AdjustmentRequest): Promise<Adjustment> {
     return this.createQuantityAdjustment(adjustmentRequest, SubResource.SETS);
   }

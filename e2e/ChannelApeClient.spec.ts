@@ -27,6 +27,9 @@ import { InventoryItemUpdateRequest } from './../src/inventories/model/Inventory
 import LocationCreateRequest from './../src/locations/model/LocationCreateRequest';
 import LocationUpdateRequest from './../src/locations/model/LocationUpdateRequest';
 import AdjustmentRequest from './../src/inventories/quantities/model/AdjustmentRequest';
+import BatchAdjustmentRequest from '../src/inventories/quantities/model/BatchAdjustmentRequest';
+import { InventoryStatus } from '../src/inventories/enum/InventoryStatus';
+import { fail } from 'assert';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
@@ -966,6 +969,66 @@ describe('ChannelApe Client', () => {
           expect(actualAdjustment.updatedAt).to.not.be.undefined;
           expect(actualAdjustment.locationId).to.equal(locationId);
           expect(actualAdjustment.inventoryStatus).to.equal(adjustmentRequest.inventoryStatus);
+        });
+      });
+    });
+
+    describe('And valid batch adjustment request', () => {
+      context('When adjusting quantities', () => {
+        it('Then update', async () => {
+          const batchAdjustmentRequest = new BatchAdjustmentRequest(
+            '28',
+            new Date().toISOString(),
+            [{
+              sku: 'A1',
+              adjustments: [{
+                quantity: 1,
+                status: InventoryStatus.AVAILABLE_TO_SELL
+              }, {
+                quantity: 3,
+                status: InventoryStatus.ON_HOLD
+              }]
+            }, {
+              sku: 'B1',
+              adjustments: [{
+                quantity: 2,
+                status: InventoryStatus.AVAILABLE_TO_SELL
+              }, {
+                quantity: 0,
+                status: InventoryStatus.ON_HOLD
+              }]
+            }]
+          );
+          await channelApeClient.inventories().quantities().setBatch(batchAdjustmentRequest);
+        });
+      });
+
+      context('When setting quantities', () => {
+        it('Then update', async () => {
+          const batchAdjustmentRequest = new BatchAdjustmentRequest(
+            '28',
+            new Date().toISOString(),
+            [{
+              sku: 'A1',
+              adjustments: [{
+                quantity: 1,
+                status: InventoryStatus.AVAILABLE_TO_SELL
+              }, {
+                quantity: 3,
+                status: InventoryStatus.ON_HOLD
+              }]
+            }, {
+              sku: 'B1',
+              adjustments: [{
+                quantity: 2,
+                status: InventoryStatus.AVAILABLE_TO_SELL
+              }, {
+                quantity: 0,
+                status: InventoryStatus.ON_HOLD
+              }]
+            }]
+          );
+          await channelApeClient.inventories().quantities().setBatch(batchAdjustmentRequest);
         });
       });
     });
