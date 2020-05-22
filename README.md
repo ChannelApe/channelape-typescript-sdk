@@ -519,7 +519,7 @@ channelApeClient.inventories().quantities().adjust(adjustmentRequest)
   });
 ```
 
-### Batch Adjust Inventory Item Quantity
+### Batch Update Inventory Item Quantity
 
 - If at least one adjustment fails, the call will wait for all other pending requests
 to complete and then throw an error.
@@ -528,13 +528,14 @@ should be created.  If a key with the same string for a particular inventory ite
 and status was already used, it will not perform the adjustment.  For example, this can be 
 used to allow only one adjustment per day so that if the batched adjustments are sent through 
 a second time, only the ones which failed will be recreated.
-Here is the generated key format: {deduplicationKey}_{locationId}_{inventoryItemId}_{status}
+Here is the generated key format: {deduplicationKey}\_{locationId}\_{inventoryItemId}\_{status}
 
 Currently Allowed Inventory Statuses:
 - AVAILABLE_TO_SELL
 - ON_HOLD
 - ON_HAND
 - COMMITTED
+- ON_ORDER
 
 ```typescript
 const batchAdjustmentRequest: BatchAdjustmentRequest = {
@@ -544,22 +545,36 @@ const batchAdjustmentRequest: BatchAdjustmentRequest = {
     sku: 'A1',
     adjustments: [{
       quantity: 1,
-      status: 'AVAILABLE_TO_SELL'
+      status: InventoryStatus.AVAILABLE_TO_SELL
     }, {
       quantity: 3,
-      status: 'ON_HOLD'
+      status: InventoryStatus.ON_HOLD
     }]
   }, {
     sku: 'B1',
     adjustments: [{
       quantity: 2,
-      status: 'AVAILABLE_TO_SELL'
+      status: InventoryStatus.AVAILABLE_TO_SELL
     }, {
       quantity: 0,
-      status: 'ON_HOLD'
+      status: InventoryStatus.ON_HOLD
     }]
   }]
 };
+```
+
+#### Batch Set Inventory Item Quantities
+
+```typescript
+channelApeClient.inventories().quantities().setBatch(batchAdjustmentRequest)
+  .then(() => {
+    // All adjustments completed successfully
+  });
+```
+
+#### Batch Adjust Inventory Item Quantities
+
+```typescript
 channelApeClient.inventories().quantities().adjustBatch(batchAdjustmentRequest)
   .then(() => {
     // All adjustments completed successfully

@@ -38,6 +38,14 @@ describe('Inventory Quantities Service', () => {
           inventoryStatus: request.inventoryStatus
         };
       });
+      inventoryItemQuantitiesServiceStub.adjust.callsFake((request) => {
+        return {
+          locationId: request.locationId,
+          quantity: request.quantity,
+          inventoryItemId: request.inventoryItemId,
+          inventoryStatus: request.inventoryStatus
+        };
+      });
       done();
     });
 
@@ -74,7 +82,7 @@ describe('Inventory Quantities Service', () => {
         inventoriesServiceStub,
         locationsServiceStub
       );
-      await inventoryQuantitiesService.adjustBatch(batchAdjustmentRequest);
+      await inventoryQuantitiesService.setBatch(batchAdjustmentRequest);
       const expectedStatus = adjustmentsBySku[0].adjustments[0].status;
       expect(inventoriesServiceStub.get.calledOnce).to.equal(true);
       expect(inventoriesServiceStub.get.firstCall.args[0]).to.equal(location.businessId);
@@ -128,7 +136,7 @@ describe('Inventory Quantities Service', () => {
         inventoriesServiceStub,
         locationsServiceStub
       );
-      await inventoryQuantitiesService.adjustBatch(batchAdjustmentRequest);
+      await inventoryQuantitiesService.setBatch(batchAdjustmentRequest);
       expect(inventoriesServiceStub.get.calledOnce).to.equal(true);
       expect(inventoriesServiceStub.get.firstCall.args[0]).to.equal(location.businessId);
       expect(inventoriesServiceStub.get.firstCall.args[1]).to.equal(adjustmentsBySku[0].sku);
@@ -183,7 +191,7 @@ describe('Inventory Quantities Service', () => {
         locationsServiceStub
       );
 
-      await inventoryQuantitiesService.adjustBatch(batchAdjustmentRequest);
+      await inventoryQuantitiesService.setBatch(batchAdjustmentRequest);
 
       expect(inventoriesServiceStub.create.called).to.equal(false);
       expect(inventoriesServiceStub.get.calledOnce).to.equal(true);
@@ -255,7 +263,7 @@ describe('Inventory Quantities Service', () => {
 
       inventoriesServiceStub.get.resolves([]);
 
-      await inventoryQuantitiesService.adjustBatch(batchAdjustmentRequest);
+      await inventoryQuantitiesService.setBatch(batchAdjustmentRequest);
 
       expect(inventoriesServiceStub.get.callCount).to.equal(3);
       for (const [index, adjustment] of adjustmentsBySku.entries()) {
@@ -360,7 +368,7 @@ describe('Inventory Quantities Service', () => {
         return [];
       });
 
-      await inventoryQuantitiesService.adjustBatch(batchAdjustmentRequest);
+      await inventoryQuantitiesService.setBatch(batchAdjustmentRequest);
 
       expect(inventoriesServiceStub.get.callCount).to.equal(3);
       for (const [index, adjustment] of adjustmentsBySku.entries()) {
@@ -447,7 +455,7 @@ describe('Inventory Quantities Service', () => {
       });
 
       try {
-        await inventoryQuantitiesService.adjustBatch(batchAdjustmentRequest);
+        await inventoryQuantitiesService.setBatch(batchAdjustmentRequest);
         fail('Expected to fail');
       } catch (error) {
         expect(error.message).to.equal('At least one adjustment failed');
@@ -479,7 +487,7 @@ describe('Inventory Quantities Service', () => {
       }
     });
 
-    it('And batchAdjustmentRequest When making adjustments for multiple existing skus ' +
+    it('And batchAdjustmentRequest When setting adjustments for multiple existing skus ' +
     'and one adjustment fails Then get multiple inventory items and make multiple adjustments ' +
     'and throw an error', async () => {
       const deduplicationKey = '05052020';
@@ -553,7 +561,7 @@ describe('Inventory Quantities Service', () => {
       });
 
       try {
-        await inventoryQuantitiesService.adjustBatch(batchAdjustmentRequest);
+        await inventoryQuantitiesService.setBatch(batchAdjustmentRequest);
         fail('Expected to fail');
       } catch (error) {
         expect(error.message).to.equal('At least one adjustment failed');
@@ -581,7 +589,7 @@ describe('Inventory Quantities Service', () => {
       }
     });
 
-    it('And batchAdjustmentRequest When making adjustments for multiple existing skus ' +
+    it('And batchAdjustmentRequest When setting adjustments for multiple existing skus ' +
     'and one adjustment fails Then get multiple inventory items and make multiple adjustments ' +
     'and throw an error', async () => {
       const deduplicationKey = '05052020';
@@ -640,7 +648,7 @@ describe('Inventory Quantities Service', () => {
       });
 
       try {
-        await inventoryQuantitiesService.adjustBatch(batchAdjustmentRequest);
+        await inventoryQuantitiesService.setBatch(batchAdjustmentRequest);
         fail('Expected to fail');
       } catch (error) {
         expect(error.message).to.equal('At least one adjustment failed');
@@ -672,8 +680,72 @@ describe('Inventory Quantities Service', () => {
       }
     });
 
+    it('And batchAdjustmentRequest When setting multiple adjustments for a single sku ' +
+      'which does not exist Then create multiple inventory items and make multiple adjustments', async () => {
+      const deduplicationKey = '05052020';
+      const adjustmentsBySku = [{
+        sku: 'A1',
+        adjustments: [{
+          status: InventoryStatus.AVAILABLE_TO_SELL,
+          quantity: 3
+        }, {
+          status: InventoryStatus.COMMITTED,
+          quantity: 2
+        }, {
+          status: InventoryStatus.ON_HAND,
+          quantity: 1
+        }]
+      }];
+      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, deduplicationKey, adjustmentsBySku);
+      const createdInventoryItem = {
+        sku: batchAdjustmentRequest.adjustmentsBySku[0].sku,
+        id: '1',
+        businessId: location.businessId,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      inventoriesServiceStub.get.resolves([]);
+      inventoriesServiceStub.create.resolves(createdInventoryItem);
+
+      const inventoryQuantitiesService = new InventoryBatchAdjustmentsService(
+        // @ts-ignore
+        inventoryItemQuantitiesServiceStub,
+        inventoriesServiceStub,
+        locationsServiceStub
+      );
+      await inventoryQuantitiesService.adjustBatch(batchAdjustmentRequest);
+      expect(inventoriesServiceStub.get.calledOnce).to.equal(true);
+      expect(inventoriesServiceStub.get.firstCall.args[0]).to.equal(location.businessId);
+      expect(inventoriesServiceStub.get.firstCall.args[1]).to.equal(adjustmentsBySku[0].sku);
+      expect(inventoriesServiceStub.create.calledOnce).to.equal(true);
+      expect(inventoriesServiceStub.create.firstCall.args[0]).to.deep.equal({
+        sku: adjustmentsBySku[0].sku,
+        businessId: location.businessId
+      });
+      expect(inventoryItemQuantitiesServiceStub.adjust.callCount).to.equal(3);
+      for (const adjustment of adjustmentsBySku[0].adjustments) {
+        const foundAdjustment = findAdjustInventoryItem(createdInventoryItem.id, adjustment.status);
+        if (!foundAdjustment) {
+          fail('Could not find adjustment');
+        }
+        const expectedKey = buildKey(deduplicationKey, location.id, createdInventoryItem.id, adjustment.status);
+        expect(foundAdjustment.quantity).to.equal(adjustment.quantity);
+        expect(foundAdjustment.locationId).to.equal(location.id);
+        expect(foundAdjustment.idempotentKey).to.equal(expectedKey);
+      }
+    });
+
     function findSetInventoryItem(inventoryId: string, status: string) {
       const found = inventoryItemQuantitiesServiceStub.set.args.find((args) => {
+        return args[0].inventoryStatus === status &&
+          args[0].inventoryItemId === inventoryId;
+      });
+      return found ? found[0] : undefined;
+    }
+
+    function findAdjustInventoryItem(inventoryId: string, status: string) {
+      const found = inventoryItemQuantitiesServiceStub.adjust.args.find((args) => {
         return args[0].inventoryStatus === status &&
           args[0].inventoryItemId === inventoryId;
       });
