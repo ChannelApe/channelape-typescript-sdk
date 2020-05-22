@@ -29,7 +29,6 @@ import LocationUpdateRequest from './../src/locations/model/LocationUpdateReques
 import AdjustmentRequest from './../src/inventories/quantities/model/AdjustmentRequest';
 import BatchAdjustmentRequest from '../src/inventories/quantities/model/BatchAdjustmentRequest';
 import { InventoryStatus } from '../src/inventories/enum/InventoryStatus';
-import { fail } from 'assert';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
