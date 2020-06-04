@@ -934,12 +934,14 @@ describe('ChannelApe Client', () => {
           const inventoryItemId = '34';
           const locationId = '28';
           const quantity = -148;
-          const inventoryStatus = 'AVAILABLE_TO_SELL';
+          const inventoryStatus =  InventoryStatus.AVAILABLE_TO_SELL;
+          const idempotentKey  = `${new Date().toISOString()}_${locationId}_${inventoryItemId}_${inventoryStatus}`;
           const adjustmentRequest: AdjustmentRequest = {
             inventoryItemId,
             locationId,
             quantity,
-            inventoryStatus
+            inventoryStatus,
+            idempotentKey
           };
           const actualAdjustment = await channelApeClient.inventories().quantities().adjust(adjustmentRequest);
           expect(actualAdjustment.inventoryItemId).to.equal(inventoryItemId);
@@ -955,7 +957,7 @@ describe('ChannelApe Client', () => {
           const inventoryItemId = '33';
           const locationId = '28';
           const quantity = 29;
-          const inventoryStatus = 'ON_ORDER';
+          const inventoryStatus = InventoryStatus.ON_ORDER;
           const adjustmentRequest: AdjustmentRequest = {
             inventoryItemId,
             locationId,

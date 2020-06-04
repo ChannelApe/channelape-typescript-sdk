@@ -508,12 +508,39 @@ channelApeClient.inventories().update(inventoryItemUpdateRequest)
 
 ### Adjust Inventory Item Quantity
 ```typescript
+const inventoryItemId = '34';
+const locationId = '28';
+const quantity = 31;
+const inventoryStatus =  InventoryStatus.AVAILABLE_TO_SELL;
 const adjustmentRequest: AdjustmentRequest = {
-  locationId: '123',
-  inventoryStatus: 'ABC-123',
-  quantity: 31
+  inventoryItemId,
+  locationId,
+  quantity,
+  inventoryStatus
 };
 channelApeClient.inventories().quantities().adjust(adjustmentRequest)
+  .then((adjustment: Adjustment) => {
+    // Do what you need with the adjustment
+  });
+```
+
+### Set Inventory Item Quantity
+- idempotentKey is optional. It will default to a UUID if nothing is provided. This key is used to 
+determine if an adjustment should be created or if it is a duplicate.
+```typescript
+const inventoryItemId = '34';
+const locationId = '28';
+const quantity = -148;
+const inventoryStatus =  InventoryStatus.ON_ORDER;
+const idempotentKey  = `${new Date().toISOString()}_${locationId}_${inventoryItemId}_${inventoryStatus}`;
+const adjustmentRequest: AdjustmentRequest = {
+  inventoryItemId,
+  locationId,
+  quantity,
+  inventoryStatus,
+  idempotentKey
+};
+channelApeClient.inventories().quantities().set(adjustmentRequest)
   .then((adjustment: Adjustment) => {
     // Do what you need with the adjustment
   });
@@ -578,19 +605,6 @@ channelApeClient.inventories().quantities().setBatch(batchAdjustmentRequest)
 channelApeClient.inventories().quantities().adjustBatch(batchAdjustmentRequest)
   .then(() => {
     // All adjustments completed successfully
-  });
-```
-
-### Set Inventory Item Quantity
-```typescript
-const adjustmentRequest: AdjustmentRequest = {
-  locationId: '123',
-  inventoryStatus: 'ABC-123',
-  quantity: 31
-};
-channelApeClient.inventories().quantities().set(adjustmentRequest)
-  .then((adjustment: Adjustment) => {
-    // Do what you need with the adjustment
   });
 ```
 
