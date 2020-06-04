@@ -473,8 +473,8 @@ channelApeClient.inventories().get(inventoryItemId)
 const inventorySku: string = 'ABC-123';
 const businessId: string = '1';
 channelApeClient.inventories().get(businessId, inventorySku)
-  .then((inventoryItem: InventoryItem) => {
-    // Do what you need with the inventory item
+  .then((inventoryItems: InventoryItem[]) => {
+    // Do what you need with the inventory items
   });
 ```
 
@@ -611,7 +611,7 @@ channelApeClient.inventories().quantities().adjustBatch(batchAdjustmentRequest)
 ### Retrieve an inventory item's current quantities
 ```typescript
 const inventoryItemId = '35';
-channelApeClient.inventories().quantities().retrieve(inventoryItemId);
+channelApeClient.inventories().quantities().retrieve(inventoryItemId)
   .then((quantities: InventoryItemQuantity[]) => {
     // Do what you need with the inventory item quantities
   });
