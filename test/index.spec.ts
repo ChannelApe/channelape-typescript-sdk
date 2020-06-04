@@ -968,7 +968,7 @@ describe('Index', () => {
 
   it('Expect AdjustmentBySku to be exported', () => {
     const adjustmentBySku: ChannelApe.AdjustmentBySku = {
-      status: ChannelApe.InventoryStatus.COMMITTED,
+      inventoryStatus: ChannelApe.InventoryStatus.COMMITTED,
       quantity: 44
     };
     expect(adjustmentBySku.quantity).to.equal(44);
@@ -979,11 +979,11 @@ describe('Index', () => {
       sku: 'ABC-123',
       adjustments: [
         {
-          status: ChannelApe.InventoryStatus.COMMITTED,
+          inventoryStatus: ChannelApe.InventoryStatus.COMMITTED,
           quantity: 44
         },
         {
-          status: ChannelApe.InventoryStatus.AVAILABLE_TO_SELL,
+          inventoryStatus: ChannelApe.InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 20
         }
       ]
@@ -999,19 +999,19 @@ describe('Index', () => {
         sku: 'A1',
         adjustments: [{
           quantity: 1,
-          status: ChannelApe.InventoryStatus.AVAILABLE_TO_SELL
+          inventoryStatus: ChannelApe.InventoryStatus.AVAILABLE_TO_SELL
         }, {
           quantity: 3,
-          status: ChannelApe.InventoryStatus.ON_HOLD
+          inventoryStatus: ChannelApe.InventoryStatus.ON_HOLD
         }]
       }, {
         sku: 'B1',
         adjustments: [{
           quantity: 2,
-          status: ChannelApe.InventoryStatus.AVAILABLE_TO_SELL
+          inventoryStatus: ChannelApe.InventoryStatus.AVAILABLE_TO_SELL
         }, {
           quantity: 0,
-          status: ChannelApe.InventoryStatus.ON_HOLD
+          inventoryStatus: ChannelApe.InventoryStatus.ON_HOLD
         }]
       }]
     };

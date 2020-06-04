@@ -215,10 +215,10 @@ export class InventoryBatchAdjustmentsService {
     allowedStatuses: string[],
     adjustmentType: AdjustmentType
   ): Promise<Adjustment> {
-    if (!allowedStatuses.includes(adjustment.status)) {
+    if (!allowedStatuses.includes(adjustment.inventoryStatus)) {
       const errorMessage = `No matching status found.  Skipping adjustment.
         InventoryItemId: ${inventoryItem.id}
-        Status: ${adjustment.status}
+        Status: ${adjustment.inventoryStatus}
         Expected one of the following statuses: ${allowedStatuses}`;
       this.logger.warn(errorMessage);
       throw new UnknownStatusError(errorMessage);
@@ -228,8 +228,9 @@ export class InventoryBatchAdjustmentsService {
       locationId,
       quantity: adjustment.quantity,
       inventoryItemId: inventoryItem.id,
-      inventoryStatus: adjustment.status,
-      idempotentKey: this.generateIdempotentKey(inventoryItem.id, adjustment.status, locationId, deduplicationKey)
+      inventoryStatus: adjustment.inventoryStatus,
+      idempotentKey: this.generateIdempotentKey(
+        inventoryItem.id, adjustment.inventoryStatus, locationId, deduplicationKey)
     };
 
     try {

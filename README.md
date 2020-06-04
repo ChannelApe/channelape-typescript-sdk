@@ -572,19 +572,19 @@ const batchAdjustmentRequest: BatchAdjustmentRequest = {
     sku: 'A1',
     adjustments: [{
       quantity: 1,
-      status: InventoryStatus.AVAILABLE_TO_SELL
+      inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL
     }, {
       quantity: 3,
-      status: InventoryStatus.ON_HOLD
+      inventoryStatus: InventoryStatus.ON_HOLD
     }]
   }, {
     sku: 'B1',
     adjustments: [{
       quantity: 2,
-      status: InventoryStatus.AVAILABLE_TO_SELL
+      inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL
     }, {
       quantity: 0,
-      status: InventoryStatus.ON_HOLD
+      inventoryStatus: InventoryStatus.ON_HOLD
     }]
   }]
 };
