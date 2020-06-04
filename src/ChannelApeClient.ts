@@ -100,8 +100,8 @@ export default class ChannelApeClient {
     this.analyticsService = new AnalyticsService(this.requestClientWrapper);
     this.productFiltersService = new ProductFiltersService(this.requestClientWrapper);
     this.usersService = new UsersService(this.requestClientWrapper);
-    this.inventoriesService = new InventoriesService(this.requestClientWrapper);
     this.locationsService = new LocationsService(this.requestClientWrapper);
+    this.inventoriesService = new InventoriesService(this.requestClientWrapper, this.locationsService);
   }
 
   get SessionId(): string {

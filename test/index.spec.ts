@@ -454,6 +454,250 @@ describe('Index', () => {
     expect(lineItem.sku).to.equal('abc-123');
   });
 
+  it('Expect OrderCreateRequest to be exported', () => {
+    const orderCreateRequest: ChannelApe.OrderCreateRequest = {
+      additionalFields: [
+        {
+          name: 'closed_at',
+          value: 'null'
+        }],
+      alphabeticCurrencyCode: 'USD',
+      channelId: '0d134d16-ad7e-4724-841e-7d46e0f128bd',
+      channelOrderId: '314980073478',
+      customer: {
+        additionalFields: [
+          {
+            name: 'id',
+            value: '289747828742'
+          }],
+        billingAddress: {
+          additionalFields: [],
+          address1: '04822 Stracke Shores',
+          city: 'South Deanhaven',
+          country: 'United States',
+          countryCode: 'US',
+          firstName: 'Rebekah',
+          lastName: 'Little',
+          name: 'Rebekah Little',
+          postalCode: '66493',
+          province: 'Kansas',
+          provinceCode: 'KS'
+        },
+        email: 'Aurore.Purdy17@gmail.com',
+        firstName: 'Rebekah',
+        lastName: 'Little',
+        shippingAddress: {
+          additionalFields: [],
+          address1: '04822 Stracke Shores',
+          city: 'South Deanhaven',
+          country: 'United States',
+          countryCode: 'US',
+          firstName: 'Rebekah',
+          lastName: 'Little',
+          name: 'Rebekah Little',
+          postalCode: '66493',
+          province: 'Kansas',
+          provinceCode: 'KS'
+        }
+      },
+      fulfillments: [],
+      lineItems: [
+        {
+          additionalFields: [
+            {
+              name: 'variant_id',
+              value: '36581474886'
+            },
+            {
+              name: 'title',
+              value: 'Generic Steel Shirt'
+            },
+            {
+              name: 'variant_title',
+              value: 'Generic Steel Shirt'
+            },
+            {
+              name: 'product_id',
+              value: '9670311622'
+            },
+            {
+              name: 'requires_shipping',
+              value: 'true'
+            },
+            {
+              name: 'taxable',
+              value: 'true'
+            },
+            {
+              name: 'gift_card',
+              value: 'false'
+            },
+            {
+              name: 'variant_inventory_management',
+              value: 'shopify'
+            },
+            {
+              name: 'fulfillable_quantity',
+              value: '1'
+            },
+            {
+              name: 'total_discount',
+              value: '0.00'
+            },
+            {
+              name: 'fulfillment_service',
+              value: 'manual'
+            }
+          ],
+          grams: 371,
+          id: '646495567878',
+          price: 12.99,
+          quantity: 1,
+          shippingMethod: 'Standard',
+          sku: 'e67f1d90-824a-4941-8497-08d632763c93',
+          title: 'Generic Steel Shirt',
+          vendor: 'Ankunding - Corwin'
+        }
+      ],
+      purchasedAt: new Date('2018-03-29T19:06:26.000Z'),
+      status: ChannelApe.OrderStatus.OPEN,
+      subtotalPrice: 25.98,
+      totalGrams: 74,
+      totalPrice: 31.93,
+      totalShippingPrice: 5.95,
+      totalTax: 0.00,
+    };
+    expect(orderCreateRequest.channelOrderId).to.equal('314980073478');
+  });
+
+  it('Expect OrderUpdateRequest to be exported', () => {
+    const orderUpdateRequest: ChannelApe.OrderUpdateRequest = {
+      additionalFields: [
+        {
+          name: 'closed_at',
+          value: 'null'
+        }],
+      alphabeticCurrencyCode: 'USD',
+      businessId: '4d688534-d82e-4111-940c-322ba9aec108',
+      channelId: '0d134d16-ad7e-4724-841e-7d46e0f128bd',
+      channelOrderId: '314980073478',
+      createdAt: new Date('2018-05-03T18:07:58.009Z'),
+      customer: {
+        additionalFields: [
+          {
+            name: 'id',
+            value: '289747828742'
+          }],
+        billingAddress: {
+          additionalFields: [],
+          address1: '04822 Stracke Shores',
+          city: 'South Deanhaven',
+          country: 'United States',
+          countryCode: 'US',
+          firstName: 'Rebekah',
+          lastName: 'Little',
+          name: 'Rebekah Little',
+          postalCode: '66493',
+          province: 'Kansas',
+          provinceCode: 'KS'
+        },
+        email: 'Aurore.Purdy17@gmail.com',
+        firstName: 'Rebekah',
+        lastName: 'Little',
+        shippingAddress: {
+          additionalFields: [],
+          address1: '04822 Stracke Shores',
+          city: 'South Deanhaven',
+          country: 'United States',
+          countryCode: 'US',
+          firstName: 'Rebekah',
+          lastName: 'Little',
+          name: 'Rebekah Little',
+          postalCode: '66493',
+          province: 'Kansas',
+          provinceCode: 'KS'
+        }
+      },
+      fulfillments: [],
+      id: 'c0f45529-cbed-4e90-9a38-c208d409ef2a',
+      lineItems: [
+        {
+          additionalFields: [
+            {
+              name: 'variant_id',
+              value: '36581474886'
+            },
+            {
+              name: 'title',
+              value: 'Generic Steel Shirt'
+            },
+            {
+              name: 'variant_title',
+              value: 'Generic Steel Shirt'
+            },
+            {
+              name: 'product_id',
+              value: '9670311622'
+            },
+            {
+              name: 'requires_shipping',
+              value: 'true'
+            },
+            {
+              name: 'taxable',
+              value: 'true'
+            },
+            {
+              name: 'gift_card',
+              value: 'false'
+            },
+            {
+              name: 'variant_inventory_management',
+              value: 'shopify'
+            },
+            {
+              name: 'fulfillable_quantity',
+              value: '1'
+            },
+            {
+              name: 'total_discount',
+              value: '0.00'
+            },
+            {
+              name: 'fulfillment_service',
+              value: 'manual'
+            }
+          ],
+          grams: 371,
+          id: '646495567878',
+          price: 12.99,
+          quantity: 1,
+          shippingMethod: 'Standard',
+          sku: 'e67f1d90-824a-4941-8497-08d632763c93',
+          title: 'Generic Steel Shirt',
+          vendor: 'Ankunding - Corwin'
+        }
+      ],
+      purchasedAt: new Date('2018-03-29T19:06:26.000Z'),
+      status: ChannelApe.OrderStatus.OPEN,
+      subtotalPrice: 25.98,
+      totalGrams: 74,
+      totalPrice: 31.93,
+      totalShippingPrice: 5.95,
+      totalTax: 0.00,
+      updatedAt: new Date('2018-05-03T18:07:58.009Z')
+    };
+    expect(orderUpdateRequest.id).to.equal('c0f45529-cbed-4e90-9a38-c208d409ef2a');
+  });
+
+  it('Expect OrderPatchRequest to be exported', () => {
+    const orderPatchRequest: ChannelApe.OrderPatchRequest = {
+      id: 'c0f45529-cbed-4e90-9a38-c208d409ef2a',
+      status: ChannelApe.OrderStatus.IN_PROGRESS
+    };
+    expect(orderPatchRequest.id).to.equal('c0f45529-cbed-4e90-9a38-c208d409ef2a');
+  });
+
   it('Expect OrdersRequestByBusinessId to be exported', () => {
     const ordersRequestByBusinessId: ChannelApe.OrdersQueryRequestByBusinessId = {
       businessId: 'businessId',
@@ -657,6 +901,157 @@ describe('Index', () => {
       errors: []
     };
     expect(subscription.active).to.equal(true);
+  });
+
+  it('Expect InventoryStatus to be exported', () => {
+    const inventoryStatus: ChannelApe.InventoryStatus = ChannelApe.InventoryStatus.ON_HAND;
+    expect(inventoryStatus).to.equal(ChannelApe.InventoryStatus.ON_HAND);
+  });
+
+  it('Expect InventoryItem to be exported', () => {
+    const inventoryItem: ChannelApe.InventoryItem = {
+      id: '4454',
+      businessId: '39393',
+      sku: 'ABC-123',
+      title: 'Cool inventory title',
+      createdAt: new Date('2018-05-03T18:07:58.009Z'),
+      updatedAt: new Date('2018-05-05T18:07:58.009Z')
+    };
+    expect(inventoryItem.sku).to.equal('ABC-123');
+  });
+
+  it('Expect InventoryItemCreateRequest to be exported', () => {
+    const inventoryItemCreateRequest: ChannelApe.InventoryItemCreateRequest = {
+      businessId: '39393',
+      sku: 'ABC-123',
+    };
+    expect(inventoryItemCreateRequest.sku).to.equal('ABC-123');
+  });
+
+  it('Expect InventoryItemUpdateRequest to be exported', () => {
+    const inventoryItemUpdateRequest: ChannelApe.InventoryItemUpdateRequest = {
+      id: '39393',
+      sku: 'ABC-123',
+    };
+    expect(inventoryItemUpdateRequest.sku).to.equal('ABC-123');
+  });
+
+  it('Expect AdjustmentRequest to be exported', () => {
+    const inventoryItemId = '34';
+    const locationId = '28';
+    const quantity = 31;
+    const inventoryStatus = ChannelApe.InventoryStatus.AVAILABLE_TO_SELL;
+    const adjustmentRequest: ChannelApe.AdjustmentRequest = {
+      inventoryItemId,
+      locationId,
+      quantity,
+      inventoryStatus
+    };
+    expect(adjustmentRequest.locationId).to.equal('28');
+  });
+
+  it('Expect Adjustment to be exported', () => {
+    const inventoryItemId = '34';
+    const locationId = '28';
+    const inventoryStatus = ChannelApe.InventoryStatus.AVAILABLE_TO_SELL;
+    const adjustment: ChannelApe.Adjustment = {
+      inventoryItemId,
+      locationId,
+      inventoryStatus,
+      quantity: 100,
+      adjustment: 4,
+      createdAt: new Date('2018-05-03T18:07:58.009Z'),
+      updatedAt: new Date('2018-05-05T18:07:58.009Z')
+    };
+    expect(adjustment.adjustment).to.equal(4);
+  });
+
+  it('Expect AdjustmentBySku to be exported', () => {
+    const adjustmentBySku: ChannelApe.AdjustmentBySku = {
+      inventoryStatus: ChannelApe.InventoryStatus.COMMITTED,
+      quantity: 44
+    };
+    expect(adjustmentBySku.quantity).to.equal(44);
+  });
+
+  it('Expect AdjustmentsBySku to be exported', () => {
+    const adjustmentsBySku: ChannelApe.AdjustmentsBySku = {
+      sku: 'ABC-123',
+      adjustments: [
+        {
+          inventoryStatus: ChannelApe.InventoryStatus.COMMITTED,
+          quantity: 44
+        },
+        {
+          inventoryStatus: ChannelApe.InventoryStatus.AVAILABLE_TO_SELL,
+          quantity: 20
+        }
+      ]
+    };
+    expect(adjustmentsBySku.adjustments.length).to.equal(2);
+  });
+
+  it('Expect BatchAdjustmentRequest to be exported', () => {
+    const batchAdjustmentRequest: ChannelApe.BatchAdjustmentRequest = {
+      locationId: '123',
+      deduplicationKey: '05052020',
+      adjustmentsBySku: [{
+        sku: 'A1',
+        adjustments: [{
+          quantity: 1,
+          inventoryStatus: ChannelApe.InventoryStatus.AVAILABLE_TO_SELL
+        }, {
+          quantity: 3,
+          inventoryStatus: ChannelApe.InventoryStatus.ON_HOLD
+        }]
+      }, {
+        sku: 'B1',
+        adjustments: [{
+          quantity: 2,
+          inventoryStatus: ChannelApe.InventoryStatus.AVAILABLE_TO_SELL
+        }, {
+          quantity: 0,
+          inventoryStatus: ChannelApe.InventoryStatus.ON_HOLD
+        }]
+      }]
+    };
+    expect(batchAdjustmentRequest.deduplicationKey).to.equal('05052020');
+  });
+
+  it('Expect InventoryItemQuantity to be exported', () => {
+    const inventoryItemQuantity: ChannelApe.InventoryItemQuantity = {
+      locationId: '44',
+      inventoryStatus: ChannelApe.InventoryStatus.COMMITTED,
+      quantity: 443
+    };
+    expect(inventoryItemQuantity.quantity).to.equal(443);
+  });
+
+  it('Expect Location to be exported', () => {
+    const location: ChannelApe.Location = {
+      id: '444',
+      name: 'My 3PL',
+      businessId: '440404',
+      createdAt: new Date('2018-05-03T18:07:58.009Z'),
+      updatedAt: new Date('2018-05-05T18:07:58.009Z')
+    };
+    expect(location.name).to.equal('My 3PL');
+  });
+
+  it('Expect LocationCreateRequest to be exported', () => {
+    const locationCreateRequest: ChannelApe.LocationCreateRequest = {
+      name: 'My 3PL',
+      businessId: '440404',
+    };
+    expect(locationCreateRequest.name).to.equal('My 3PL');
+  });
+
+  it('Expect LocationUpdateRequest to be exported', () => {
+    const locationUpdateRequest: ChannelApe.LocationUpdateRequest = {
+      name: 'My 3PL',
+      id: '3432'
+    };
+    expect(locationUpdateRequest.name).to.equal('My 3PL');
   });
 
 });

@@ -8,8 +8,9 @@ import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import InventoriesService from './../../../src/inventories/service/InventoriesService';
 import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import { fail } from 'assert';
-import { InventoryItemCreateRequest } from './../../../src/inventories/model/InventoryItemCreateRequest';
-import { InventoryItemUpdateRequest } from './../../../src/inventories/model/InventoryItemUpdateRequest';
+import InventoryItemCreateRequest from './../../../src/inventories/model/InventoryItemCreateRequest';
+import InventoryItemUpdateRequest from './../../../src/inventories/model/InventoryItemUpdateRequest';
+import LocationsService from '../../../src/locations/service/LocationsService';
 
 describe('Inventories Service', () => {
 
@@ -27,6 +28,7 @@ describe('Inventories Service', () => {
       });
 
     let sandbox: sinon.SinonSandbox;
+    const locationsServiceStub = sinon.createStubInstance(LocationsService);
 
     beforeEach((done) => {
       sandbox = sinon.createSandbox();
@@ -71,7 +73,7 @@ describe('Inventories Service', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
           .yields(null, response, expectedInventoryItem);
 
-      const inventoriesService: InventoriesService = new InventoriesService(client);
+      const inventoriesService: InventoriesService = new InventoriesService(client, locationsServiceStub);
       return inventoriesService.get('28').then((actualInventoryItem: any) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.INVENTORIES}/${expectedInventoryItem.id}`);
         expect(actualInventoryItem.id).to.equal(expectedInventoryItem.id);
@@ -97,7 +99,7 @@ describe('Inventories Service', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
           .yields(null, response, expectedChannelApeErrorResponse);
 
-      const inventoriesService: InventoriesService = new InventoriesService(client);
+      const inventoriesService: InventoriesService = new InventoriesService(client, locationsServiceStub);
       try {
         await inventoriesService.get('1');
         fail('Successfully ran inventory retrieval by id but should have failed');
@@ -123,7 +125,7 @@ describe('Inventories Service', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
           .yields(response, null, expectedChannelApeErrorResponse);
 
-      const inventoriesService: InventoriesService = new InventoriesService(client);
+      const inventoriesService: InventoriesService = new InventoriesService(client, locationsServiceStub);
       try {
         await inventoriesService.get('1');
         fail('Successfully ran inventory retrieval by id but should have failed with 500');
@@ -143,7 +145,7 @@ describe('Inventories Service', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
           .yields(error, null, null);
 
-      const inventoriesService: InventoriesService = new InventoriesService(client);
+      const inventoriesService: InventoriesService = new InventoriesService(client, locationsServiceStub);
       try {
         await inventoriesService.get('1');
         fail('Successfully ran inventory retrieval by id but should have failed');
@@ -181,7 +183,7 @@ describe('Inventories Service', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
           .yields(null, response, inventoryItemResponse);
 
-      const inventoriesService: InventoriesService = new InventoriesService(client);
+      const inventoriesService: InventoriesService = new InventoriesService(client, locationsServiceStub);
       const actualInventoryItemsResponse = await inventoriesService.get('1', 'ABC-123');
       expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.INVENTORIES}`);
       expect(actualInventoryItemsResponse.length).to.equal(1);
@@ -208,7 +210,7 @@ describe('Inventories Service', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
           .yields(null, response, expectedChannelApeErrorResponse);
 
-      const inventoriesService: InventoriesService = new InventoriesService(client);
+      const inventoriesService: InventoriesService = new InventoriesService(client, locationsServiceStub);
       try {
         await inventoriesService.get('1', 'ABC-123');
         fail('Successfully ran inventory retrieval by business and sku but should have failed');
@@ -231,7 +233,7 @@ describe('Inventories Service', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
           .yields(expectedError, null, null);
 
-      const inventoriesService: InventoriesService = new InventoriesService(client);
+      const inventoriesService: InventoriesService = new InventoriesService(client, locationsServiceStub);
       try {
         await inventoriesService.get('1', 'ABC-123');
         fail('Successfully ran inventory retrieval by business and sku but should have failed');
@@ -271,7 +273,7 @@ describe('Inventories Service', () => {
       const clientPostStub: sinon.SinonStub = sandbox.stub(client, 'post')
           .yields(null, response, expectedCreatedInventoryItem);
 
-      const inventoriesService: InventoriesService = new InventoriesService(client);
+      const inventoriesService: InventoriesService = new InventoriesService(client, locationsServiceStub);
       const actualInventoryItemsResponse = await inventoriesService.create(inventoryItemCreationRequest);
       expect(clientPostStub.args[0][0]).to.equal(`/${Version.V1}${Resource.INVENTORIES}`);
       expect(clientPostStub.args[0][1].data).to.equal(inventoryItemCreationRequest);
@@ -304,7 +306,7 @@ describe('Inventories Service', () => {
       const clientPostStub: sinon.SinonStub = sandbox.stub(client, 'post')
           .yields(null, response, expectedChannelApeErrorResponse);
 
-      const inventoriesService: InventoriesService = new InventoriesService(client);
+      const inventoriesService: InventoriesService = new InventoriesService(client, locationsServiceStub);
 
       try {
         await inventoriesService.create(inventoryItemCreationRequest);
@@ -336,7 +338,7 @@ describe('Inventories Service', () => {
       const clientPostStub: sinon.SinonStub = sandbox.stub(client, 'post')
           .yields(expectedError, null, null);
 
-      const inventoriesService: InventoriesService = new InventoriesService(client);
+      const inventoriesService: InventoriesService = new InventoriesService(client, locationsServiceStub);
 
       try {
         await inventoriesService.create(inventoryItemCreationRequest);
@@ -379,7 +381,7 @@ describe('Inventories Service', () => {
       const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put')
           .yields(null, response, expectedCreatedInventoryItem);
 
-      const inventoriesService: InventoriesService = new InventoriesService(client);
+      const inventoriesService: InventoriesService = new InventoriesService(client, locationsServiceStub);
       const actualInventoryItemResponse = await inventoriesService.update(inventoryItemUpdateRequest);
       expect(clientPutStub.args[0][0]).to
       .equal(`/${Version.V1}${Resource.INVENTORIES}/${inventoryItemUpdateRequest.id}`);
@@ -413,7 +415,7 @@ describe('Inventories Service', () => {
       const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put')
           .yields(null, response, expectedChannelApeErrorResponse);
 
-      const inventoriesService: InventoriesService = new InventoriesService(client);
+      const inventoriesService: InventoriesService = new InventoriesService(client, locationsServiceStub);
 
       try {
         await inventoriesService.update(inventoryItemUpdateRequest);
@@ -446,7 +448,7 @@ describe('Inventories Service', () => {
       const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put')
           .yields(expectedError, null, null);
 
-      const inventoriesService: InventoriesService = new InventoriesService(client);
+      const inventoriesService: InventoriesService = new InventoriesService(client, locationsServiceStub);
 
       try {
         await inventoriesService.update(inventoryItemUpdateRequest);

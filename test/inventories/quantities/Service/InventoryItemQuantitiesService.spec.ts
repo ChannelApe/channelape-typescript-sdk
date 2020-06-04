@@ -10,6 +10,9 @@ import AdjustmentRequest from '../../../../src/inventories/quantities/model/Adju
 import InventoryItemQuantitiesService from '../../../../src/inventories/quantities/InventoryItemQuantitiesService';
 import SubResource from '../../../../src/model/SubResource';
 import { fail } from 'assert';
+import { InventoryBatchAdjustmentsService } from '../../../../src/inventories/quantities/InventoryBatchAdjustmentsService';
+import InventoriesService from '../../../../src/inventories/service/InventoriesService';
+import LocationsService from '../../../../src/locations/service/LocationsService';
 
 describe('Inventory Quantities Service', () => {
 
@@ -27,9 +30,14 @@ describe('Inventory Quantities Service', () => {
       });
 
     let sandbox: sinon.SinonSandbox;
+    const inventoriesServiceStub = sinon.createStubInstance(InventoriesService);
+    const locationsServiceStub = sinon.createStubInstance(LocationsService);
+    let inventoryBatchAdjustmentService: any;
 
     beforeEach((done) => {
       sandbox = sinon.createSandbox();
+      inventoryBatchAdjustmentService = sandbox.createStubInstance(InventoryBatchAdjustmentsService);
+      inventoryBatchAdjustmentService.adjustBatch.resolves();
       done();
     });
 
@@ -78,7 +86,8 @@ describe('Inventory Quantities Service', () => {
       const clientPostStub: sinon.SinonStub = sandbox.stub(client, 'post')
         .yields(null, response, expectedAdjustment);
 
-      const inventoryQuantitiesService: InventoryItemQuantitiesService = new InventoryItemQuantitiesService(client);
+      const inventoryQuantitiesService =
+        new InventoryItemQuantitiesService(client, inventoriesServiceStub, locationsServiceStub);
       return inventoryQuantitiesService.adjust(adjustmentRequest).then((actualAdjustment: any) => {
         // tslint:disable-next-line:max-line-length
         expect(clientPostStub.args[0][0]).to.equal(`/${Version.V1}${Resource.INVENTORIES}/${expectedAdjustment.inventoryItemId}/${SubResource.QUANTITIES}/${SubResource.ADJUSTS}`);
@@ -115,7 +124,8 @@ describe('Inventory Quantities Service', () => {
       const clientPostStub: sinon.SinonStub = sandbox.stub(client, 'post')
         .yields(null, response, expectedChannelApeErrorResponse);
 
-      const inventoryQuantitiesService: InventoryItemQuantitiesService = new InventoryItemQuantitiesService(client);
+      const inventoryQuantitiesService =
+        new InventoryItemQuantitiesService(client, inventoriesServiceStub, locationsServiceStub);
       try {
         await inventoryQuantitiesService.adjust(adjustmentRequest);
         fail('Expected inventory quantity adjustment to fail but it didn\'t.');
@@ -147,7 +157,8 @@ describe('Inventory Quantities Service', () => {
       const clientPostStub: sinon.SinonStub = sandbox.stub(client, 'post')
         .yields(error, null, null);
 
-      const inventoryQuantitiesService: InventoryItemQuantitiesService = new InventoryItemQuantitiesService(client);
+      const inventoryQuantitiesService =
+        new InventoryItemQuantitiesService(client, inventoriesServiceStub, locationsServiceStub);
       try {
         await inventoryQuantitiesService.adjust(adjustmentRequest);
         fail('Expected inventory quantity adjustment to fail but it didn\'t.');
@@ -188,7 +199,8 @@ describe('Inventory Quantities Service', () => {
       const clientPostStub: sinon.SinonStub = sandbox.stub(client, 'post')
         .yields(null, response, expectedAdjustment);
 
-      const inventoryQuantitiesService: InventoryItemQuantitiesService = new InventoryItemQuantitiesService(client);
+      const inventoryQuantitiesService =
+        new InventoryItemQuantitiesService(client, inventoriesServiceStub, locationsServiceStub);
       return inventoryQuantitiesService.set(adjustmentRequest).then((actualAdjustment: any) => {
         // tslint:disable-next-line:max-line-length
         expect(clientPostStub.args[0][0]).to.equal(`/${Version.V1}${Resource.INVENTORIES}/${expectedAdjustment.inventoryItemId}/${SubResource.QUANTITIES}/${SubResource.SETS}`);
@@ -224,7 +236,8 @@ describe('Inventory Quantities Service', () => {
       const clientPostStub: sinon.SinonStub = sandbox.stub(client, 'post')
         .yields(null, response, expectedChannelApeErrorResponse);
 
-      const inventoryQuantitiesService: InventoryItemQuantitiesService = new InventoryItemQuantitiesService(client);
+      const inventoryQuantitiesService =
+        new InventoryItemQuantitiesService(client, inventoriesServiceStub, locationsServiceStub);
       try {
         await inventoryQuantitiesService.set(adjustmentRequest);
         fail('Expected inventory quantity adjustment to fail but it didn\'t.');
@@ -256,7 +269,8 @@ describe('Inventory Quantities Service', () => {
       const clientPostStub: sinon.SinonStub = sandbox.stub(client, 'post')
         .yields(error, null, null);
 
-      const inventoryQuantitiesService: InventoryItemQuantitiesService = new InventoryItemQuantitiesService(client);
+      const inventoryQuantitiesService =
+        new InventoryItemQuantitiesService(client, inventoriesServiceStub, locationsServiceStub);
       try {
         await inventoryQuantitiesService.set(adjustmentRequest);
         fail('Expected inventory quantity adjustment to fail but it didn\'t.');
@@ -293,7 +307,8 @@ describe('Inventory Quantities Service', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
         .yields(null, response, expectedQuantities);
 
-      const inventoryQuantitiesService: InventoryItemQuantitiesService = new InventoryItemQuantitiesService(client);
+      const inventoryQuantitiesService =
+        new InventoryItemQuantitiesService(client, inventoriesServiceStub, locationsServiceStub);
       return inventoryQuantitiesService.retrieve('35').then((actualQuantities: any) => {
         expect(actualQuantities.length).to.equal(2);
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.INVENTORIES}/35/${SubResource.QUANTITIES}`);
@@ -318,7 +333,8 @@ describe('Inventory Quantities Service', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
         .yields(null, response, expectedChannelApeErrorResponse);
 
-      const inventoryQuantitiesService: InventoryItemQuantitiesService = new InventoryItemQuantitiesService(client);
+      const inventoryQuantitiesService =
+        new InventoryItemQuantitiesService(client, inventoriesServiceStub, locationsServiceStub);
 
       try {
         await inventoryQuantitiesService.retrieve('35');
@@ -340,7 +356,8 @@ describe('Inventory Quantities Service', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
         .yields(error, null, null);
 
-      const inventoryQuantitiesService: InventoryItemQuantitiesService = new InventoryItemQuantitiesService(client);
+      const inventoryQuantitiesService =
+        new InventoryItemQuantitiesService(client, inventoriesServiceStub, locationsServiceStub);
 
       try {
         await inventoryQuantitiesService.retrieve('35');

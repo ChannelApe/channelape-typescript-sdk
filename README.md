@@ -473,8 +473,8 @@ channelApeClient.inventories().get(inventoryItemId)
 const inventorySku: string = 'ABC-123';
 const businessId: string = '1';
 channelApeClient.inventories().get(businessId, inventorySku)
-  .then((inventoryItem: InventoryItem) => {
-    // Do what you need with the inventory item
+  .then((inventoryItems: InventoryItem[]) => {
+    // Do what you need with the inventory items
   });
 ```
 
@@ -508,10 +508,15 @@ channelApeClient.inventories().update(inventoryItemUpdateRequest)
 
 ### Adjust Inventory Item Quantity
 ```typescript
+const inventoryItemId = '34';
+const locationId = '28';
+const quantity = 31;
+const inventoryStatus =  InventoryStatus.AVAILABLE_TO_SELL;
 const adjustmentRequest: AdjustmentRequest = {
-  locationId: '123',
-  inventoryStatus: 'ABC-123',
-  quantity: 31
+  inventoryItemId,
+  locationId,
+  quantity,
+  inventoryStatus
 };
 channelApeClient.inventories().quantities().adjust(adjustmentRequest)
   .then((adjustment: Adjustment) => {
@@ -520,11 +525,20 @@ channelApeClient.inventories().quantities().adjust(adjustmentRequest)
 ```
 
 ### Set Inventory Item Quantity
+- idempotentKey is optional. It will default to a UUID if nothing is provided. This key is used to 
+determine if an adjustment should be created or if it is a duplicate.
 ```typescript
+const inventoryItemId = '34';
+const locationId = '28';
+const quantity = -148;
+const inventoryStatus =  InventoryStatus.ON_ORDER;
+const idempotentKey  = `${new Date().toISOString()}_${locationId}_${inventoryItemId}_${inventoryStatus}`;
 const adjustmentRequest: AdjustmentRequest = {
-  locationId: '123',
-  inventoryStatus: 'ABC-123',
-  quantity: 31
+  inventoryItemId,
+  locationId,
+  quantity,
+  inventoryStatus,
+  idempotentKey
 };
 channelApeClient.inventories().quantities().set(adjustmentRequest)
   .then((adjustment: Adjustment) => {
@@ -532,10 +546,72 @@ channelApeClient.inventories().quantities().set(adjustmentRequest)
   });
 ```
 
+### Batch Update Inventory Item Quantity
+
+- If at least one adjustment fails, the call will wait for all other pending requests
+to complete and then throw an error.
+- The deduplication key specifies a string which will be used to determine if an adjustment
+should be created.  If a key with the same string for a particular inventory item, location, 
+and status was already used, it will not perform the adjustment.  For example, this can be 
+used to allow only one adjustment per day so that if the batched adjustments are sent through 
+a second time, only the ones which failed will be recreated.
+Here is the generated key format: {deduplicationKey}\_{locationId}\_{inventoryItemId}\_{status}
+
+Currently Allowed Inventory Statuses:
+- AVAILABLE_TO_SELL
+- ON_HOLD
+- ON_HAND
+- COMMITTED
+- ON_ORDER
+
+```typescript
+const batchAdjustmentRequest: BatchAdjustmentRequest = {
+  locationId: '123',
+  deduplicationKey: '05052020',
+  adjustmentsBySku: [{
+    sku: 'A1',
+    adjustments: [{
+      quantity: 1,
+      inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL
+    }, {
+      quantity: 3,
+      inventoryStatus: InventoryStatus.ON_HOLD
+    }]
+  }, {
+    sku: 'B1',
+    adjustments: [{
+      quantity: 2,
+      inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL
+    }, {
+      quantity: 0,
+      inventoryStatus: InventoryStatus.ON_HOLD
+    }]
+  }]
+};
+```
+
+#### Batch Set Inventory Item Quantities
+
+```typescript
+channelApeClient.inventories().quantities().setBatch(batchAdjustmentRequest)
+  .then(() => {
+    // All adjustments completed successfully
+  });
+```
+
+#### Batch Adjust Inventory Item Quantities
+
+```typescript
+channelApeClient.inventories().quantities().adjustBatch(batchAdjustmentRequest)
+  .then(() => {
+    // All adjustments completed successfully
+  });
+```
+
 ### Retrieve an inventory item's current quantities
 ```typescript
 const inventoryItemId = '35';
-channelApeClient.inventories().quantities().retrieve(inventoryItemId);
+channelApeClient.inventories().quantities().retrieve(inventoryItemId)
   .then((quantities: InventoryItemQuantity[]) => {
     // Do what you need with the inventory item quantities
   });
