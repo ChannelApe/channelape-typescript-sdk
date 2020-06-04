@@ -8,8 +8,8 @@ import RequestCallbackParams from '../../model/RequestCallbackParams';
 import InventoryItemsResponse from '../model/InventoryItemsResponse';
 import GenerateApiError from '../../utils/GenerateApiError';
 import { AxiosRequestConfig } from 'axios';
-import { InventoryItemCreateRequest } from './../model/InventoryItemCreateRequest';
-import { InventoryItemUpdateRequest } from './../model/InventoryItemUpdateRequest';
+import InventoryItemCreateRequest from './../model/InventoryItemCreateRequest';
+import InventoryItemUpdateRequest from './../model/InventoryItemUpdateRequest';
 import InventoryItemQuantitiesService from '../quantities/InventoryItemQuantitiesService';
 import LocationsService from '../../locations/service/LocationsService';
 

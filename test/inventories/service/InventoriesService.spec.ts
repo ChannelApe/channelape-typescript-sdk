@@ -8,8 +8,8 @@ import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import InventoriesService from './../../../src/inventories/service/InventoriesService';
 import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import { fail } from 'assert';
-import { InventoryItemCreateRequest } from './../../../src/inventories/model/InventoryItemCreateRequest';
-import { InventoryItemUpdateRequest } from './../../../src/inventories/model/InventoryItemUpdateRequest';
+import InventoryItemCreateRequest from './../../../src/inventories/model/InventoryItemCreateRequest';
+import InventoryItemUpdateRequest from './../../../src/inventories/model/InventoryItemUpdateRequest';
 import LocationsService from '../../../src/locations/service/LocationsService';
 
 describe('Inventories Service', () => {

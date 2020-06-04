@@ -5,3 +5,5 @@ export enum InventoryStatus {
   COMMITTED = 'COMMITTED',
   ON_ORDER = 'ON_ORDER'
 }
+
+export default InventoryStatus;

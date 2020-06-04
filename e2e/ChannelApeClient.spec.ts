@@ -22,8 +22,8 @@ import OrderActivityOperation from '../src/orders/service/activities/model/Order
 import OrderActivityResult from '../src/orders/service/activities/model/OrderActivityResult';
 import ProductFilterRequest from '../src/products/filters/models/ProductFilterRequest';
 import VariantsPage from '../src/variants/model/VariantsPage';
-import { InventoryItemCreateRequest } from './../src/inventories/model/InventoryItemCreateRequest';
-import { InventoryItemUpdateRequest } from './../src/inventories/model/InventoryItemUpdateRequest';
+import InventoryItemCreateRequest from './../src/inventories/model/InventoryItemCreateRequest';
+import InventoryItemUpdateRequest from './../src/inventories/model/InventoryItemUpdateRequest';
 import LocationCreateRequest from './../src/locations/model/LocationCreateRequest';
 import LocationUpdateRequest from './../src/locations/model/LocationUpdateRequest';
 import AdjustmentRequest from './../src/inventories/quantities/model/AdjustmentRequest';
