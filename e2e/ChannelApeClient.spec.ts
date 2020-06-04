@@ -29,6 +29,7 @@ import LocationUpdateRequest from './../src/locations/model/LocationUpdateReques
 import AdjustmentRequest from './../src/inventories/quantities/model/AdjustmentRequest';
 import BatchAdjustmentRequest from '../src/inventories/quantities/model/BatchAdjustmentRequest';
 import { InventoryStatus } from '../src/inventories/enum/InventoryStatus';
+import { InventoryAdjustmentUpdateType } from '../src/inventories/quantities/model/InventoryAdjustmentUpdateType';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
@@ -1038,6 +1039,28 @@ describe('ChannelApe Client', () => {
             }]
           );
           await channelApeClient.inventories().quantities().setBatch(batchAdjustmentRequest);
+        });
+      });
+
+      context('When adjusting/setting quantities', () => {
+        it('Then update', async () => {
+          const deduplicationKey = '05052020';
+          const adjustmentsBySkuRequest = [{
+            deduplicationKey,
+            updateType: InventoryAdjustmentUpdateType.SET,
+            quantity: 10,
+            sku: 'A1',
+            inventoryStatus: InventoryStatus.COMMITTED,
+            locationId: '28'
+          }, {
+            deduplicationKey,
+            updateType: InventoryAdjustmentUpdateType.ADJUST,
+            quantity: 5,
+            sku: 'B1',
+            inventoryStatus: InventoryStatus.COMMITTED,
+            locationId: '29'
+          }];
+          await channelApeClient.inventories().quantities().batch(adjustmentsBySkuRequest);
         });
       });
     });

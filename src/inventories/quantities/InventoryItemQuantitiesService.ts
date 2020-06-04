@@ -16,6 +16,7 @@ import BatchAdjustmentRequest from './model/BatchAdjustmentRequest';
 import { InventoryBatchAdjustmentsService } from './InventoryBatchAdjustmentsService';
 import InventoriesService from '../service/InventoriesService';
 import LocationsService from '../../locations/service/LocationsService';
+import { AdjustmentBySkuRequest } from './model/AdjustmentBySkuRequest';
 
 export default class InventoryQuantitiesService extends RestService {
   private EXPECTED_POST_STATUS: number = 201;
@@ -34,6 +35,10 @@ export default class InventoryQuantitiesService extends RestService {
       this.inventoriesService,
       this.locationsService
     );
+  }
+
+  public batch(adjustmentBySkuRequests: AdjustmentBySkuRequest[]): Promise<void> {
+    return this.inventoryBatchAdjustmentsService.batch(adjustmentBySkuRequests);
   }
 
   public adjust(adjustmentRequest: AdjustmentRequest): Promise<Adjustment> {

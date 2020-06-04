@@ -11,6 +11,8 @@ import LocationsService from '../../locations/service/LocationsService';
 import InventoryItemQuantitiesService from './InventoryItemQuantitiesService';
 import { UnknownStatusError } from '../model/UnknownStatusError';
 import { InventoryStatus } from '../enum/InventoryStatus';
+import { AdjustmentBySkuRequest } from './model/AdjustmentBySkuRequest';
+import { InventoryAdjustmentUpdateType } from './model/InventoryAdjustmentUpdateType';
 
 export class InventoryBatchAdjustmentsService {
 
@@ -21,6 +23,60 @@ export class InventoryBatchAdjustmentsService {
     private readonly inventoriesService: InventoriesService,
     private readonly locationsService: LocationsService
   ) { }
+
+  public async batch(adjustmentBySkuRequests: AdjustmentBySkuRequest[]): Promise<void> {
+    const batchSetAdjustmentRequests: BatchAdjustmentRequest[] = [];
+    const batchAdjustAdjustmentRequests: BatchAdjustmentRequest[] = [];
+
+    for (const adjustmentBySkuRequest of adjustmentBySkuRequests) {
+      let batchAdjustmentRequestByLocation;
+      if (adjustmentBySkuRequest.updateType === InventoryAdjustmentUpdateType.SET) {
+        batchAdjustmentRequestByLocation = batchSetAdjustmentRequests
+        .find((batchAdjustmentRequest: BatchAdjustmentRequest) => {
+          return batchAdjustmentRequest.locationId === adjustmentBySkuRequest.locationId;
+        });
+        if (!batchAdjustmentRequestByLocation) {
+          batchAdjustmentRequestByLocation = new BatchAdjustmentRequest(adjustmentBySkuRequest.locationId, []);
+          batchSetAdjustmentRequests.push(batchAdjustmentRequestByLocation);
+        }
+      } else {
+        batchAdjustmentRequestByLocation = batchAdjustAdjustmentRequests
+        .find((batchAdjustmentRequest: BatchAdjustmentRequest) => {
+          return batchAdjustmentRequest.locationId === adjustmentBySkuRequest.locationId;
+        });
+        if (!batchAdjustmentRequestByLocation) {
+          batchAdjustmentRequestByLocation = new BatchAdjustmentRequest(adjustmentBySkuRequest.locationId, []);
+          batchAdjustAdjustmentRequests.push(batchAdjustmentRequestByLocation);
+        }
+      }
+
+      let foundAdjustmentsBySku = batchAdjustmentRequestByLocation.adjustmentsBySku
+        .find((adjustmentsBySku: AdjustmentsBySku) => {
+          return adjustmentsBySku.sku === adjustmentBySkuRequest.sku;
+        });
+      if (!foundAdjustmentsBySku) {
+        foundAdjustmentsBySku = {
+          sku: adjustmentBySkuRequest.sku,
+          adjustments: []
+        };
+        batchAdjustmentRequestByLocation.adjustmentsBySku.push(foundAdjustmentsBySku);
+      }
+
+      foundAdjustmentsBySku.adjustments.push({
+        quantity: adjustmentBySkuRequest.quantity,
+        inventoryStatus: adjustmentBySkuRequest.inventoryStatus,
+        deduplicationKey: adjustmentBySkuRequest.deduplicationKey
+      });
+    }
+
+    for (const batchAdjustmentRequest of batchSetAdjustmentRequests) {
+      await this.setBatch(batchAdjustmentRequest);
+    }
+    for (const batchAdjustmentRequest of batchAdjustAdjustmentRequests) {
+      await this.adjustBatch(batchAdjustmentRequest);
+    }
+
+  }
 
   /**
    * Adjusts multiple inventory adjustments for multiple SKU's.  If an inventory item does not yet exist

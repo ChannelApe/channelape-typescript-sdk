@@ -9,10 +9,9 @@ export default class BatchAdjustmentRequest {
       throw new Error('You must provide a location ID');
     }
     if (
-      !Array.isArray(adjustmentsBySku) ||
-      adjustmentsBySku.length === 0
+      !Array.isArray(adjustmentsBySku)
     ) {
-      throw new Error('You must provide an array of at least one AdjustmentBySku object');
+      throw new Error('You must provide an array');
     }
 
     this.locationId = locationId;

@@ -9,6 +9,7 @@ import BatchAdjustmentRequest from '../../../../src/inventories/quantities/model
 import { InventoryStatus } from '../../../../src/inventories/enum/InventoryStatus';
 import { fail } from 'assert';
 import AdjustmentsBySku from '../../../../src/inventories/quantities/model/AdjustmentsBySku';
+import { InventoryAdjustmentUpdateType } from '../../../../src/inventories/quantities/model/InventoryAdjustmentUpdateType';
 
 describe('Inventory Quantities Service', () => {
 
@@ -769,6 +770,82 @@ describe('Inventory Quantities Service', () => {
         expect(foundAdjustment.locationId).to.equal(location.id);
         expect(foundAdjustment.idempotentKey).to.equal(expectedKey);
       }
+    });
+
+    it('And array of adjustmentBySkuRequests When making multiple adjustments types for multiple skus ' +
+      'for multiple locations Then make adjustments', async () => {
+      const deduplicationKey = '05052020';
+      const adjustmentsBySkuRequest = [{
+        deduplicationKey,
+        updateType: InventoryAdjustmentUpdateType.SET,
+        quantity: 10,
+        sku: 'ABC-123',
+        inventoryStatus: InventoryStatus.COMMITTED,
+        locationId: 'location-1'
+      }, {
+        deduplicationKey,
+        updateType: InventoryAdjustmentUpdateType.ADJUST,
+        quantity: 5,
+        sku: 'ABC-124',
+        inventoryStatus: InventoryStatus.COMMITTED,
+        locationId: 'location-2'
+      }];
+      const existingInventoryItems = [{
+        sku: adjustmentsBySkuRequest[0].sku,
+        id: '1',
+        businessId: location.businessId,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }, {
+        sku: adjustmentsBySkuRequest[1].sku,
+        id: '2',
+        businessId: location.businessId,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }];
+
+      inventoriesServiceStub.get.callsFake((businessId: string, sku: string) => {
+        return [existingInventoryItems.find(item => item.sku === sku)];
+      });
+
+      const inventoryQuantitiesService = new InventoryBatchAdjustmentsService(
+        // @ts-ignore
+        inventoryItemQuantitiesServiceStub,
+        inventoriesServiceStub,
+        locationsServiceStub
+      );
+      await inventoryQuantitiesService.batch(adjustmentsBySkuRequest);
+
+      expect(inventoriesServiceStub.get.callCount).to.equal(2);
+      expect(inventoriesServiceStub.create.called).to.equal(false);
+
+      expect(inventoryItemQuantitiesServiceStub.set.calledOnce).to.equal(true);
+      expect(inventoryItemQuantitiesServiceStub.set.firstCall.args[0]).to.deep.equal({
+        locationId: adjustmentsBySkuRequest[0].locationId,
+        quantity: adjustmentsBySkuRequest[0].quantity,
+        inventoryItemId: existingInventoryItems[0].id,
+        inventoryStatus: adjustmentsBySkuRequest[0].inventoryStatus,
+        idempotentKey: buildKey(
+          deduplicationKey,
+          adjustmentsBySkuRequest[0].locationId,
+          existingInventoryItems[0].id,
+          adjustmentsBySkuRequest[0].inventoryStatus
+        )
+      });
+
+      expect(inventoryItemQuantitiesServiceStub.adjust.calledOnce).to.equal(true);
+      expect(inventoryItemQuantitiesServiceStub.adjust.firstCall.args[0]).to.deep.equal({
+        locationId: adjustmentsBySkuRequest[1].locationId,
+        quantity: adjustmentsBySkuRequest[1].quantity,
+        inventoryItemId: existingInventoryItems[1].id,
+        inventoryStatus: adjustmentsBySkuRequest[1].inventoryStatus,
+        idempotentKey: buildKey(
+          deduplicationKey,
+          adjustmentsBySkuRequest[1].locationId,
+          existingInventoryItems[1].id,
+          adjustmentsBySkuRequest[1].inventoryStatus
+        )
+      });
     });
 
     function findSetInventoryItem(inventoryId: string, status: string) {

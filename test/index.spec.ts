@@ -908,6 +908,11 @@ describe('Index', () => {
     expect(inventoryStatus).to.equal(ChannelApe.InventoryStatus.ON_HAND);
   });
 
+  it('Expect InventoryAdjustmentUpdateType to be exported', () => {
+    const inventoryStatus: ChannelApe.InventoryAdjustmentUpdateType = ChannelApe.InventoryAdjustmentUpdateType.SET;
+    expect(inventoryStatus).to.equal(ChannelApe.InventoryAdjustmentUpdateType.SET);
+  });
+
   it('Expect InventoryItem to be exported', () => {
     const inventoryItem: ChannelApe.InventoryItem = {
       id: '4454',
