@@ -567,24 +567,27 @@ Currently Allowed Inventory Statuses:
 ```typescript
 const batchAdjustmentRequest: BatchAdjustmentRequest = {
   locationId: '123',
-  deduplicationKey: '05052020',
   adjustmentsBySku: [{
     sku: 'A1',
     adjustments: [{
       quantity: 1,
-      inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL
+      inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+      deduplicationKey: '05052020'
     }, {
       quantity: 3,
-      inventoryStatus: InventoryStatus.ON_HOLD
+      inventoryStatus: InventoryStatus.ON_HOLD,
+      deduplicationKey: '05052020'
     }]
   }, {
     sku: 'B1',
     adjustments: [{
       quantity: 2,
-      inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL
+      inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+      deduplicationKey: '05052020'
     }, {
       quantity: 0,
-      inventoryStatus: InventoryStatus.ON_HOLD
+      inventoryStatus: InventoryStatus.ON_HOLD,
+      deduplicationKey: '05052020'
     }]
   }]
 };

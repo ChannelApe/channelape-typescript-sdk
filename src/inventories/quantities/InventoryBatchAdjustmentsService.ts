@@ -66,7 +66,6 @@ export class InventoryBatchAdjustmentsService {
           adjustmentsBySku,
           batchAdjustmentRequest.locationId,
           businessId,
-          batchAdjustmentRequest.deduplicationKey,
           adjustmentType
         );
       });
@@ -118,7 +117,6 @@ export class InventoryBatchAdjustmentsService {
     adjustmentsBySku: AdjustmentsBySku,
     locationId: string,
     businessId: string,
-    deduplicationKey: string,
     adjustmentType: AdjustmentType
   ): Promise<Q.PromiseState<Adjustment>[]> {
     let inventoryItem = await this.getInventoryItem(adjustmentsBySku.sku, businessId);
@@ -133,7 +131,6 @@ export class InventoryBatchAdjustmentsService {
         this.sendAdjustmentRequest(
           adjustment,
           inventoryItem,
-          deduplicationKey,
           locationId,
           allowedStatuses,
           adjustmentType
@@ -210,7 +207,6 @@ export class InventoryBatchAdjustmentsService {
   private async sendAdjustmentRequest(
     adjustment: AdjustmentBySku,
     inventoryItem: InventoryItem,
-    deduplicationKey: string,
     locationId: string,
     allowedStatuses: string[],
     adjustmentType: AdjustmentType
@@ -224,13 +220,18 @@ export class InventoryBatchAdjustmentsService {
       throw new UnknownStatusError(errorMessage);
     }
 
+    const idempotentKey = this.generateIdempotentKey(
+      inventoryItem.id,
+      adjustment.inventoryStatus,
+      locationId,
+      adjustment.deduplicationKey
+    );
     const adjustmentRequest: AdjustmentRequest = {
       locationId,
+      idempotentKey,
       quantity: adjustment.quantity,
       inventoryItemId: inventoryItem.id,
       inventoryStatus: adjustment.inventoryStatus,
-      idempotentKey: this.generateIdempotentKey(
-        inventoryItem.id, adjustment.inventoryStatus, locationId, deduplicationKey)
     };
 
     try {

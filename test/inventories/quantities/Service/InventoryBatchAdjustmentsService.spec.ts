@@ -60,11 +60,12 @@ describe('Inventory Quantities Service', () => {
       const adjustmentsBySku = [{
         sku: 'A1',
         adjustments: [{
+          deduplicationKey,
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 3
         }]
       }];
-      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, deduplicationKey, adjustmentsBySku);
+      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, adjustmentsBySku);
       const createdInventoryItem = {
         sku: batchAdjustmentRequest.adjustmentsBySku[0].sku,
         id: '1',
@@ -103,22 +104,25 @@ describe('Inventory Quantities Service', () => {
     });
 
     it('And batchAdjustmentRequest When making multiple adjustments for a single sku ' +
-      'which does not exist Then create multiple inventory items and make multiple adjustments', async () => {
-      const deduplicationKey = '05052020';
+      'which does not exist, And each adjustment with a different deduplication key, ' +
+      'Then create multiple inventory items and make multiple adjustments', async () => {
       const adjustmentsBySku = [{
         sku: 'A1',
         adjustments: [{
+          deduplicationKey: 'adj-1',
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 3
         }, {
+          deduplicationKey: 'adj-2',
           inventoryStatus: InventoryStatus.COMMITTED,
           quantity: 2
         }, {
+          deduplicationKey: 'adj-3',
           inventoryStatus: InventoryStatus.ON_HAND,
           quantity: 1
         }]
       }];
-      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, deduplicationKey, adjustmentsBySku);
+      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, adjustmentsBySku);
       const createdInventoryItem = {
         sku: batchAdjustmentRequest.adjustmentsBySku[0].sku,
         id: '1',
@@ -152,7 +156,7 @@ describe('Inventory Quantities Service', () => {
           fail('Could not find adjustment');
         }
         const expectedKey = buildKey(
-          deduplicationKey, location.id, createdInventoryItem.id, adjustment.inventoryStatus);
+          adjustment.deduplicationKey, location.id, createdInventoryItem.id, adjustment.inventoryStatus);
         expect(foundAdjustment.quantity).to.equal(adjustment.quantity);
         expect(foundAdjustment.locationId).to.equal(location.id);
         expect(foundAdjustment.idempotentKey).to.equal(expectedKey);
@@ -165,17 +169,20 @@ describe('Inventory Quantities Service', () => {
       const adjustmentsBySku = [{
         sku: 'A1',
         adjustments: [{
+          deduplicationKey,
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 3
         }, {
+          deduplicationKey,
           inventoryStatus: InventoryStatus.COMMITTED,
           quantity: 2
         }, {
+          deduplicationKey,
           inventoryStatus: InventoryStatus.ON_HAND,
           quantity: 1
         }]
       }];
-      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, deduplicationKey, adjustmentsBySku);
+      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, adjustmentsBySku);
       const existingInventoryItem = {
         id: '1',
         sku: batchAdjustmentRequest.adjustmentsBySku[0].sku,
@@ -218,32 +225,38 @@ describe('Inventory Quantities Service', () => {
       const adjustmentsBySku = [{
         sku: 'A1',
         adjustments: [{
+          deduplicationKey,
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 1
         }, {
+          deduplicationKey,
           inventoryStatus: InventoryStatus.COMMITTED,
           quantity: 2
         }]
       }, {
         sku: 'B1',
         adjustments: [{
+          deduplicationKey,
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 3
         }, {
+          deduplicationKey,
           inventoryStatus: InventoryStatus.COMMITTED,
           quantity: 4
         }]
       }, {
         sku: 'C1',
         adjustments: [{
+          deduplicationKey,
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 5
         }, {
+          deduplicationKey,
           inventoryStatus: InventoryStatus.COMMITTED,
           quantity: 6
         }]
       }];
-      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, deduplicationKey, adjustmentsBySku);
+      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, adjustmentsBySku);
 
       inventoriesServiceStub.create.callsFake((options: any) => {
         const foundIndex = adjustmentsBySku.findIndex(adjustment => adjustment.sku === options.sku);
@@ -303,32 +316,38 @@ describe('Inventory Quantities Service', () => {
       const adjustmentsBySku = [{
         sku: 'A1',
         adjustments: [{
+          deduplicationKey,
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 1
         }, {
+          deduplicationKey,
           inventoryStatus: InventoryStatus.COMMITTED,
           quantity: 2
         }]
       }, {
         sku: 'B1',
         adjustments: [{
+          deduplicationKey,
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 3
         }, {
+          deduplicationKey,
           inventoryStatus: InventoryStatus.COMMITTED,
           quantity: 4
         }]
       }, {
         sku: 'C1',
         adjustments: [{
+          deduplicationKey,
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 5
         }, {
+          deduplicationKey,
           inventoryStatus: InventoryStatus.COMMITTED,
           quantity: 6
         }]
       }];
-      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, deduplicationKey, adjustmentsBySku);
+      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, adjustmentsBySku);
 
       inventoriesServiceStub.create.callsFake((options: any) => {
         const foundIndex = adjustmentsBySku.findIndex(adjustment => adjustment.sku === options.sku);
@@ -408,18 +427,21 @@ describe('Inventory Quantities Service', () => {
       const adjustmentsBySku = [{
         sku: 'A1',
         adjustments: [{
+          deduplicationKey,
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 1
         }]
       }, {
         sku: 'B1',
         adjustments: [{
+          deduplicationKey,
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 3
         }]
       }, {
         sku: 'C1',
         adjustments: [{
+          deduplicationKey,
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 5
         }]
@@ -439,7 +461,7 @@ describe('Inventory Quantities Service', () => {
         updatedAt: new Date()
       }];
 
-      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, deduplicationKey, adjustmentsBySku);
+      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, adjustmentsBySku);
 
       const inventoryQuantitiesService = new InventoryBatchAdjustmentsService(
         // @ts-ignore
@@ -496,21 +518,25 @@ describe('Inventory Quantities Service', () => {
       const adjustmentsBySku = [{
         sku: 'A1',
         adjustments: [{
+          deduplicationKey,
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 1
         }]
       }, {
         sku: 'B1',
         adjustments: [{
+          deduplicationKey,
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 3
         }, {
+          deduplicationKey,
           inventoryStatus: InventoryStatus.ON_HAND,
           quantity: 4
         }]
       }, {
         sku: 'C1',
         adjustments: [{
+          deduplicationKey,
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 5
         }]
@@ -536,7 +562,7 @@ describe('Inventory Quantities Service', () => {
         updatedAt: new Date()
       }];
 
-      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, deduplicationKey, adjustmentsBySku);
+      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, adjustmentsBySku);
 
       const inventoryQuantitiesService = new InventoryBatchAdjustmentsService(
         // @ts-ignore
@@ -598,18 +624,21 @@ describe('Inventory Quantities Service', () => {
       const adjustmentsBySku = [{
         sku: 'A1',
         adjustments: [{
+          deduplicationKey,
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 1
         }]
       }, {
         sku: 'B1',
         adjustments: [{
+          deduplicationKey,
           status: 'XY',
           quantity: 3
         }]
       }, {
         sku: 'C1',
         adjustments: [{
+          deduplicationKey,
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 5
         }]
@@ -635,7 +664,7 @@ describe('Inventory Quantities Service', () => {
         updatedAt: new Date()
       }];
 
-      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, deduplicationKey, adjustmentsBySku);
+      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, adjustmentsBySku);
 
       const inventoryQuantitiesService = new InventoryBatchAdjustmentsService(
         // @ts-ignore
@@ -688,17 +717,20 @@ describe('Inventory Quantities Service', () => {
       const adjustmentsBySku = [{
         sku: 'A1',
         adjustments: [{
+          deduplicationKey,
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 3
         }, {
+          deduplicationKey,
           inventoryStatus: InventoryStatus.COMMITTED,
           quantity: 2
         }, {
+          deduplicationKey,
           inventoryStatus: InventoryStatus.ON_HAND,
           quantity: 1
         }]
       }];
-      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, deduplicationKey, adjustmentsBySku);
+      const batchAdjustmentRequest = new BatchAdjustmentRequest(location.id, adjustmentsBySku);
       const createdInventoryItem = {
         sku: batchAdjustmentRequest.adjustmentsBySku[0].sku,
         id: '1',

@@ -977,26 +977,30 @@ describe('ChannelApe Client', () => {
     describe('And valid batch adjustment request', () => {
       context('When adjusting quantities', () => {
         it('Then update', async () => {
+          const currentDateTime = new Date().toISOString();
           const batchAdjustmentRequest = new BatchAdjustmentRequest(
             '28',
-            new Date().toISOString(),
             [{
               sku: 'A1',
               adjustments: [{
                 quantity: 1,
-                inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL
+                inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+                deduplicationKey: currentDateTime
               }, {
                 quantity: 3,
-                inventoryStatus: InventoryStatus.ON_HOLD
+                inventoryStatus: InventoryStatus.ON_HOLD,
+                deduplicationKey: currentDateTime
               }]
             }, {
               sku: 'B1',
               adjustments: [{
                 quantity: 2,
-                inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL
+                inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+                deduplicationKey: currentDateTime
               }, {
                 quantity: 0,
-                inventoryStatus: InventoryStatus.ON_HOLD
+                inventoryStatus: InventoryStatus.ON_HOLD,
+                deduplicationKey: currentDateTime
               }]
             }]
           );
@@ -1006,26 +1010,30 @@ describe('ChannelApe Client', () => {
 
       context('When setting quantities', () => {
         it('Then update', async () => {
+          const currentDateTime = new Date().toISOString();
           const batchAdjustmentRequest = new BatchAdjustmentRequest(
             '28',
-            new Date().toISOString(),
             [{
               sku: 'A1',
               adjustments: [{
                 quantity: 1,
-                inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL
+                inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+                deduplicationKey: currentDateTime
               }, {
                 quantity: 3,
-                inventoryStatus: InventoryStatus.ON_HOLD
+                inventoryStatus: InventoryStatus.ON_HOLD,
+                deduplicationKey: currentDateTime
               }]
             }, {
               sku: 'B1',
               adjustments: [{
                 quantity: 2,
-                inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL
+                inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+                deduplicationKey: currentDateTime
               }, {
                 quantity: 0,
-                inventoryStatus: InventoryStatus.ON_HOLD
+                inventoryStatus: InventoryStatus.ON_HOLD,
+                deduplicationKey: currentDateTime
               }]
             }]
           );
