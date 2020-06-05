@@ -565,32 +565,33 @@ Currently Allowed Inventory Statuses:
 - ON_ORDER
 
 ```typescript
-const batchAdjustmentRequest: BatchAdjustmentRequest = {
-  locationId: '123',
-  adjustmentsBySku: [{
-    sku: 'A1',
-    adjustments: [{
-      quantity: 1,
-      inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
-      deduplicationKey: '05052020'
-    }, {
-      quantity: 3,
-      inventoryStatus: InventoryStatus.ON_HOLD,
-      deduplicationKey: '05052020'
-    }]
+const adjustmentsBySku: AdjustmentsBySku = [{
+  sku: 'A1',
+  adjustments: [{
+    quantity: 1,
+    inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+    deduplicationKey: '05052020',
+    locationId: '123'
   }, {
-    sku: 'B1',
-    adjustments: [{
-      quantity: 2,
-      inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
-      deduplicationKey: '05052020'
-    }, {
-      quantity: 0,
-      inventoryStatus: InventoryStatus.ON_HOLD,
-      deduplicationKey: '05052020'
-    }]
+    quantity: 3,
+    inventoryStatus: InventoryStatus.ON_HOLD,
+    deduplicationKey: '05052020',
+    locationId: '123'
   }]
-};
+}, {
+  sku: 'B1',
+  adjustments: [{
+    quantity: 2,
+    inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+    deduplicationKey: '05052020',
+    locationId: '123'
+  }, {
+    quantity: 0,
+    inventoryStatus: InventoryStatus.ON_HOLD,
+    deduplicationKey: '05052020',
+    locationId: '123'
+  }]
+}];
 ```
 
 #### Batch Set/Adjust Inventory Item Quantities
@@ -620,7 +621,7 @@ channelApeClient.inventories().quantities().batch(adjustmentBySkuRequests)
 #### Batch Set Inventory Item Quantities
 
 ```typescript
-channelApeClient.inventories().quantities().setBatch(batchAdjustmentRequest)
+channelApeClient.inventories().quantities().setBatch(adjustmentsBySku)
   .then(() => {
     // All adjustments completed successfully
   });
@@ -629,7 +630,7 @@ channelApeClient.inventories().quantities().setBatch(batchAdjustmentRequest)
 #### Batch Adjust Inventory Item Quantities
 
 ```typescript
-channelApeClient.inventories().quantities().adjustBatch(batchAdjustmentRequest)
+channelApeClient.inventories().quantities().adjustBatch(adjustmentsBySku)
   .then(() => {
     // All adjustments completed successfully
   });

@@ -4,4 +4,5 @@ export default interface AdjustmentBySku {
   quantity: number;
   inventoryStatus: InventoryStatus;
   deduplicationKey: string;
+  locationId: string;
 }

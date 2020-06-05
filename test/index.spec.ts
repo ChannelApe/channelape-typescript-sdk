@@ -908,11 +908,6 @@ describe('Index', () => {
     expect(inventoryStatus).to.equal(ChannelApe.InventoryStatus.ON_HAND);
   });
 
-  it('Expect InventoryAdjustmentUpdateType to be exported', () => {
-    const inventoryStatus: ChannelApe.InventoryAdjustmentUpdateType = ChannelApe.InventoryAdjustmentUpdateType.SET;
-    expect(inventoryStatus).to.equal(ChannelApe.InventoryAdjustmentUpdateType.SET);
-  });
-
   it('Expect InventoryItem to be exported', () => {
     const inventoryItem: ChannelApe.InventoryItem = {
       id: '4454',
@@ -975,7 +970,8 @@ describe('Index', () => {
     const adjustmentBySku: ChannelApe.AdjustmentBySku = {
       inventoryStatus: ChannelApe.InventoryStatus.COMMITTED,
       quantity: 44,
-      deduplicationKey: 'tracking-number-1'
+      deduplicationKey: 'tracking-number-1',
+      locationId: 'location-1'
     };
     expect(adjustmentBySku.quantity).to.equal(44);
   });
@@ -987,46 +983,18 @@ describe('Index', () => {
         {
           inventoryStatus: ChannelApe.InventoryStatus.COMMITTED,
           quantity: 44,
-          deduplicationKey: 'tracking-number-1'
+          deduplicationKey: 'tracking-number-1',
+          locationId: 'location-1'
         },
         {
           inventoryStatus: ChannelApe.InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 20,
-          deduplicationKey: 'tracking-number-2'
+          deduplicationKey: 'tracking-number-2',
+          locationId: 'location-1'
         }
       ]
     };
     expect(adjustmentsBySku.adjustments.length).to.equal(2);
-  });
-
-  it('Expect BatchAdjustmentRequest to be exported', () => {
-    const batchAdjustmentRequest: ChannelApe.BatchAdjustmentRequest = {
-      locationId: '123',
-      adjustmentsBySku: [{
-        sku: 'A1',
-        adjustments: [{
-          quantity: 1,
-          inventoryStatus: ChannelApe.InventoryStatus.AVAILABLE_TO_SELL,
-          deduplicationKey: 'tracking-number-1'
-        }, {
-          quantity: 3,
-          inventoryStatus: ChannelApe.InventoryStatus.ON_HOLD,
-          deduplicationKey: 'tracking-number-2'
-        }]
-      }, {
-        sku: 'B1',
-        adjustments: [{
-          quantity: 2,
-          inventoryStatus: ChannelApe.InventoryStatus.AVAILABLE_TO_SELL,
-          deduplicationKey: 'tracking-number-3'
-        }, {
-          quantity: 0,
-          inventoryStatus: ChannelApe.InventoryStatus.ON_HOLD,
-          deduplicationKey: 'tracking-number-4'
-        }]
-      }]
-    };
-    expect(batchAdjustmentRequest.locationId).to.equal('123');
   });
 
   it('Expect InventoryItemQuantity to be exported', () => {
