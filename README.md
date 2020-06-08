@@ -594,30 +594,6 @@ const adjustmentsBySku: AdjustmentsBySku = [{
 }];
 ```
 
-#### Batch Set/Adjust Inventory Item Quantities
-```typescript
-const adjustmentBySkuRequests: AdjustmentBySkuRequest[] = [{
-  updateType: InventoryAdjustmentUpdateType.SET,
-  quantity: 10,
-  sku: 'ABC-123',
-  inventoryStatus: InventoryStatus.COMMITTED,
-  locationId: 'location-1',
-  deduplicationKey: '05052020'
-}, {
-  updateType: InventoryAdjustmentUpdateType.ADJUST,
-  quantity: 5,
-  sku: 'ABC-124',
-  inventoryStatus: InventoryStatus.COMMITTED,
-  locationId: 'location-2',
-  deduplicationKey: '05052020'
-}];
-
-channelApeClient.inventories().quantities().batch(adjustmentBySkuRequests)
-  .then(() => {
-    // All adjustments completed successfully
-  });
-```
-
 #### Batch Set Inventory Item Quantities
 
 ```typescript
