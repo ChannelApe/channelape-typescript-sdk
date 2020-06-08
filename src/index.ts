@@ -82,7 +82,6 @@ export { default as AdjustmentRequest } from './inventories/quantities/model/Adj
 export { default as Adjustment } from './inventories/quantities/model/Adjustment';
 export { default as AdjustmentBySku } from './inventories/quantities/model/AdjustmentBySku';
 export { default as AdjustmentsBySku } from './inventories/quantities/model/AdjustmentsBySku';
-export { default as BatchAdjustmentRequest } from './inventories/quantities/model/BatchAdjustmentRequest';
 export { default as InventoryItemQuantity } from './inventories/quantities/model/InventoryItemQuantity';
 export { default as Location } from './locations/model/Location';
 export { default as LocationCreateRequest } from './locations/model/LocationCreateRequest';

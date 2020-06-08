@@ -969,7 +969,9 @@ describe('Index', () => {
   it('Expect AdjustmentBySku to be exported', () => {
     const adjustmentBySku: ChannelApe.AdjustmentBySku = {
       inventoryStatus: ChannelApe.InventoryStatus.COMMITTED,
-      quantity: 44
+      quantity: 44,
+      deduplicationKey: 'tracking-number-1',
+      locationId: 'location-1'
     };
     expect(adjustmentBySku.quantity).to.equal(44);
   });
@@ -980,42 +982,19 @@ describe('Index', () => {
       adjustments: [
         {
           inventoryStatus: ChannelApe.InventoryStatus.COMMITTED,
-          quantity: 44
+          quantity: 44,
+          deduplicationKey: 'tracking-number-1',
+          locationId: 'location-1'
         },
         {
           inventoryStatus: ChannelApe.InventoryStatus.AVAILABLE_TO_SELL,
-          quantity: 20
+          quantity: 20,
+          deduplicationKey: 'tracking-number-2',
+          locationId: 'location-1'
         }
       ]
     };
     expect(adjustmentsBySku.adjustments.length).to.equal(2);
-  });
-
-  it('Expect BatchAdjustmentRequest to be exported', () => {
-    const batchAdjustmentRequest: ChannelApe.BatchAdjustmentRequest = {
-      locationId: '123',
-      deduplicationKey: '05052020',
-      adjustmentsBySku: [{
-        sku: 'A1',
-        adjustments: [{
-          quantity: 1,
-          inventoryStatus: ChannelApe.InventoryStatus.AVAILABLE_TO_SELL
-        }, {
-          quantity: 3,
-          inventoryStatus: ChannelApe.InventoryStatus.ON_HOLD
-        }]
-      }, {
-        sku: 'B1',
-        adjustments: [{
-          quantity: 2,
-          inventoryStatus: ChannelApe.InventoryStatus.AVAILABLE_TO_SELL
-        }, {
-          quantity: 0,
-          inventoryStatus: ChannelApe.InventoryStatus.ON_HOLD
-        }]
-      }]
-    };
-    expect(batchAdjustmentRequest.deduplicationKey).to.equal('05052020');
   });
 
   it('Expect InventoryItemQuantity to be exported', () => {

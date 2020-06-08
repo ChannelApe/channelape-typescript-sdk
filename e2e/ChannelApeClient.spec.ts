@@ -27,8 +27,8 @@ import InventoryItemUpdateRequest from './../src/inventories/model/InventoryItem
 import LocationCreateRequest from './../src/locations/model/LocationCreateRequest';
 import LocationUpdateRequest from './../src/locations/model/LocationUpdateRequest';
 import AdjustmentRequest from './../src/inventories/quantities/model/AdjustmentRequest';
-import BatchAdjustmentRequest from '../src/inventories/quantities/model/BatchAdjustmentRequest';
 import { InventoryStatus } from '../src/inventories/enum/InventoryStatus';
+import { AdjustmentsBySku } from '../src';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
@@ -977,61 +977,72 @@ describe('ChannelApe Client', () => {
     describe('And valid batch adjustment request', () => {
       context('When adjusting quantities', () => {
         it('Then update', async () => {
-          const batchAdjustmentRequest = new BatchAdjustmentRequest(
-            '28',
-            new Date().toISOString(),
-            [{
-              sku: 'A1',
-              adjustments: [{
-                quantity: 1,
-                inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL
-              }, {
-                quantity: 3,
-                inventoryStatus: InventoryStatus.ON_HOLD
-              }]
+          const currentDateTime = new Date().toISOString();
+          const adjustmentsBySku: AdjustmentsBySku[] = [{
+            sku: 'A1',
+            adjustments: [{
+              quantity: 1,
+              inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+              deduplicationKey: currentDateTime,
+              locationId: '28'
             }, {
-              sku: 'B1',
-              adjustments: [{
-                quantity: 2,
-                inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL
-              }, {
-                quantity: 0,
-                inventoryStatus: InventoryStatus.ON_HOLD
-              }]
+              quantity: 3,
+              inventoryStatus: InventoryStatus.ON_HOLD,
+              deduplicationKey: currentDateTime,
+              locationId: '28'
             }]
-          );
-          await channelApeClient.inventories().quantities().setBatch(batchAdjustmentRequest);
+          }, {
+            sku: 'B1',
+            adjustments: [{
+              quantity: 2,
+              inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+              deduplicationKey: currentDateTime,
+              locationId: '28'
+            }, {
+              quantity: 0,
+              inventoryStatus: InventoryStatus.ON_HOLD,
+              deduplicationKey: currentDateTime,
+              locationId: '28'
+            }]
+          }];
+          await channelApeClient.inventories().quantities().setBatch(adjustmentsBySku);
         });
       });
 
       context('When setting quantities', () => {
         it('Then update', async () => {
-          const batchAdjustmentRequest = new BatchAdjustmentRequest(
-            '28',
-            new Date().toISOString(),
-            [{
-              sku: 'A1',
-              adjustments: [{
-                quantity: 1,
-                inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL
-              }, {
-                quantity: 3,
-                inventoryStatus: InventoryStatus.ON_HOLD
-              }]
+          const currentDateTime = new Date().toISOString();
+          const adjustmentsBySku: AdjustmentsBySku[] = [{
+            sku: 'A1',
+            adjustments: [{
+              quantity: 1,
+              inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+              deduplicationKey: currentDateTime,
+              locationId: '28'
             }, {
-              sku: 'B1',
-              adjustments: [{
-                quantity: 2,
-                inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL
-              }, {
-                quantity: 0,
-                inventoryStatus: InventoryStatus.ON_HOLD
-              }]
+              quantity: 3,
+              inventoryStatus: InventoryStatus.ON_HOLD,
+              deduplicationKey: currentDateTime,
+              locationId: '28'
             }]
-          );
-          await channelApeClient.inventories().quantities().setBatch(batchAdjustmentRequest);
+          }, {
+            sku: 'B1',
+            adjustments: [{
+              quantity: 2,
+              inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+              deduplicationKey: currentDateTime,
+              locationId: '28'
+            }, {
+              quantity: 0,
+              inventoryStatus: InventoryStatus.ON_HOLD,
+              deduplicationKey: currentDateTime,
+              locationId: '28'
+            }]
+          }];
+          await channelApeClient.inventories().quantities().setBatch(adjustmentsBySku);
         });
       });
+
     });
 
     describe('And valid inventory item id', () => {

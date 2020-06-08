@@ -1,7 +1,6 @@
 import Adjustment from './model/Adjustment';
 import AdjustmentRequest from './model/AdjustmentRequest';
 import * as Q from 'q';
-import BatchAdjustmentRequest from './model/BatchAdjustmentRequest';
 import AdjustmentsBySku from './model/AdjustmentsBySku';
 import { Logger, LogLevel } from 'channelape-logger';
 import InventoryItem from '../model/InventoryItem';
@@ -30,10 +29,10 @@ export class InventoryBatchAdjustmentsService {
    * another adjustment for the same deduplication key, inventory item, location, and status.  For example,
    * if you only wanted to allow one adjustment per day, you could use a value of the current day/month/year.
    *
-   * @param {BatchAdjustmentRequest} batchAdjustmentRequest
+   * @param {AdjustmentsBySku} adjustmentsBySku
    */
-  public adjustBatch(batchAdjustmentRequest: BatchAdjustmentRequest): Promise<void> {
-    return this.performAdjustments(batchAdjustmentRequest, AdjustmentType.ADJUST);
+  public adjustBatch(adjustmentsBySku: AdjustmentsBySku[]): Promise<void> {
+    return this.performAdjustments(adjustmentsBySku, AdjustmentType.ADJUST);
   }
 
   /**
@@ -44,29 +43,23 @@ export class InventoryBatchAdjustmentsService {
    * another adjustment for the same deduplication key, inventory item, location, and status.  For example,
    * if you only wanted to allow one adjustment per day, you could use a value of the current day/month/year.
    *
-   * @param {BatchAdjustmentRequest} batchAdjustmentRequest
+   * @param {AdjustmentsBySku} adjustmentsBySku
    */
-  public setBatch(batchAdjustmentRequest: BatchAdjustmentRequest): Promise<void> {
-    return this.performAdjustments(batchAdjustmentRequest, AdjustmentType.SET);
+  public setBatch(adjustmentsBySku: AdjustmentsBySku[]): Promise<void> {
+    return this.performAdjustments(adjustmentsBySku, AdjustmentType.SET);
   }
 
   private async performAdjustments(
-    batchAdjustmentRequest: BatchAdjustmentRequest,
+    adjustmentsBySku: AdjustmentsBySku[],
     adjustmentType: AdjustmentType
   ): Promise<void> {
-    if (!(batchAdjustmentRequest instanceof BatchAdjustmentRequest)) {
-      throw new Error('Must provide a BatchAdjustmentRequest instance');
-    }
+    const businessId = await this.getBusinessIdFromLocation(adjustmentsBySku[0].adjustments[0].locationId);
 
-    const businessId = await this.getBusinessIdFromLocation(batchAdjustmentRequest.locationId);
-
-    const adjustmentsBySkuPromises = batchAdjustmentRequest.adjustmentsBySku
+    const adjustmentsBySkuPromises = adjustmentsBySku
       .map((adjustmentsBySku: AdjustmentsBySku) => {
         return this.handleAdjustmentsBySku(
           adjustmentsBySku,
-          batchAdjustmentRequest.locationId,
           businessId,
-          batchAdjustmentRequest.deduplicationKey,
           adjustmentType
         );
       });
@@ -99,7 +92,7 @@ export class InventoryBatchAdjustmentsService {
     const unknownStatuses = rejectedAdjustment.filter((reason: any) => reason instanceof UnknownStatusError);
     const totalAttemptedAdjustments = fulfilledAdjustment.length + rejectedAdjustment.length - unknownStatuses.length;
 
-    this.logger.info(`Inventory adjustments completed for location ${batchAdjustmentRequest.locationId}:`);
+    this.logger.info('Inventory adjustments completed.');
     this.logger.info(`\tSkipped adjustments with unknown statuses: ${unknownStatuses.length}`);
     this.logger.info('\tSuccessfully retrieved or created inventory items: ' +
       `${successfullyGottenOrCreatedInventoryItemCount} / ${promiseStateResults.length}`);
@@ -116,9 +109,7 @@ export class InventoryBatchAdjustmentsService {
 
   private async handleAdjustmentsBySku(
     adjustmentsBySku: AdjustmentsBySku,
-    locationId: string,
     businessId: string,
-    deduplicationKey: string,
     adjustmentType: AdjustmentType
   ): Promise<Q.PromiseState<Adjustment>[]> {
     let inventoryItem = await this.getInventoryItem(adjustmentsBySku.sku, businessId);
@@ -133,8 +124,6 @@ export class InventoryBatchAdjustmentsService {
         this.sendAdjustmentRequest(
           adjustment,
           inventoryItem,
-          deduplicationKey,
-          locationId,
           allowedStatuses,
           adjustmentType
         )
@@ -210,8 +199,6 @@ export class InventoryBatchAdjustmentsService {
   private async sendAdjustmentRequest(
     adjustment: AdjustmentBySku,
     inventoryItem: InventoryItem,
-    deduplicationKey: string,
-    locationId: string,
     allowedStatuses: string[],
     adjustmentType: AdjustmentType
   ): Promise<Adjustment> {
@@ -224,13 +211,18 @@ export class InventoryBatchAdjustmentsService {
       throw new UnknownStatusError(errorMessage);
     }
 
+    const idempotentKey = this.generateIdempotentKey(
+      inventoryItem.id,
+      adjustment.inventoryStatus,
+      adjustment.locationId,
+      adjustment.deduplicationKey
+    );
     const adjustmentRequest: AdjustmentRequest = {
-      locationId,
+      idempotentKey,
+      locationId: adjustment.locationId,
       quantity: adjustment.quantity,
       inventoryItemId: inventoryItem.id,
       inventoryStatus: adjustment.inventoryStatus,
-      idempotentKey: this.generateIdempotentKey(
-        inventoryItem.id, adjustment.inventoryStatus, locationId, deduplicationKey)
     };
 
     try {
@@ -244,14 +236,14 @@ export class InventoryBatchAdjustmentsService {
       }
       this.logger.info(`Successfully set quantity.
         Inventory Item ID: ${adjustmentRequest.inventoryItemId}
-        Location ID: ${locationId}
+        Location ID: ${adjustment.locationId}
         Quantity: ${adjustmentRequest.quantity}
         Status: ${adjustmentRequest.inventoryStatus}`);
       return result;
     } catch (error) {
       this.logger.error(`Failed to set quantity.
         Inventory Item ID: ${adjustmentRequest.inventoryItemId}
-        Location ID: ${locationId}
+        Location ID: ${adjustment.locationId}
         Quantity: ${adjustmentRequest.quantity}
         Status: ${adjustmentRequest.inventoryStatus}`);
       this.logger.error(error);
