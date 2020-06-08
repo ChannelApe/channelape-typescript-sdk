@@ -515,7 +515,7 @@ export default {
       ],
       status: 'OPEN',
       trackingUrls: ['https://ups1.com/tracking-url1', 'https://ups1.com/tracking-url2'],
-      locationId: '44792710',
+      locationId: '28',
       shippedAt: '2018-05-05T17:03:03.582Z'
     }
   ],

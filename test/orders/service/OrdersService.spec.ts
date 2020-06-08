@@ -118,7 +118,7 @@ describe('OrdersService', () => {
         expect(fulfillment1.trackingUrls!.length).to.equal(2);
         expect(fulfillment1.trackingUrls).to.contain('https://ups1.com/tracking-url1');
         expect(fulfillment1.trackingUrls).to.contain('https://ups1.com/tracking-url2');
-        expect(fulfillment1.locationId).to.contain('44792710');
+        expect(fulfillment1.locationId).to.contain('28');
         expect(fulfillment1.shippedAt).to.equal(undefined);
       });
     });
@@ -140,7 +140,7 @@ describe('OrdersService', () => {
         expect(fulfillment1.trackingUrls!.length).to.equal(2);
         expect(fulfillment1.trackingUrls).to.contain('https://ups1.com/tracking-url1');
         expect(fulfillment1.trackingUrls).to.contain('https://ups1.com/tracking-url2');
-        expect(fulfillment1.locationId).to.contain('1');
+        expect(fulfillment1.locationId).to.contain('28');
         expect(fulfillment1.shippedAt!.toISOString()).to.equal('2018-05-05T17:03:03.582Z');
       });
     });
