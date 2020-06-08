@@ -66,7 +66,7 @@ export default {
     },
     {
       name: 'location_id',
-      value: 'null'
+      value: '1'
     },
     {
       name: 'browser_ip',
@@ -544,7 +544,8 @@ export default {
       }
     ],
     status: 'OPEN',
-    trackingUrls: ['https://ups1.com/tracking-url1', 'https://ups1.com/tracking-url2']
+    trackingUrls: ['https://ups1.com/tracking-url1', 'https://ups1.com/tracking-url2'],
+    locationId: '44792710'
   }],
   id: '06b70c49-a13e-42ca-a490-404d29c7fa46',
   lineItems: [{
