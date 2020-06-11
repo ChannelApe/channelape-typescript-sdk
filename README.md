@@ -39,7 +39,7 @@ const channelApeClient = new ChannelApeClient({
 #### Optional client configurations
 
 * timeout - Number of milliseconds to wait for the API to send response headers. Defaults to 180000 (3 minutes). Cannot be set lower than 2000 (2 seconds).
-* endpoint - Envrionment endpoint you would like to hit. Defaults to https://api.channelape.com
+* endpoint - Environment endpoint you would like to hit. Defaults to https://api.channelape.com
 * logLevel - Level of logs you wish to see from the SDK. Defaults to OFF.
 * maximumRequestRetryTimeout - Number of milliseconds to keep retrying a request for when an undesired response status code is received. Defaults to 180000 (3 minutes). Cannot be set lower than 2000 (2 seconds).
 * minimumRequestRetryRandomDelay - Minimum number of milliseconds to randomly delay by when an undesired response status code is received. Defaults to 1000 (1 second). Cannot be set lower than 1000 (1 second).
