@@ -12,17 +12,40 @@ import InventoryItemQuantitiesResponse from './model/InventoryItemQuantitiesResp
 import InventoryItemQuantity from './model/InventoryItemQuantity';
 import RequestCallbackParams from '../../../src/model/RequestCallbackParams';
 import GenerateApiError from './../../utils/GenerateApiError';
+import { InventoryBatchAdjustmentsService } from './InventoryBatchAdjustmentsService';
+import InventoriesService from '../service/InventoriesService';
+import LocationsService from '../../locations/service/LocationsService';
+import { AdjustmentsBySku } from '../..';
 
 export default class InventoryQuantitiesService extends RestService {
-  EXPECTED_POST_STATUS: number = 201;
-  EXPECTED_GET_STATUS: number = 200;
+  private EXPECTED_POST_STATUS: number = 201;
+  private EXPECTED_GET_STATUS: number = 200;
 
-  constructor(private readonly client: RequestClientWrapper) {
+  private inventoryBatchAdjustmentsService: InventoryBatchAdjustmentsService;
+
+  constructor(
+    private readonly client: RequestClientWrapper,
+    private readonly inventoriesService: InventoriesService,
+    private readonly locationsService: LocationsService
+  ) {
     super();
+    this.inventoryBatchAdjustmentsService = new InventoryBatchAdjustmentsService(
+      this,
+      this.inventoriesService,
+      this.locationsService
+    );
   }
 
   public adjust(adjustmentRequest: AdjustmentRequest): Promise<Adjustment> {
     return this.createQuantityAdjustment(adjustmentRequest, SubResource.ADJUSTS);
+  }
+
+  public adjustBatch(adjustmentsBySku: AdjustmentsBySku[]) {
+    return this.inventoryBatchAdjustmentsService.adjustBatch(adjustmentsBySku);
+  }
+
+  public setBatch(adjustmentsBySku: AdjustmentsBySku[]) {
+    return this.inventoryBatchAdjustmentsService.setBatch(adjustmentsBySku);
   }
 
   public set(adjustmentRequest: AdjustmentRequest): Promise<Adjustment> {

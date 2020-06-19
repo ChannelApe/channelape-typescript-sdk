@@ -22,11 +22,13 @@ import OrderActivityOperation from '../src/orders/service/activities/model/Order
 import OrderActivityResult from '../src/orders/service/activities/model/OrderActivityResult';
 import ProductFilterRequest from '../src/products/filters/models/ProductFilterRequest';
 import VariantsPage from '../src/variants/model/VariantsPage';
-import { InventoryItemCreateRequest } from './../src/inventories/model/InventoryItemCreateRequest';
-import { InventoryItemUpdateRequest } from './../src/inventories/model/InventoryItemUpdateRequest';
+import InventoryItemCreateRequest from './../src/inventories/model/InventoryItemCreateRequest';
+import InventoryItemUpdateRequest from './../src/inventories/model/InventoryItemUpdateRequest';
 import LocationCreateRequest from './../src/locations/model/LocationCreateRequest';
 import LocationUpdateRequest from './../src/locations/model/LocationUpdateRequest';
 import AdjustmentRequest from './../src/inventories/quantities/model/AdjustmentRequest';
+import { InventoryStatus } from '../src/inventories/enum/InventoryStatus';
+import { AdjustmentsBySku } from '../src';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
@@ -932,12 +934,14 @@ describe('ChannelApe Client', () => {
           const inventoryItemId = '34';
           const locationId = '28';
           const quantity = -148;
-          const inventoryStatus = 'AVAILABLE_TO_SELL';
+          const inventoryStatus =  InventoryStatus.AVAILABLE_TO_SELL;
+          const idempotentKey  = `${new Date().toISOString()}_${locationId}_${inventoryItemId}_${inventoryStatus}`;
           const adjustmentRequest: AdjustmentRequest = {
             inventoryItemId,
             locationId,
             quantity,
-            inventoryStatus
+            inventoryStatus,
+            idempotentKey
           };
           const actualAdjustment = await channelApeClient.inventories().quantities().adjust(adjustmentRequest);
           expect(actualAdjustment.inventoryItemId).to.equal(inventoryItemId);
@@ -953,7 +957,7 @@ describe('ChannelApe Client', () => {
           const inventoryItemId = '33';
           const locationId = '28';
           const quantity = 29;
-          const inventoryStatus = 'ON_ORDER';
+          const inventoryStatus = InventoryStatus.ON_ORDER;
           const adjustmentRequest: AdjustmentRequest = {
             inventoryItemId,
             locationId,
@@ -968,6 +972,77 @@ describe('ChannelApe Client', () => {
           expect(actualAdjustment.inventoryStatus).to.equal(adjustmentRequest.inventoryStatus);
         });
       });
+    });
+
+    describe('And valid batch adjustment request', () => {
+      context('When adjusting quantities', () => {
+        it('Then update', async () => {
+          const currentDateTime = new Date().toISOString();
+          const adjustmentsBySku: AdjustmentsBySku[] = [{
+            sku: 'A1',
+            adjustments: [{
+              quantity: 1,
+              inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+              deduplicationKey: currentDateTime,
+              locationId: '28'
+            }, {
+              quantity: 3,
+              inventoryStatus: InventoryStatus.ON_HOLD,
+              deduplicationKey: currentDateTime,
+              locationId: '28'
+            }]
+          }, {
+            sku: 'B1',
+            adjustments: [{
+              quantity: 2,
+              inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+              deduplicationKey: currentDateTime,
+              locationId: '28'
+            }, {
+              quantity: 0,
+              inventoryStatus: InventoryStatus.ON_HOLD,
+              deduplicationKey: currentDateTime,
+              locationId: '28'
+            }]
+          }];
+          await channelApeClient.inventories().quantities().setBatch(adjustmentsBySku);
+        });
+      });
+
+      context('When setting quantities', () => {
+        it('Then update', async () => {
+          const currentDateTime = new Date().toISOString();
+          const adjustmentsBySku: AdjustmentsBySku[] = [{
+            sku: 'A1',
+            adjustments: [{
+              quantity: 1,
+              inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+              deduplicationKey: currentDateTime,
+              locationId: '28'
+            }, {
+              quantity: 3,
+              inventoryStatus: InventoryStatus.ON_HOLD,
+              deduplicationKey: currentDateTime,
+              locationId: '28'
+            }]
+          }, {
+            sku: 'B1',
+            adjustments: [{
+              quantity: 2,
+              inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+              deduplicationKey: currentDateTime,
+              locationId: '28'
+            }, {
+              quantity: 0,
+              inventoryStatus: InventoryStatus.ON_HOLD,
+              deduplicationKey: currentDateTime,
+              locationId: '28'
+            }]
+          }];
+          await channelApeClient.inventories().quantities().setBatch(adjustmentsBySku);
+        });
+      });
+
     });
 
     describe('And valid inventory item id', () => {
