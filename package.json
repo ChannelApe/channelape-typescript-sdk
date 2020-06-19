@@ -65,7 +65,7 @@
     }
   ],
   "dependencies": {
-    "axios": "^0.18.1",
+    "axios": "^0.19.2",
     "channelape-logger": "^0.2.0",
     "q": "1.5.1",
     "qs": "^6.9.1",
