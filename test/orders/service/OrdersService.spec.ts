@@ -214,7 +214,7 @@ describe('OrdersService', () => {
       });
     });
 
-    it.only(`And valid businessId, start date, and end date
+    it(`And valid businessId, start date, and end date
             When retrieving orders Then return resolved promise with orders`, () => {
       const startDate = '2018-05-01T18:07:58.009Z';
       const updatedAtStartDate = '2018-05-01T18:08:58.009Z';
