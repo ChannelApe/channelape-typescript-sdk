@@ -214,9 +214,12 @@ describe('OrdersService', () => {
       });
     });
 
-    it(`And valid businessId, start date, and end date
+    it.only(`And valid businessId, start date, and end date
             When retrieving orders Then return resolved promise with orders`, () => {
       const startDate = '2018-05-01T18:07:58.009Z';
+      const updatedAtStartDate = '2018-05-01T18:08:58.009Z';
+      const updatedAtEndDate = '2018-05-01T18:08:59.009Z';
+
       const endDate = '2018-05-07T18:07:58.009Z';
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
 
@@ -227,6 +230,8 @@ describe('OrdersService', () => {
           params: {
             startDate,
             endDate,
+            updatedAtStartDate,
+            updatedAtEndDate,
             businessId
           }
         }
@@ -240,7 +245,9 @@ describe('OrdersService', () => {
       const requestOptions: OrdersQueryRequestByBusinessId = {
         businessId,
         startDate: new Date(startDate),
-        endDate: new Date(endDate)
+        endDate: new Date(endDate),
+        updatedAtStartDate: new Date(updatedAtStartDate),
+        updatedAtEndDate: new Date(updatedAtEndDate)
       };
       return ordersService.get(requestOptions).then((actualOrders) => {
         expect(actualOrders).to.be.an('array');
