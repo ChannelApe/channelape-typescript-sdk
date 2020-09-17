@@ -62,7 +62,8 @@ describe('Inventory Quantities Service', () => {
           deduplicationKey,
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 3,
-          locationId: location.id
+          locationId: location.id,
+          memo: 'Test memo'
         }]
       }];
       const createdInventoryItem = {
@@ -98,7 +99,8 @@ describe('Inventory Quantities Service', () => {
         quantity: adjustmentsBySku[0].adjustments[0].quantity,
         inventoryItemId: createdInventoryItem.id,
         inventoryStatus: expectedStatus,
-        idempotentKey: buildKey(deduplicationKey, location.id, createdInventoryItem.id, expectedStatus)
+        idempotentKey: buildKey(deduplicationKey, location.id, createdInventoryItem.id, expectedStatus),
+        memo: adjustmentsBySku[0].adjustments[0].memo
       });
     });
 
