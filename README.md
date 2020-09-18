@@ -571,12 +571,14 @@ const adjustmentsBySku: AdjustmentsBySku = [{
     quantity: 1,
     inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
     deduplicationKey: '05052020',
-    locationId: '123'
+    locationId: '123',
+    memo: 'Memo'
   }, {
     quantity: 3,
     inventoryStatus: InventoryStatus.ON_HOLD,
     deduplicationKey: '05052020',
-    locationId: '123'
+    locationId: '123',
+    memo: 'Memo'
   }]
 }, {
   sku: 'B1',
@@ -584,12 +586,14 @@ const adjustmentsBySku: AdjustmentsBySku = [{
     quantity: 2,
     inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
     deduplicationKey: '05052020',
-    locationId: '123'
+    locationId: '123',
+    memo: 'Memo'
   }, {
     quantity: 0,
     inventoryStatus: InventoryStatus.ON_HOLD,
     deduplicationKey: '05052020',
-    locationId: '123'
+    locationId: '123',
+    memo: 'Memo'
   }]
 }];
 ```

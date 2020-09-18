@@ -222,8 +222,12 @@ export class InventoryBatchAdjustmentsService {
       locationId: adjustment.locationId,
       quantity: adjustment.quantity,
       inventoryItemId: inventoryItem.id,
-      inventoryStatus: adjustment.inventoryStatus,
+      inventoryStatus: adjustment.inventoryStatus
     };
+
+    if (adjustment.memo) {
+      adjustmentRequest.memo = adjustment.memo;
+    }
 
     try {
       let result;
