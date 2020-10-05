@@ -12,7 +12,7 @@ describe('JsonOrderFormatterService', () => {
         try {
           JsonOrderFormatterService.formatOrder('{"id":"order-id"}');
         } catch (e) {
-          expect(e.message).to.equal('Cannot read property \'map\' of undefined');
+          expect(e.message).to.equal("Cannot read property 'map' of undefined");
         }
       });
     });
@@ -44,9 +44,9 @@ describe('JsonOrderFormatterService', () => {
     describe('without required order properties', () => {
       it('Throw an error', () => {
         try {
-          JsonOrderFormatterService.formatOrder({ id : 'order-id' });
+          JsonOrderFormatterService.formatOrder({ id: 'order-id' });
         } catch (e) {
-          expect(e.message).to.equal('Cannot read property \'map\' of undefined');
+          expect(e.message).to.equal("Cannot read property 'map' of undefined");
         }
       });
     });
@@ -56,6 +56,30 @@ describe('JsonOrderFormatterService', () => {
         const order = JsonOrderFormatterService.formatOrder(singleOrder.default);
         expect(order.id).to.equal('c0f45529-cbed-4e90-9a38-c208d409ef2a');
         expect(order.updatedAt.getFullYear()).to.equal(2018);
+      });
+    });
+
+    describe('with bad user input of leading or trailing whitespace', () => {
+      it('Return an Order with trimmed fields', () => {
+        const badSingleOrder = JSON.parse(JSON.stringify(singleOrder.default));
+        badSingleOrder.customer.name = '                    ';
+        badSingleOrder.customer.email = 'Aurore.Purdy17@gmail.com     ';
+        badSingleOrder.customer.phone = ' 555-555-5555  ';
+        badSingleOrder.customer.shippingAddress.address2 = '    ';
+        badSingleOrder.customer.shippingAddress.city = '    South Deanhaven';
+        const order = JsonOrderFormatterService.formatOrder(badSingleOrder);
+        const trimmedRegex = /^\S.*\S$/;
+        expect(order.customer).to.exist;
+        if (order.customer) {
+          expect(order.customer.name).to.be.empty;
+          expect(order.customer.email).to.match(trimmedRegex);
+          expect(order.customer.phone).to.match(trimmedRegex);
+          expect(order.customer.shippingAddress).to.exist;
+          if (order.customer.shippingAddress) {
+            expect(order.customer.shippingAddress.address2).to.be.empty;
+            expect(order.customer.shippingAddress.city).to.match(trimmedRegex);
+          }
+        }
       });
     });
   });
