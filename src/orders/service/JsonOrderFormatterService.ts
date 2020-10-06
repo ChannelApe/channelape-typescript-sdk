@@ -2,7 +2,6 @@ import Order from '../model/Order';
 import OrderStatus from '../model/OrderStatus';
 import LineItem from '../model/LineItem';
 import Fulfillment from '../model/Fulfillment';
-import Customer from '../model/Customer';
 import trimObject from '../../utils/trimObject';
 
 export default class JsonOrderFormatterService {
@@ -28,12 +27,11 @@ export default class JsonOrderFormatterService {
     }
     order.totalTax = Number(order.totalTax);
     order.totalGrams = Number(order.totalGrams);
-    order.customer = trimObject(order.customer) as Customer;
     order.lineItems = order.lineItems.map(JsonOrderFormatterService.formatLineItem);
     order.fulfillments = order.fulfillments.map((f: any) =>
       JsonOrderFormatterService.formatFulfillment(f),
     );
-    return order as Order;
+    return trimObject(order) as Order;
   }
 
   private static formatFulfillment(fulfillment: Fulfillment): Fulfillment {
