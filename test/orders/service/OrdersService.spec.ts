@@ -299,7 +299,7 @@ describe('OrdersService', () => {
       const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
 
       const expectedErrorMessage =
-      `get /v1/orders
+        `get /v1/orders
   Status: 404
   Response Body:
   Request failed with status code 404`;
