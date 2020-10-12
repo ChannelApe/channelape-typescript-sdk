@@ -214,7 +214,7 @@ describe('OrdersService', () => {
       });
     });
 
-    it(`And valid businessId, start date, and end date
+    it(`And valid businessId, start date, end date, updatedAt start date, and updatedAt end date
             When retrieving orders Then return resolved promise with orders`, () => {
       const startDate = '2018-05-01T18:07:58.009Z';
       const updatedAtStartDate = '2018-05-01T18:08:58.009Z';
@@ -254,6 +254,73 @@ describe('OrdersService', () => {
         expect(actualOrders.length).to.equal(2);
         expect(actualOrders[0].businessId).to.equal(businessId);
       });
+    });
+
+    it(`And valid businessId, updatedAt start date, and updatedAt end date
+            When retrieving orders Then return resolved promise with orders`, () => {
+      const updatedAtStartDate = '2018-05-01T18:08:58.009Z';
+      const updatedAtEndDate = '2018-05-01T18:08:59.009Z';
+      const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
+
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onGet(
+        `${Environment.STAGING}/${Version.V1}/orders`,
+        {
+          params: {
+            updatedAtStartDate,
+            updatedAtEndDate,
+            businessId
+          }
+        }
+      ).reply(200, {
+        orders: multipleOrders,
+        pagination: {
+          lastPage: true
+        }
+      });
+
+      const requestOptions: OrdersQueryRequestByBusinessId = {
+        businessId,
+        updatedAtStartDate: new Date(updatedAtStartDate),
+        updatedAtEndDate: new Date(updatedAtEndDate)
+      };
+      return ordersService.get(requestOptions).then((actualOrders) => {
+        expect(actualOrders).to.be.an('array');
+        expect(actualOrders.length).to.equal(2);
+        expect(actualOrders[0].businessId).to.equal(businessId);
+      });
+    });
+
+    it(`And valid businessId, updatedAt start date before start date and updatedAt end date,
+            When retrieving orders Then return rejected promise with ChannelApeError`, () => {
+      const endDate = '2018-04-30T14:08:58.009Z';
+      const updatedAtStartDate = '2018-05-01T18:08:58.009Z';
+      const updatedAtEndDate = '2018-05-01T18:08:59.009Z';
+      const businessId = '4d688534-d82e-4111-940c-322ba9aec108';
+
+      const expectedErrorMessage =
+      `get /v1/orders
+  Status: 404
+  Response Body:
+  Request failed with status code 404`;
+
+      const mockedAxiosAdapter = new axiosMockAdapter(axios);
+      mockedAxiosAdapter.onGet().reply(404, {
+        statusCode: 404
+      });
+
+      const requestOptions: OrdersQueryRequestByBusinessId = {
+        businessId,
+        startDate: new Date(endDate),
+        updatedAtStartDate: new Date(updatedAtStartDate),
+        updatedAtEndDate: new Date(updatedAtEndDate)
+      };
+      return ordersService.get(requestOptions).then((actualOrders) => {
+        throw new Error('Test failed!');
+      })
+        .catch((e: ChannelApeError) => {
+          expect(e.message).to.equal(expectedErrorMessage);
+        });
     });
 
     it(`And valid businessId and single status
