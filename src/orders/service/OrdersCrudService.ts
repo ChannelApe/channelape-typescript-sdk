@@ -124,6 +124,12 @@ export default class OrdersCrudService {
     if (ordersQueryParams.endDate != null && typeof ordersQueryParams.endDate !== 'string') {
       ordersQueryParams.endDate = ordersQueryParams.endDate.toISOString();
     }
+    if (ordersQueryParams.updatedAtStartDate != null && typeof ordersQueryParams.updatedAtStartDate !== 'string') {
+      ordersQueryParams.updatedAtStartDate = ordersQueryParams.updatedAtStartDate.toISOString();
+    }
+    if (ordersQueryParams.updatedAtEndDate != null && typeof ordersQueryParams.updatedAtEndDate !== 'string') {
+      ordersQueryParams.updatedAtEndDate = ordersQueryParams.updatedAtEndDate.toISOString();
+    }
 
     const options: AxiosRequestConfig = {
       params: ordersQueryParams,
