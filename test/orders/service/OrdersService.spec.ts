@@ -637,7 +637,6 @@ Code: 15 Message: Requested business cannot be found.`;
     });
 
     it('And valid OrderCreateRequest with an actionId when creating an order, Then return created order', () => {
-      console.log(JSON.stringify(singleOrder));
       const orderCreateRequest: OrderCreateRequest = JSON.parse(JSON.stringify(singleOrder));
       orderCreateRequest.actionId = 'some-action-id';
       orderCreateRequest.fulfillments!.push({
