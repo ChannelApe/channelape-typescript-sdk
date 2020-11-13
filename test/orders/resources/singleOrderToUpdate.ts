@@ -232,7 +232,18 @@ const singleOrderToUpdate: Order = {
       shippingMethod: 'Standard',
       sku: 'b4809155-1c5d-4b3b-affc-491ad5503007',
       title: 'Ergonomic Plastic Computer',
-      vendor: 'Greenholt Group'
+      vendor: 'Greenholt Group',
+      taxes: [
+        {
+          price: 9.99,
+          rate: 0.06,
+          title: 'PA State Tax'
+        },
+        {
+          price: 1.00,
+          title: 'NV State Tax'
+        }
+      ],
     },
     {
       additionalFields: [
@@ -284,7 +295,8 @@ const singleOrderToUpdate: Order = {
       shippingMethod: 'Standard',
       sku: 'fc4bad52-475e-4320-828e-00fc753244fe',
       title: 'Tasty Cotton Bike',
-      vendor: 'Frami LLC'
+      vendor: 'Frami LLC',
+      taxes: []
     }
   ],
   purchasedAt: new Date('2018-03-29T19:06:26.000Z'),
