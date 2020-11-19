@@ -1,4 +1,5 @@
 import AdditionalField from '../../model/AdditionalField';
+import Tax from './Tax';
 
 export default interface LineItem {
   additionalFields?: AdditionalField[];
@@ -14,6 +15,7 @@ export default interface LineItem {
   title?: string;
   vendor?: string;
   restockType?: string;
+  taxes?: Tax[];
   readonly giftCardCode?: string;
   readonly giftCardId?: string;
 }

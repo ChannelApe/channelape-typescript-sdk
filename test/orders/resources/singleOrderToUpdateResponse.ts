@@ -350,7 +350,18 @@ export default {
       shippingMethod: 'Standard',
       sku: 'e67f1d90-824a-4941-8497-08d632763c93',
       title: 'Generic Steel Shirt',
-      vendor: 'Ankunding - Corwin'
+      vendor: 'Ankunding - Corwin',
+      taxes: [
+        {
+          price: 9.99,
+          rate: 0.06,
+          title: 'PA State Tax'
+        },
+        {
+          price: 1.00,
+          title: 'NV State Tax'
+        }
+      ],
     },
     {
       additionalFields: [
@@ -402,7 +413,8 @@ export default {
       shippingMethod: 'Standard',
       sku: '27464759-a723-47bf-8d31-332cec285ead',
       title: 'Tasty Steel Bacon',
-      vendor: 'Hand, Swift and Langosh'
+      vendor: 'Hand, Swift and Langosh',
+      taxes: []
     }
   ],
   purchasedAt: '2018-03-29T19:06:26.000Z',
