@@ -58,8 +58,8 @@ describe('JsonOrderFormatterService', () => {
         const order = JsonOrderFormatterService.formatOrder(singleOrder.default);
         expect(order.id).to.equal('c0f45529-cbed-4e90-9a38-c208d409ef2a');
         expect(order.updatedAt.getFullYear()).to.equal(2018);
-        expect (order.lineItems.length).to.equals(2);
-        expect (order.lineItems[0].taxes).to.not.be.undefined;
+        expect(order.lineItems.length).to.equals(2);
+        expect(order.lineItems[0].taxes).to.not.be.undefined;
         // @ts-ignore
         expect(order.lineItems[0].taxes[0].price).to.equals(Number(9.99));
         // @ts-ignore
@@ -72,9 +72,6 @@ describe('JsonOrderFormatterService', () => {
         expect(order.lineItems[0].taxes[1].rate).to.be.undefined;
         // @ts-ignore
         expect(order.lineItems[0].taxes[1].title).to.equals('NV State Tax');
-        
-
-        
       });
     });
 

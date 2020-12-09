@@ -23,7 +23,6 @@ export default class JsonOrderFormatterService {
     order.totalPrice = Number(order.totalPrice);
     order.subtotalPrice = Number(order.subtotalPrice);
     order.totalShippingPrice = Number(order.totalShippingPrice);
-    
     if (typeof order.totalShippingTax !== 'undefined') {
       order.totalShippingTax = Number(order.totalShippingTax);
     }
@@ -57,6 +56,6 @@ export default class JsonOrderFormatterService {
     tax.price = Number(tax.price);
     tax.rate = tax.rate ? Number(tax.rate) : undefined;
     return tax;
-  };
+  }
 
 }
