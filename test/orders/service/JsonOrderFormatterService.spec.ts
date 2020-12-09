@@ -55,7 +55,11 @@ describe('JsonOrderFormatterService', () => {
 
     describe('with all required order properties', () => {
       it('Return an Order', () => {
-        const order = JsonOrderFormatterService.formatOrder(singleOrder.default);
+        const anyOrder = JSON.parse(JSON.stringify(singleOrder.default));
+        anyOrder.lineItems[0].taxes[0].price = '9.99';
+        anyOrder.lineItems[0].taxes[0].rate = '0.06';
+        anyOrder.lineItems[0].taxes[1].price = '1.00';
+        const order = JsonOrderFormatterService.formatOrder(JSON.stringify(anyOrder));
         expect(order.id).to.equal('c0f45529-cbed-4e90-9a38-c208d409ef2a');
         expect(order.updatedAt.getFullYear()).to.equal(2018);
         expect(order.lineItems.length).to.equals(2);
