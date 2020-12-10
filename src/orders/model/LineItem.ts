@@ -16,6 +16,6 @@ export default interface LineItem {
   vendor?: string;
   restockType?: string;
   taxes?: Tax[];
-  readonly giftCardCode?: string;
+  giftCardCode?: string;
   readonly giftCardId?: string;
 }

@@ -3,6 +3,7 @@ import OrderStatus from '../model/OrderStatus';
 import LineItem from '../model/LineItem';
 import Fulfillment from '../model/Fulfillment';
 import trimObject from '../../utils/trimObject';
+import Tax from '../model/Tax';
 
 export default class JsonOrderFormatterService {
   public static formatOrder(rawOrder: any): Order {
@@ -45,6 +46,16 @@ export default class JsonOrderFormatterService {
   private static formatLineItem(lineItem: LineItem): LineItem {
     lineItem.grams = Number(lineItem.grams);
     lineItem.price = Number(lineItem.price);
+    if (typeof lineItem.taxes !== 'undefined') {
+      lineItem.taxes = lineItem.taxes.map(JsonOrderFormatterService.formatLineItemTax);
+    }
     return lineItem;
   }
+
+  private static formatLineItemTax(tax: Tax): Tax {
+    tax.price = Number(tax.price);
+    tax.rate = tax.rate ? Number(tax.rate) : undefined;
+    return tax;
+  }
+
 }
