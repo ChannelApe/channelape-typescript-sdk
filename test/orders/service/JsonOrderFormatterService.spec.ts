@@ -4,6 +4,7 @@ import * as fs from 'fs';
 
 import * as singleOrder from '../resources/singleOrder';
 import JsonOrderFormatterService from '../../../src/orders/service/JsonOrderFormatterService';
+import { fail } from 'assert';
 
 describe('JsonOrderFormatterService', () => {
   describe('Given a JSON string', () => {
@@ -45,6 +46,7 @@ describe('JsonOrderFormatterService', () => {
       it('Throw an error', () => {
         try {
           JsonOrderFormatterService.formatOrder({ id: 'order-id' });
+          fail('Expected exception to be thrown but none occurred');
         } catch (e) {
           expect(e.message).to.equal("Cannot read property 'map' of undefined");
         }
@@ -53,9 +55,27 @@ describe('JsonOrderFormatterService', () => {
 
     describe('with all required order properties', () => {
       it('Return an Order', () => {
-        const order = JsonOrderFormatterService.formatOrder(singleOrder.default);
+        const anyOrder = JSON.parse(JSON.stringify(singleOrder.default));
+        anyOrder.lineItems[0].taxes[0].price = '9.99';
+        anyOrder.lineItems[0].taxes[0].rate = '0.06';
+        anyOrder.lineItems[0].taxes[1].price = '1.00';
+        const order = JsonOrderFormatterService.formatOrder(JSON.stringify(anyOrder));
         expect(order.id).to.equal('c0f45529-cbed-4e90-9a38-c208d409ef2a');
         expect(order.updatedAt.getFullYear()).to.equal(2018);
+        expect(order.lineItems.length).to.equals(2);
+        expect(order.lineItems[0].taxes).to.not.be.undefined;
+        // @ts-ignore
+        expect(order.lineItems[0].taxes[0].price).to.equals(Number(9.99));
+        // @ts-ignore
+        expect(order.lineItems[0].taxes[0].rate).to.equals(Number(0.06));
+        // @ts-ignore
+        expect(order.lineItems[0].taxes[0].title).to.equals('PA State Tax');
+        // @ts-ignore
+        expect(order.lineItems[0].taxes[1].price).to.equals(Number(1.00));
+        // @ts-ignore
+        expect(order.lineItems[0].taxes[1].rate).to.be.undefined;
+        // @ts-ignore
+        expect(order.lineItems[0].taxes[1].title).to.equals('NV State Tax');
       });
     });
 
