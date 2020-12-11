@@ -4,6 +4,9 @@ import LineItem from '../model/LineItem';
 import Fulfillment from '../model/Fulfillment';
 import trimObject from '../../utils/trimObject';
 import Tax from '../model/Tax';
+import RefundTransaction from '../model/RefundTransaction';
+import Refund from '../model/Refund';
+import RefundAdjustment from '../model/RefundAdjustment';
 
 export default class JsonOrderFormatterService {
   public static formatOrder(rawOrder: any): Order {
@@ -32,6 +35,9 @@ export default class JsonOrderFormatterService {
     order.fulfillments = order.fulfillments.map((f: any) =>
       JsonOrderFormatterService.formatFulfillment(f),
     );
+    order.refunds = order.refunds.map((r: any) =>
+      JsonOrderFormatterService.formatRefund(r),
+    );
     return trimObject(order) as Order;
   }
 
@@ -56,6 +62,26 @@ export default class JsonOrderFormatterService {
     tax.price = Number(tax.price);
     tax.rate = tax.rate ? Number(tax.rate) : undefined;
     return tax;
+  }
+
+  private static formatRefund(refund: Refund): Refund {
+    if (typeof refund.transactions !== 'undefined') {
+      refund.transactions = refund.transactions.map(JsonOrderFormatterService.formatRefundTransaction);
+    }
+    if (typeof refund.adjustments !== 'undefined') {
+      refund.adjustments = refund.adjustments.map(JsonOrderFormatterService.formatRefundAdjustment);
+    }
+    return refund;
+  }
+
+  private static formatRefundTransaction(refundTransaction: RefundTransaction): RefundTransaction {
+    refundTransaction.amount = Number(refundTransaction.amount);
+    return refundTransaction;
+  }
+
+  private static formatRefundAdjustment(refundAdjustment: RefundAdjustment): RefundAdjustment {
+    refundAdjustment.amount = Number(refundAdjustment.amount);
+    return refundAdjustment;
   }
 
 }

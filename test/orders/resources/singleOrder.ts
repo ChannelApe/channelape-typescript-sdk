@@ -1,3 +1,4 @@
+import TransactionStatus from '../../../src/orders/model/TransactionStatus';
 import Order from '../../../src/orders/model/Order';
 import OrderStatus from '../../../src/orders/model/OrderStatus';
 
@@ -303,6 +304,33 @@ const singleOrder: Order = {
           sku: 'ABC-124',
           quantity: 13,
           restockType: 'NO_RESTOCK'
+        }
+      ],
+      transactions: [
+        {
+          amount: 12.99,
+          id: 'transaction-1234',
+          message: 'Refunded 12.99 from manual gateway',
+          status: TransactionStatus.SUCCESS
+        },
+        {
+          amount: 15.99,
+          id: 'transaction-5678',
+          message: 'Refunded 15.99 from manual gateway',
+          status: TransactionStatus.ERROR
+        }
+      ],
+      adjustments: [
+        {
+          amount: -12.99,
+          id: 'adjustment-1234',
+          reason: 'Shipping Refund',
+          taxAmount: -0.99
+        },
+        {
+          amount: -10.00,
+          id: 'adjustment-5678',
+          reason: 'Second Payment Method'
         }
       ]
     }
