@@ -69,7 +69,7 @@ describe('OrdersService', () => {
         // @ts-ignore
         expect(2).to.equal(expectedRefund.transactions.length);
         // @ts-ignore
-        const expectedTransaction1 = actualRefund1.transactions[0]; 
+        const expectedTransaction1 = actualRefund1.transactions[0];
         // @ts-ignore
         const actualTransaction1 = actualRefund1.transactions[0];
         expect(actualTransaction1.id).to.equal(expectedTransaction1.id);
@@ -77,7 +77,7 @@ describe('OrdersService', () => {
         expect(actualTransaction1.message).to.equal(expectedTransaction1.message);
         expect(actualTransaction1.status).to.equal(expectedTransaction1.status);
         // @ts-ignore
-        const expectedTransaction2 = actualRefund1.transactions[1]; 
+        const expectedTransaction2 = actualRefund1.transactions[1];
         // @ts-ignore
         const actualTransaction2 = actualRefund1.transactions[1];
         expect(actualTransaction2.id).to.equal(expectedTransaction2.id);
@@ -87,7 +87,7 @@ describe('OrdersService', () => {
         // @ts-ignore
         expect(2).to.equal(expectedRefund.adjustments.length);
         // @ts-ignore
-        const expectedAdjustment1 = actualRefund1.adjustments[0]; 
+        const expectedAdjustment1 = actualRefund1.adjustments[0];
         // @ts-ignore
         const actualAdjustment1 = actualRefund1.adjustments[0];
         expect(actualAdjustment1.id).to.equal(expectedAdjustment1.id);
@@ -95,7 +95,7 @@ describe('OrdersService', () => {
         expect(actualAdjustment1.reason).to.equal(expectedAdjustment1.reason);
         expect(actualAdjustment1.taxAmount).to.equal(expectedAdjustment1.taxAmount);
         // @ts-ignore
-        const expectedAdjustment2 = actualRefund1.adjustments[0]; 
+        const expectedAdjustment2 = actualRefund1.adjustments[0];
         // @ts-ignore
         const actualAdjustment2 = actualRefund1.adjustments[0];
         expect(actualAdjustment2.id).to.equal(expectedAdjustment2.id);
