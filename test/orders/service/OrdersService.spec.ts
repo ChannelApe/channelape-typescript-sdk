@@ -69,7 +69,7 @@ describe('OrdersService', () => {
         // @ts-ignore
         expect(2).to.equal(expectedRefund.transactions.length);
         // @ts-ignore
-        const expectedTransaction1 = actualRefund1.transactions[0];
+        const expectedTransaction1 = actualRefund1.transactions[0]; 
         // @ts-ignore
         const actualTransaction1 = actualRefund1.transactions[0];
         expect(actualTransaction1.id).to.equal(expectedTransaction1.id);
@@ -77,7 +77,7 @@ describe('OrdersService', () => {
         expect(actualTransaction1.message).to.equal(expectedTransaction1.message);
         expect(actualTransaction1.status).to.equal(expectedTransaction1.status);
         // @ts-ignore
-        const expectedTransaction2 = actualRefund1.transactions[1];
+        const expectedTransaction2 = actualRefund1.transactions[1]; 
         // @ts-ignore
         const actualTransaction2 = actualRefund1.transactions[1];
         expect(actualTransaction2.id).to.equal(expectedTransaction2.id);
@@ -87,7 +87,7 @@ describe('OrdersService', () => {
         // @ts-ignore
         expect(2).to.equal(expectedRefund.adjustments.length);
         // @ts-ignore
-        const expectedAdjustment1 = actualRefund1.adjustments[0];
+        const expectedAdjustment1 = actualRefund1.adjustments[0]; 
         // @ts-ignore
         const actualAdjustment1 = actualRefund1.adjustments[0];
         expect(actualAdjustment1.id).to.equal(expectedAdjustment1.id);
@@ -95,12 +95,13 @@ describe('OrdersService', () => {
         expect(actualAdjustment1.reason).to.equal(expectedAdjustment1.reason);
         expect(actualAdjustment1.taxAmount).to.equal(expectedAdjustment1.taxAmount);
         // @ts-ignore
-        const expectedAdjustment2 = actualRefund1.adjustments[0];
+        const expectedAdjustment2 = actualRefund1.adjustments[0]; 
         // @ts-ignore
         const actualAdjustment2 = actualRefund1.adjustments[0];
         expect(actualAdjustment2.id).to.equal(expectedAdjustment2.id);
         expect(actualAdjustment2.amount).to.equal(expectedAdjustment2.amount);
         expect(actualAdjustment2.reason).to.equal(expectedAdjustment2.reason);
+        expect(actualAdjustment2.taxAmount).to.equal(expectedAdjustment2.taxAmount);
         expect(2).to.equal(expectedRefund.lineItems.length);
         expect(actualRefund1.lineItems[0].sku).to.equal(expectedRefund.lineItems[0].sku);
         expect(actualRefund1.lineItems[0].upc).to.equal(expectedRefund.lineItems[0].upc);
@@ -709,6 +710,7 @@ Code: 15 Message: Requested business cannot be found.`;
         const actualRefund1 = createdOrder.refunds[0];
         expect(actualRefund1.channelRefundId).to.equal(expectedRefund.channelRefundId);
         expect(actualRefund1.supplierRefundId).to.equal(expectedRefund.supplierRefundId);
+
         expect(2).to.equal(expectedRefund.lineItems.length);
         expect(actualRefund1.lineItems[0].sku).to.equal(expectedRefund.lineItems[0].sku);
         expect(actualRefund1.lineItems[0].upc).to.equal(expectedRefund.lineItems[0].upc);
