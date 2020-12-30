@@ -69,7 +69,7 @@ export default class JsonOrderFormatterService {
   }
 
   private static formatRefund(refund: Refund): Refund {
-    if (typeof refund.lineItems  !== 'undefined') {
+    if (typeof refund.lineItems !== 'undefined') {
       refund.lineItems = refund.lineItems.map(JsonOrderFormatterService.formatLineItem);
     }
     if (typeof refund.transactions !== 'undefined') {

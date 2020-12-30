@@ -84,14 +84,14 @@ describe('OrdersService', () => {
         expect(actualTransaction2.amount).to.equal(expectedTransaction2.amount);
         expect(actualTransaction2.message).to.equal(expectedTransaction2.message);
         expect(actualTransaction2.status).to.equal(expectedTransaction2.status);
-         // @ts-ignore
-         const expectedTransaction3 = expectedRefund.transactions[2];
-         // @ts-ignore
-         const actualTransaction3 = actualRefund1.transactions[2];
-         expect(actualTransaction3.id).to.equal(expectedTransaction3.id);
-         expect(actualTransaction3.amount).to.equal(expectedTransaction3.amount);
-         expect(actualTransaction3.message).to.equal(expectedTransaction3.message);
-         expect(actualTransaction3.status).to.equal(expectedTransaction3.status);
+        // @ts-ignore
+        const expectedTransaction3 = expectedRefund.transactions[2];
+        // @ts-ignore
+        const actualTransaction3 = actualRefund1.transactions[2];
+        expect(actualTransaction3.id).to.equal(expectedTransaction3.id);
+        expect(actualTransaction3.amount).to.equal(expectedTransaction3.amount);
+        expect(actualTransaction3.message).to.equal(expectedTransaction3.message);
+        expect(actualTransaction3.status).to.equal(expectedTransaction3.status);
         // @ts-ignore
         expect(3).to.equal(expectedRefund.adjustments.length);
         // @ts-ignore
