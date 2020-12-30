@@ -1,11 +1,11 @@
 import LineItem from './LineItem';
-import RefundAdjustment from './RefundAdjustment';
-import RefundTransaction from './RefundTransaction';
+import Adjustment from './Adjustment';
+import Transaction from './Transaction';
 
 export default interface Refund {
   supplierRefundId?: string;
   channelRefundId?: string;
   lineItems: LineItem[];
-  transactions?: RefundTransaction[];
-  adjustments?: RefundAdjustment[];
+  transactions?: Transaction[];
+  adjustments?: Adjustment[];
 }

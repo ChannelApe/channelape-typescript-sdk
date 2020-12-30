@@ -4,9 +4,9 @@ import LineItem from '../model/LineItem';
 import Fulfillment from '../model/Fulfillment';
 import trimObject from '../../utils/trimObject';
 import Tax from '../model/Tax';
-import RefundTransaction from '../model/RefundTransaction';
+import Transaction from '../model/Transaction';
 import Refund from '../model/Refund';
-import RefundAdjustment from '../model/RefundAdjustment';
+import Adjustment from '../model/Adjustment';
 
 export default class JsonOrderFormatterService {
   public static formatOrder(rawOrder: any): Order {
@@ -50,8 +50,12 @@ export default class JsonOrderFormatterService {
   }
 
   private static formatLineItem(lineItem: LineItem): LineItem {
-    lineItem.grams = Number(lineItem.grams);
-    lineItem.price = Number(lineItem.price);
+    if (typeof lineItem.grams !== 'undefined') {
+      lineItem.grams = Number(lineItem.grams);
+    }
+    if (typeof lineItem.price !== 'undefined') {
+      lineItem.price = Number(lineItem.price);
+    }
     if (typeof lineItem.taxes !== 'undefined') {
       lineItem.taxes = lineItem.taxes.map(JsonOrderFormatterService.formatLineItemTax);
     }
@@ -65,23 +69,26 @@ export default class JsonOrderFormatterService {
   }
 
   private static formatRefund(refund: Refund): Refund {
+    if (typeof refund.lineItems  !== 'undefined') {
+      refund.lineItems = refund.lineItems.map(JsonOrderFormatterService.formatLineItem);
+    }
     if (typeof refund.transactions !== 'undefined') {
-      refund.transactions = refund.transactions.map(JsonOrderFormatterService.formatRefundTransaction);
+      refund.transactions = refund.transactions.map(JsonOrderFormatterService.formatTransaction);
     }
     if (typeof refund.adjustments !== 'undefined') {
-      refund.adjustments = refund.adjustments.map(JsonOrderFormatterService.formatRefundAdjustment);
+      refund.adjustments = refund.adjustments.map(JsonOrderFormatterService.formatAdjustment);
     }
     return refund;
   }
 
-  private static formatRefundTransaction(refundTransaction: RefundTransaction): RefundTransaction {
-    refundTransaction.amount = Number(refundTransaction.amount);
-    return refundTransaction;
+  private static formatTransaction(transaction: Transaction): Transaction {
+    transaction.amount = Number(transaction.amount);
+    return transaction;
   }
 
-  private static formatRefundAdjustment(refundAdjustment: RefundAdjustment): RefundAdjustment {
-    refundAdjustment.amount = Number(refundAdjustment.amount);
-    return refundAdjustment;
+  private static formatAdjustment(adjustment: Adjustment): Adjustment {
+    adjustment.amount = Number(adjustment.amount);
+    return adjustment;
   }
 
 }

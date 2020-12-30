@@ -1,4 +1,4 @@
-export default interface RefundAdjustment {
+export default interface Adjustment {
   id: string;
   amount: number;
   taxAmount?: number;

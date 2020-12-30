@@ -318,6 +318,11 @@ const singleOrder: Order = {
           id: 'transaction-5678',
           message: 'Refunded 15.99 from manual gateway',
           status: TransactionStatus.ERROR
+        },
+        {
+          amount: 10.50,
+          id: 'transaction-91011',
+          status: TransactionStatus.ERROR
         }
       ],
       adjustments: [
@@ -331,6 +336,10 @@ const singleOrder: Order = {
           amount: -10.00,
           id: 'adjustment-5678',
           reason: 'Second Payment Method'
+        },
+        {
+          amount: -10.50,
+          id: 'adjustment-91011'
         }
       ]
     }

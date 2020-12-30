@@ -1,6 +1,6 @@
 import TransactionStatus from './TransactionStatus';
 
-export default interface RefundTransaction {
+export default interface Transaction {
   id: string;
   message?: string;
   amount: number;
