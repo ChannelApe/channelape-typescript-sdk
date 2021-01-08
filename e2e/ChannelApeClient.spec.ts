@@ -219,6 +219,7 @@ describe('ChannelApe Client', () => {
             expect(actualOrder.id).to.equal(expectedOrderId);
             expect(actualOrder.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
             expect(actualOrder.status).to.equal(OrderStatus.OPEN);
+            // @ts-ignore
             expect(actualOrder.refunds![0].lineItems[0].quantity).to.equal(2);
             expect(actualOrder.refunds![0].channelRefundId).to.equal('74273487234');
             expect(actualOrder.refunds![0].supplierRefundId).to.equal('7348234');

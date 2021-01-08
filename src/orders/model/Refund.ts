@@ -5,7 +5,7 @@ import Transaction from './Transaction';
 export default interface Refund {
   supplierRefundId?: string;
   channelRefundId?: string;
-  lineItems: LineItem[];
+  lineItems?: LineItem[];
   transactions?: Transaction[];
   adjustments?: Adjustment[];
 }
