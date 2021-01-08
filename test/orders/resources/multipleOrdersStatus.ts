@@ -164,6 +164,7 @@ const multipleOrdersStatus: Order[] = [
       }
     },
     fulfillments: [],
+    refunds: [],
     id: 'c0f45529-cbed-4e90-9a38-c208d409ef2a',
     lineItems: [
       {
@@ -442,6 +443,7 @@ const multipleOrdersStatus: Order[] = [
       }
     },
     fulfillments: [],
+    refunds: [],
     id: 'd3257ee3-c7ee-4beb-bbee-8d5d12f0c1f1',
     lineItems: [
       {
@@ -724,6 +726,7 @@ const multipleOrdersStatus: Order[] = [
       }
     },
     fulfillments: [],
+    refunds: [],
     id: 'd3257ee3-c7ee-4beb-bbee-8d5d12f0c1f1',
     lineItems: [
       {
