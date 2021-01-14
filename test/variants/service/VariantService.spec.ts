@@ -372,7 +372,7 @@ describe('VariantsService', () => {
 
     describe('And valid businessId and valid sku', () => {
       context('When searching variants', () => {
-        it('Then return variant quick search results', () => {
+        it('And not doing exact match, Then return all variant quick search results', () => {
           const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
           const expectedSku = '6030038';
           const variantsRequest: VariantsSearchRequestBySku = {
@@ -389,11 +389,49 @@ describe('VariantsService', () => {
           const actualVariantsPromise = variantsService.search(variantsRequest);
           return actualVariantsPromise.then((actualVariants) => {
             expect(actualVariants).to.be.an('array');
+            expect(actualVariants.length).to.equal(3);
+            const variant1 = actualVariants[0];
+            expect(variant1!.businessId).to.equal(expectedBusinessId);
+            expect(variant1!.sku).to.equal(expectedSku);
+            expect(variant1!.vendor).to.equal('Caveman Foods');
+            expect(variant1!.title).to.equal('Caveman Foods Chicken Jerky');
+            const variant2 = actualVariants[1];
+            expect(variant2!.sku).to.equal('6030038-TEST-1');
+            expect(variant2!.businessId).to.equal(expectedBusinessId);
+            expect(variant2!.vendor).to.equal('Caveman Foods');
+            expect(variant2!.title).to.equal('Caveman Foods Chicken Jerky2');
+            const variant3 = actualVariants[2];
+            expect(variant3!.sku).to.equal('6030038-TEST-2');
+            expect(variant3!.businessId).to.equal(expectedBusinessId);
+            expect(variant3!.vendor).to.equal('Caveman Foods');
+            expect(variant3!.title).to.equal('Caveman Foods Chicken Jerky3');
+          });
+        });
+
+        it('And doing exact match, Then return only matched variant quick search result', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const expectedSku = '6030038';
+          const variantsRequest: VariantsSearchRequestBySku = {
+            sku: expectedSku,
+            businessId: expectedBusinessId,
+            exactMatch: true
+          };
+
+          const mockedAxiosAdapter = new axiosMockAdapter(axios);
+          const baseUrl = `${Environment.STAGING}/${Version.V1}${Resource.PRODUCTS}`;
+          mockedAxiosAdapter.onGet(`${baseUrl}${Resource.VARIANTS}${Resource.SKUS}`, {
+            params: variantsRequest
+          }).reply(200, getVariantsBySku);
+
+          const actualVariantsPromise = variantsService.search(variantsRequest);
+          return actualVariantsPromise.then((actualVariants) => {
+            expect(actualVariants).to.be.an('array');
             expect(actualVariants.length).to.equal(1);
-            const variant = actualVariants.find(v => v.sku === expectedSku);
-            expect(variant!.businessId).to.equal(expectedBusinessId);
-            expect(variant!.vendor).to.equal('Caveman Foods');
-            expect(variant!.title).to.equal('Caveman Foods Chicken Jerky');
+            const variant1 = actualVariants[0];
+            expect(variant1!.businessId).to.equal(expectedBusinessId);
+            expect(variant1!.sku).to.equal(expectedSku);
+            expect(variant1!.vendor).to.equal('Caveman Foods');
+            expect(variant1!.title).to.equal('Caveman Foods Chicken Jerky');
           });
         });
       });
@@ -401,12 +439,13 @@ describe('VariantsService', () => {
 
     describe('And valid businessId and valid upc', () => {
       context('When searching variants', () => {
-        it('Then return variant quick search results', () => {
+        it('And doing exact match, Then return variant quick search results', () => {
           const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
           const expectedUpc = '853385003971';
           const variantsRequest: VariantsSearchRequestByUpc = {
             upc: expectedUpc,
-            businessId: expectedBusinessId
+            businessId: expectedBusinessId,
+            exactMatch: true
           };
 
           const mockedAxiosAdapter = new axiosMockAdapter(axios);
@@ -423,6 +462,42 @@ describe('VariantsService', () => {
             expect(variant!.businessId).to.equal(expectedBusinessId);
             expect(variant!.vendor).to.equal('Caveman Foods');
             expect(variant!.title).to.equal('Caveman Foods Chicken Jerky');
+          });
+        });
+
+        it('And not doing exact match, Then return matching variant quick search result', () => {
+          const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+          const expectedUpc = '853385003971';
+          const variantsRequest: VariantsSearchRequestByUpc = {
+            upc: expectedUpc,
+            businessId: expectedBusinessId
+          };
+
+          const mockedAxiosAdapter = new axiosMockAdapter(axios);
+          const baseUrl = `${Environment.STAGING}/${Version.V1}${Resource.PRODUCTS}`;
+          mockedAxiosAdapter.onGet(`${baseUrl}${Resource.VARIANTS}${Resource.UPCS}`, {
+            params: variantsRequest
+          }).reply(200, getVariantsByUpc);
+
+          const actualVariantsPromise = variantsService.search(variantsRequest);
+          return actualVariantsPromise.then((actualVariants) => {
+            expect(actualVariants).to.be.an('array');
+            expect(actualVariants.length).to.equal(3);
+            const variant1 = actualVariants[0];
+            expect(variant1!.upc).to.equal(expectedUpc);
+            expect(variant1!.businessId).to.equal(expectedBusinessId);
+            expect(variant1!.vendor).to.equal('Caveman Foods');
+            expect(variant1!.title).to.equal('Caveman Foods Chicken Jerky');
+            const variant2 = actualVariants[1];
+            expect(variant2!.upc).to.equal('853385003971-TEST-1');
+            expect(variant2!.businessId).to.equal(expectedBusinessId);
+            expect(variant2!.vendor).to.equal('Caveman Foods');
+            expect(variant2!.title).to.equal('Caveman Foods Chicken Jerky2');
+            const variant3 = actualVariants[2];
+            expect(variant3!.upc).to.equal('853385003971-TEST-2');
+            expect(variant3!.businessId).to.equal(expectedBusinessId);
+            expect(variant3!.vendor).to.equal('Caveman Foods');
+            expect(variant3!.title).to.equal('Caveman Foods Chicken Jerky3');
           });
         });
       });
