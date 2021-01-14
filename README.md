@@ -242,6 +242,8 @@ channelApeClient.variants().search(variantsRequest)
 
 #### Get Variant Search Results for a SKU
 
+* *exactMatch* parameter if set to true will only match the exact sku set on the request instead of all sku's that start with that given character sequence.
+
 ````typescript
 const variantsRequest: VariantsSearchRequestBySku = {
   sku,
@@ -255,6 +257,9 @@ channelApeClient.variants().search(variantsRequest)
 ````
 
 #### Get Variant Search Results for a UPC
+
+* *exactMatch* parameter if set to true will only match the exact upc set on the request instead of all upc's that start with that given character sequence.
+
 ````typescript
 const variantsRequest: VariantsSearchRequestByUpc = {
   upc,

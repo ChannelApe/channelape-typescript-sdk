@@ -666,7 +666,7 @@ describe('ChannelApe Client', () => {
               expect(actualVariants.length).to.be.greaterThan(1);
               const variant = actualVariants[0];
               expect(variant!.businessId).to.equal(expectedBusinessId);
-              expect(variant!.sku).to.equal("BH300136-SAGE-L");
+              expect(variant!.sku).to.equal('BH300136-SAGE-L');
             });
           });
         });

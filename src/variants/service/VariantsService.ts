@@ -118,7 +118,7 @@ export default class VariantsService {
         body
       };
       this.mapVariantsSearchPromise(requestUrl, deferred, requestResponse, variantSearchDetails,
-        <GenericVariantsSearchRequest> variantSearchRequest, EXPECTED_GET_STATUS, getSinglePage);
+        <GenericVariantsSearchRequest>variantSearchRequest, EXPECTED_GET_STATUS, getSinglePage);
     });
     return deferred.promise as any;
   }
@@ -126,7 +126,7 @@ export default class VariantsService {
   private getVariantByRequest(variantRequest: VariantsRequest, deferred: Q.Deferred<any>): void {
     const requestUrl = `/${Version.V1}${Resource.PRODUCTS}/${variantRequest.productId}${Resource.VARIANTS}/` +
       `${encodeURIComponent(variantRequest.inventoryItemValue)}`;
-    const options: AxiosRequestConfig = { };
+    const options: AxiosRequestConfig = {};
     this.client.get(requestUrl, options, (error, response, body) => {
       const requestResponse: RequestCallbackParams = {
         error,
@@ -140,7 +140,7 @@ export default class VariantsService {
   private getVariantsByRequest(variantsRequest: VariantsRequestByProductId, variants: Variant[],
     deferred: Q.Deferred<any>): void {
     const requestUrl = `/${Version.V1}${Resource.PRODUCTS}/${variantsRequest.productId}${Resource.VARIANTS}`;
-    const options: AxiosRequestConfig = { };
+    const options: AxiosRequestConfig = {};
     this.client.get(requestUrl, options, (error, response, body) => {
       const requestResponse: RequestCallbackParams = {
         error,
@@ -202,15 +202,15 @@ export default class VariantsService {
       const mergedVariantDetails: VariantSearchDetails[] = variantDetails.concat(variantSearchResults);
 
       if (getSinglePage) {
-        const variantSearchDetailsToReturn = variantsRequest.exactMatch 
-          ? this.filterOutNonExactMatches(mergedVariantDetails, variantsRequest) : mergedVariantDetails ;
+        const variantSearchDetailsToReturn = variantsRequest.exactMatch
+          ? this.filterOutNonExactMatches(mergedVariantDetails, variantsRequest) : mergedVariantDetails;
         deferred.resolve({
           variantSearchResults: variantSearchDetailsToReturn,
           pagination: data.pagination
         });
       } else if (data.pagination.lastPage) {
-        const variantSearchDetailsToReturn = variantsRequest.exactMatch 
-          ? this.filterOutNonExactMatches(mergedVariantDetails, variantsRequest) : mergedVariantDetails ;
+        const variantSearchDetailsToReturn = variantsRequest.exactMatch
+          ? this.filterOutNonExactMatches(mergedVariantDetails, variantsRequest) : mergedVariantDetails;
         deferred.resolve(variantSearchDetailsToReturn);
       } else {
         const newVariantsRequest: GenericVariantsSearchRequest = {
@@ -222,16 +222,19 @@ export default class VariantsService {
     } else {
       const channelApeErrorResponse =
         GenerateApiError(requestUrl, requestCallbackParams.response, requestCallbackParams.body,
-            EXPECTED_GET_STATUS);
+          EXPECTED_GET_STATUS);
       deferred.reject(channelApeErrorResponse);
     }
   }
 
-  private filterOutNonExactMatches(variantSearchDetails: VariantSearchDetails[], variantSearchRequest: GenericVariantsSearchRequest) {
+  private filterOutNonExactMatches(variantSearchDetails: VariantSearchDetails[],
+    variantSearchRequest: GenericVariantsSearchRequest) {
     return variantSearchDetails.filter((searchResult) => {
-      if(variantSearchRequest.sku && searchResult.sku.toLowerCase() !== variantSearchRequest.sku.toLowerCase()) {
+      if (variantSearchRequest.sku && searchResult.sku.toLowerCase() !== variantSearchRequest.sku.toLowerCase()) {
         return false;
-      } else if(variantSearchRequest.upc && searchResult.upc.toLowerCase() !== variantSearchRequest.upc.toLowerCase()) {
+      }
+      if (variantSearchRequest.upc &&
+        searchResult.upc.toLowerCase() !== variantSearchRequest.upc.toLowerCase()) {
         return false;
       }
       return true;

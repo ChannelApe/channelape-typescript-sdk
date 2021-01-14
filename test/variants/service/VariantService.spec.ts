@@ -396,16 +396,15 @@ describe('VariantsService', () => {
             expect(variant1!.vendor).to.equal('Caveman Foods');
             expect(variant1!.title).to.equal('Caveman Foods Chicken Jerky');
             const variant2 = actualVariants[1];
-            expect(variant2!.sku).to.equal(expectedSku + '-TEST-1');
+            expect(variant2!.sku).to.equal('6030038-TEST-1');
             expect(variant2!.businessId).to.equal(expectedBusinessId);
             expect(variant2!.vendor).to.equal('Caveman Foods');
             expect(variant2!.title).to.equal('Caveman Foods Chicken Jerky2');
             const variant3 = actualVariants[2];
-            expect(variant3!.sku).to.equal(expectedSku + '-TEST-2');
+            expect(variant3!.sku).to.equal('6030038-TEST-2');
             expect(variant3!.businessId).to.equal(expectedBusinessId);
             expect(variant3!.vendor).to.equal('Caveman Foods');
             expect(variant3!.title).to.equal('Caveman Foods Chicken Jerky3');
-            
           });
         });
 
@@ -433,8 +432,6 @@ describe('VariantsService', () => {
             expect(variant1!.sku).to.equal(expectedSku);
             expect(variant1!.vendor).to.equal('Caveman Foods');
             expect(variant1!.title).to.equal('Caveman Foods Chicken Jerky');
-            const variant2 = actualVariants[1];
-            
           });
         });
       });
@@ -492,12 +489,12 @@ describe('VariantsService', () => {
             expect(variant1!.vendor).to.equal('Caveman Foods');
             expect(variant1!.title).to.equal('Caveman Foods Chicken Jerky');
             const variant2 = actualVariants[1];
-            expect(variant2!.upc).to.equal(expectedUpc + "-TEST-1");
+            expect(variant2!.upc).to.equal('853385003971-TEST-1');
             expect(variant2!.businessId).to.equal(expectedBusinessId);
             expect(variant2!.vendor).to.equal('Caveman Foods');
             expect(variant2!.title).to.equal('Caveman Foods Chicken Jerky2');
             const variant3 = actualVariants[2];
-            expect(variant3!.upc).to.equal(expectedUpc + "-TEST-2");
+            expect(variant3!.upc).to.equal('853385003971-TEST-2');
             expect(variant3!.businessId).to.equal(expectedBusinessId);
             expect(variant3!.vendor).to.equal('Caveman Foods');
             expect(variant3!.title).to.equal('Caveman Foods Chicken Jerky3');
