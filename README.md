@@ -241,10 +241,12 @@ channelApeClient.variants().search(variantsRequest)
 ````
 
 #### Get Variant Search Results for a SKU
+
 ````typescript
 const variantsRequest: VariantsSearchRequestBySku = {
   sku,
-  businessId
+  businessId,
+  exactMatch: true
 };
 channelApeClient.variants().search(variantsRequest)
   .then((variantSearchResults: VariantSearchResults[]) => {
@@ -256,7 +258,8 @@ channelApeClient.variants().search(variantsRequest)
 ````typescript
 const variantsRequest: VariantsSearchRequestByUpc = {
   upc,
-  businessId
+  businessId,
+  exactMatch: true
 };
 channelApeClient.variants().search(variantsRequest)
   .then((variantSearchResults: VariantSearchResults[]) => {
