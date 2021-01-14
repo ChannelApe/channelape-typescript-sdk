@@ -200,13 +200,17 @@ export default class VariantsService {
       const data: VariantSearchApiResponse = requestCallbackParams.body as VariantSearchApiResponse;
       const variantSearchResults = data.variantSearchResults.map(vs => this.formatVariantSearchDetails(vs));
       const mergedVariantDetails: VariantSearchDetails[] = variantDetails.concat(variantSearchResults);
+
       if (getSinglePage) {
+        const variantSearchDetailsToReturn = variantsRequest.exactMatch 
+          ? this.filterOutNonExactMatches(mergedVariantDetails, variantsRequest) : mergedVariantDetails ;
         deferred.resolve({
-          variantSearchResults: mergedVariantDetails,
+          variantSearchResults: variantSearchDetailsToReturn,
           pagination: data.pagination
         });
       } else if (data.pagination.lastPage) {
-        const variantSearchDetailsToReturn = mergedVariantDetails;
+        const variantSearchDetailsToReturn = variantsRequest.exactMatch 
+          ? this.filterOutNonExactMatches(mergedVariantDetails, variantsRequest) : mergedVariantDetails ;
         deferred.resolve(variantSearchDetailsToReturn);
       } else {
         const newVariantsRequest: GenericVariantsSearchRequest = {
@@ -221,6 +225,17 @@ export default class VariantsService {
             EXPECTED_GET_STATUS);
       deferred.reject(channelApeErrorResponse);
     }
+  }
+
+  private filterOutNonExactMatches(variantSearchDetails: VariantSearchDetails[], variantSearchRequest: GenericVariantsSearchRequest) {
+    return variantSearchDetails.filter((searchResult) => {
+      if(variantSearchRequest.sku && searchResult.sku.toLowerCase() !== variantSearchRequest.sku.toLowerCase()) {
+        return false;
+      } else if(variantSearchRequest.upc && searchResult.upc.toLowerCase() !== variantSearchRequest.upc.toLowerCase()) {
+        return false;
+      }
+      return true;
+    });
   }
 
   private formatVariant(variant: VariantApiResponse): Variant {
