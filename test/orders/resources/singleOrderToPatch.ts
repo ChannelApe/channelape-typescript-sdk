@@ -176,6 +176,7 @@ const singleOrderToPatch: Partial<Order> = {
     }
   },
   fulfillments: [],
+  refunds: [],
   id: 'c0f45529-cbed-4e90-9a38-c208d409ef2a',
   purchasedAt: new Date('2018-03-29T19:06:26.000Z'),
   status: OrderStatus.OPEN,

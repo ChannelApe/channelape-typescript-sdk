@@ -4,6 +4,9 @@ import LineItem from '../model/LineItem';
 import Fulfillment from '../model/Fulfillment';
 import trimObject from '../../utils/trimObject';
 import Tax from '../model/Tax';
+import Transaction from '../model/Transaction';
+import Refund from '../model/Refund';
+import Adjustment from '../model/Adjustment';
 
 export default class JsonOrderFormatterService {
   public static formatOrder(rawOrder: any): Order {
@@ -32,6 +35,9 @@ export default class JsonOrderFormatterService {
     order.fulfillments = order.fulfillments.map((f: any) =>
       JsonOrderFormatterService.formatFulfillment(f),
     );
+    order.refunds = order.refunds.map((r: any) =>
+      JsonOrderFormatterService.formatRefund(r),
+    );
     return trimObject(order) as Order;
   }
 
@@ -44,8 +50,12 @@ export default class JsonOrderFormatterService {
   }
 
   private static formatLineItem(lineItem: LineItem): LineItem {
-    lineItem.grams = Number(lineItem.grams);
-    lineItem.price = Number(lineItem.price);
+    if (typeof lineItem.grams !== 'undefined') {
+      lineItem.grams = Number(lineItem.grams);
+    }
+    if (typeof lineItem.price !== 'undefined') {
+      lineItem.price = Number(lineItem.price);
+    }
     if (typeof lineItem.taxes !== 'undefined') {
       lineItem.taxes = lineItem.taxes.map(JsonOrderFormatterService.formatLineItemTax);
     }
@@ -56,6 +66,29 @@ export default class JsonOrderFormatterService {
     tax.price = Number(tax.price);
     tax.rate = tax.rate ? Number(tax.rate) : undefined;
     return tax;
+  }
+
+  private static formatRefund(refund: Refund): Refund {
+    if (typeof refund.lineItems !== 'undefined') {
+      refund.lineItems = refund.lineItems.map(JsonOrderFormatterService.formatLineItem);
+    }
+    if (typeof refund.transactions !== 'undefined') {
+      refund.transactions = refund.transactions.map(JsonOrderFormatterService.formatTransaction);
+    }
+    if (typeof refund.adjustments !== 'undefined') {
+      refund.adjustments = refund.adjustments.map(JsonOrderFormatterService.formatAdjustment);
+    }
+    return refund;
+  }
+
+  private static formatTransaction(transaction: Transaction): Transaction {
+    transaction.amount = Number(transaction.amount);
+    return transaction;
+  }
+
+  private static formatAdjustment(adjustment: Adjustment): Adjustment {
+    adjustment.amount = Number(adjustment.amount);
+    return adjustment;
   }
 
 }

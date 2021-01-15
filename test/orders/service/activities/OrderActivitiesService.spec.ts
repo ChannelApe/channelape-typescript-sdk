@@ -86,7 +86,8 @@ describe('OrdersActivitiesService', () => {
             orders: [{
               orderId: expectedOrderId,
               lineItems: [],
-              fulfillments: []
+              fulfillments: [],
+              refunds: []
             }],
             pagination: { lastPage: true }
           });
@@ -134,12 +135,14 @@ describe('OrdersActivitiesService', () => {
               channelOrderId: 'channel-order-id',
               orderId: expectedOrderId,
               lineItems: [],
-              fulfillments: []
+              fulfillments: [],
+              refunds: []
             }, {
               channelOrderId: 'channel-order-id',
               orderId: expectedOrderId,
               lineItems: [],
-              fulfillments: []
+              fulfillments: [],
+              refunds: []
             }],
             pagination: { lastPage: true }
           });

@@ -219,6 +219,7 @@ describe('ChannelApe Client', () => {
             expect(actualOrder.id).to.equal(expectedOrderId);
             expect(actualOrder.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
             expect(actualOrder.status).to.equal(OrderStatus.OPEN);
+            // @ts-ignore
             expect(actualOrder.refunds![0].lineItems[0].quantity).to.equal(2);
             expect(actualOrder.refunds![0].channelRefundId).to.equal('74273487234');
             expect(actualOrder.refunds![0].supplierRefundId).to.equal('7348234');
@@ -614,7 +615,7 @@ describe('ChannelApe Client', () => {
 
       describe('And valid businessId and valid vendor', () => {
         context('When searching variants', () => {
-          it('Then return variant quick search results', () => {
+          it('And not using exact match with single result Then return variant quick search results', () => {
             const expectedVendor = 'Optimum Nutrition';
             const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
             const expectedSku = '2730117';
@@ -629,6 +630,43 @@ describe('ChannelApe Client', () => {
               expect(variant!.businessId).to.equal(expectedBusinessId);
               expect(variant!.vendor).to.equal(expectedVendor);
               expect(variant!.title).to.equal('Optimum Nutrition Opti-Women');
+            });
+          });
+
+          it('And using exact match with multiple variants Then return matching variant quick search variant', () => {
+            const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+            const expectedSku = 'BH300136';
+            const variantsRequest: VariantsSearchRequestBySku = {
+              sku: expectedSku,
+              businessId: expectedBusinessId,
+              exactMatch: true,
+              size: 20
+            };
+            const actualVariantsPromise = channelApeClient.variants().search(variantsRequest);
+            return actualVariantsPromise.then((actualVariants) => {
+              expect(actualVariants).to.be.an('array');
+              expect(actualVariants.length).to.equals(1);
+              const variant = actualVariants[0];
+              expect(variant!.businessId).to.equal(expectedBusinessId);
+              expect(variant!.sku).to.equal(expectedSku);
+              expect(variant!.title).to.equal('Eldridge Plaid Coat');
+            });
+          });
+
+          it('And not using exact match with multiple results Then return variant quick search variant results', () => {
+            const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
+            const expectedSku = 'BH300136';
+            const variantsRequest: VariantsSearchRequestBySku = {
+              sku: expectedSku,
+              businessId: expectedBusinessId
+            };
+            const actualVariantsPromise = channelApeClient.variants().search(variantsRequest);
+            return actualVariantsPromise.then((actualVariants) => {
+              expect(actualVariants).to.be.an('array');
+              expect(actualVariants.length).to.be.greaterThan(1);
+              const variant = actualVariants[0];
+              expect(variant!.businessId).to.equal(expectedBusinessId);
+              expect(variant!.sku).to.equal('BH300136-SAGE-L');
             });
           });
         });

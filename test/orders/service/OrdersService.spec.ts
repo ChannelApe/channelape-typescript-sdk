@@ -66,19 +66,73 @@ describe('OrdersService', () => {
         const actualRefund1 = actualOrder.refunds[0];
         expect(actualRefund1.channelRefundId).to.equal(expectedRefund.channelRefundId);
         expect(actualRefund1.supplierRefundId).to.equal(expectedRefund.supplierRefundId);
-        expect(2).to.equal(expectedRefund.lineItems.length);
-        expect(actualRefund1.lineItems[0].sku).to.equal(expectedRefund.lineItems[0].sku);
-        expect(actualRefund1.lineItems[0].upc).to.equal(expectedRefund.lineItems[0].upc);
-        expect(actualRefund1.lineItems[0].quantity).to.equal(expectedRefund.lineItems[0].quantity);
-        expect(actualRefund1.lineItems[0].id).to.equal(expectedRefund.lineItems[0].id);
-        expect(actualRefund1.lineItems[0].price).to.equal(expectedRefund.lineItems[0].price);
-        expect(actualRefund1.lineItems[0].restockType).to.equal(expectedRefund.lineItems[0].restockType);
-        expect(actualRefund1.lineItems[1].sku).to.equal(expectedRefund.lineItems[1].sku);
-        expect(actualRefund1.lineItems[1].upc).to.equal(expectedRefund.lineItems[1].upc);
-        expect(actualRefund1.lineItems[1].quantity).to.equal(expectedRefund.lineItems[1].quantity);
-        expect(actualRefund1.lineItems[1].id).to.equal(expectedRefund.lineItems[1].id);
-        expect(actualRefund1.lineItems[1].price).to.equal(expectedRefund.lineItems[1].price);
-        expect(actualRefund1.lineItems[1].restockType).to.equal(expectedRefund.lineItems[1].restockType);
+        // @ts-ignore
+        expect(3).to.equal(expectedRefund.transactions.length);
+        // @ts-ignore
+        const expectedTransaction1 = expectedRefund.transactions[0];
+        // @ts-ignore
+        const actualTransaction1 = actualRefund1.transactions[0];
+        expect(actualTransaction1.id).to.equal(expectedTransaction1.id);
+        expect(actualTransaction1.amount).to.equal(expectedTransaction1.amount);
+        expect(actualTransaction1.message).to.equal(expectedTransaction1.message);
+        expect(actualTransaction1.status).to.equal(expectedTransaction1.status);
+        // @ts-ignore
+        const expectedTransaction2 = expectedRefund.transactions[1];
+        // @ts-ignore
+        const actualTransaction2 = actualRefund1.transactions[1];
+        expect(actualTransaction2.id).to.equal(expectedTransaction2.id);
+        expect(actualTransaction2.amount).to.equal(expectedTransaction2.amount);
+        expect(actualTransaction2.message).to.equal(expectedTransaction2.message);
+        expect(actualTransaction2.status).to.equal(expectedTransaction2.status);
+        // @ts-ignore
+        const expectedTransaction3 = expectedRefund.transactions[2];
+        // @ts-ignore
+        const actualTransaction3 = actualRefund1.transactions[2];
+        expect(actualTransaction3.id).to.equal(expectedTransaction3.id);
+        expect(actualTransaction3.amount).to.equal(expectedTransaction3.amount);
+        expect(actualTransaction3.message).to.equal(expectedTransaction3.message);
+        expect(actualTransaction3.status).to.equal(expectedTransaction3.status);
+        // @ts-ignore
+        expect(3).to.equal(expectedRefund.adjustments.length);
+        // @ts-ignore
+        const expectedAdjustment1 = expectedRefund.adjustments[0];
+        // @ts-ignore
+        const actualAdjustment1 = actualRefund1.adjustments[0];
+        expect(actualAdjustment1.id).to.equal(expectedAdjustment1.id);
+        expect(actualAdjustment1.amount).to.equal(expectedAdjustment1.amount);
+        expect(actualAdjustment1.reason).to.equal(expectedAdjustment1.reason);
+        expect(actualAdjustment1.taxAmount).to.equal(expectedAdjustment1.taxAmount);
+        // @ts-ignore
+        const expectedAdjustment2 = expectedRefund.adjustments[1];
+        // @ts-ignore
+        const actualAdjustment2 = actualRefund1.adjustments[1];
+        expect(actualAdjustment2.id).to.equal(expectedAdjustment2.id);
+        expect(actualAdjustment2.amount).to.equal(expectedAdjustment2.amount);
+        expect(actualAdjustment2.reason).to.equal(expectedAdjustment2.reason);
+        expect(actualAdjustment2.taxAmount).to.equal(expectedAdjustment2.taxAmount);
+        // @ts-ignore
+        const expectedAdjustment3 = expectedRefund.adjustments[2];
+        // @ts-ignore
+        const actualAdjustment3 = actualRefund1.adjustments[2];
+        expect(actualAdjustment3.id).to.equal(expectedAdjustment3.id);
+        expect(actualAdjustment3.amount).to.equal(expectedAdjustment3.amount);
+        expect(actualAdjustment3.reason).to.equal(expectedAdjustment3.reason);
+        expect(actualAdjustment3.taxAmount).to.equal(expectedAdjustment3.taxAmount);
+        expect(2).to.equal(expectedRefund.lineItems!.length);
+        const expectedRefundLineItems = (expectedRefund.lineItems) as any;
+        const actualRefundLineItems = (actualRefund1.lineItems) as any;
+        expect(actualRefundLineItems[0].sku).to.equal(expectedRefundLineItems[0].sku);
+        expect(actualRefundLineItems[0].upc).to.equal(expectedRefundLineItems[0].upc);
+        expect(actualRefundLineItems[0].quantity).to.equal(expectedRefundLineItems[0].quantity);
+        expect(actualRefundLineItems[0].id).to.equal(expectedRefundLineItems[0].id);
+        expect(actualRefundLineItems[0].price).to.equal(expectedRefundLineItems[0].price);
+        expect(actualRefundLineItems[0].restockType).to.equal(expectedRefundLineItems[0].restockType);
+        expect(actualRefundLineItems[1].sku).to.equal(expectedRefundLineItems[1].sku);
+        expect(actualRefundLineItems[1].upc).to.equal(expectedRefundLineItems[1].upc);
+        expect(actualRefundLineItems[1].quantity).to.equal(expectedRefundLineItems[1].quantity);
+        expect(actualRefundLineItems[1].id).to.equal(expectedRefundLineItems[1].id);
+        expect(actualRefundLineItems[1].price).to.equal(expectedRefundLineItems[1].price);
+        expect(actualRefundLineItems[1].restockType).to.equal(expectedRefundLineItems[1].restockType);
       });
     });
 
@@ -674,19 +728,23 @@ Code: 15 Message: Requested business cannot be found.`;
         const actualRefund1 = createdOrder.refunds[0];
         expect(actualRefund1.channelRefundId).to.equal(expectedRefund.channelRefundId);
         expect(actualRefund1.supplierRefundId).to.equal(expectedRefund.supplierRefundId);
+
+        // @ts-ignore
         expect(2).to.equal(expectedRefund.lineItems.length);
-        expect(actualRefund1.lineItems[0].sku).to.equal(expectedRefund.lineItems[0].sku);
-        expect(actualRefund1.lineItems[0].upc).to.equal(expectedRefund.lineItems[0].upc);
-        expect(actualRefund1.lineItems[0].quantity).to.equal(expectedRefund.lineItems[0].quantity);
-        expect(actualRefund1.lineItems[0].id).to.equal(expectedRefund.lineItems[0].id);
-        expect(actualRefund1.lineItems[0].price).to.equal(expectedRefund.lineItems[0].price);
-        expect(actualRefund1.lineItems[0].restockType).to.equal(expectedRefund.lineItems[0].restockType);
-        expect(actualRefund1.lineItems[1].sku).to.equal(expectedRefund.lineItems[1].sku);
-        expect(actualRefund1.lineItems[1].upc).to.equal(expectedRefund.lineItems[1].upc);
-        expect(actualRefund1.lineItems[1].quantity).to.equal(expectedRefund.lineItems[1].quantity);
-        expect(actualRefund1.lineItems[1].id).to.equal(expectedRefund.lineItems[1].id);
-        expect(actualRefund1.lineItems[1].price).to.equal(expectedRefund.lineItems[1].price);
-        expect(actualRefund1.lineItems[1].restockType).to.equal(expectedRefund.lineItems[1].restockType);
+        const expectedRefundLineItems = (expectedRefund.lineItems) as any;
+        const actualRefundLineItems = (actualRefund1.lineItems) as any;
+        expect(actualRefundLineItems[0].sku).to.equal(expectedRefundLineItems[0].sku);
+        expect(actualRefundLineItems[0].upc).to.equal(expectedRefundLineItems[0].upc);
+        expect(actualRefundLineItems[0].quantity).to.equal(expectedRefundLineItems[0].quantity);
+        expect(actualRefundLineItems[0].id).to.equal(expectedRefundLineItems[0].id);
+        expect(actualRefundLineItems[0].price).to.equal(expectedRefundLineItems[0].price);
+        expect(actualRefundLineItems[0].restockType).to.equal(expectedRefundLineItems[0].restockType);
+        expect(actualRefundLineItems[1].sku).to.equal(expectedRefundLineItems[1].sku);
+        expect(actualRefundLineItems[1].upc).to.equal(expectedRefundLineItems[1].upc);
+        expect(actualRefundLineItems[1].quantity).to.equal(expectedRefundLineItems[1].quantity);
+        expect(actualRefundLineItems[1].id).to.equal(expectedRefundLineItems[1].id);
+        expect(actualRefundLineItems[1].price).to.equal(expectedRefundLineItems[1].price);
+        expect(actualRefundLineItems[1].restockType).to.equal(expectedRefundLineItems[1].restockType);
         expect(createdOrder.lineItems[0].taxes!.length).to.equal(2);
         expect(createdOrder.lineItems[0].taxes![0].title).to.equal('PA State Tax');
         expect(createdOrder.lineItems[0].taxes![0].price).to.equal(9.99);

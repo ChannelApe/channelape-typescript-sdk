@@ -2,7 +2,7 @@
   "errors": [],
   "pagination": {
     "lastPage": true,
-    "pageSize": 1
+    "pageSize": 3
   },
   "variantSearchResults": [
     {
@@ -12,6 +12,62 @@
       "sku": "6030038",
       "upc": "853385003971",
       "title": "Caveman Foods Chicken Jerky",
+      "vendor": "Caveman Foods",
+      "condition": "NEW",
+      "primaryCategory": "Snacks / Foods",
+      "secondaryCategory": "Snacks / Foods",
+      "tags": [
+        "FresnoCaliforniaQuantityOnHand_Yes",
+        "LasVegasNevadaQuantityOnHand_No",
+        "EuropaSports",
+        "CharlotteNorthCarolinaQuantityOnHand_Yes",
+        "WindsorConnecticutQuantityOnHand_Yes",
+        "MesquiteTexasQuantityOnHand_Yes",
+        "StrongsvilleOhioQuantityOnHand_Yes",
+        "WalmartCategoryParent_FoodAndBeverage",
+        "OrlandoFloridaQuantityOnHand_Yes"
+      ],
+      "grams": "70.8738078125",
+      "currencyCode": "USD",
+      "retailPrice": "8.99",
+      "wholesalePrice": "5.50",
+      "quantity": 0
+    },
+    {
+      "productId": "00050387-9bb1-4587-becc-ff951981d0f8",
+      "inventoryItemValue": "6030038",
+      "businessId": "4baafa5b-4fbf-404e-9766-8a02ad45c3a4",
+      "sku": "6030038-",
+      "upc": "853385003971-TEST-1",
+      "title": "Caveman Foods Chicken Jerky2",
+      "vendor": "Caveman Foods",
+      "condition": "NEW",
+      "primaryCategory": "Snacks / Foods",
+      "secondaryCategory": "Snacks / Foods",
+      "tags": [
+        "FresnoCaliforniaQuantityOnHand_Yes",
+        "LasVegasNevadaQuantityOnHand_No",
+        "EuropaSports",
+        "CharlotteNorthCarolinaQuantityOnHand_Yes",
+        "WindsorConnecticutQuantityOnHand_Yes",
+        "MesquiteTexasQuantityOnHand_Yes",
+        "StrongsvilleOhioQuantityOnHand_Yes",
+        "WalmartCategoryParent_FoodAndBeverage",
+        "OrlandoFloridaQuantityOnHand_Yes"
+      ],
+      "grams": "70.8738078125",
+      "currencyCode": "USD",
+      "retailPrice": "8.99",
+      "wholesalePrice": "5.50",
+      "quantity": 0
+    },
+    {
+      "productId": "00050387-9bb1-4587-becc-ff951981d0f8",
+      "inventoryItemValue": "6030038",
+      "businessId": "4baafa5b-4fbf-404e-9766-8a02ad45c3a4",
+      "sku": "6030038-",
+      "upc": "853385003971-TEST-2",
+      "title": "Caveman Foods Chicken Jerky3",
       "vendor": "Caveman Foods",
       "condition": "NEW",
       "primaryCategory": "Snacks / Foods",
