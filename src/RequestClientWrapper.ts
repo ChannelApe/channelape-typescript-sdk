@@ -155,6 +155,7 @@ export default class RequestClientWrapper {
               const apiErrors = e.response == null || e.response.data == null || e.response.data.errors == null
                 ? [] : e.response.data.errors;
               const finalError = new ChannelApeError(e.message, e.response, url, apiErrors);
+              this.requestCompleted();
               callback(finalError, e, e.body);
             } catch (e) {
               callback(new Error('API Error'), e, {});
