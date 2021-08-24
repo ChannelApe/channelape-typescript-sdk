@@ -1,0 +1,42 @@
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js 8.10.0
+      uses: actions/setup-node@v2
+      with:
+        node-version: 8.10.0
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
+    - name: Run e2e tests
+      run: npm run e2e
+      env:
+        CHANNEL_APE_SESSION_ID: ${{ secrets.CHANNEL_APE_SESSION_ID }}
+    - name: Sonar
+      run: |
+        .travis/overwrite-sonar-project-version.sh; fi
+        sonar-scanner; fi
+    - name: NPM Publish
+      id: publish
+      uses: JS-DevTools/npm-publish@v1
+      with:
+          token: ${{ secrets.NPM_TOKEN }}
+    - if: steps.publish.outputs.type != 'none'
+      run: |
+        echo "Version changed: ${{ steps.publish.outputs.old-version }} => ${{ steps.publish.outputs.version }}"
