@@ -21,6 +21,7 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Inventories](#inventories)
 - [Inventory Quantities](#inventory-quantities)
 - [Locations](#locations)
+- [Steps](#steps)
 
 ### Getting Started
 
@@ -125,6 +126,14 @@ channelapeClient.suppliers().get(supplierId)
 ```typescript
 channelapeClient.suppliers().get({ businessId: 'some-valid-business-id' })
   .then((suppliers: Supplier[]) => {
+    // do what you need to do with supplier data here
+  });
+```
+
+#### Update a supplier
+```typescript
+channelapeClient.suppliers().update(supplierUpdateRequest)
+  .then((supplier: Supplier) => {
     // do what you need to do with supplier data here
   });
 ```
@@ -674,5 +683,15 @@ const locationUpdateRequest: LocationUpdateRequest = {
 channelApeClient.locations().update(locationUpdateRequest)
   .then((location: Location) => {
     // Do what you need with the updated location
+  });
+```
+
+### Steps
+
+#### Get step by ID
+```typescript
+channelapeClient.steps().get(stepId)
+  .then((step: Step) => {
+    // do what you need to do with step data here
   });
 ```

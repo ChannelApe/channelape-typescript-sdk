@@ -9,8 +9,10 @@ import SuppliersQueryRequestByBusinessId from '../model/SuppliersQueryRequestByB
 import RequestCallbackParams from '../../model/RequestCallbackParams';
 import SuppliersResponse from '../model/SuppliersResponse';
 import GenerateApiError from '../../utils/GenerateApiError';
+import SupplierUpdateRequest from '../model/SupplierUpdateRequest';
 
 const EXPECTED_GET_STATUS = 200;
+const EXPECTED_PUT_STATUS = 200;
 
 export default class SuppliersService {
 
@@ -24,6 +26,15 @@ export default class SuppliersService {
       return this.getSupplierById(supplierIdOrRequest);
     }
     return this.getSuppliersByRequest(supplierIdOrRequest);
+  }
+
+  public update(supplier: SupplierUpdateRequest): Promise<Supplier> {
+    const deferred = Q.defer<Supplier>();
+    const requestUrl = `/${Version.V1}${Resource.SUPPLIERS}/${supplier.id}`;
+    this.client.put(requestUrl, { data: supplier }, (error, response, body) => {
+      this.mapSupplierPromise(requestUrl, deferred, error, response, body, EXPECTED_PUT_STATUS);
+    });
+    return deferred.promise as any;
   }
 
   private getSupplierById(supplierId: string): Promise<Supplier> {
