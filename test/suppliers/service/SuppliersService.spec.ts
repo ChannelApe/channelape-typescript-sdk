@@ -9,6 +9,7 @@ import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorRes
 import Supplier from '../../../src/suppliers/model/Supplier';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import { ChannelApeError } from '../../../src/index';
+import SupplierUpdateRequest from '../../../src/suppliers/model/SupplierUpdateRequest';
 
 describe('Suppliers Service', () => {
 
@@ -188,6 +189,25 @@ describe('Suppliers Service', () => {
       }).catch((e) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.SUPPLIERS}`);
         expectSupplierApeErrorResponse(e);
+      });
+    });
+
+    it('And valid supplier ' +
+      'When updating supplier Then return resolved promise with supplier', () => {
+
+      const response = {
+        status: 200,
+        config: {
+          method: 'PUT'
+        }
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'put')
+        .yields(null, response, expectedSupplier);
+
+      const suppliersService: SuppliersService = new SuppliersService(client);
+      return suppliersService.update(expectedSupplier as SupplierUpdateRequest).then((actualAction) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.SUPPLIERS}/${expectedSupplier.id}`);
+        expectSupplier(expectedSupplier);
       });
     });
 
