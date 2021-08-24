@@ -86,3 +86,10 @@ export { default as InventoryItemQuantity } from './inventories/quantities/model
 export { default as Location } from './locations/model/Location';
 export { default as LocationCreateRequest } from './locations/model/LocationCreateRequest';
 export { default as LocationUpdateRequest } from './locations/model/LocationUpdateRequest';
+export { default as Step } from './steps/model/Step';
+export { default as EnvironmentVariableKey } from './steps/model/EnvironmentVariableKey';
+export { default as EnvironmentVariable } from './suppliers/model/EnvironmentVariable';
+export { default as OrderQueryParameters } from './suppliers/model/OrderQueryParameters';
+export { default as StepSettings } from './suppliers/model/StepSettings';
+export { default as StepVersion } from './suppliers/model/StepVersion';
+export { default as SupplierUpdateRequest } from './suppliers/model/SupplierUpdateRequest';

@@ -18,7 +18,8 @@ enum Resource {
   BUSINESS_MEMBER_VERIFICATIONS = '/businessmemberverifications',
   USERS = '/users',
   INVENTORIES = '/inventories',
-  LOCATIONS = '/locations'
+  LOCATIONS = '/locations',
+  STEPS = '/steps'
 }
 
 export default Resource;
