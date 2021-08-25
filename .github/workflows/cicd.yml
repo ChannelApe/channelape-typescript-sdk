@@ -27,7 +27,8 @@ jobs:
         CHANNEL_APE_SESSION_ID: ${{ secrets.CHANNEL_APE_SESSION_ID }}
     - name: Sonar
       run: |
-        bash .travis/overwrite-sonar-project-version.sh
+        echo $PWD
+        bash ../overwrite-sonar-project-version.sh
         sonar-scanner
     - name: NPM Publish
       id: publish
