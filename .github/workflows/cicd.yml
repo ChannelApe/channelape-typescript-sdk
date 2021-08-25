@@ -39,7 +39,9 @@ jobs:
           | awk -F: '{ print $2 }' \
           | sed 's/[",]//g' \
           | tr -d '[[:space:]]')
-        ([ ${GITHUB_REF:0:8} = feature/ ] || [ ${GITHUB_REF:0:7} = develop ]) && SONAR_TARGET=develop || SONAR_TARGET=master
+        BRANCH_NAME=$(git branch --show-current)
+        ([ ${BRANCH_NAME:0:8} = feature/ ] || [ ${BRANCH_NAME:0:7} = develop ]) && SONAR_TARGET=develop || SONAR_TARGET=master
+        echo $BRANCH_NAME
         echo $SONAR_TARGET
         echo $PACKAGE_VERSION
         echo $GITHUB_REF
@@ -60,7 +62,7 @@ jobs:
           -Dsonar.typescript.lcov.reportPaths=reports/lcov/lcov.info
 
           -Dsonar.projectVersion=$PACKAGE_VERSION
-          -Dsonar.branch.name=$GITHUB_REF
+          -Dsonar.branch.name=$BRANCH_NAME
           -Dsonar.branch.target=$SONAR_TARGET
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
