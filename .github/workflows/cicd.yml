@@ -13,6 +13,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+        # SONARCLOUD: Disabling shallow clone is recommended for improving relevancy of reporting
+        fetch-depth: 0
     - name: Use Node.js 8.10.0
       uses: actions/setup-node@v2
       with:
@@ -26,10 +28,42 @@ jobs:
       env:
         CHANNEL_APE_SESSION_ID: ${{ secrets.CHANNEL_APE_SESSION_ID }}
     - name: Sonar
+      # run: |
+      #   ls
+      #   bash .github/overwrite-sonar-project-properties.sh
       run: |
-        ls
-        bash .github/overwrite-sonar-project-version.sh
-        sonar-scanner
+        PACKAGE_VERSION=$(cat package.json \
+          | grep version \
+          | head -1 \
+          | awk -F: '{ print $2 }' \
+          | sed 's/[",]//g' \
+          | tr -d '[[:space:]]')
+        ([ ${GITHUB_REF:0:8} = feature/ ] || [ ${GITHUB_REF:0:7} = develop ]) && SONAR_TARGET=develop || SONAR_TARGET=master
+        echo $SONAR_TARGET
+        echo $PACKAGE_VERSION
+        echo $GITHUB_REF
+    - name: SonarCloud Scan
+      uses: sonarsource/sonarcloud-github-action@master
+      args: >
+        -Dsonar.organization=channelape-github
+        -Dsonar.projectKey=channelape-typescript-sdk
+        -Dsonar.projectName=channelape-typescript-sdk
+        -Dsonar.links.homepage=https://github.com/ChannelApe/channelape-typescript-sdk
+        -Dsonar.links.ci=https://github.com/ChannelApe/channelape-typescript-sdk/actions
+        -Dsonar.links.scm=https://github.com/ChannelApe/channelape-typescript-sdk
+        -Dsonar.links.issue=https://github.com/ChannelApe/channelape-typescript-sdk/issues
+        -Dsonar.sources=./src
+        -Dsonar.tests=./test
+        -Dsonar.dynamicAnalysis=reuseReports
+        -Dsonar.typescript.lcov.reportPaths=reports/lcov/lcov.info
+
+        -Dsonar.projectVersion=$PACKAGE_VERSION
+        -Dsonar.branch.name=$GITHUB_REF
+        -Dsonar.branch.target=$SONAR_TARGET
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    
     - name: NPM Publish
       id: publish
       uses: JS-DevTools/npm-publish@v1
