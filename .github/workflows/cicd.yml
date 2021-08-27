@@ -28,10 +28,7 @@ jobs:
       run: npm run e2e
       env:
         CHANNEL_APE_SESSION_ID: ${{ secrets.CHANNEL_APE_SESSION_ID }}
-    - name: Sonar
-      # run: |
-      #   ls
-      #   bash .github/overwrite-sonar-project-properties.sh
+    - name: SonarCloud Setup
       run: |
         PACKAGE_VERSION=$(cat package.json \
           | grep version \
