@@ -49,18 +49,6 @@ jobs:
       uses: sonarsource/sonarcloud-github-action@master
       with:
         args: >
-          -Dsonar.organization=channelape-github
-          -Dsonar.projectKey=channelape-typescript-sdk
-          -Dsonar.projectName=channelape-typescript-sdk
-          -Dsonar.links.homepage=https://github.com/ChannelApe/channelape-typescript-sdk
-          -Dsonar.links.ci=https://github.com/ChannelApe/channelape-typescript-sdk/actions
-          -Dsonar.links.scm=https://github.com/ChannelApe/channelape-typescript-sdk
-          -Dsonar.links.issue=https://github.com/ChannelApe/channelape-typescript-sdk/issues
-          -Dsonar.sources=./src
-          -Dsonar.tests=./test
-          -Dsonar.dynamicAnalysis=reuseReports
-          -Dsonar.typescript.lcov.reportPaths=reports/lcov/lcov.info
-
           -Dsonar.projectVersion=$PACKAGE_VERSION
           -Dsonar.branch.name=$BRANCH_NAME
           -Dsonar.branch.target=$SONAR_TARGET
