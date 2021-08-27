@@ -2,7 +2,7 @@
 
 TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channelape.io/)
 
-[![Build Status](https://travis-ci.com/ChannelApe/channelape-typescript-sdk.svg?branch=master)](https://travis-ci.com/ChannelApe/channelape-typescript-sdk)  [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=channelape-typescript-sdk&metric=alert_status)](https://sonarcloud.io/dashboard?id=channelape-typescript-sdk) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=channelape-typescript-sdk&metric=coverage)](https://sonarcloud.io/dashboard?id=channelape-typescript-sdk)
+[![Build Status](https://github.com/ChannelApe/channelape-typescript-sdk/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/ChannelApe/channelape-typescript-sdk/actions)  [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=channelape-typescript-sdk&metric=alert_status)](https://sonarcloud.io/dashboard?id=channelape-typescript-sdk) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=channelape-typescript-sdk&metric=coverage)](https://sonarcloud.io/dashboard?id=channelape-typescript-sdk)
 
 ## Features
 - [Getting Started](#getting-started)
