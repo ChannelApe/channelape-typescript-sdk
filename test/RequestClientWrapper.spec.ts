@@ -146,7 +146,7 @@ describe('RequestClientWrapper', () => {
             expect(error).not.to.be.null;
             expect(error.message).includes('A problem with the ChannelApe API has been encountered.');
             expect(error.message).includes('Your request was tried a total of ');
-            expect(warnLogSpy.args[0][0]).to.equal(`get ${endpoint}/v1/orders -- FAILED WITH STATUS: Network Error`);
+            expect(warnLogSpy.args[0][0]).to.equal('get /v1/orders -- FAILED WITH STATUS: Network Error');
             done();
           });
         }).timeout(3000);
@@ -284,7 +284,7 @@ Code: 0 Message: You didnt pass any body`;
         method: 'PUT'
       };
       mockedAxios.onPut(`${endpoint}${requestUrl}`).reply((config) => {
-        expect(JSON.parse(config.data).body.additionalFields[0].value).to.equal('RRR');
+        expect(JSON.parse(config.data).additionalFields[0].value).to.equal('RRR');
         return [201, singleOrderToUpdate];
       });
       requestClientWrapper.put(requestUrl, options, (error, response, body) => {
@@ -301,7 +301,7 @@ Code: 0 Message: You didnt pass any body`;
         method: 'PUT'
       };
       mockedAxios.onPut(`${endpoint}${requestUrl}`).reply((config) => {
-        expect(JSON.parse(config.data).body).to.equal('');
+        expect(config.data).to.equal('');
         return [
           201,
           ''
@@ -359,7 +359,7 @@ Code: 0 Message: You didnt pass any body`;
         method: 'POST'
       };
       mockedAxios.onPost(`${endpoint}${requestUrl}`).reply((config) => {
-        expect(JSON.parse(config.data).body.additionalFields[0].value).to.equal('RRR');
+        expect(JSON.parse(config.data).additionalFields[0].value).to.equal('RRR');
         return [202, singleOrderToUpdate];
       });
       requestClientWrapper.post(requestUrl, options, (error, response, body) => {

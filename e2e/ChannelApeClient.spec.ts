@@ -989,11 +989,11 @@ describe('ChannelApe Client', () => {
         });
       });
 
-      describe('And valid inventory item creation request', () => {
-        context('When creating inventory item', () => {
-          it('Then create and return inventory item', async () => {
+      describe('And valid location creation request', () => {
+        context('When creating location', () => {
+          it('Then create and return location', async () => {
             const businessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
-            const generatedName = `Some-Location-${Math.floor((Math.random() * 100000) + 1).toString()}`;
+            const generatedName = `Some-Location-${new Date().getTime().toString()}`;
             const locationCreateRequest: LocationCreateRequest = {
               businessId,
               name: generatedName
