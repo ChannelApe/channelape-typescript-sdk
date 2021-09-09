@@ -1,5 +1,5 @@
 export default interface Session {
   sessionId: string;
   userId: string;
-  apiAccountId: string;
+  apiAccountId?: string;
 }
