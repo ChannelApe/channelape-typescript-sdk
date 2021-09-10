@@ -20,7 +20,7 @@ enum Resource {
   INVENTORIES = '/inventories',
   LOCATIONS = '/locations',
   STEPS = '/steps',
-  API_ACCOUNTS = "/apiaccounts"
+  API_ACCOUNTS = '/apiaccounts'
 }
 
 export default Resource;

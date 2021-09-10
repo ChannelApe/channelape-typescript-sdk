@@ -6,7 +6,6 @@ import Version from './../../../../src/model/Version';
 import Resource from './../../../../src/model/Resource';
 import Environment from './../../../../src/model/Environment';
 import ChannelApeApiErrorResponse from './../../../../src/model/ChannelApeApiErrorResponse';
-import Channel from './../../../../src/channels/model/Channel';
 import RequestClientWrapper from './../../../../src/RequestClientWrapper';
 import { ChannelApeError } from './../../../../src/index';
 import ApiAccount from './../../../../src/businesses/apiaccounts/model/ApiAccount';
@@ -29,13 +28,13 @@ describe('Api Accounts Service', () => {
     let sandbox: sinon.SinonSandbox;
 
     const expectedApiAccount: ApiAccount = {
-        businessId: "4baafa5b-4fbf-404e-9766-8a02ad45c3a4",
-        creationTime: new Date("2019-09-05T20:22:19.737Z"),
-        errors: [],
-        id: "14bc4780-f2c0-48d6-8e9a-41e6816c55eb",
-        name: "Update Orders Playbook Step",
-        lastAccessedTime: new Date("2020-09-05T20:22:19.737Z"),
-        expired: true
+      businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4',
+      creationTime: new Date('2019-09-05T20:22:19.737Z'),
+      errors: [],
+      id: '14bc4780-f2c0-48d6-8e9a-41e6816c55eb',
+      name: 'Update Orders Playbook Step',
+      lastAccessedTime: new Date('2020-09-05T20:22:19.737Z'),
+      expired: true
     };
 
     const expectedChannelApeErrorResponse: ChannelApeApiErrorResponse = {
@@ -62,9 +61,8 @@ describe('Api Accounts Service', () => {
       done();
     });
 
-    it('And valid API Account ID ' +
-      'When retrieving API Account for business Then return resolved promise with API Account', () => {
-
+    it(`And valid API Account ID When retrieving API Account for business
+    Then return resolved promise with API Account`, () => {
       const response = {
         status: 200,
         config: {
@@ -73,7 +71,6 @@ describe('Api Accounts Service', () => {
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
         .yields(null, response, expectedApiAccount);
-
       const apiAccountsService: ApiAccountsService = new ApiAccountsService(client);
       return apiAccountsService.get(expectedApiAccount.businessId, expectedApiAccount.id).then((actualAction) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.BUSINESSES}/${expectedApiAccount.businessId}${Resource.API_ACCOUNTS}/${expectedApiAccount.id}`);
@@ -81,9 +78,8 @@ describe('Api Accounts Service', () => {
       });
     });
 
-    it('And not found API Account ID ' +
-      'When retrieving API Account ID for business Then return resolved promise with error', () => {
-
+    it(`And not found API Account ID When retrieving API
+    Account ID for business Then return resolved promise with error`, () => {
       const response = {
         status: 404,
         config: {
@@ -100,9 +96,8 @@ describe('Api Accounts Service', () => {
       });
     });
 
-    it('And unexpected error occurs ' +
-      'When retrieving API Account ID for business Then return rejected promise with error', () => {
-
+    it(`And unexpected error occurs
+    When retrieving API Account ID for business Then return rejected promise with error`, () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
         .yields(expectedError, null, null);
 
@@ -112,7 +107,6 @@ describe('Api Accounts Service', () => {
         expect(e).to.equal(expectedError);
       });
     });
-
 
     function expectApiAccount(actualApiAccount: ApiAccount) {
       expect(actualApiAccount.id).to.equal(expectedApiAccount.id);
