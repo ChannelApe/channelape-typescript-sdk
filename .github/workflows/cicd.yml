@@ -48,9 +48,6 @@ jobs:
         echo "Sonar Target: ${SONAR_TARGET}"
         echo "Package Version: ${PACKAGE_VERSION}"
         echo "NPM Tag: ${NPM_TAG}"
-    - name: Debug
-      run: |
-        echo "TAG: ${{ env.NPM_TAG }}"
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
       with:
