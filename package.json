@@ -12,7 +12,7 @@
     "unit-test": "mocha --config ./test/.mocharc.json \"test/**/*.spec.*\"",
     "watch-unit-test": "mocha --recursive --compilers ts:ts-node/register --watch test/**/*.spec.* ",
     "test": "npm run unit-test",
-    "pretest": "npm run compile && npm run lint",
+    "pretest": "npm run compile && npm run lint --fix",
     "posttest": "npm run cover",
     "cover": "nyc npm run unit-test && nyc check-coverage --lines 90 --branches 90 --statements 90 --functions 90",
     "lint": "tslint -p tsconfig.json && tslint -p test/tsconfig.json && tslint -p e2e/tsconfig.json",
