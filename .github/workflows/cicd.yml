@@ -31,7 +31,7 @@ jobs:
     - name: Get branch name
       id: branch-name
       uses: tj-actions/branch-names@v4.9
-    - name: SonarCloud Setup
+    - name: SonarCloud and NPM Setup
       run: |
         PACKAGE_VERSION=$(cat package.json \
           | grep version \
@@ -41,9 +41,13 @@ jobs:
           | tr -d '[[:space:]]')
         BRANCH_NAME=${{ steps.branch-name.outputs.current_branch }}
         ([[ ${BRANCH_NAME:0:8} = feature/ ]] || [[ ${BRANCH_NAME:0:7} = develop ]]) && SONAR_TARGET=develop || SONAR_TARGET=master
+        NPM_TAG=$(node scripts/get-npm-tag.js "${{ steps.branch-name.outputs.current_branch }}")
+        echo "NPM_TAG=${NPM_TAG}" >> $GITHUB_ENV
+
         echo "Branch: ${BRANCH_NAME}"
         echo "Sonar Target: ${SONAR_TARGET}"
         echo "Package Version: ${PACKAGE_VERSION}"
+        echo "NPM Tag: ${NPM_TAG}"
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
       with:
@@ -54,12 +58,13 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-    
     - name: NPM Publish
       id: publish
       uses: JS-DevTools/npm-publish@v1
       with:
           token: ${{ secrets.NPM_TOKEN }}
+          tag: ${{ env.NPM_TAG }}
     - if: steps.publish.outputs.type != 'none'
       run: |
         echo "Version changed: ${{ steps.publish.outputs.old-version }} => ${{ steps.publish.outputs.version }}"
+        echo "Tag: ${{ steps.publish.outputs.tag }}"
