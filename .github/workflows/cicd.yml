@@ -41,12 +41,15 @@ jobs:
           | tr -d '[[:space:]]')
         BRANCH_NAME=${{ steps.branch-name.outputs.current_branch }}
         ([[ ${BRANCH_NAME:0:8} = feature/ ]] || [[ ${BRANCH_NAME:0:7} = develop ]]) && SONAR_TARGET=develop || SONAR_TARGET=master
-        NPM_TAG=$(node scripts/get-npm-tag.js "${{ steps.branch-name.outputs.current_branch }}")
+        export NPM_TAG=$(node scripts/get-npm-tag.js "${{ steps.branch-name.outputs.current_branch }}")
 
         echo "Branch: ${BRANCH_NAME}"
         echo "Sonar Target: ${SONAR_TARGET}"
         echo "Package Version: ${PACKAGE_VERSION}"
         echo "NPM Tag: ${NPM_TAG}"
+    - name: Debug
+      run: |
+        echo "TAG: ${{ env.NPM_TAG }}"
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
       with:
