@@ -6,7 +6,6 @@ function run() {
     const LATEST = 'latest';
     const currentBranch = process.argv[2];
 
-    console.log(JSON.stringify(process.env, null, 4));
     if (
         isPullRequestWithTargetBranchOf(MASTER) ||
         isPushToBranch(MASTER, currentBranch)
