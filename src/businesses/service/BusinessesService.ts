@@ -6,13 +6,20 @@ import BusinessesCrudService from './BusinessesCrudService';
 import BusinessCreateRequest from '../model/BusinessCreateRequest';
 import { BusinessMemberRequest } from '../model/BusinessMemberRequest';
 import { BusinessMember } from '../model/BusinessMember';
+import ApiAccountsService from '../apiaccounts/service/ApiAccountsService';
 
 export default class BusinessesService {
 
   private readonly businessesCrudService: BusinessesCrudService;
+  private readonly apiAccountsService: ApiAccountsService;
 
   constructor(private readonly client: RequestClientWrapper) {
     this.businessesCrudService = new BusinessesCrudService(this.client);
+    this.apiAccountsService = new ApiAccountsService(client);
+  }
+
+  public apiAccounts(): ApiAccountsService {
+    return this.apiAccountsService;
   }
 
   public get(request: BusinessesQueryRequestByUserId): Promise<Business[]>;
