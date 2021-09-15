@@ -14,13 +14,14 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Orders](#orders)
 - [Variants](#variants)
 - [Businesses](#businesses)
+  - [API Accounts](#apiAccounts)
 - [Subscriptions](#subscriptions)
 - [Order Activities](#order-activities)
 - [Analytics](#analytics)
 - [Product Filters](#product-filters)
 - [Users](#users)
 - [Inventories](#inventories)
-- [Inventory Quantities](#inventory-quantities)
+  - [Inventory Quantities](#inventory-quantities)
 - [Locations](#locations)
 - [Steps](#steps)
 
@@ -369,6 +370,19 @@ const businessToCreate: BusinessCreateRequest = {
 channelApeClient.businesses().create(businessToCreate)
   .then((business: Business) => {
     // do what you need to do with the newly created business here 
+  });
+```
+
+#### API Accounts
+
+##### Get API Account
+
+```typescript
+const businessId = 'valid-business-id';
+const apiAccountId = 'valid-api-account-id';
+channelApeClient.businesses().apiAccounts().get(businessId, apiAccountId)
+  .then((apiAccount: ApiAccount) => {
+    // do what you need to do with the API account here 
   });
 ```
 
