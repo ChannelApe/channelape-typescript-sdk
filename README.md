@@ -2,10 +2,11 @@
 
 TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channelape.io/)
 
-[![Build Status](https://travis-ci.org/ChannelApe/channelape-typescript-sdk.svg?branch=master)](https://travis-ci.org/ChannelApe/channelape-typescript-sdk)  [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=channelape-typescript-sdk&metric=alert_status)](https://sonarcloud.io/dashboard?id=channelape-typescript-sdk) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=channelape-typescript-sdk&metric=coverage)](https://sonarcloud.io/dashboard?id=channelape-typescript-sdk)
+[![Build Status](https://github.com/ChannelApe/channelape-typescript-sdk/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/ChannelApe/channelape-typescript-sdk/actions)  [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=channelape-typescript-sdk&metric=alert_status)](https://sonarcloud.io/dashboard?id=channelape-typescript-sdk) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=channelape-typescript-sdk&metric=coverage)](https://sonarcloud.io/dashboard?id=channelape-typescript-sdk)
 
 ## Features
 - [Getting Started](#getting-started)
+- [Errors](#errors)
 - [Sessions](#sessions)
 - [Actions](#actions)
 - [Channels](#channels)
@@ -21,6 +22,7 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Inventories](#inventories)
 - [Inventory Quantities](#inventory-quantities)
 - [Locations](#locations)
+- [Steps](#steps)
 
 ### Getting Started
 
@@ -45,6 +47,22 @@ const channelApeClient = new ChannelApeClient({
 * minimumRequestRetryRandomDelay - Minimum number of milliseconds to randomly delay by when an undesired response status code is received. Defaults to 1000 (1 second). Cannot be set lower than 1000 (1 second).
 * maximumRequestRetryRandomDelay - Maximum number of milliseconds to randomly delay by when an undesired response status code is received. Defaults to 5000 (5 seconds). Cannot be set lower than 2000 (2 seconds).
 * maximumConcurrentConnections - Maximum number of connections or requests that can be made to the API at a single time.  Defaults to 5.
+
+
+### Error Handling
+
+When a call to the ChannelApe API returns an error, it can be accessed through the `ApiErrors` array on the error object.  The following is an example:
+```typescript
+try {
+  newOrder = await client.orders().create(orderWithChannelOrderIdThatAlreadyExists);
+} catch (error) {
+  if (error?.ApiErrors?.code === 168) {
+    ... Handle duplicate channel order ID error
+  }
+}
+```
+
+Error codes and descriptions can be found here: [Postman API Error Handling](https://docs.channelape.io/?version=latest#error-handling)
 
 
 ### Sessions
@@ -125,6 +143,14 @@ channelapeClient.suppliers().get(supplierId)
 ```typescript
 channelapeClient.suppliers().get({ businessId: 'some-valid-business-id' })
   .then((suppliers: Supplier[]) => {
+    // do what you need to do with supplier data here
+  });
+```
+
+#### Update a supplier
+```typescript
+channelapeClient.suppliers().update(supplierUpdateRequest)
+  .then((supplier: Supplier) => {
     // do what you need to do with supplier data here
   });
 ```
@@ -674,5 +700,15 @@ const locationUpdateRequest: LocationUpdateRequest = {
 channelApeClient.locations().update(locationUpdateRequest)
   .then((location: Location) => {
     // Do what you need with the updated location
+  });
+```
+
+### Steps
+
+#### Get step by ID
+```typescript
+channelapeClient.steps().get(stepId)
+  .then((step: Step) => {
+    // do what you need to do with step data here
   });
 ```

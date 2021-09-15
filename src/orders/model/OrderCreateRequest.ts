@@ -3,6 +3,7 @@ import Fulfillment from './Fulfillment';
 import AdditionalField from '../../model/AdditionalField';
 import OrderStatus from './OrderStatus';
 import Customer from './Customer';
+import Refund from './Refund';
 
 export default interface OrderCreateRequest {
   additionalFields?: AdditionalField[];
@@ -24,4 +25,5 @@ export default interface OrderCreateRequest {
   lineItems: LineItem[];
   fulfillments?: Fulfillment[];
   actionId?: string;
+  refunds?: Refund[];
 }

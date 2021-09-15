@@ -1,4 +1,5 @@
 import FileSettings from '../../model/fileSettings/FileSettings';
+import StepSettings from './StepSettings';
 
 export default interface Supplier {
   businessId: string;
@@ -8,5 +9,6 @@ export default interface Supplier {
   id: string;
   integrationId: string;
   name: string;
+  stepSettings?: StepSettings;
   updatedAt: Date;
 }
