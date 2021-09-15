@@ -35,9 +35,14 @@ export default class JsonOrderFormatterService {
     order.fulfillments = order.fulfillments.map((f: any) =>
       JsonOrderFormatterService.formatFulfillment(f),
     );
-    order.refunds = order.refunds.map((r: any) =>
-      JsonOrderFormatterService.formatRefund(r),
-    );
+    if (order.refunds) {
+      order.refunds = order.refunds.map((r: any) =>
+        JsonOrderFormatterService.formatRefund(r),
+      );
+    } else {
+      order.refunds = [];
+    }
+
     return trimObject(order) as Order;
   }
 

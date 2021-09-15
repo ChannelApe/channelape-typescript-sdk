@@ -118,15 +118,15 @@ export default class RequestClientWrapper {
           break;
         case HttpRequestMethod.PUT:
           const putData = options.data === undefined ? '' : options.data;
-          requestPromise = axios.put(url, { body: putData }, options);
+          requestPromise = axios.put(url, putData, options);
           break;
         case HttpRequestMethod.POST:
           const postData = options.data === undefined ? '' : options.data;
-          requestPromise = axios.post(url, { body: postData }, options);
+          requestPromise = axios.post(url, postData, options);
           break;
         case HttpRequestMethod.PATCH:
           const patchData = options.data === undefined ? '' : options.data;
-          requestPromise = axios.patch(url, { body: patchData }, options);
+          requestPromise = axios.patch(url, patchData, options);
           break;
         default:
           throw new ChannelApeError('HTTP Request Method could not be determined', {} as any, '', []);

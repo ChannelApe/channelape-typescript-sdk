@@ -28,7 +28,10 @@ import LocationCreateRequest from './../src/locations/model/LocationCreateReques
 import LocationUpdateRequest from './../src/locations/model/LocationUpdateRequest';
 import AdjustmentRequest from './../src/inventories/quantities/model/AdjustmentRequest';
 import { InventoryStatus } from '../src/inventories/enum/InventoryStatus';
-import { AdjustmentsBySku } from '../src';
+import AdjustmentsBySku from '../src/inventories/quantities/model/AdjustmentsBySku';
+import Step from '../src/steps/model/Step';
+import StepVersion from '../src/suppliers/model/StepVersion';
+import SupplierUpdateRequest from '../src/suppliers/model/SupplierUpdateRequest';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
@@ -185,6 +188,43 @@ describe('ChannelApe Client', () => {
               }
             }
             assertSupplierEuropaSportsSnackFoods(suppliers[i]);
+          });
+        });
+      });
+    });
+
+    describe('And valid supplier', () => {
+      context('When updating a supplier', () => {
+        it('Then return the supplier', () => {
+          const supplierUpdate = {
+            id: 'b8205acd-4bdd-4153-9282-88f4570192d4',
+            businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4',
+            enabled: true,
+            integrationId: 'dea1fe11-81ad-4b1f-90ca-18a099a5186f',
+            name: 'E2E Test Supplier',
+            stepSettings: {
+              environmentVariables: [
+                {
+                  name: 'CHANNEL_APE_SECRET_KEY'
+                },
+                {
+                  name: 'TEST_VARIABLE',
+                  value: new Date().toISOString()
+                }
+              ],
+              maximumConcurrentConnections: '5',
+              orderQueryParameters: {
+                purchasedAtMaxIntervalMinutes: '0',
+                purchasedAtMinIntervalMinutes: '1440',
+                status: OrderStatus.OPEN
+              },
+              stepId: 'e3d1046f-a878-4d42-b675-0c215a406075',
+              version: StepVersion.TEST
+            }
+          };
+          const actualSuppliersPromise = channelApeClient.suppliers().update(supplierUpdate);
+          return actualSuppliersPromise.then((supplier) => {
+            assertSupplierUpdate(supplier, supplierUpdate);
           });
         });
       });
@@ -949,11 +989,11 @@ describe('ChannelApe Client', () => {
         });
       });
 
-      describe('And valid inventory item creation request', () => {
-        context('When creating inventory item', () => {
-          it('Then create and return inventory item', async () => {
+      describe('And valid location creation request', () => {
+        context('When creating location', () => {
+          it('Then create and return location', async () => {
             const businessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
-            const generatedName = `Some-Location-${Math.floor((Math.random() * 100000) + 1).toString()}`;
+            const generatedName = `Some-Location-${new Date().getTime().toString()}`;
             const locationCreateRequest: LocationCreateRequest = {
               businessId,
               name: generatedName
@@ -1114,6 +1154,16 @@ describe('ChannelApe Client', () => {
         });
       });
 
+      describe('And valid step ID', () => {
+        context('When retrieving step', () => {
+          it('Then return step', () => {
+            const expectedStepId = 'e3d1046f-a878-4d42-b675-0c215a406075';
+            const actualStepPromise = channelApeClient.steps().get(expectedStepId);
+            return actualStepPromise.then(assertStep);
+          });
+        });
+      });
+
     });
 
     function getSessionId(): string {
@@ -1208,6 +1258,19 @@ describe('ChannelApe Client', () => {
       expect(supplier.id).to.equal('1e4ebaa6-9796-4ccf-bd73-8765893a66bd');
       expect(supplier.integrationId).to.equal('2eacfed0-46ce-46b5-b8c6-dd8e29672c8c');
       expect(supplier.name).to.equal('Europa Sports');
+    }
+
+    function assertStep(actualStep: Step) {
+      expect(actualStep.id).to.deep.equal('e3d1046f-a878-4d42-b675-0c215a406075');
+      expect(actualStep.name).to.deep.equal('E2E Test Step');
+    }
+
+    function assertSupplierUpdate(actualSupplier: Supplier, updateRequest: SupplierUpdateRequest) {
+      expect(actualSupplier.id).to.equal(updateRequest.id);
+      expect(actualSupplier.name).to.equal(updateRequest.name);
+      expect(actualSupplier.enabled).to.equal(updateRequest.enabled);
+      expect(actualSupplier.integrationId).to.equal(updateRequest.integrationId);
+      expect(actualSupplier.stepSettings).to.deep.equal(updateRequest.stepSettings);
     }
   });
 });

@@ -6,6 +6,7 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 
 ## Features
 - [Getting Started](#getting-started)
+- [Errors](#errors)
 - [Sessions](#sessions)
 - [Actions](#actions)
 - [Channels](#channels)
@@ -13,14 +14,16 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Orders](#orders)
 - [Variants](#variants)
 - [Businesses](#businesses)
+  - [API Accounts](#apiAccounts)
 - [Subscriptions](#subscriptions)
 - [Order Activities](#order-activities)
 - [Analytics](#analytics)
 - [Product Filters](#product-filters)
 - [Users](#users)
 - [Inventories](#inventories)
-- [Inventory Quantities](#inventory-quantities)
+  - [Inventory Quantities](#inventory-quantities)
 - [Locations](#locations)
+- [Steps](#steps)
 
 ### Getting Started
 
@@ -45,6 +48,22 @@ const channelApeClient = new ChannelApeClient({
 * minimumRequestRetryRandomDelay - Minimum number of milliseconds to randomly delay by when an undesired response status code is received. Defaults to 1000 (1 second). Cannot be set lower than 1000 (1 second).
 * maximumRequestRetryRandomDelay - Maximum number of milliseconds to randomly delay by when an undesired response status code is received. Defaults to 5000 (5 seconds). Cannot be set lower than 2000 (2 seconds).
 * maximumConcurrentConnections - Maximum number of connections or requests that can be made to the API at a single time.  Defaults to 5.
+
+
+### Error Handling
+
+When a call to the ChannelApe API returns an error, it can be accessed through the `ApiErrors` array on the error object.  The following is an example:
+```typescript
+try {
+  newOrder = await client.orders().create(orderWithChannelOrderIdThatAlreadyExists);
+} catch (error) {
+  if (error?.ApiErrors?.code === 168) {
+    ... Handle duplicate channel order ID error
+  }
+}
+```
+
+Error codes and descriptions can be found here: [Postman API Error Handling](https://docs.channelape.io/?version=latest#error-handling)
 
 
 ### Sessions
@@ -125,6 +144,14 @@ channelapeClient.suppliers().get(supplierId)
 ```typescript
 channelapeClient.suppliers().get({ businessId: 'some-valid-business-id' })
   .then((suppliers: Supplier[]) => {
+    // do what you need to do with supplier data here
+  });
+```
+
+#### Update a supplier
+```typescript
+channelapeClient.suppliers().update(supplierUpdateRequest)
+  .then((supplier: Supplier) => {
     // do what you need to do with supplier data here
   });
 ```
@@ -343,6 +370,19 @@ const businessToCreate: BusinessCreateRequest = {
 channelApeClient.businesses().create(businessToCreate)
   .then((business: Business) => {
     // do what you need to do with the newly created business here 
+  });
+```
+
+#### API Accounts
+
+##### Get API Account
+
+```typescript
+const businessId = 'valid-business-id';
+const apiAccountId = 'valid-api-account-id';
+channelApeClient.businesses().apiAccounts().get(businessId, apiAccountId)
+  .then((apiAccount: ApiAccount) => {
+    // do what you need to do with the API account here 
   });
 ```
 
@@ -674,5 +714,15 @@ const locationUpdateRequest: LocationUpdateRequest = {
 channelApeClient.locations().update(locationUpdateRequest)
   .then((location: Location) => {
     // Do what you need with the updated location
+  });
+```
+
+### Steps
+
+#### Get step by ID
+```typescript
+channelapeClient.steps().get(stepId)
+  .then((step: Step) => {
+    // do what you need to do with step data here
   });
 ```

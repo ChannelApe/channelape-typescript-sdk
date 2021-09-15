@@ -27,6 +27,7 @@ describe('Sessions Service', () => {
       });
     const sessionId = 'b40da0b8-a770-4de7-a496-361254bd7d6c';
     const userId = 'f6ed6f7a-47bf-4dd3-baed-71a8a9684e80';
+    const apiAccountId = 'a6ed6f7a-47bf-4dd3-baed-71a8a9684e80';
     const sessionsService = new SessionsService(client);
 
     let sandbox: sinon.SinonSandbox;
@@ -61,6 +62,30 @@ describe('Sessions Service', () => {
         expect(clientGetStub.args[0][0])
             .to.equal(`/${Version.V1}${Resource.SESSIONS}/${sessionId}`);
         expect(actualResponse.userId).to.equal(expectedResponse.userId);
+        expect(actualResponse.sessionId).to.equal(expectedResponse.sessionId);
+      });
+    });
+
+    it('And session ID is valid with API Account ID ' +
+      'When retrieving session Then return resolved promise with session data', () => {
+
+      const expectedResponse = {
+        sessionId,
+        apiAccountId
+      };
+
+      const response = {
+        status: 200,
+        config: {},
+        data: expectedResponse
+      };
+
+      const clientGetStub = sandbox.stub(axios, 'get').resolves(response);
+
+      return sessionsService.get(sessionId).then((actualResponse) => {
+        expect(clientGetStub.args[0][0])
+            .to.equal(`/${Version.V1}${Resource.SESSIONS}/${sessionId}`);
+        expect(actualResponse.apiAccountId).to.equal(expectedResponse.apiAccountId);
         expect(actualResponse.sessionId).to.equal(expectedResponse.sessionId);
       });
     });
