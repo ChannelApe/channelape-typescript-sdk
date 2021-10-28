@@ -389,7 +389,7 @@ describe('Businesses Service', () => {
         userId: 'valid-user-id'
       }));
       const businessId = 'valid-business-id';
-      const username = 'manthan.c@channelape.com';
+      const username = 'sample.c@channelape.com';
       const mockedAxiosAdapter = new axiosMockAdapter(axios);
       mockedAxiosAdapter.onPost(`/${Version.V1}${Resource.BUSINESSES}/${businessId}/members`)
           .reply((data) => {
@@ -415,7 +415,7 @@ describe('Businesses Service', () => {
       const clientGetStub = sandbox.stub(client, 'post')
           .yields(null, response, expectedForbiddenErrorResponse);
       const businessId = 'invalid-business-id';
-      const username = 'sample11.c@channelape.com';
+      const username = 'sample.c@channelape.com';
       const businessService: BusinessesService = new BusinessesService(client);
       return businessService.inviteMember(username, businessId).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
