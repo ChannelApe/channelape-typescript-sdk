@@ -2,6 +2,7 @@ import InventoryItemKey from '../../model/InventoryItemKey';
 import ChannelApeApiError from '../../model/ChannelApeApiError';
 import TimeZoneId from '../../model/TimeZoneId';
 import AlphabeticCurrencyCode from '../../model/AlphabeticCurrencyCode';
+import { Users } from '../../users/model/User';
 
 export default interface Business {
   alphabeticCurrencyCode: AlphabeticCurrencyCode;
@@ -11,4 +12,8 @@ export default interface Business {
   inventoryItemKey: InventoryItemKey;
   name: string;
   timeZone: TimeZoneId;
+}
+export interface BusinessMembers{
+  errors:string[];
+  Users:Users[];
 }

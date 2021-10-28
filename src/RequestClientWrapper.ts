@@ -77,7 +77,14 @@ export default class RequestClientWrapper {
       this.requestQueue.unshift(requestConfig);
     }
   }
-
+  public delete(url:string, params:AxiosRequestConfig, callback:RequestCallback):void {
+    this.handleRequest({
+      url,
+      params,
+      callback,
+      method: HttpRequestMethod.DELETE
+    });
+  }
   prepareRequest(requestConfig: RequestConfig): void {
     this.pendingRequests = this.pendingRequests + 1;
     this.makeRequest(
@@ -127,6 +134,9 @@ export default class RequestClientWrapper {
         case HttpRequestMethod.PATCH:
           const patchData = options.data === undefined ? '' : options.data;
           requestPromise = axios.patch(url, patchData, options);
+          break;
+        case HttpRequestMethod.DELETE:
+          requestPromise = axios.delete(url, options);
           break;
         default:
           throw new ChannelApeError('HTTP Request Method could not be determined', {} as any, '', []);

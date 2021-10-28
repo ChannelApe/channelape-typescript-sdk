@@ -1,7 +1,7 @@
 import ChannelApeApiError from '../../../model/ChannelApeApiError';
 
 export default interface ApiAccount {
-  id: string;
+  id: string | any;
   businessId: string;
   name: string;
   errors?: ChannelApeApiError[];

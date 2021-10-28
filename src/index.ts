@@ -93,3 +93,7 @@ export { default as OrderQueryParameters } from './suppliers/model/OrderQueryPar
 export { default as StepSettings } from './suppliers/model/StepSettings';
 export { default as StepVersion } from './suppliers/model/StepVersion';
 export { default as SupplierUpdateRequest } from './suppliers/model/SupplierUpdateRequest';
+export { default as ApiAccount } from './businesses/apiaccounts/model/ApiAccount';
+export { default as BusinessMembers } from './businesses/model/Business';
+export { default as InvitationResponse } from './businesses/model/InvitationResponse';
+export { default as RemoveMember } from './businesses/model/RemoveMember';

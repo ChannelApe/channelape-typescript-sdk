@@ -1,4 +1,4 @@
-import Business from '../model/Business';
+import Business, { BusinessMembers } from '../model/Business';
 import RequestClientWrapper from '../../RequestClientWrapper';
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import Resource from '../../model/Resource';
@@ -10,6 +10,8 @@ import * as Q from 'q';
 import BusinessCreateRequest from '../model/BusinessCreateRequest';
 import { BusinessMemberRequest } from '../model/BusinessMemberRequest';
 import { BusinessMember } from '../model/BusinessMember';
+import InvitationResponse from '../model/InvitationResponse';
+import RemoveMember from '../model/RemoveMember';
 
 const EXPECTED_GET_STATUS = 200;
 const EXPECTED_CREATE_STATUS = 201;
@@ -51,7 +53,14 @@ export default class BusinessesCrudService {
     });
     return deferred.promise as any;
   }
-
+  public getBusinessMembers(request: BusinessMemberRequest): Promise<BusinessMembers> {
+    const deferred = Q.defer<BusinessMembers | BusinessMembers[]>();
+    const requestUrl = `/${Version.V1}${Resource.BUSINESSES}/?businessId=${request.businessId}`;
+    this.client.get(requestUrl, {}, (error, response, body) => {
+      this.mapBusinessPromises(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
+    });
+    return deferred.promise as any;
+  }
   public verifyBusinessMember(verificationCode: string): Promise<Business> {
     const deferred = Q.defer<Business | BusinessMember>();
     const requestUrl = `/${Version.V1}${Resource.BUSINESS_MEMBER_VERIFICATIONS}/${verificationCode}`;
@@ -70,6 +79,38 @@ export default class BusinessesCrudService {
     };
     this.client.post(requestUrl, options, (error, response, body) => {
       this.mapBusinessPromise(requestUrl, deferred, error, response, body, EXPECTED_CREATE_STATUS);
+    });
+    return deferred.promise as any;
+  }
+  public inviteMember(email:string, businessId:string):Promise<InvitationResponse>  {
+    const deferred = Q.defer<Business | BusinessMember>();
+    const requestUrl = `/${Version.V1}${Resource.BUSINESSES}/${businessId}/members`;
+    const options: AxiosRequestConfig = {
+      data: JSON.stringify({
+        username: email
+      })
+    };
+    this.client.post(requestUrl, options, (error, response, body) => {
+      this.mapBusinessPromise(requestUrl, deferred, error, response, body, EXPECTED_CREATE_STATUS);
+    });
+    return deferred.promise as any;
+  }
+  public removeMember(businessId:string, userId:string):Promise<RemoveMember>  {
+    const deferred = Q.defer<Business | BusinessMember>();
+    const requestUrl = `/${Version.V1}${Resource.BUSINESSES}/${businessId}/members/${userId}`;
+    this.client.delete(requestUrl, {}, (error, response, body) => {
+      this.mapBusinessPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
+    });
+    return deferred.promise as any;
+  }
+  public update(business: BusinessCreateRequest): Promise<Business> {
+    const deferred = Q.defer<Business | BusinessMember>();
+    const requestUrl = `${Version.V1}${Resource.BUSINESSES}`;
+    const options: AxiosRequestConfig = {
+      data: business
+    };
+    this.client.put(requestUrl, options, (error, response, body) => {
+      this.mapBusinessPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
     });
     return deferred.promise as any;
   }
@@ -99,6 +140,23 @@ export default class BusinessesCrudService {
     response: AxiosResponse,
     body: any,
     expectedStatusCode: number
+  ) {
+    if (error) {
+      deferred.reject(error);
+    } else if (response.status === expectedStatusCode) {
+      deferred.resolve(body);
+    } else {
+      const channelApeErrorResponse = GenerateApiError(requestUrl, response, body, expectedStatusCode);
+      deferred.reject(channelApeErrorResponse);
+    }
+  }
+  private mapBusinessPromises(
+      requestUrl: string,
+      deferred: Q.Deferred<BusinessMembers | BusinessMembers[]>,
+      error: any,
+      response: AxiosResponse,
+      body: any,
+      expectedStatusCode: number
   ) {
     if (error) {
       deferred.reject(error);

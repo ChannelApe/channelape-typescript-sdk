@@ -1,4 +1,4 @@
-import Business from '../model/Business';
+import Business, { BusinessMembers } from '../model/Business';
 import RequestClientWrapper from '../../RequestClientWrapper';
 import BusinessesQueryRequestByUserId from '../model/BusinessesQueryRequestByUserId';
 import BusinessesQueryRequestByBusinessId from '../model/BusinessesQueryRequestByBusinessId';
@@ -7,6 +7,8 @@ import BusinessCreateRequest from '../model/BusinessCreateRequest';
 import { BusinessMemberRequest } from '../model/BusinessMemberRequest';
 import { BusinessMember } from '../model/BusinessMember';
 import ApiAccountsService from '../apiaccounts/service/ApiAccountsService';
+import InvitationResponse from '../model/InvitationResponse';
+import RemoveMember from '../model/RemoveMember';
 
 export default class BusinessesService {
 
@@ -41,5 +43,17 @@ export default class BusinessesService {
   public create(business: BusinessCreateRequest): Promise<Business> {
     return this.businessesCrudService.create(business);
   }
+  public getBusinessMembers(request: BusinessMemberRequest): Promise<BusinessMembers> {
+    return this.businessesCrudService.getBusinessMembers(request);
+  }
+  public inviteMember(email:string, businessId:string):Promise<InvitationResponse> {
+    return this.businessesCrudService.inviteMember(email, businessId);
+  }
 
+  public removeMember(businessId:string, userId:string):Promise<RemoveMember> {
+    return this.businessesCrudService.removeMember(businessId, userId);
+  }
+  public update(business: BusinessCreateRequest):Promise<Business> {
+    return this.businessesCrudService.update(business);
+  }
 }

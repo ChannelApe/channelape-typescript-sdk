@@ -347,7 +347,51 @@ channelApeClient.businesses().getBusinessMember(businessMemberQueryRequest)
     // do what you need to do with the business member here
   });
 ```
-
+#### Get Business Members
+```typescript
+const businessMemberRequest: BusinessMemberRequest = {
+  userId,
+  businessId
+}
+channelApeClient.businesses().getBusinessMembers(businessMemberQueryRequest)
+  .then((businessMembers: BusinessMembers) => {
+    // do what you need to do with the business members here
+  });
+```
+#### Invite a Member to a business
+```typescript
+const businessId = 'valid-business-id';
+const email = 'valid-email-id';
+channelApeClient.businesses().inviteMember(email, businessId)
+then((invitationMember: InvitationResponse) => {
+    // send invitationMember to a user
+  });
+```
+#### Remove a Member from a business
+```typescript
+const businessId = 'valid-business-id';
+const userId = 'valid-id';
+channelApeClient.businesses().removeMember(businessId, userId)
+then((removeMember: RemoveMember) => {
+    // remove a member from business
+  });
+```
+#### Update a Business's Settings
+```typescript
+const businessToUpdate: Business = {
+  name: 'name',
+  inventoryItemKey: InventoryItemKey.SKU,
+  timeZone: TimeZoneId.US_ALASKA,
+  alphabeticCurrencyCode: AlphabeticCurrencyCode.USD,
+  id: 'valid-id',
+  embeds: [],
+  errors: []
+}
+channelApeClient.businesses().update(businessToUpdate)
+  .then((updatedBusiness: Business) => {
+    // do what you need to do with the updated business here 
+  });
+```
 #### Verify Business Member
 ```typescript
 
@@ -380,12 +424,31 @@ channelApeClient.businesses().create(businessToCreate)
 ```typescript
 const businessId = 'valid-business-id';
 const apiAccountId = 'valid-api-account-id';
-channelApeClient.businesses().apiAccounts().get(businessId, apiAccountId)
+channelApeClient.businesses().apiAccounts().get(businessId, apiAccountId )
   .then((apiAccount: ApiAccount) => {
     // do what you need to do with the API account here 
   });
 ```
+##### Get API Accounts
 
+```typescript
+const businessId = 'valid-business-id';
+const apiAccountId = 'valid-api-account-id';
+channelApeClient.businesses().apiAccounts().get(businessId)
+  .then((apiAccount: ApiAccount) => {
+    // do what you need to do with the API account here 
+  });
+```
+##### Delete API Account from a business
+
+```typescript
+const businessId = 'valid-business-id';
+const apiAccountId = 'valid-api-account-id';
+channelApeClient.businesses().apiAccounts().delete(businessId, apiAccountId)
+  .then((deleteAccount: ApiAccount) => {
+    // do what you need to do with the API account here 
+  });
+```
 ### Subscriptions
 
 #### Get Subscription
