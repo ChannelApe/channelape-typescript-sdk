@@ -6,14 +6,14 @@ import Version from '../../../src/model/Version';
 import Resource from '../../../src/model/Resource';
 import Environment from '../../../src/model/Environment';
 import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
-import Business, { BusinessMembers } from '../../../src/businesses/model/Business';
+import Business from '../../../src/businesses/model/Business';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import {
   ChannelApeError,
   AlphabeticCurrencyCode,
   InventoryItemKey,
   TimeZoneId,
-  InvitationResponse, RemoveMember
+  InvitationResponse
 } from '../../../src/index';
 import axios from 'axios';
 import axiosMockAdapter from 'axios-mock-adapter';
@@ -21,8 +21,9 @@ import axiosMockAdapter from 'axios-mock-adapter';
 import singleBusiness from '../resources/singleBusiness';
 import BusinessCreateRequest from '../../../src/businesses/model/BusinessCreateRequest';
 import { fail } from 'assert';
-import { Users } from '../../../src/users/model/User';
 import updateBusinessSettings from '../resources/updateBusinessSettings';
+import { BusinessMember } from '../../../src/businesses/model/BusinessMember';
+import User from '../../../src/users/model/User';
 
 describe('Businesses Service', () => {
 
@@ -61,16 +62,14 @@ describe('Businesses Service', () => {
       name: 'Test Business 2',
       timeZone: TimeZoneId.AUSTRALIA_BRISBANE
     };
-    const expectedBusinessMember:Users = {
+    const expectedBusinessMember: User = {
       analyticsEnabled: false,
-      errors: [],
       id: 'valid-user-id',
       username: 'some@email.com',
       verified: true
     };
-    const expectedBusinessMember2:Users = {
+    const expectedBusinessMember2: User = {
       analyticsEnabled: false,
-      errors: [],
       id: 'some-user-id',
       username: 'some@email.com',
       verified: true
@@ -308,14 +307,10 @@ describe('Businesses Service', () => {
         expect(member.owner).to.equal(expectedOwnerValue, 'owner');
       });
     });
-    it(`And valid all business ID and user ID when retrieving user's business access configuration for all user's,
+
+    it(`And valid all business ID and user ID when retrieving user's business access configuration for all users,
       Then return user's business access configuration`, () => {
       const businessId = 'valid-business-id';
-      const userId = 'valid-user-id';
-      const request = {
-        businessId,
-        userId
-      };
       const response = {
         status: 200,
         config: {
@@ -323,13 +318,14 @@ describe('Businesses Service', () => {
         }
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
-          .yields(null, response, { errors: [], Users: [expectedBusinessMember, expectedBusinessMember2] });
+          .yields(null, response, { errors: [], users: [expectedBusinessMember, expectedBusinessMember2] });
       const businessService: BusinessesService = new BusinessesService(client);
-      return businessService.getBusinessMembers(request).then((actualBusinessesResponse) => {
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.BUSINESSES}/?businessId=${request.businessId}`);
-        expectBusinessMembers(actualBusinessesResponse);
+      return businessService.getBusinessUsers(businessId).then((actualBusinessesResponse) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.BUSINESSES}/?businessId=${businessId}`);
+        expectBusinessUsers(actualBusinessesResponse);
       });
     });
+
     it('And invalid business ID ' +
         'When retrieving all businesses Then return a rejected promise with 403 status code ' +
         'And an error message', () => {
@@ -343,19 +339,15 @@ describe('Businesses Service', () => {
       const clientGetStub = sandbox.stub(client, 'get')
           .yields(null, response, expectedForbiddenErrorResponse);
       const businessId = 'invalid-business-id';
-      const userId = 'invalid-user-id';
-      const request = {
-        businessId,
-        userId
-      };
       const businessService: BusinessesService = new BusinessesService(client);
-      return businessService.getBusinessMembers(request).then((actualResponse) => {
+      return businessService.getBusinessUsers(businessId).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.BUSINESSES}/?businessId=${request.businessId}`);
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.BUSINESSES}/?businessId=${businessId}`);
         expectedForbiddenErrorsResponse(e);
       });
     });
+
     it('And when no params of business ID ' +
         'When retrieving all businesses Then return a rejected promise with 400 status code ' +
         'And an error message', () => {
@@ -369,19 +361,16 @@ describe('Businesses Service', () => {
       const clientGetStub = sandbox.stub(client, 'get')
           .yields(null, response, expectedBadRequestErrorResponse);
       const businessId = '';
-      const userId = '';
-      const request = {
-        businessId,
-        userId
-      };
+
       const businessService: BusinessesService = new BusinessesService(client);
-      return businessService.getBusinessMembers(request).then((actualResponse) => {
+      return businessService.getBusinessUsers(businessId).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.BUSINESSES}/?businessId=`);
         expectedBadRequestErrorsResponse(e);
       });
     });
+
     it('And send the invitation for business member, Then return return a user ID', () => {
       const newInvitation: InvitationResponse = JSON.parse(JSON.stringify({
         businessId: 'valid-business-id',
@@ -402,6 +391,7 @@ describe('Businesses Service', () => {
         expect(invitationMember.userId).equal('valid-user-id');
       });
     });
+
     it('And invalid business ID ' +
         'When send invitation, Then return a rejected promise with 403 status code ' +
         'And an error message', () => {
@@ -424,6 +414,7 @@ describe('Businesses Service', () => {
         expectedForbiddenErrorsResponse(e);
       });
     });
+
     it('And invalid email ID ' +
         'When send invitation, Then return a rejected promise with 404 status code ' +
         'And an error message', () => {
@@ -448,7 +439,7 @@ describe('Businesses Service', () => {
     });
 
     it('And will remove the member from the business and return the removed user', () => {
-      const removeInvitation: RemoveMember = JSON.parse(JSON.stringify({
+      const removeInvitation: BusinessMember = JSON.parse(JSON.stringify({
         businessId: 'valid-business-id',
         errors: [],
         owner: false,
@@ -469,6 +460,7 @@ describe('Businesses Service', () => {
         expect(removeMember.owner).equal(false);
       });
     });
+
     it('And invalid user ID ' +
         'When remove the member from the business, Then return a rejected promise with 404 status code ' +
         'And an error message', () => {
@@ -492,11 +484,12 @@ describe('Businesses Service', () => {
         expectedRemoveMemberErrorsResponse(e);
       });
     });
+
     it('And will update the provided business, Then return update a business settings', () => {
-      const updateBusiness: BusinessCreateRequest = JSON.parse(JSON.stringify(updateBusinessSettings));
+      const updateBusiness: Business = JSON.parse(JSON.stringify(updateBusinessSettings));
 
       const mockedAxiosAdapter = new axiosMockAdapter(axios);
-      mockedAxiosAdapter.onPut(`${Environment.STAGING}/${Version.V1}${Resource.BUSINESSES}`)
+      mockedAxiosAdapter.onPut(`${Environment.STAGING}/${Version.V1}${Resource.BUSINESSES}/${updateBusiness.id}`)
           .reply((data) => {
             expect(data.headers['X-Channel-Ape-Authorization-Token']).to.equal('valid-session-id');
             return Promise.resolve([200, updateBusiness]);
@@ -511,6 +504,7 @@ describe('Businesses Service', () => {
             .to.equal(AlphabeticCurrencyCode.USD, 'alphabeticCurrencyCode');
       });
     });
+
     it('And invalid business setting update request ' +
         'When updating business setting then return rejected promise with errors', async () => {
 
@@ -541,7 +535,7 @@ describe('Businesses Service', () => {
         fail('Successfully ran inventory update but should have failed');
       } catch (error) {
         expect(clientPutStub.args[0][0]).to
-            .equal(`${Version.V1}${Resource.BUSINESSES}`);
+            .equal(`${Version.V1}${Resource.BUSINESSES}/${updateSettingData.id}`);
         expect(clientPutStub.args[0][1].data).to.equal(updateSettingData);
 
         expect(error.Response.statusCode).to.equal(404);
@@ -550,6 +544,7 @@ describe('Businesses Service', () => {
             .to.equal(expectedBusinessUpdateErrorResponse.errors[0].message);
       }
     });
+
     it('And invalid business setting update(timezone) request ' +
         'When updating business setting(timezone) then return rejected promise with errors', async () => {
 
@@ -580,7 +575,7 @@ describe('Businesses Service', () => {
         fail('Successfully ran inventory update but should have failed');
       } catch (error) {
         expect(clientPutStub.args[0][0]).to
-            .equal(`${Version.V1}${Resource.BUSINESSES}`);
+            .equal(`${Version.V1}${Resource.BUSINESSES}/${updateSettingData.id}`);
         expect(clientPutStub.args[0][1].data).to.equal(updateSettingData);
 
         expect(error.Response.statusCode).to.equal(400);
@@ -589,8 +584,9 @@ describe('Businesses Service', () => {
             .to.equal(expectedBusinessUpdateTimezoneErrorResponse.errors[0].message);
       }
     });
+
     it('And invalid business setting update when business name is blank request ' +
-        'When business name is blankthen return rejected promise with errors', async () => {
+        'When business name is blank Then return rejected promise with errors', async () => {
 
       const response = {
         status: 400,
@@ -619,7 +615,7 @@ describe('Businesses Service', () => {
         fail('Successfully ran inventory update but should have failed');
       } catch (error) {
         expect(clientPutStub.args[0][0]).to
-            .equal(`${Version.V1}${Resource.BUSINESSES}`);
+            .equal(`${Version.V1}${Resource.BUSINESSES}/${updateSettingData.id}`);
         expect(clientPutStub.args[0][1].data).to.equal(updateSettingData);
 
         expect(error.Response.statusCode).to.equal(400);
@@ -659,11 +655,12 @@ describe('Businesses Service', () => {
       expect(error.ApiErrors[0].message)
         .to.equal(expectedChannelApeErrorResponse.errors[0].message);
     }
-    function  expectBusinessMembers(actualBusinessMembers:BusinessMembers) {
-      expect(actualBusinessMembers.Users[0].id).to.equal(expectedBusinessMember.id);
-      expect(actualBusinessMembers.Users[0].username).to.equal(expectedBusinessMember.username);
+    function  expectBusinessUsers(actualUsersResponse: any) {
+      expect(actualUsersResponse[0].id).to.equal(expectedBusinessMember.id);
+      expect(actualUsersResponse[0].username).to.equal(expectedBusinessMember.username);
     }
     function expectedForbiddenErrorsResponse(error: ChannelApeError) {
+      console.log(error);
       expect(error.Response.statusCode).to.equal(403);
       expect(error.ApiErrors[0].code).to.equal(expectedForbiddenErrorResponse.errors[0].code);
       expect(error.ApiErrors[0].message)

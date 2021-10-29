@@ -37,7 +37,7 @@ describe('Api Accounts Service', () => {
       expired: true
     };
 
-    const expectedApiAccounts:ApiAccount [] = [
+    const expectedApiAccounts: ApiAccount [] = [
       {
         businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4',
         creationTime: new Date('2019-09-05T20:22:19.737Z'),
@@ -145,6 +145,7 @@ describe('Api Accounts Service', () => {
         expect(e).to.equal(expectedError);
       });
     });
+
     it(`And return a list of all of the API accounts for the business, if only the business ID
     Then return resolved promise with API Account for all accounts`, () => {
       const response = {
@@ -155,13 +156,14 @@ describe('Api Accounts Service', () => {
       };
       const businessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
-          .yields(null, response, expectedApiAccounts);
+          .yields(null, response, { apiAccounts: expectedApiAccounts });
       const apiAccountsService: ApiAccountsService = new ApiAccountsService(client);
       return apiAccountsService.get(businessId).then((actualAllAccounts : ApiAccount[] | ApiAccount) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.BUSINESSES}/${businessId}${Resource.API_ACCOUNTS}`);
         expectApiAccounts(actualAllAccounts);
       });
     });
+
     it(`And unexpected error occurs
     When retrieving API Accounts ID's for all business Then return rejected promise with error`, () => {
       const businessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
@@ -174,6 +176,7 @@ describe('Api Accounts Service', () => {
         expect(e).to.equal(expectedError);
       });
     });
+
     it(`And delete the specified API account from the business,
     Then return resolved promise with deleted account`, () => {
       const response = {
@@ -194,6 +197,7 @@ describe('Api Accounts Service', () => {
         expect(deleteAccount.businessId).to.equal(deleteAccountResponse.businessId);
       });
     });
+
     it(`And not found API Account ID When deleting API
     Account from business Then return resolved promise with error status 404`, () => {
       const response = {
@@ -211,6 +215,34 @@ describe('Api Accounts Service', () => {
       return apiAccountsService.get(businessId, apiAccountId).catch((e) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.BUSINESSES}/${businessId}${Resource.API_ACCOUNTS}/${apiAccountId}`);
         expectDeleteAccountErrorResponse(e);
+      });
+    });
+
+    it(`And creating a new API account
+      Then return resolved promise with new API account`, () => {
+      const response = {
+        status: 201,
+        config: {
+          method: 'POST'
+        }
+      };
+      const businessId = '64d70831-c365-4238-b3d8-6077bebca788';
+      const name = 'some-api-key';
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'post')
+        .yields(null, response, {
+          name,
+          businessId: '9ad7a773-64d3-4efa-a916-3117e79f3c8f',
+          creationTime: '2021-10-29T15:59:30.416Z',
+          errors: [],
+          expired: true,
+          id: '23323c67-5240-415a-a0ce-1b534231f35b',
+          lastAccessedTime: undefined
+        });
+
+      const apiAccountsService: ApiAccountsService = new ApiAccountsService(client);
+      return apiAccountsService.create(name, businessId).then((response) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.BUSINESSES}/${businessId}${Resource.API_ACCOUNTS}`);
+        expect((response as ApiAccount).name).to.equal(name);
       });
     });
 
