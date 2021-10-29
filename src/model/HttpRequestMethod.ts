@@ -2,6 +2,7 @@ enum HttpRequestMethod {
   GET = 'GET',
   PUT = 'PUT',
   POST = 'POST',
-  PATCH = 'PATCH'
+  PATCH = 'PATCH',
+  DELETE= 'DELETE'
 }
 export default HttpRequestMethod;

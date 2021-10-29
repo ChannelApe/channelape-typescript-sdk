@@ -10,6 +10,8 @@ import * as Q from 'q';
 import BusinessCreateRequest from '../model/BusinessCreateRequest';
 import { BusinessMemberRequest } from '../model/BusinessMemberRequest';
 import { BusinessMember } from '../model/BusinessMember';
+import InvitationResponse from '../model/InvitationResponse';
+import User from '../../users/model/User';
 
 const EXPECTED_GET_STATUS = 200;
 const EXPECTED_CREATE_STATUS = 201;
@@ -22,7 +24,7 @@ export default class BusinessesCrudService {
   public get(request: BusinessesQueryRequestByBusinessId): Promise<Business>;
   public get(
     request: BusinessesQueryRequestByUserId & BusinessesQueryRequestByBusinessId
-  ): Promise<Business[]> | Promise<Business> {
+  ): Promise<Business[] | Business> {
     const deferred = Q.defer<Business[] | Business>();
     let requestUrl = `/${Version.V1}${Resource.BUSINESSES}`;
     let requestOptions: AxiosRequestConfig = {};
@@ -38,7 +40,7 @@ export default class BusinessesCrudService {
   }
 
   public getBusinessMember(request: BusinessMemberRequest): Promise<BusinessMember> {
-    const deferred = Q.defer<Business | BusinessMember>();
+    const deferred = Q.defer<BusinessMember>();
     const requestUrl = `/${Version.V1}${Resource.BUSINESSES}`;
     const requestOptions: AxiosRequestConfig = {
       params: {
@@ -47,29 +49,73 @@ export default class BusinessesCrudService {
       }
     };
     this.client.get(requestUrl, requestOptions, (error, response, body) => {
-      this.mapBusinessPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
+      this.mapResponse(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
+    });
+    return deferred.promise as any;
+  }
+
+  public getBusinessUsers(businessId: string): Promise<User[]> {
+    const deferred = Q.defer<User[]>();
+    const requestUrl = `/${Version.V1}${Resource.BUSINESSES}/?businessId=${businessId}`;
+    this.client.get(requestUrl, {}, (error, response, body) => {
+      this.mapResponse<User[]>(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
     });
     return deferred.promise as any;
   }
 
   public verifyBusinessMember(verificationCode: string): Promise<Business> {
-    const deferred = Q.defer<Business | BusinessMember>();
+    const deferred = Q.defer<Business>();
     const requestUrl = `/${Version.V1}${Resource.BUSINESS_MEMBER_VERIFICATIONS}/${verificationCode}`;
     const requestOptions: AxiosRequestConfig = {};
     this.client.get(requestUrl, requestOptions, (error, response, body) => {
-      this.mapBusinessPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
+      this.mapResponse(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
     });
     return deferred.promise as any;
   }
 
   public create(business: BusinessCreateRequest): Promise<Business> {
-    const deferred = Q.defer<Business | BusinessMember>();
+    const deferred = Q.defer<Business>();
     const requestUrl = `${Version.V1}${Resource.BUSINESSES}`;
     const options: AxiosRequestConfig = {
       data: business
     };
     this.client.post(requestUrl, options, (error, response, body) => {
-      this.mapBusinessPromise(requestUrl, deferred, error, response, body, EXPECTED_CREATE_STATUS);
+      this.mapResponse(requestUrl, deferred, error, response, body, EXPECTED_CREATE_STATUS);
+    });
+    return deferred.promise as any;
+  }
+
+  public inviteMember(email: string, businessId: string): Promise<InvitationResponse>  {
+    const deferred = Q.defer<InvitationResponse>();
+    const requestUrl = `/${Version.V1}${Resource.BUSINESSES}/${businessId}/members`;
+    const options: AxiosRequestConfig = {
+      data: JSON.stringify({
+        username: email
+      })
+    };
+    this.client.post(requestUrl, options, (error, response, body) => {
+      this.mapResponse(requestUrl, deferred, error, response, body, EXPECTED_CREATE_STATUS);
+    });
+    return deferred.promise as any;
+  }
+
+  public removeMember(businessId: string, userId: string): Promise<BusinessMember>  {
+    const deferred = Q.defer<BusinessMember>();
+    const requestUrl = `/${Version.V1}${Resource.BUSINESSES}/${businessId}/members/${userId}`;
+    this.client.delete(requestUrl, {}, (error, response, body) => {
+      this.mapResponse(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
+    });
+    return deferred.promise as any;
+  }
+
+  public update(business: Business): Promise<Business> {
+    const deferred = Q.defer<Business>();
+    const requestUrl = `${Version.V1}${Resource.BUSINESSES}/${business.id}`;
+    const options: AxiosRequestConfig = {
+      data: business
+    };
+    this.client.put(requestUrl, options, (error, response, body) => {
+      this.mapResponse(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
     });
     return deferred.promise as any;
   }
@@ -92,20 +138,21 @@ export default class BusinessesCrudService {
     }
   }
 
-  private mapBusinessPromise(
-    requestUrl: string,
-    deferred: Q.Deferred<Business | BusinessMember>,
-    error: any,
-    response: AxiosResponse,
-    body: any,
-    expectedStatusCode: number
-  ) {
+  private mapResponse<T>(
+      requestUrl: string,
+      deferred: Q.Deferred<T>,
+      error: any,
+      response: AxiosResponse,
+      body: any,
+      expectedStatusCode: number
+  ): void {
+    const data = body && body.users ? body.users : body;
     if (error) {
       deferred.reject(error);
     } else if (response.status === expectedStatusCode) {
-      deferred.resolve(body);
+      deferred.resolve(data);
     } else {
-      const channelApeErrorResponse = GenerateApiError(requestUrl, response, body, expectedStatusCode);
+      const channelApeErrorResponse = GenerateApiError(requestUrl, response, data, expectedStatusCode);
       deferred.reject(channelApeErrorResponse);
     }
   }

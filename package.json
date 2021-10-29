@@ -1,6 +1,6 @@
 {
   "name": "channelape-sdk",
-  "version": "1.30.0",
+  "version": "1.31.0-develop.1",
   "description": "A client for interacting with ChannelApe's API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -65,7 +65,7 @@
     }
   ],
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "0.21.1",
     "channelape-logger": "^0.2.0",
     "q": "1.5.1",
     "qs": "^6.9.1",
@@ -82,7 +82,7 @@
     "@types/sinon": "^4.3.1",
     "@types/uuid": "^3.4.6",
     "app-root-path": "^2.1.0",
-    "axios-mock-adapter": "^1.20.0",
+    "axios-mock-adapter": "1.20.0",
     "chai": "^4.1.2",
     "concurrently": "^3.5.1",
     "faker": "^4.1.0",
