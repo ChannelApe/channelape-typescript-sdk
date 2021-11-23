@@ -18,4 +18,6 @@ export default interface LineItem {
   taxes?: Tax[];
   giftCardCode?: string;
   readonly giftCardId?: string;
+  reserveQuantity?: number;
+  presaleQuantity?: number;
 }
