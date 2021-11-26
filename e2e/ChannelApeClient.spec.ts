@@ -520,7 +520,7 @@ describe('ChannelApe Client', () => {
                 expect(actualOrders.length).to.equal(273);
                 expect(actualOrders[0].id).to.equal('7f68efb0-3143-4bed-9944-27fe933326a2');
               });
-            });
+            }).timeout(40000);
           });
         });
 
@@ -563,7 +563,7 @@ describe('ChannelApe Client', () => {
 
           describe('And lastKey of "1f557ede-3df5-4335-a64b-cb4181943965"', () => {
             context('When retrieving the next single page of orders', () => {
-              it('Then return the last single page of 52 orders for the business', () => {
+              it('Then return the last single page of 70 orders for the business', () => {
                 const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
                 const ordersQueryRequestByBusinessId: OrdersQueryRequestByBusinessId = {
                   businessId: expectedBusinessId,
@@ -573,7 +573,7 @@ describe('ChannelApe Client', () => {
                 const actualOrdersPromise = channelApeClient.orders().getPage(ordersQueryRequestByBusinessId);
                 return actualOrdersPromise.then((actualOrders) => {
                   expect(actualOrders.orders).to.be.an('array');
-                  expect(actualOrders.orders.length).to.equal(52);
+                  expect(actualOrders.orders.length).to.equal(70);
                   expect(actualOrders.orders[0].id).to.equal('a6f23ae7-fae6-4cf3-b7b9-10eaa84d7ff2');
                   expect(actualOrders.pagination.lastPage).to.equal(true);
                 });
