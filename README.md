@@ -311,6 +311,7 @@ channelApeClient.variants().search(variantsRequest)
   });
 ````
 
+
 ### Businesses
 
 #### Get Business
@@ -348,16 +349,61 @@ channelApeClient.businesses().getBusinessMember(businessMemberQueryRequest)
   });
 ```
 
+#### Get Business Members
+```typescript
+const businessMemberRequest: BusinessMemberRequest = {
+  userId,
+  businessId
+}
+channelApeClient.businesses().getBusinessUsers(businessId)
+  .then((users: User[]) => {
+    // do what you need to do with the business members here
+  });
+```
+
+#### Invite a Member to a business
+```typescript
+const businessId = 'valid-business-id';
+const email = 'valid-email-id';
+channelApeClient.businesses().inviteMember(email, businessId)
+then((invitationMember: InvitationResponse) => {
+    // send invitationMember to a user
+  });
+```
+
+#### Remove a Member from a business
+```typescript
+const businessId = 'valid-business-id';
+const userId = 'valid-id';
+channelApeClient.businesses().removeMember(businessId, userId)
+then((removedMember: BusinessMember) => {
+    // remove a member from business
+  });
+```
+#### Update a Business's Settings
+```typescript
+const businessToUpdate: Business = {
+  name: 'name',
+  inventoryItemKey: InventoryItemKey.SKU,
+  timeZone: TimeZoneId.US_ALASKA,
+  alphabeticCurrencyCode: AlphabeticCurrencyCode.USD,
+  id: 'valid-id',
+  embeds: [],
+  errors: []
+}
+channelApeClient.businesses().update(businessToUpdate)
+  .then((updatedBusiness: Business) => {
+    // do what you need to do with the updated business here 
+  });
+```
 #### Verify Business Member
 ```typescript
-
 const verificationCode = '1234567';
 channelApeClient.businesses().verifyBusinessMember(verificationCode)
   .then((business: Business) => {
     // do what you need to do with the business here
   });
 ```
-
 
 #### Create Business
 ```typescript
@@ -373,15 +419,44 @@ channelApeClient.businesses().create(businessToCreate)
   });
 ```
 
+
 #### API Accounts
 
-##### Get API Account
-
+##### Get API Account By ID
 ```typescript
 const businessId = 'valid-business-id';
 const apiAccountId = 'valid-api-account-id';
 channelApeClient.businesses().apiAccounts().get(businessId, apiAccountId)
   .then((apiAccount: ApiAccount) => {
+    // do what you need to do with the API account here 
+  });
+```
+
+##### Get All API Accounts for a Business
+```typescript
+const businessId = 'valid-business-id';
+channelApeClient.businesses().apiAccounts().get(businessId)
+  .then((apiAccount: ApiAccount[]) => {
+    // do what you need to do with the API accounts here 
+  });
+```
+
+##### Create API Account
+```typescript
+const businessId = 'valid-business-id';
+const apiKeyName = 'some-api-key';
+channelApeClient.businesses().apiAccounts().create(name, businessId)
+  .then((apiAccount: ApiAccount) => {
+    // do what you need to do with the API account here 
+  });
+```
+
+##### Delete API Account from a business
+```typescript
+const businessId = 'valid-business-id';
+const apiAccountId = 'valid-api-account-id';
+channelApeClient.businesses().apiAccounts().delete(businessId, apiAccountId)
+  .then((deleteAccount: ApiAccount) => {
     // do what you need to do with the API account here 
   });
 ```
@@ -415,7 +490,6 @@ const orderActivityCreateRequest: OrderActivityCreateRequestByChannel = {
     }
   ]
 };
-
 
 // Create an order activity if you know the ChannelApe Order ID (i.e. order.id) of the order in question
 const orderActivityCreateRequest: OrderActivityCreateRequestByOrderId = {

@@ -8,4 +8,5 @@ export default interface ApiAccount {
   lastAccessedTime?: Date;
   creationTime?: Date;
   expired?: boolean;
+  privateKey?: string;
 }
