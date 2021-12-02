@@ -89,9 +89,9 @@ export default class BusinessesCrudService {
     const deferred = Q.defer<InvitationResponse>();
     const requestUrl = `/${Version.V1}${Resource.BUSINESSES}/${businessId}/members`;
     const options: AxiosRequestConfig = {
-      data: JSON.stringify({
+      data: {
         username: email
-      })
+      }
     };
     this.client.post(requestUrl, options, (error, response, body) => {
       this.mapResponse(requestUrl, deferred, error, response, body, EXPECTED_CREATE_STATUS);
