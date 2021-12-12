@@ -9,6 +9,7 @@ import ChannelsQueryRequestByBusinessId from '../model/ChannelsQueryRequestByBus
 import RequestCallbackParams from '../../model/RequestCallbackParams';
 import ChannelsResponse from '../model/ChannelsResponse';
 import GenerateApiError from '../../utils/GenerateApiError';
+import ChannelCreateRequest from '../model/ChannelCreateRequest';
 
 const EXPECTED_GET_STATUS = 200;
 
@@ -24,6 +25,18 @@ export default class ChannelsService {
       return this.getChannelById(channelIdOrRequest);
     }
     return this.getChannelsByRequest(channelIdOrRequest);
+  }
+
+  public create(data: ChannelCreateRequest): Promise<Channel> {
+    const deferred = Q.defer<Channel>();
+    const requestUrl = `/${Version.V1}${Resource.CHANNELS}`;
+    const options: AxiosRequestConfig = {
+      data
+    };
+    this.client.post(requestUrl, options, (error, response, body) => {
+      this.mapChannelPromise(requestUrl, deferred, error, response, body, 201);
+    });
+    return deferred.promise as any;
   }
 
   private getChannelById(channelId: string): Promise<Channel> {
