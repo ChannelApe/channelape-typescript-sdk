@@ -1,0 +1,65 @@
+name: Develop Branch CI/CD
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        # SONARCLOUD: Disabling shallow clone is recommended for improving relevancy of reporting
+        fetch-depth: 0
+    - name: Use Node.js 14.17.5
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14.17.5
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
+    - name: Run e2e tests
+      run: npm run e2e
+      env:
+        CHANNEL_APE_SESSION_ID: ${{ secrets.CHANNEL_APE_SESSION_ID }}
+    - name: Get branch name
+      id: branch-name
+      uses: tj-actions/branch-names@v4.9
+    - name: SonarCloud and NPM Setup
+      run: |
+        PACKAGE_VERSION=$(cat package.json \
+          | grep version \
+          | head -1 \
+          | awk -F: '{ print $2 }' \
+          | sed 's/[",]//g' \
+          | tr -d '[[:space:]]')
+        BRANCH_NAME=${{ steps.branch-name.outputs.current_branch }}
+
+        echo "Branch: ${BRANCH_NAME}"
+        echo "Package Version: ${PACKAGE_VERSION}"
+    - name: SonarCloud Scan
+      uses: sonarsource/sonarcloud-github-action@master
+      with:
+        args: >
+          -Dsonar.projectVersion=$PACKAGE_VERSION
+          -Dsonar.branch.name=$BRANCH_NAME
+          -Dsonar.branch.target=develop
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    - name: NPM Publish
+      id: publish
+      uses: JS-DevTools/npm-publish@v1
+      with:
+          token: ${{ secrets.NPM_TOKEN }}
+          tag: develop
+    - if: steps.publish.outputs.type != 'none'
+      run: |
+        echo "Version changed: ${{ steps.publish.outputs.old-version }} => ${{ steps.publish.outputs.version }}"
+        echo "Tag: ${{ steps.publish.outputs.tag }}"

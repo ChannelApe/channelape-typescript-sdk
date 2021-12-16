@@ -1,10 +1,10 @@
-name: CI/CD
+name: Master Branch CI/CD
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ master ]
   pull_request:
-    branches: [ master, develop ]
+    branches: [ master ]
 
 jobs:
   build:
@@ -40,21 +40,16 @@ jobs:
           | sed 's/[",]//g' \
           | tr -d '[[:space:]]')
         BRANCH_NAME=${{ steps.branch-name.outputs.current_branch }}
-        ([[ ${BRANCH_NAME:0:8} = feature/ ]] || [[ ${BRANCH_NAME:0:7} = develop ]]) && SONAR_TARGET=develop || SONAR_TARGET=master
-        NPM_TAG=$(node scripts/get-npm-tag.js "${{ steps.branch-name.outputs.current_branch }}")
-        echo "NPM_TAG=${NPM_TAG}" >> $GITHUB_ENV
 
         echo "Branch: ${BRANCH_NAME}"
-        echo "Sonar Target: ${SONAR_TARGET}"
         echo "Package Version: ${PACKAGE_VERSION}"
-        echo "NPM Tag: ${NPM_TAG}"
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
       with:
         args: >
           -Dsonar.projectVersion=$PACKAGE_VERSION
           -Dsonar.branch.name=$BRANCH_NAME
-          -Dsonar.branch.target=$SONAR_TARGET
+          -Dsonar.branch.target=master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -63,7 +58,7 @@ jobs:
       uses: JS-DevTools/npm-publish@v1
       with:
           token: ${{ secrets.NPM_TOKEN }}
-          tag: ${{ env.NPM_TAG }}
+          tag: latest
     - if: steps.publish.outputs.type != 'none'
       run: |
         echo "Version changed: ${{ steps.publish.outputs.old-version }} => ${{ steps.publish.outputs.version }}"

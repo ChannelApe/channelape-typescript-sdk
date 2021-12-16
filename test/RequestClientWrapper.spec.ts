@@ -301,7 +301,7 @@ Code: 0 Message: You didnt pass any body`;
         method: 'PUT'
       };
       mockedAxios.onPut(`${endpoint}${requestUrl}`).reply((config) => {
-        expect(config.data).to.equal('');
+        expect(config.data).to.be.oneOf(['', '""']);
         return [
           201,
           ''
