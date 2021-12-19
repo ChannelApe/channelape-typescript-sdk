@@ -173,6 +173,13 @@ channelapeClient.suppliers().update(supplierUpdateRequest)
     // do what you need to do with supplier data here
   });
 ```
+#### Create a Play supplier
+```typescript
+channelapeClient.suppliers().create(SupplierCreateRequest)
+  .then((supplier: Supplier) => {
+    // do what you need to do with supplier data here
+  });
+```
 
 ### Orders
 
