@@ -10,6 +10,7 @@ import RequestCallbackParams from '../../model/RequestCallbackParams';
 import SuppliersResponse from '../model/SuppliersResponse';
 import GenerateApiError from '../../utils/GenerateApiError';
 import SupplierUpdateRequest from '../model/SupplierUpdateRequest';
+import SupplierCreateRequest from '../model/SupplierCreateRequest';
 
 const EXPECTED_GET_STATUS = 200;
 const EXPECTED_PUT_STATUS = 200;
@@ -26,6 +27,17 @@ export default class SuppliersService {
       return this.getSupplierById(supplierIdOrRequest);
     }
     return this.getSuppliersByRequest(supplierIdOrRequest);
+  }
+  public create(supplier: SupplierCreateRequest): Promise<Supplier> {
+    const deferred = Q.defer<Supplier>();
+    const requestUrl = `/${Version.V1}${Resource.SUPPLIERS}`;
+    const options: AxiosRequestConfig = {
+      data: supplier
+    };
+    this.client.post(requestUrl, options, (error, response, body) => {
+      this.mapSupplierPromise(requestUrl, deferred, error, response, body, 201);
+    });
+    return deferred.promise as any;
   }
 
   public update(supplier: SupplierUpdateRequest): Promise<Supplier> {
