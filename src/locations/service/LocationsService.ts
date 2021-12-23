@@ -9,6 +9,9 @@ import Location from './../model/Location';
 import LocationsResponse from './../model/LocationsResponse';
 import LocationCreateRequest from '../model/LocationCreateRequest';
 import LocationUpdateRequest from './../model/LocationUpdateRequest';
+import LocationSLA from '../model/LocationSLA';
+import LocationClosureResponse from '../model/LocationClosureResponse';
+import LocationClosedDay from '../model/LocationClosedDay';
 
 export default class LocationsService extends RestService {
 
@@ -64,6 +67,28 @@ export default class LocationsService extends RestService {
     });
   }
 
+  public getSla(locationId: string): Promise<LocationSLA> {
+    const deferred = Q.defer<LocationSLA>();
+    const requestUrl = `/${Version.V1}${Resource.LOCATIONS}/${locationId}/sla`;
+    this.client.get(requestUrl, {}, (error, response, body) =>
+      this.mapResponseToPromise(requestUrl, deferred, error, response, body, this.EXPECTED_GET_OR_UPDATE_STATUS));
+    return deferred.promise as any;
+  }
+
+  public getClosures(locationId: string): Promise<LocationClosedDay[]> {
+    return new Promise((resolve) => {
+      const requestUrl = `/${Version.V1}${Resource.LOCATIONS}/${locationId}/closures`;
+      this.client.get(requestUrl, {}, (error, response, body) => {
+        const requestResponse: RequestCallbackParams = {
+          error,
+          response,
+          body
+        };
+        resolve(this.mapLocationClosuresResponse(requestUrl, requestResponse, this.EXPECTED_GET_OR_UPDATE_STATUS));
+      });
+    });
+  }
+
   private mapLocationsResponse(
     requestUrl: string,
     requestCallbackParams: RequestCallbackParams,
@@ -84,9 +109,35 @@ export default class LocationsService extends RestService {
     });
   }
 
+  private mapLocationClosuresResponse(
+    requestUrl: string,
+    requestCallbackParams: RequestCallbackParams,
+    expectedStatusCode: number
+  ): Promise<LocationClosedDay[]> {
+    return new Promise((resolve, reject) => {
+      if (requestCallbackParams.error) {
+        reject(requestCallbackParams.error);
+      } else if (requestCallbackParams.response.status === expectedStatusCode) {
+        const data: LocationClosureResponse = requestCallbackParams.body as LocationClosureResponse;
+        resolve(data.closedDays.map(closedDay => this.formatLocationClosure(closedDay)));
+      } else {
+        const channelApeErrorResponse =
+          GenerateApiError(requestUrl, requestCallbackParams.response, requestCallbackParams.body,
+            this.EXPECTED_GET_OR_UPDATE_STATUS);
+        reject(channelApeErrorResponse);
+      }
+    });
+  }
+
   private formatLocation(location: any): Location {
     location.createdAt = new Date(location.createdAt);
     location.updatedAt = new Date(location.updatedAt);
     return location as Location;
+  }
+
+  private formatLocationClosure(locationClosedDay: any): LocationClosedDay {
+    locationClosedDay.createdAt = new Date(locationClosedDay.createdAt);
+    locationClosedDay.updatedAt = new Date(locationClosedDay.updatedAt);
+    return locationClosedDay as LocationClosedDay;
   }
 }
