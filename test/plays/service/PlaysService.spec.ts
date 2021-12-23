@@ -27,7 +27,7 @@ describe('Plays Service', () => {
       });
 
     let sandbox: sinon.SinonSandbox;
-    let stepsService: StepsService;
+    const stepsService: StepsService = new StepsService(client);
 
     const expectedPlay: Play = {
       id: '9c728601-0286-457d-b0d6-ec19292d4485',
@@ -91,9 +91,9 @@ describe('Plays Service', () => {
         .yields(null, response, expectedPlay);
 
       const playsService: PlaysService = new PlaysService(client, stepsService);
-      return playsService.get(expectedPlay.id).then((actualAction) => {
+      return playsService.get(expectedPlay.id).then((actualPlay) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.PLAYS}/${expectedPlay.id}`);
-        expectPlay(expectedPlay);
+        expectPlay(actualPlay);
       });
     });
 
@@ -139,11 +139,11 @@ describe('Plays Service', () => {
       expect(actualPlay.name).to.equal(expectedPlay.name);
       expect(actualPlay.createdAt.toISOString()).to.equal(expectedPlay.createdAt.toISOString());
       expect(actualPlay.updatedAt.toISOString()).to.equal(expectedPlay.updatedAt.toISOString());
-      expect(actualPlay.steps[0]['environmentVariableKeys']).to.equal(expectedPlay.steps[0]['environmentVariableKeys']);
-      expect(actualPlay.steps[0]['id']).to.equal(expectedPlay.steps[0]['id']);
-      expect(actualPlay.steps[0]['name']).to.equal(expectedPlay.steps[0]['name']);
-      expect(actualPlay.steps[0]['createdAt'].toISOString()).to.equal(expectedPlay.steps[0]['createdAt']);
-      expect(actualPlay.steps[0]['updatedAt'].toISOString()).to.equal(expectedPlay.steps[0]['updatedAt']);
+      expect(actualPlay.steps[0].environmentVariableKeys).to.equal(expectedPlay.steps[0].environmentVariableKeys);
+      expect(actualPlay.steps[0].id).to.equal(expectedPlay.steps[0].id);
+      expect(actualPlay.steps[0].name).to.equal(expectedPlay.steps[0].name);
+      expect(actualPlay.steps[0].createdAt.toISOString()).to.equal(expectedPlay.steps[0].createdAt.toISOString());
+      expect(actualPlay.steps[0].updatedAt.toISOString()).to.equal(expectedPlay.steps[0].updatedAt.toISOString());
     }
 
     function expectPlayApeErrorResponse(error: ChannelApeError) {

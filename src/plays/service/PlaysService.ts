@@ -11,7 +11,10 @@ import StepsService from '../../steps/service/StepsService';
 const EXPECTED_GET_STATUS = 200;
 
 export default class PlaysService {
-  constructor(private readonly client: RequestClientWrapper, private readonly stepsService: StepsService) { }
+  constructor(
+    private readonly client: RequestClientWrapper,
+    private readonly stepsService: StepsService
+  ) { }
 
   public get(playId: string): Promise<Play> {
     const deferred = Q.defer<Play>();
@@ -27,9 +30,6 @@ export default class PlaysService {
       deferred.reject(error);
     } else if (response.status === expectedStatusCode) {
       const play: Play = this.formatPlay(body);
-      play.steps.map((item)=>{
-        item = this.stepsService.formatStep(item);
-      });
       deferred.resolve(play);
     } else {
       const playApeErrorResponse = GenerateApiError(requestUrl, response, body, EXPECTED_GET_STATUS);
@@ -40,6 +40,7 @@ export default class PlaysService {
   private formatPlay(play: any): Play {
     play.createdAt = new Date(play.createdAt);
     play.updatedAt = new Date(play.updatedAt);
+    play.steps = play.steps.map((item: any) => this.stepsService.formatStep(item));
     return play as Play;
   }
 
