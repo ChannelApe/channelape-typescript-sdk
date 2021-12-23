@@ -10,6 +10,8 @@ import Supplier from '../../../src/suppliers/model/Supplier';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import { ChannelApeError } from '../../../src/index';
 import SupplierUpdateRequest from '../../../src/suppliers/model/SupplierUpdateRequest';
+import OrderStatus from '../../../src/orders/model/OrderStatus';
+import SupplierCreateRequest from '../../../src/suppliers/model/SupplierCreateRequest';
 
 describe('Suppliers Service', () => {
 
@@ -27,7 +29,22 @@ describe('Suppliers Service', () => {
       });
 
     let sandbox: sinon.SinonSandbox;
-
+    const expectedPlaySupplier: SupplierCreateRequest = {
+      businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4',
+      enabled: true,
+      integrationId: '02df0b31-a071-4791-b9c2-aa01e4fb0ce6',
+      name: 'Test Play',
+      playSettings: {
+        playId: 'playid4c1596c2-1b01-4621-aead-8c25e966b61a',
+        environmentVariables: [],
+        maximumConcurrentConnections: '5',
+        orderQueryParameters: {
+          purchasedAtMaxIntervalMinutes: '0',
+          purchasedAtMinIntervalMinutes: '1440',
+          status: OrderStatus.OPEN
+        },
+      }
+    };
     const expectedSupplier: Supplier = {
       businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4',
       id: '9c728601-0286-457d-b0d6-ec19292d4485',
@@ -70,6 +87,25 @@ describe('Suppliers Service', () => {
     afterEach((done) => {
       sandbox.restore();
       done();
+    });
+    it('Create new valid play suppllier ' +
+    'When creating play suppllier Then return resolved promise with play suppllier', () => {
+
+      const response = {
+        status: 201,
+        config: {
+          method: 'POST'
+        }
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'post')
+      .yields(null, response, expectedPlaySupplier);
+
+      const suppliersService: SuppliersService = new SuppliersService(client);
+      return suppliersService.create(expectedPlaySupplier).then((actualAction) => {
+        expect(actualAction.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
+        expect(actualAction.integrationId).to.equal('02df0b31-a071-4791-b9c2-aa01e4fb0ce6');
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.SUPPLIERS}`);
+      });
     });
 
     it('And valid supplier ID ' +

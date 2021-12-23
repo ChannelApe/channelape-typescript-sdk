@@ -99,3 +99,5 @@ export { default as StepVersion } from './suppliers/model/StepVersion';
 export { default as SupplierUpdateRequest } from './suppliers/model/SupplierUpdateRequest';
 export { default as ApiAccount } from './businesses/apiaccounts/model/ApiAccount';
 export { default as InvitationResponse } from './businesses/model/InvitationResponse';
+export { default as SupplierCreateRequest } from './suppliers/model/SupplierCreateRequest';
+export { default as PlaySettings } from './suppliers/model/PlaySettings';
