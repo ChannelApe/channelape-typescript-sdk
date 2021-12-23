@@ -189,7 +189,7 @@ describe('ChannelApe Client', () => {
             }
             assertSupplierEuropaSportsSnackFoods(suppliers[i]);
           });
-        });
+        }).timeout(40000);
       });
     });
 

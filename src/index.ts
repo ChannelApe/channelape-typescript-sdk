@@ -101,3 +101,4 @@ export { default as ApiAccount } from './businesses/apiaccounts/model/ApiAccount
 export { default as InvitationResponse } from './businesses/model/InvitationResponse';
 export { default as SupplierCreateRequest } from './suppliers/model/SupplierCreateRequest';
 export { default as PlaySettings } from './suppliers/model/PlaySettings';
+export { default as Play } from './plays/service/PlaysService';

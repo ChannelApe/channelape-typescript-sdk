@@ -22,6 +22,12 @@ export default class StepsService {
     return deferred.promise as any;
   }
 
+  public formatStep(step: any): Step {
+    step.createdAt = new Date(step.createdAt);
+    step.updatedAt = new Date(step.updatedAt);
+    return step as Step;
+  }
+
   private mapStepPromise(requestUrl: string, deferred: Q.Deferred<Step>, error: any, response: AxiosResponse,
     body: any, expectedStatusCode: number) {
     if (error) {
@@ -33,12 +39,6 @@ export default class StepsService {
       const stepApeErrorResponse = GenerateApiError(requestUrl, response, body, EXPECTED_GET_STATUS);
       deferred.reject(stepApeErrorResponse);
     }
-  }
-
-  private formatStep(step: any): Step {
-    step.createdAt = new Date(step.createdAt);
-    step.updatedAt = new Date(step.updatedAt);
-    return step as Step;
   }
 
 }

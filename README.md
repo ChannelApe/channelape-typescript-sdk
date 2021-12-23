@@ -24,6 +24,7 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
   - [Inventory Quantities](#inventory-quantities)
 - [Locations](#locations)
 - [Steps](#steps)
+- [Plays](#plays)
 
 ### Getting Started
 
@@ -841,5 +842,15 @@ channelApeClient.locations().getClosures(locationId)
 channelapeClient.steps().get(stepId)
   .then((step: Step) => {
     // do what you need to do with step data here
+  });
+```
+
+### Plays
+
+#### Get Play by ID
+```typescript
+channelapeClient.plays().get(playId)
+  .then((play: Play) => {
+    // do what you need to do with play data here
   });
 ```
