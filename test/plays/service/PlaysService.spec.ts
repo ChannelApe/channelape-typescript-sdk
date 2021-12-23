@@ -9,6 +9,7 @@ import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import { ChannelApeError } from '../../../src/index';
 import PlaysService from '../../../src/plays/service/PlaysService';
 import Play from '../../../src/plays/model/Play';
+import StepsService from '../../../src/steps/service/StepsService';
 
 describe('Plays Service', () => {
 
@@ -26,13 +27,31 @@ describe('Plays Service', () => {
       });
 
     let sandbox: sinon.SinonSandbox;
+    let stepsService: StepsService;
 
     const expectedPlay: Play = {
       id: '9c728601-0286-457d-b0d6-ec19292d4485',
       name: 'Custom Play',
       createdAt: new Date('2018-02-22T16:04:29.030Z'),
       updatedAt: new Date('2018-04-02T13:04:27.299Z'),
-      steps: []
+      steps: [
+        {
+          environmentVariableKeys: [],
+          id: '3803b9ff-e3f3-4762-9642-9bdf1f6504a0',
+          name: 'Order Management',
+          public: true,
+          createdAt: new Date('2018-02-22T16:04:29.030Z'),
+          updatedAt: new Date('2018-04-02T13:04:27.299Z'),
+        },
+        {
+          environmentVariableKeys: [],
+          id: '78417f87-82ff-4e82-a0eb-674b52305bc1',
+          name: 'CSV - Send Order',
+          public: true,
+          createdAt: new Date('2018-02-22T16:04:29.030Z'),
+          updatedAt: new Date('2018-04-02T13:04:27.299Z'),
+        }
+      ]
     };
 
     const expectedChannelApeErrorResponse: ChannelApeApiErrorResponse = {
@@ -59,7 +78,7 @@ describe('Plays Service', () => {
       done();
     });
 
-    it.only('And valid Play ID ' +
+    it('And valid Play ID ' +
       'When retrieving Play Then return resolved promise with Play', () => {
 
       const response = {
@@ -71,7 +90,7 @@ describe('Plays Service', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
         .yields(null, response, expectedPlay);
 
-      const playsService: PlaysService = new PlaysService(client);
+      const playsService: PlaysService = new PlaysService(client, stepsService);
       return playsService.get(expectedPlay.id).then((actualAction) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.PLAYS}/${expectedPlay.id}`);
         expectPlay(expectedPlay);
@@ -84,7 +103,7 @@ describe('Plays Service', () => {
       const clientGetStub = sandbox.stub(client, 'get')
         .yields(expectedError, null, null);
 
-      const playsService: PlaysService = new PlaysService(client);
+      const playsService: PlaysService = new PlaysService(client, stepsService);
       return playsService.get(expectedPlay.id).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
@@ -106,7 +125,7 @@ describe('Plays Service', () => {
       const clientGetStub = sandbox.stub(client, 'get')
         .yields(null, response, expectedChannelApeErrorResponse);
 
-      const playsService: PlaysService = new PlaysService(client);
+      const playsService: PlaysService = new PlaysService(client, stepsService);
       return playsService.get(expectedPlay.id).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
@@ -120,6 +139,11 @@ describe('Plays Service', () => {
       expect(actualPlay.name).to.equal(expectedPlay.name);
       expect(actualPlay.createdAt.toISOString()).to.equal(expectedPlay.createdAt.toISOString());
       expect(actualPlay.updatedAt.toISOString()).to.equal(expectedPlay.updatedAt.toISOString());
+      expect(actualPlay.steps[0]['environmentVariableKeys']).to.equal(expectedPlay.steps[0]['environmentVariableKeys']);
+      expect(actualPlay.steps[0]['id']).to.equal(expectedPlay.steps[0]['id']);
+      expect(actualPlay.steps[0]['name']).to.equal(expectedPlay.steps[0]['name']);
+      expect(actualPlay.steps[0]['createdAt'].toISOString()).to.equal(expectedPlay.steps[0]['createdAt']);
+      expect(actualPlay.steps[0]['updatedAt'].toISOString()).to.equal(expectedPlay.steps[0]['updatedAt']);
     }
 
     function expectPlayApeErrorResponse(error: ChannelApeError) {
