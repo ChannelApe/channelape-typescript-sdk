@@ -817,6 +817,24 @@ channelApeClient.locations().update(locationUpdateRequest)
   });
 ```
 
+### Get location SLA
+```typescript
+const locationId: string = '1';
+channelApeClient.locations().getSLA(locationId)
+  .then((locationSLA: LocationSLA) => {
+    // Do what you need with the locations
+  });
+```
+
+### Get location closures
+```typescript
+const locationId: string = '1';
+channelApeClient.locations().getClosures(locationId)
+  .then((locationClosures: LocationClosedDay[]) => {
+    // Do what you need with the locations
+  });
+```
+
 ### Steps
 
 #### Get step by ID

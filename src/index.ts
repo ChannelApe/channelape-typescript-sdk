@@ -86,6 +86,10 @@ export { default as InventoryItemQuantity } from './inventories/quantities/model
 export { default as Location } from './locations/model/Location';
 export { default as LocationCreateRequest } from './locations/model/LocationCreateRequest';
 export { default as LocationUpdateRequest } from './locations/model/LocationUpdateRequest';
+export { default as LocationClosedDay } from './locations/model/LocationClosedDay';
+export { default as LocationClosureResponse } from './locations/model/LocationClosureResponse';
+export { default as LocationSLA } from './locations/model/LocationSLA';
+export { default as LocationSLAOperatingDay } from './locations/model/LocationSLAOperatingDay';
 export { default as Step } from './steps/model/Step';
 export { default as EnvironmentVariableKey } from './steps/model/EnvironmentVariableKey';
 export { default as EnvironmentVariable } from './suppliers/model/EnvironmentVariable';
