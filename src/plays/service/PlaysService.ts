@@ -18,7 +18,7 @@ export default class PlaysService {
 
   public get(playId: string): Promise<Play> {
     const deferred = Q.defer<Play>();
-    const requestUrl = `/${Version.V2}${Resource.PLAYS}/${playId}`;
+    const requestUrl = `/${Version.V1}${Resource.PLAYS}/${playId}`;
     this.client.get(requestUrl, {}, (error, response, body) => {
       this.mapPlayPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
     });
