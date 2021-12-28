@@ -6,4 +6,6 @@ export default interface OrderQueryParameters {
   status: OrderStatus;
   updatedAtMaxIntervalMinutes?: string;
   updatedAtMinIntervalMinutes?: string;
+	channelIds?: string[];
+	statuses?: OrderStatus[];
 }
