@@ -189,7 +189,7 @@ describe('ChannelApe Client', () => {
             }
             assertSupplierEuropaSportsSnackFoods(suppliers[i]);
           });
-        });
+        }).timeout(40000);
       });
     });
 
@@ -214,9 +214,11 @@ describe('ChannelApe Client', () => {
               ],
               maximumConcurrentConnections: '5',
               orderQueryParameters: {
+                channelIds: [],
                 purchasedAtMaxIntervalMinutes: '0',
                 purchasedAtMinIntervalMinutes: '1440',
-                status: OrderStatus.OPEN
+                status: OrderStatus.OPEN,
+                statuses: []
               },
               stepId: 'e3d1046f-a878-4d42-b675-0c215a406075',
               version: StepVersion.TEST

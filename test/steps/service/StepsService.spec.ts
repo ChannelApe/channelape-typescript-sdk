@@ -80,9 +80,9 @@ describe('Steps Service', () => {
         .yields(null, response, expectedStep);
 
       const stepsService: StepsService = new StepsService(client);
-      return stepsService.get(expectedStep.id).then((actualAction) => {
+      return stepsService.get(expectedStep.id).then((actualStep) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.STEPS}/${expectedStep.id}`);
-        expectStep(expectedStep);
+        expectStep(actualStep);
       });
     });
 

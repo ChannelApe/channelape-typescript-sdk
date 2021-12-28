@@ -423,5 +423,157 @@ describe('Locations Service', () => {
         expect(error).to.equal(expectedError);
       }
     });
+
+    it('And valid location id ' +
+      'When retrieving sla information then return resolved promise with sla information', async () => {
+
+      const response = {
+        status: 200,
+        config: {
+          method: 'GET'
+        }
+      };
+
+      const expectedSLA = {
+        createdAt: '2021-06-11T07:48:05.000Z',
+        fulfillmentSLAHours: '1',
+        locationId: '48',
+        operatingDays: [
+          {
+            createdAt: '2021-10-01T15:08:34.000Z',
+            day: 'T',
+            end: '10:00',
+            fulfillmentCutoffTime: '09:00',
+            id: '23',
+            open: '08:00',
+            updatedAt: '2021-10-01T15:09:56.000Z'
+          },
+          {
+            createdAt: '2021-10-01T15:08:34.000Z',
+            day: 'W',
+            end: '10:00',
+            fulfillmentCutoffTime: '09:00',
+            id: '24',
+            open: '08:00',
+            updatedAt: '2021-10-01T15:09:56.000Z'
+          }
+        ],
+        updatedAt: '2021-10-01T15:09:56.000Z'
+      };
+
+      const slaResponse = {
+        createdAt: '2021-06-11T07:48:05.000Z',
+        errors: [],
+        fulfillmentSLAHours: '1',
+        locationId: '48',
+        operatingDays: [
+          {
+            createdAt: '2021-10-01T15:08:34.000Z',
+            day: 'T',
+            end: '10:00',
+            fulfillmentCutoffTime: '09:00',
+            id: '23',
+            open: '08:00',
+            updatedAt: '2021-10-01T15:09:56.000Z'
+          },
+          {
+            createdAt: '2021-10-01T15:08:34.000Z',
+            day: 'W',
+            end: '10:00',
+            fulfillmentCutoffTime: '09:00',
+            id: '24',
+            open: '08:00',
+            updatedAt: '2021-10-01T15:09:56.000Z'
+          }
+        ],
+        updatedAt: '2021-10-01T15:09:56.000Z'
+      };
+
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+        .yields(null, response, slaResponse);
+
+      const locationsService: LocationsService = new LocationsService(client);
+      const actualSLAResponse = await locationsService.getSla(expectedSLA.locationId);
+      expect(clientGetStub.args[0][0]).to
+        .equal(`/${Version.V1}${Resource.LOCATIONS}/${expectedSLA.locationId}/sla`);
+
+      expect(actualSLAResponse.locationId).to.equal(expectedSLA.locationId);
+      expect(actualSLAResponse.fulfillmentSLAHours).to.equal(expectedSLA.fulfillmentSLAHours);
+      expect(actualSLAResponse.createdAt).to.equal(expectedSLA.createdAt);
+      expect(actualSLAResponse.updatedAt).to.equal(expectedSLA.updatedAt);
+      expect(actualSLAResponse.operatingDays.length).to.equal(2);
+
+      expect(actualSLAResponse.operatingDays[0].day).to.equal(expectedSLA.operatingDays[0].day);
+      expect(actualSLAResponse.operatingDays[0].end).to.equal(expectedSLA.operatingDays[0].end);
+      expect(actualSLAResponse.operatingDays[0].fulfillmentCutoffTime).to
+        .equal(expectedSLA.operatingDays[0].fulfillmentCutoffTime);
+      expect(actualSLAResponse.operatingDays[0].id).to.equal(expectedSLA.operatingDays[0].id);
+      expect(actualSLAResponse.operatingDays[0].open).to.equal(expectedSLA.operatingDays[0].open);
+      expect(actualSLAResponse.operatingDays[0].createdAt).to.equal(expectedSLA.operatingDays[0].createdAt);
+      expect(actualSLAResponse.operatingDays[0].updatedAt).to.equal(expectedSLA.operatingDays[0].updatedAt);
+
+      expect(actualSLAResponse.operatingDays[1].day).to.equal(expectedSLA.operatingDays[1].day);
+      expect(actualSLAResponse.operatingDays[1].end).to.equal(expectedSLA.operatingDays[1].end);
+      expect(actualSLAResponse.operatingDays[1].fulfillmentCutoffTime).to
+        .equal(expectedSLA.operatingDays[1].fulfillmentCutoffTime);
+      expect(actualSLAResponse.operatingDays[1].id).to.equal(expectedSLA.operatingDays[1].id);
+      expect(actualSLAResponse.operatingDays[1].open).to.equal(expectedSLA.operatingDays[1].open);
+      expect(actualSLAResponse.operatingDays[1].createdAt).to.equal(expectedSLA.operatingDays[1].createdAt);
+      expect(actualSLAResponse.operatingDays[1].updatedAt).to.equal(expectedSLA.operatingDays[1].updatedAt);
+
+    });
+
+    it('And valid location id ' +
+      'When retrieving closure information then return resolved promise with closures', async () => {
+
+      const response = {
+        status: 200,
+        config: {
+          method: 'GET'
+        }
+      };
+
+      const expectedClosures = [
+        {
+          createdAt: '2021-10-01T15:08:34.000Z',
+          id: '23',
+          date: '2021-11-11',
+          updatedAt: '2021-10-01T15:09:56.000Z'
+        },
+        {
+          createdAt: '2021-10-01T15:08:34.000Z',
+          id: '24',
+          date: '2021-11-12',
+          updatedAt: '2021-10-01T15:09:56.000Z'
+        }
+      ];
+
+      const closuresResponse = {
+        closedDays: expectedClosures,
+        errors: [],
+        locationId: '48'
+      };
+
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+        .yields(null, response, closuresResponse);
+
+      const locationsService: LocationsService = new LocationsService(client);
+      const actualClosuresResponse = await locationsService.getClosures(closuresResponse.locationId);
+      expect(clientGetStub.args[0][0]).to
+        .equal(`/${Version.V1}${Resource.LOCATIONS}/${closuresResponse.locationId}/closures`);
+
+      expect(actualClosuresResponse.length).to.equal(2);
+
+      expect(actualClosuresResponse[0].createdAt).to.equal(expectedClosures[0].createdAt);
+      expect(actualClosuresResponse[0].updatedAt).to.equal(expectedClosures[0].updatedAt);
+      expect(actualClosuresResponse[0].id).to.equal(expectedClosures[0].id);
+      expect(actualClosuresResponse[0].date).to.equal(expectedClosures[0].date);
+
+      expect(actualClosuresResponse[1].createdAt).to.equal(expectedClosures[1].createdAt);
+      expect(actualClosuresResponse[1].updatedAt).to.equal(expectedClosures[1].updatedAt);
+      expect(actualClosuresResponse[1].id).to.equal(expectedClosures[1].id);
+      expect(actualClosuresResponse[1].date).to.equal(expectedClosures[1].date);
+
+    });
   });
 });
