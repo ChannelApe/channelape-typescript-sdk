@@ -92,7 +92,7 @@ describe('Plays Service', () => {
 
       const playsService: PlaysService = new PlaysService(client, stepsService);
       return playsService.get(expectedPlay.id).then((actualPlay) => {
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.PLAYS}/${expectedPlay.id}`);
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V2}${Resource.PLAYS}/${expectedPlay.id}`);
         expectPlay(actualPlay);
       });
     });
@@ -107,7 +107,7 @@ describe('Plays Service', () => {
       return playsService.get(expectedPlay.id).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.PLAYS}/${expectedPlay.id}`);
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V2}${Resource.PLAYS}/${expectedPlay.id}`);
         expect(e).to.equal(expectedError);
       });
     });
@@ -129,7 +129,7 @@ describe('Plays Service', () => {
       return playsService.get(expectedPlay.id).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.PLAYS}/${expectedPlay.id}`);
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V2}${Resource.PLAYS}/${expectedPlay.id}`);
         expectPlayApeErrorResponse(e);
       });
     });
