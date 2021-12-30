@@ -74,7 +74,17 @@ export default class LocationsService extends RestService {
       this.mapResponseToPromise(requestUrl, deferred, error, response, body, this.EXPECTED_GET_OR_UPDATE_STATUS));
     return deferred.promise as any;
   }
-
+  public updateClosures(locationId: string, closedDates: any): Promise<LocationClosedDay[]> {
+    const deferred = Q.defer<Location>();
+    const requestUrl = `/${Version.V1}${Resource.LOCATIONS}/${locationId}/closures`;
+    const options = {
+      data: closedDates
+    };
+    this.client.put(requestUrl, options, (error, response, body) => {
+      return this.mapResponseToPromise(requestUrl, deferred, error, response, body, this.EXPECTED_GET_OR_UPDATE_STATUS);
+    });
+    return deferred.promise as any;
+  }
   public getClosures(locationId: string): Promise<LocationClosedDay[]> {
     return new Promise((resolve) => {
       const requestUrl = `/${Version.V1}${Resource.LOCATIONS}/${locationId}/closures`;

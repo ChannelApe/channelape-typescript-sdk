@@ -575,5 +575,74 @@ describe('Locations Service', () => {
       expect(actualClosuresResponse[1].date).to.equal(expectedClosures[1].date);
 
     });
+    it('And valid location update closed dates request ' +
+    'When update location closed dates then update location closed dates and ' +
+    'return resolved promise with location closed dates', async () => {
+
+      const response = {
+        status: 200,
+        config: {
+          method: 'PUT'
+        }
+      };
+
+      const expectedLocationClosures = {
+        closedDays: [
+          {
+            createdAt: '2021-12-30T09:27:38.000Z',
+            date: '2021/04/01',
+            id: '12',
+            updatedAt: '2021-12-30T10:05:28.787Z'
+          },
+          {
+            createdAt: '2021-12-30T09:27:38.000Z',
+            date: '2021/05/01',
+            id: '10',
+            updatedAt: '2021-12-30T10:05:28.787Z'
+          },
+          {
+            createdAt: '2021-12-30T10:05:28.787Z',
+            date: '2021/02/01',
+            id: '16',
+            updatedAt: '2021-12-30T10:05:28.787Z'
+          },
+          {
+            createdAt: '2021-12-30T09:27:38.000Z',
+            date: '2021/03/01',
+            id: '11',
+            updatedAt: '2021-12-30T10:05:28.787Z'
+          },
+          {
+            createdAt: '2021-12-30T09:27:38.000Z',
+            date: '2021/06/01',
+            id: '13',
+            updatedAt: '2021-12-30T10:05:28.787Z'
+          }
+        ],
+        errors: [],
+        locationId: '577'
+      };
+
+      const locationId = 'location-id';
+      // const closesDates = {
+      //   closedDays: [
+      //     '2021/02/01',
+      //     '2021/03/01',
+      //     '2021/04/01',
+      //     '2021/05/01',
+      //     '2021/06/01'
+      //   ]
+      // };
+
+      const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put')
+          .yields(null, response, expectedLocationClosures);
+
+      const locationsService: LocationsService = new LocationsService(client);
+      const actualLocationResponse = await locationsService.updateClosures(locationId, expectedLocationClosures);
+      console.log(actualLocationResponse);
+      expect(clientPutStub.args[0][0]).to
+      .equal(`/${Version.V1}${Resource.LOCATIONS}/${locationId}/closures`);
+      expect(clientPutStub.args[0][1].data).to.equal(expectedLocationClosures);
+    });
   });
 });
