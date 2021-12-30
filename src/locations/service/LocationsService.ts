@@ -44,7 +44,17 @@ export default class LocationsService extends RestService {
     });
     return deferred.promise as any;
   }
-
+  public updateSla(locationId: string, sla: LocationSLA): Promise<LocationSLA> {
+    const deferred = Q.defer<Location>();
+    const requestUrl = `/${Version.V1}${Resource.LOCATIONS}/${locationId}/sla`;
+    const options = {
+      data: sla
+    };
+    this.client.put(requestUrl, options, (error, response, body) => {
+      return this.mapResponseToPromise(requestUrl, deferred, error, response, body, this.EXPECTED_GET_OR_UPDATE_STATUS);
+    });
+    return deferred.promise as any;
+  }
   public get(locationId: string): Promise<Location> {
     const deferred = Q.defer<Location>();
     const requestUrl = `/${Version.V1}${Resource.LOCATIONS}/${locationId}`;
