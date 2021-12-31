@@ -12,6 +12,7 @@ import LocationUpdateRequest from './../model/LocationUpdateRequest';
 import LocationSLA from '../model/LocationSLA';
 import LocationClosureResponse from '../model/LocationClosureResponse';
 import LocationClosedDay from '../model/LocationClosedDay';
+import LocationClosureRequest from '../model/LocationClosureRequest';
 
 export default class LocationsService extends RestService {
 
@@ -74,7 +75,7 @@ export default class LocationsService extends RestService {
       this.mapResponseToPromise(requestUrl, deferred, error, response, body, this.EXPECTED_GET_OR_UPDATE_STATUS));
     return deferred.promise as any;
   }
-  public updateClosures(locationId: string, closedDates: any): Promise<LocationClosedDay[]> {
+  public updateClosures(locationId: string, closedDates: LocationClosureRequest): Promise<LocationClosureResponse> {
     const deferred = Q.defer<Location>();
     const requestUrl = `/${Version.V1}${Resource.LOCATIONS}/${locationId}/closures`;
     const options = {

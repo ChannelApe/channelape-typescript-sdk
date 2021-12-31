@@ -624,25 +624,32 @@ describe('Locations Service', () => {
       };
 
       const locationId = 'location-id';
-      // const closesDates = {
-      //   closedDays: [
-      //     '2021/02/01',
-      //     '2021/03/01',
-      //     '2021/04/01',
-      //     '2021/05/01',
-      //     '2021/06/01'
-      //   ]
-      // };
+      const closesDates = {
+        closedDays: [
+          '2021/02/01',
+          '2021/03/01',
+          '2021/04/01',
+          '2021/05/01',
+          '2021/06/01'
+        ]
+      };
 
       const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put')
           .yields(null, response, expectedLocationClosures);
 
       const locationsService: LocationsService = new LocationsService(client);
-      const actualLocationResponse = await locationsService.updateClosures(locationId, expectedLocationClosures);
-      console.log(actualLocationResponse);
+      const actualLocationResponse = await locationsService.updateClosures(locationId, closesDates);
       expect(clientPutStub.args[0][0]).to
       .equal(`/${Version.V1}${Resource.LOCATIONS}/${locationId}/closures`);
-      expect(clientPutStub.args[0][1].data).to.equal(expectedLocationClosures);
+      expect(actualLocationResponse.closedDays[0].createdAt).
+       to.equal(expectedLocationClosures.closedDays[0]['createdAt']);
+      expect(actualLocationResponse.closedDays[0].id).
+       to.equal(expectedLocationClosures.closedDays[0]['id']);
+      expect(actualLocationResponse.closedDays[0].date).
+       to.equal(expectedLocationClosures.closedDays[0]['date']);
+      expect(actualLocationResponse.closedDays[0].updatedAt).
+       to.equal(expectedLocationClosures.closedDays[0]['updatedAt']);
+
     });
   });
 });
