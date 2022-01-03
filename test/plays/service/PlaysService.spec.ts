@@ -6,7 +6,7 @@ import Resource from '../../../src/model/Resource';
 import Environment from '../../../src/model/Environment';
 import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
-import { ChannelApeError, Plays } from '../../../src/index';
+import { ChannelApeError } from '../../../src/index';
 import PlaysService from '../../../src/plays/service/PlaysService';
 import Play from '../../../src/plays/model/Play';
 import StepsService from '../../../src/steps/service/StepsService';
@@ -105,7 +105,7 @@ describe('Plays Service', () => {
         .yields(null, response, expectedPlay);
 
       const playsService: PlaysService = new PlaysService(client, stepsService);
-      return playsService.get(expectedPlay.id).then((actualPlay: Play | Plays[]) => {
+      return playsService.get(expectedPlay.id).then((actualPlay: Play | Play[]) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.PLAYS}/${expectedPlay.id}`);
         if (!Array.isArray(actualPlay)) {
           expectPlay(actualPlay);
@@ -114,7 +114,6 @@ describe('Plays Service', () => {
     });
     it('And retrieve a list of all play' +
       ' When retrieving Play Then return resolved promise with all Play', () => {
-
       const response = {
         status: 200,
         config: {
@@ -125,7 +124,7 @@ describe('Plays Service', () => {
         .yields(null, response, expectedAllPlay);
 
       const playsService: PlaysService = new PlaysService(client, stepsService);
-      return playsService.get().then((actualPlay: Play | Plays[]) => {
+      return playsService.get().then((actualPlay: Play | Play[]) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V2}${Resource.PLAYS}`);
         if (Array.isArray(actualPlay)) {
           expect(actualPlay[0]['id']).to.equal(expectedAllPlay.plays[0]['id']);
@@ -177,11 +176,13 @@ describe('Plays Service', () => {
       expect(actualPlay.name).to.equal(expectedPlay.name);
       expect(actualPlay.createdAt.toISOString()).to.equal(expectedPlay.createdAt.toISOString());
       expect(actualPlay.updatedAt.toISOString()).to.equal(expectedPlay.updatedAt.toISOString());
-      expect(actualPlay.steps[0].environmentVariableKeys).to.equal(expectedPlay.steps[0].environmentVariableKeys);
-      expect(actualPlay.steps[0].id).to.equal(expectedPlay.steps[0].id);
-      expect(actualPlay.steps[0].name).to.equal(expectedPlay.steps[0].name);
-      expect(actualPlay.steps[0].createdAt.toISOString()).to.equal(expectedPlay.steps[0].createdAt.toISOString());
-      expect(actualPlay.steps[0].updatedAt.toISOString()).to.equal(expectedPlay.steps[0].updatedAt.toISOString());
+      if (actualPlay.steps && expectedPlay.steps) {
+        expect(actualPlay.steps[0].environmentVariableKeys).to.equal(expectedPlay.steps[0].environmentVariableKeys);
+        expect(actualPlay.steps[0].id).to.equal(expectedPlay.steps[0].id);
+        expect(actualPlay.steps[0].name).to.equal(expectedPlay.steps[0].name);
+        expect(actualPlay.steps[0].createdAt.toISOString()).to.equal(expectedPlay.steps[0].createdAt.toISOString());
+        expect(actualPlay.steps[0].updatedAt.toISOString()).to.equal(expectedPlay.steps[0].updatedAt.toISOString());
+      }
     }
 
     function expectPlayApeErrorResponse(error: ChannelApeError) {
