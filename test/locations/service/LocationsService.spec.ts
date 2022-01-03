@@ -581,7 +581,7 @@ describe('Locations Service', () => {
     'When updating location SLA then return rejected promise with errors', async () => {
 
       const expectedError = {
-        stack: 'some-error'
+        stack: expectedChannelApeErrorResponse
       };
       const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put')
         .yields(expectedError, null, null);
@@ -595,7 +595,8 @@ describe('Locations Service', () => {
         expect(clientPutStub.args[0][0]).to
         .equal(`/${Version.V1}${Resource.LOCATIONS}/${expectedLocationSLAUpdate.locationId}/sla`);
         expect(clientPutStub.args[0][1].data).to.equal(expectedLocationSLAUpdate);
-
+        expect(error.stack.statusCode).to.equal(404);
+        expect(error.stack.errors[0].code).to.equal(70);
         expect(error).to.equal(expectedError);
       }
     });
