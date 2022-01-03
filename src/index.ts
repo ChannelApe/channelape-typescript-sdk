@@ -102,3 +102,4 @@ export { default as InvitationResponse } from './businesses/model/InvitationResp
 export { default as SupplierCreateRequest } from './suppliers/model/SupplierCreateRequest';
 export { default as PlaySettings } from './suppliers/model/PlaySettings';
 export { default as Play } from './plays/service/PlaysService';
+export { default as LocationClosureRequest} from './locations/model/LocationClosureRequest';
