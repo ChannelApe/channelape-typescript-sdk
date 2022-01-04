@@ -640,16 +640,14 @@ describe('Locations Service', () => {
       const actualLocationResponse = await locationsService.updateClosures(locationId, closesDates);
       expect(clientPutStub.args[0][0]).to
       .equal(`/${Version.V1}${Resource.LOCATIONS}/${locationId}/closures`);
-      expect(actualLocationResponse.closedDays[0].createdAt).
+      expect(actualLocationResponse[0].createdAt).
        to.equal(expectedLocationClosures.closedDays[0]['createdAt']);
-      expect(actualLocationResponse.closedDays[0].id).
+      expect(actualLocationResponse[0].id).
        to.equal(expectedLocationClosures.closedDays[0]['id']);
-      expect(actualLocationResponse.closedDays[0].date).
+      expect(actualLocationResponse[0].date).
        to.equal(expectedLocationClosures.closedDays[0]['date']);
-      expect(actualLocationResponse.closedDays[0].updatedAt).
+      expect(actualLocationResponse[0].updatedAt).
        to.equal(expectedLocationClosures.closedDays[0]['updatedAt']);
-      expect(actualLocationResponse.locationId).
-       to.equal(expectedLocationClosures.locationId);
 
     });
     it('And invalid location update closed dates request ' +
