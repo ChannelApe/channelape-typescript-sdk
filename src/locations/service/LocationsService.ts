@@ -12,6 +12,7 @@ import LocationUpdateRequest from './../model/LocationUpdateRequest';
 import LocationSLA from '../model/LocationSLA';
 import LocationClosureResponse from '../model/LocationClosureResponse';
 import LocationClosedDay from '../model/LocationClosedDay';
+import LocationSLAOperatingDay from '../model/LocationSLAOperatingDay';
 
 export default class LocationsService extends RestService {
 
@@ -45,15 +46,20 @@ export default class LocationsService extends RestService {
     return deferred.promise as any;
   }
   public updateSla(locationId: string, sla: LocationSLA): Promise<LocationSLA> {
-    const deferred = Q.defer<Location>();
-    const requestUrl = `/${Version.V1}${Resource.LOCATIONS}/${locationId}/sla`;
-    const options = {
-      data: sla
-    };
-    this.client.put(requestUrl, options, (error, response, body) => {
-      return this.mapResponseToPromise(requestUrl, deferred, error, response, body, this.EXPECTED_GET_OR_UPDATE_STATUS);
+    return new Promise((resolve) => {
+      const requestUrl = `/${Version.V1}${Resource.LOCATIONS}/${locationId}/sla`;
+      const options = {
+        data: sla
+      };
+      this.client.put(requestUrl, options, (error, response, body) => {
+        const requestResponse: RequestCallbackParams = {
+          error,
+          response,
+          body
+        };
+        resolve(this.mapLocationSLAResponse(requestUrl, requestResponse, this.EXPECTED_GET_OR_UPDATE_STATUS));
+      });
     });
-    return deferred.promise as any;
   }
   public get(locationId: string): Promise<Location> {
     const deferred = Q.defer<Location>();
@@ -78,11 +84,17 @@ export default class LocationsService extends RestService {
   }
 
   public getSla(locationId: string): Promise<LocationSLA> {
-    const deferred = Q.defer<LocationSLA>();
-    const requestUrl = `/${Version.V1}${Resource.LOCATIONS}/${locationId}/sla`;
-    this.client.get(requestUrl, {}, (error, response, body) =>
-      this.mapResponseToPromise(requestUrl, deferred, error, response, body, this.EXPECTED_GET_OR_UPDATE_STATUS));
-    return deferred.promise as any;
+    return new Promise((resolve) => {
+      const requestUrl = `/${Version.V1}${Resource.LOCATIONS}/${locationId}/sla`;
+      this.client.get(requestUrl, {}, (error, response, body) => {
+        const requestResponse: RequestCallbackParams = {
+          error,
+          response,
+          body
+        };
+        resolve(this.mapLocationSLAResponse(requestUrl, requestResponse, this.EXPECTED_GET_OR_UPDATE_STATUS));
+      });
+    });
   }
 
   public getClosures(locationId: string): Promise<LocationClosedDay[]> {
@@ -118,7 +130,25 @@ export default class LocationsService extends RestService {
       }
     });
   }
-
+  private mapLocationSLAResponse(
+    requestUrl: string,
+    requestCallbackParams: RequestCallbackParams,
+    expectedStatusCode: number
+  ): Promise<LocationSLA> {
+    return new Promise((resolve, reject) => {
+      if (requestCallbackParams.error) {
+        reject(requestCallbackParams.error);
+      } else if (requestCallbackParams.response.status === expectedStatusCode) {
+        const data: LocationSLA = requestCallbackParams.body as LocationSLA;
+        resolve(this.formatLocationSLA(data));
+      } else {
+        const channelApeErrorResponse =
+          GenerateApiError(requestUrl, requestCallbackParams.response, requestCallbackParams.body,
+            this.EXPECTED_GET_OR_UPDATE_STATUS);
+        reject(channelApeErrorResponse);
+      }
+    });
+  }
   private mapLocationClosuresResponse(
     requestUrl: string,
     requestCallbackParams: RequestCallbackParams,
@@ -149,5 +179,17 @@ export default class LocationsService extends RestService {
     locationClosedDay.createdAt = new Date(locationClosedDay.createdAt);
     locationClosedDay.updatedAt = new Date(locationClosedDay.updatedAt);
     return locationClosedDay as LocationClosedDay;
+  }
+  private formatLocationSLA(locationSla: LocationSLA): LocationSLA {
+    locationSla.createdAt = new Date(locationSla.createdAt);
+    locationSla.updatedAt = new Date(locationSla.updatedAt);
+    locationSla.operatingDays = locationSla.operatingDays.map(operatingDay =>
+      this.locationSLAOperatingDay(operatingDay));
+    return locationSla as LocationSLA;
+  }
+  private locationSLAOperatingDay(locationSLAOperatingDay: LocationSLAOperatingDay): LocationSLAOperatingDay {
+    locationSLAOperatingDay.createdAt = new Date(locationSLAOperatingDay.createdAt);
+    locationSLAOperatingDay.updatedAt = new Date(locationSLAOperatingDay.updatedAt);
+    return locationSLAOperatingDay as LocationSLAOperatingDay;
   }
 }
