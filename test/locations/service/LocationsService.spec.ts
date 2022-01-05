@@ -12,7 +12,6 @@ import LocationCreateRequest from './../../../src/locations/model/LocationCreate
 import LocationUpdateRequest from './../../../src/locations/model/LocationUpdateRequest';
 import LocationClosureRequest from './../../../src/locations/model/LocationClosureRequest';
 
-
 describe('Locations Service', () => {
 
   describe('Given some rest client', () => {
