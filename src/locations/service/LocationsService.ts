@@ -14,6 +14,7 @@ import LocationClosureResponse from '../model/LocationClosureResponse';
 import LocationClosedDay from '../model/LocationClosedDay';
 import LocationSLAOperatingDay from '../model/LocationSLAOperatingDay';
 import LocationClosureRequest from '../model/LocationClosureRequest';
+import LocationSLAUpdateRequest from '../model/LocationSLAUpdateRequest';
 
 export default class LocationsService extends RestService {
 
@@ -46,7 +47,7 @@ export default class LocationsService extends RestService {
     });
     return deferred.promise as any;
   }
-  public updateSla(locationId: string, sla: LocationSLA): Promise<LocationSLA> {
+  public updateSla(locationId: string, sla: LocationSLAUpdateRequest): Promise<LocationSLA> {
     return new Promise((resolve) => {
       const requestUrl = `/${Version.V1}${Resource.LOCATIONS}/${locationId}/sla`;
       const options = {

@@ -11,6 +11,7 @@ import LocationsService from './../../../src/locations/service/LocationsService'
 import LocationCreateRequest from './../../../src/locations/model/LocationCreateRequest';
 import LocationUpdateRequest from './../../../src/locations/model/LocationUpdateRequest';
 import LocationClosureRequest from './../../../src/locations/model/LocationClosureRequest';
+import { LocationSLAUpdateRequest } from '../../../src';
 
 describe('Locations Service', () => {
 
@@ -28,6 +29,7 @@ describe('Locations Service', () => {
       });
 
     let sandbox: sinon.SinonSandbox;
+
     const expectedLocationSLAUpdate = {
       createdAt: new Date('2018-04-24T14:02:34.703Z'),
       fulfillmentSLAHours: '1',
@@ -598,13 +600,33 @@ describe('Locations Service', () => {
 
       const locationsService: LocationsService = new LocationsService(client);
 
+      const locationSLAUpdateRequest: LocationSLAUpdateRequest = {
+        fulfillmentSLAHours: '1',
+        operatingDays: [
+          {
+            day: 'T',
+            end: '10:00',
+            fulfillmentCutoffTime: '09:30',
+            open: '08:00'
+          },
+          {
+            day: 'W',
+            end: '10:00',
+            fulfillmentCutoffTime: '09:50',
+            open: '08:00'
+          }
+        ]
+      };
+
       try {
-        await locationsService.updateSla('location-id', expectedLocationSLAUpdate);
+        await locationsService.updateSla('location-id', locationSLAUpdateRequest);
         fail('Successfully ran location update but should have failed');
       } catch (error) {
-        expect(clientPutStub.args[0][0]).to
-        .equal(`/${Version.V1}${Resource.LOCATIONS}/${expectedLocationSLAUpdate.locationId}/sla`);
-        expect(clientPutStub.args[0][1].data).to.equal(expectedLocationSLAUpdate);
+        const actualRequestUrl = clientPutStub.args[0][0];
+        const expectedRequestUrl = `/${Version.V1}${Resource.LOCATIONS}/${expectedLocationSLAUpdate.locationId}/sla`;
+        const actualRequestBody = clientPutStub.args[0][1].data;
+        expect(actualRequestUrl).to.equal(expectedRequestUrl);
+        expect(actualRequestBody).to.equal(locationSLAUpdateRequest);
         expect(error.stack.statusCode).to.equal(404);
         expect(error.stack.errors[0].code).to.equal(70);
         expect(error).to.equal(expectedError);

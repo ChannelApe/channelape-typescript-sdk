@@ -103,3 +103,6 @@ export { default as SupplierCreateRequest } from './suppliers/model/SupplierCrea
 export { default as PlaySettings } from './suppliers/model/PlaySettings';
 export { default as Play } from './plays/service/PlaysService';
 export { default as LocationClosureRequest } from './locations/model/LocationClosureRequest';
+export { default as LocationSLAUpdateRequest } from './locations/model/LocationSLAUpdateRequest';
+export { default as LocationSLAOperatingDayUpdateRequest }
+  from './locations/model/LocationSLAOperatingDayUpdateRequest';
