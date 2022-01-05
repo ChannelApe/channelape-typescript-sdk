@@ -10,6 +10,7 @@ import { ChannelApeError } from '../../../src/index';
 import PlaysService from '../../../src/plays/service/PlaysService';
 import Play from '../../../src/plays/model/Play';
 import StepsService from '../../../src/steps/service/StepsService';
+import { fail } from 'assert';
 
 describe('Plays Service', () => {
 
@@ -28,6 +29,20 @@ describe('Plays Service', () => {
 
     let sandbox: sinon.SinonSandbox;
     const stepsService: StepsService = new StepsService(client);
+    const expectedAllPlay = { plays:[
+      {
+        id: 'a7176069-39bf-4fcd-8943-0bb96e9ca017',
+        name: 'csv - Order Fulfillment',
+        createdAt: new Date('2018-02-22T16:04:29.030Z'),
+        updatedAt: new Date('2018-04-02T13:04:27.299Z'),
+      },
+      {
+        id: 'ad0cebb9-3549-4a9b-ac62-14f0cf5c6c54',
+        name: 'ups - Send Orders - Test',
+        createdAt: new Date('2018-02-22T16:04:29.030Z'),
+        updatedAt: new Date('2018-04-02T13:04:27.299Z'),
+      }
+    ]};
 
     const expectedPlay: Play = {
       id: '9c728601-0286-457d-b0d6-ec19292d4485',
@@ -89,14 +104,36 @@ describe('Plays Service', () => {
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
         .yields(null, response, expectedPlay);
-
       const playsService: PlaysService = new PlaysService(client, stepsService);
-      return playsService.get(expectedPlay.id).then((actualPlay) => {
+      return playsService.get(expectedPlay.id).then((actualPlay: Play | Play[]) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.PLAYS}/${expectedPlay.id}`);
-        expectPlay(actualPlay);
+        if (!Array.isArray(actualPlay)) {
+          expectPlay(actualPlay);
+        }
       });
     });
+    it('And retrieve a list of all play' +
+      ' When retrieving Play Then return resolved promise with all Play', () => {
+      const response = {
+        status: 200,
+        config: {
+          method: 'GET'
+        }
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+        .yields(null, response, expectedAllPlay);
 
+      const playsService: PlaysService = new PlaysService(client, stepsService);
+      return playsService.get().then((actualPlay: Play | Play[]) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V2}${Resource.PLAYS}`);
+        if (Array.isArray(actualPlay)) {
+          expect(actualPlay[0]['id']).to.equal(expectedAllPlay.plays[0]['id']);
+          expect(actualPlay[0]['name']).to.equal(expectedAllPlay.plays[0]['name']);
+          expect(actualPlay[0]['createdAt']).to.equal(expectedAllPlay.plays[0]['createdAt']);
+          expect(actualPlay[0]['updatedAt']).to.equal(expectedAllPlay.plays[0]['updatedAt']);
+        }
+      });
+    });
     it('And valid Play ID And request connect errors ' +
       'When retrieving Play Then return a rejected promise with an error', () => {
 
@@ -139,11 +176,20 @@ describe('Plays Service', () => {
       expect(actualPlay.name).to.equal(expectedPlay.name);
       expect(actualPlay.createdAt.toISOString()).to.equal(expectedPlay.createdAt.toISOString());
       expect(actualPlay.updatedAt.toISOString()).to.equal(expectedPlay.updatedAt.toISOString());
-      expect(actualPlay.steps[0].environmentVariableKeys).to.equal(expectedPlay.steps[0].environmentVariableKeys);
-      expect(actualPlay.steps[0].id).to.equal(expectedPlay.steps[0].id);
-      expect(actualPlay.steps[0].name).to.equal(expectedPlay.steps[0].name);
-      expect(actualPlay.steps[0].createdAt.toISOString()).to.equal(expectedPlay.steps[0].createdAt.toISOString());
-      expect(actualPlay.steps[0].updatedAt.toISOString()).to.equal(expectedPlay.steps[0].updatedAt.toISOString());
+      if (expectedPlay.steps) {
+        if (!actualPlay.steps) {
+          fail('Expected actual play result to have steps');
+        } else {
+          expect(actualPlay.steps.length).to.equal(expectedPlay.steps.length);
+          expect(actualPlay.steps[0].environmentVariableKeys).to.equal(expectedPlay.steps[0].environmentVariableKeys);
+          expect(actualPlay.steps[0].id).to.equal(expectedPlay.steps[0].id);
+          expect(actualPlay.steps[0].name).to.equal(expectedPlay.steps[0].name);
+          expect(actualPlay.steps[0].createdAt.toISOString()).to.equal(expectedPlay.steps[0].createdAt.toISOString());
+          expect(actualPlay.steps[0].updatedAt.toISOString()).to.equal(expectedPlay.steps[0].updatedAt.toISOString());
+        }
+      } else {
+        expect(actualPlay.steps).to.be.undefined;
+      }
     }
 
     function expectPlayApeErrorResponse(error: ChannelApeError) {
