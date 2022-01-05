@@ -834,6 +834,23 @@ channelApeClient.locations().getClosures(locationId)
     // Do what you need with the locations
   });
 ```
+### Update location closures
+```typescript
+const closesDates: LocationClosureRequest = {
+   closedDays: [
+    '2021/02/01',
+    '2021/03/01',
+    '2021/04/01',
+    '2021/05/01',
+    '2021/06/01'
+    ]
+  };
+const locationId: string = '1';
+channelApeClient.locations().updateClosures(locationId: locationId, closedDates: closesDates)
+  .then((locationClosures: LocationClosedDay []) => {
+    // Do what you need with the locations closures update
+  });
+```
 
 ### Steps
 

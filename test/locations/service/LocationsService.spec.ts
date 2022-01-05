@@ -10,6 +10,8 @@ import { fail } from 'assert';
 import LocationsService from './../../../src/locations/service/LocationsService';
 import LocationCreateRequest from './../../../src/locations/model/LocationCreateRequest';
 import LocationUpdateRequest from './../../../src/locations/model/LocationUpdateRequest';
+import LocationClosureRequest from './../../../src/locations/model/LocationClosureRequest';
+
 
 describe('Locations Service', () => {
 
@@ -37,7 +39,7 @@ describe('Locations Service', () => {
       sandbox.restore();
       done();
     });
-    const closesDates = {
+    const closesDates: LocationClosureRequest = {
       closedDays: [
         '2021/02/01',
         '2021/03/01',
