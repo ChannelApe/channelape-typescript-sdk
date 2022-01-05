@@ -103,13 +103,35 @@ describe('Plays Service', () => {
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
         .yields(null, response, expectedPlay);
-
       const playsService: PlaysService = new PlaysService(client, stepsService);
       return playsService.get(expectedPlay.id).then((actualPlay: Play | Play[]) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.PLAYS}/${expectedPlay.id}`);
         if (!Array.isArray(actualPlay)) {
           expectPlay(actualPlay);
         }
+      });
+    });
+    it('And valid Play ID and when steps is not available in actualPlay' +
+    'When retrieving Play then Play contains steps but actualPlay doesnot ', () => {
+      const response = {
+        status: 200,
+        config: {
+          method: 'GET'
+        }
+      };
+      const actualPlay2: Play = {
+        id: '9c728601-0286-457d-b0d6-ec19292d4485',
+        name: 'Custom Play',
+        createdAt: new Date('2018-02-22T16:04:29.030Z'),
+        updatedAt: new Date('2018-04-02T13:04:27.299Z'),
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+        .yields(null, response, expectedPlay);
+
+      const playsService: PlaysService = new PlaysService(client, stepsService);
+      return playsService.get(expectedPlay.id).then((actualPlay: Play | Play[]) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.PLAYS}/${expectedPlay.id}`);
+        expect(expectedPlay.steps).to.not.equal(actualPlay2.steps);
       });
     });
     it('And retrieve a list of all play' +
