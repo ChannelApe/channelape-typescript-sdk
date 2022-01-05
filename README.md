@@ -854,3 +854,10 @@ channelapeClient.plays().get(playId)
     // do what you need to do with play data here
   });
 ```
+#### Get All Plays
+```typescript
+channelapeClient.plays().get()
+  .then((plays: Play[]) => {
+    // do what you need to do with all play data here
+  });
+```

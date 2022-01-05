@@ -10,6 +10,7 @@ import { ChannelApeError } from '../../../src/index';
 import PlaysService from '../../../src/plays/service/PlaysService';
 import Play from '../../../src/plays/model/Play';
 import StepsService from '../../../src/steps/service/StepsService';
+import { fail } from 'assert';
 
 describe('Plays Service', () => {
 
@@ -111,29 +112,6 @@ describe('Plays Service', () => {
         }
       });
     });
-    it('And valid Play ID and when steps is not available in actualPlay' +
-    'When retrieving Play then Play contains steps but actualPlay doesnot ', () => {
-      const response = {
-        status: 200,
-        config: {
-          method: 'GET'
-        }
-      };
-      const actualPlay2: Play = {
-        id: '9c728601-0286-457d-b0d6-ec19292d4485',
-        name: 'Custom Play',
-        createdAt: new Date('2018-02-22T16:04:29.030Z'),
-        updatedAt: new Date('2018-04-02T13:04:27.299Z'),
-      };
-      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
-        .yields(null, response, expectedPlay);
-
-      const playsService: PlaysService = new PlaysService(client, stepsService);
-      return playsService.get(expectedPlay.id).then((actualPlay: Play | Play[]) => {
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.PLAYS}/${expectedPlay.id}`);
-        expect(expectedPlay.steps).to.not.equal(actualPlay2.steps);
-      });
-    });
     it('And retrieve a list of all play' +
       ' When retrieving Play Then return resolved promise with all Play', () => {
       const response = {
@@ -198,12 +176,19 @@ describe('Plays Service', () => {
       expect(actualPlay.name).to.equal(expectedPlay.name);
       expect(actualPlay.createdAt.toISOString()).to.equal(expectedPlay.createdAt.toISOString());
       expect(actualPlay.updatedAt.toISOString()).to.equal(expectedPlay.updatedAt.toISOString());
-      if (actualPlay.steps && expectedPlay.steps) {
-        expect(actualPlay.steps[0].environmentVariableKeys).to.equal(expectedPlay.steps[0].environmentVariableKeys);
-        expect(actualPlay.steps[0].id).to.equal(expectedPlay.steps[0].id);
-        expect(actualPlay.steps[0].name).to.equal(expectedPlay.steps[0].name);
-        expect(actualPlay.steps[0].createdAt.toISOString()).to.equal(expectedPlay.steps[0].createdAt.toISOString());
-        expect(actualPlay.steps[0].updatedAt.toISOString()).to.equal(expectedPlay.steps[0].updatedAt.toISOString());
+      if (expectedPlay.steps) {
+        if (!actualPlay.steps) {
+          fail('Expected actual play result to have steps');
+        } else {
+          expect(actualPlay.steps.length).to.equal(expectedPlay.steps.length);
+          expect(actualPlay.steps[0].environmentVariableKeys).to.equal(expectedPlay.steps[0].environmentVariableKeys);
+          expect(actualPlay.steps[0].id).to.equal(expectedPlay.steps[0].id);
+          expect(actualPlay.steps[0].name).to.equal(expectedPlay.steps[0].name);
+          expect(actualPlay.steps[0].createdAt.toISOString()).to.equal(expectedPlay.steps[0].createdAt.toISOString());
+          expect(actualPlay.steps[0].updatedAt.toISOString()).to.equal(expectedPlay.steps[0].updatedAt.toISOString());
+        }
+      } else {
+        expect(actualPlay.steps).to.be.undefined;
       }
     }
 
