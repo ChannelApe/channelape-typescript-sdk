@@ -13,6 +13,7 @@ import LocationSLA from '../model/LocationSLA';
 import LocationClosureResponse from '../model/LocationClosureResponse';
 import LocationClosedDay from '../model/LocationClosedDay';
 import LocationSLAOperatingDay from '../model/LocationSLAOperatingDay';
+import LocationClosureRequest from '../model/LocationClosureRequest';
 
 export default class LocationsService extends RestService {
 
@@ -96,7 +97,22 @@ export default class LocationsService extends RestService {
       });
     });
   }
-
+  public updateClosures(locationId: string, closedDates: LocationClosureRequest): Promise<LocationClosedDay []> {
+    return new Promise((resolve) => {
+      const requestUrl = `/${Version.V1}${Resource.LOCATIONS}/${locationId}/closures`;
+      const options = {
+        data: closedDates
+      };
+      this.client.put(requestUrl, options, (error, response, body) => {
+        const requestResponse: RequestCallbackParams = {
+          error,
+          response,
+          body
+        };
+        resolve(this.mapLocationClosuresResponse(requestUrl, requestResponse, this.EXPECTED_GET_OR_UPDATE_STATUS));
+      });
+    });
+  }
   public getClosures(locationId: string): Promise<LocationClosedDay[]> {
     return new Promise((resolve) => {
       const requestUrl = `/${Version.V1}${Resource.LOCATIONS}/${locationId}/closures`;
