@@ -29,7 +29,32 @@ describe('Locations Service', () => {
       });
 
     let sandbox: sinon.SinonSandbox;
-
+    const expectedLocationSLAUpdate = {
+      createdAt: new Date('2018-04-24T14:02:34.703Z'),
+      fulfillmentSLAHours: '1',
+      locationId: 'location-id',
+      operatingDays: [
+        {
+          createdAt: new Date('2018-04-24T14:02:34.703Z'),
+          day: 'T',
+          end: '10:00',
+          fulfillmentCutoffTime: '09:30',
+          id: '23',
+          open: '08:00',
+          updatedAt: new Date('2018-04-24T14:02:34.703Z')
+        },
+        {
+          createdAt: new Date('2018-04-24T14:02:34.703Z'),
+          day: 'W',
+          end: '10:00',
+          fulfillmentCutoffTime: '09:50',
+          id: '24',
+          open: '08:00',
+          updatedAt: new Date('2018-04-24T14:02:34.703Z')
+        }
+      ],
+      updatedAt: new Date('2018-04-24T14:02:34.703Z')
+    };
     beforeEach((done) => {
       sandbox = sinon.createSandbox();
       done();
@@ -446,30 +471,30 @@ describe('Locations Service', () => {
       };
 
       const expectedSLA = {
-        createdAt: '2021-06-11T07:48:05.000Z',
+        createdAt: new Date('2021-06-11T07:48:05.000Z'),
         fulfillmentSLAHours: '1',
         locationId: '48',
         operatingDays: [
           {
-            createdAt: '2021-10-01T15:08:34.000Z',
+            createdAt: new Date('2021-10-01T15:08:34.000Z'),
             day: 'T',
             end: '10:00',
             fulfillmentCutoffTime: '09:00',
             id: '23',
             open: '08:00',
-            updatedAt: '2021-10-01T15:09:56.000Z'
+            updatedAt: new Date('2021-10-01T15:09:56.000Z')
           },
           {
-            createdAt: '2021-10-01T15:08:34.000Z',
+            createdAt: new Date('2021-10-01T15:08:34.000Z'),
             day: 'W',
             end: '10:00',
             fulfillmentCutoffTime: '09:00',
             id: '24',
             open: '08:00',
-            updatedAt: '2021-10-01T15:09:56.000Z'
+            updatedAt: new Date('2021-10-01T15:09:56.000Z')
           }
         ],
-        updatedAt: '2021-10-01T15:09:56.000Z'
+        updatedAt: new Date('2021-10-01T15:09:56.000Z')
       };
 
       const slaResponse = {
@@ -510,8 +535,8 @@ describe('Locations Service', () => {
 
       expect(actualSLAResponse.locationId).to.equal(expectedSLA.locationId);
       expect(actualSLAResponse.fulfillmentSLAHours).to.equal(expectedSLA.fulfillmentSLAHours);
-      expect(actualSLAResponse.createdAt).to.equal(expectedSLA.createdAt);
-      expect(actualSLAResponse.updatedAt).to.equal(expectedSLA.updatedAt);
+      expect(actualSLAResponse.createdAt).deep.equal(expectedSLA.createdAt);
+      expect(actualSLAResponse.updatedAt).deep.equal(expectedSLA.updatedAt);
       expect(actualSLAResponse.operatingDays.length).to.equal(2);
 
       expect(actualSLAResponse.operatingDays[0].day).to.equal(expectedSLA.operatingDays[0].day);
@@ -520,8 +545,8 @@ describe('Locations Service', () => {
         .equal(expectedSLA.operatingDays[0].fulfillmentCutoffTime);
       expect(actualSLAResponse.operatingDays[0].id).to.equal(expectedSLA.operatingDays[0].id);
       expect(actualSLAResponse.operatingDays[0].open).to.equal(expectedSLA.operatingDays[0].open);
-      expect(actualSLAResponse.operatingDays[0].createdAt).to.equal(expectedSLA.operatingDays[0].createdAt);
-      expect(actualSLAResponse.operatingDays[0].updatedAt).to.equal(expectedSLA.operatingDays[0].updatedAt);
+      expect(actualSLAResponse.operatingDays[0].createdAt).deep.equal(expectedSLA.operatingDays[0].createdAt);
+      expect(actualSLAResponse.operatingDays[0].updatedAt).deep.equal(expectedSLA.operatingDays[0].updatedAt);
 
       expect(actualSLAResponse.operatingDays[1].day).to.equal(expectedSLA.operatingDays[1].day);
       expect(actualSLAResponse.operatingDays[1].end).to.equal(expectedSLA.operatingDays[1].end);
@@ -529,11 +554,63 @@ describe('Locations Service', () => {
         .equal(expectedSLA.operatingDays[1].fulfillmentCutoffTime);
       expect(actualSLAResponse.operatingDays[1].id).to.equal(expectedSLA.operatingDays[1].id);
       expect(actualSLAResponse.operatingDays[1].open).to.equal(expectedSLA.operatingDays[1].open);
-      expect(actualSLAResponse.operatingDays[1].createdAt).to.equal(expectedSLA.operatingDays[1].createdAt);
-      expect(actualSLAResponse.operatingDays[1].updatedAt).to.equal(expectedSLA.operatingDays[1].updatedAt);
+      expect(actualSLAResponse.operatingDays[1].createdAt).deep.equal(expectedSLA.operatingDays[1].createdAt);
+      expect(actualSLAResponse.operatingDays[1].updatedAt).deep.equal(expectedSLA.operatingDays[1].updatedAt);
 
     });
+    it('And valid location SLA information update request ' +
+    'When update location SLA information then update location SLA information and ' +
+    'return resolved promise with location SLA information', async () => {
 
+      const response = {
+        status: 200,
+        config: {
+          method: 'PUT'
+        }
+      };
+      const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put')
+        .yields(null, response, expectedLocationSLAUpdate);
+
+      const locationsService: LocationsService = new LocationsService(client);
+      const actualSLAResponse = await locationsService.updateSla('location-id', expectedLocationSLAUpdate);
+      expect(clientPutStub.args[0][0]).to
+      .equal(`/${Version.V1}${Resource.LOCATIONS}/${expectedLocationSLAUpdate.locationId}/sla`);
+      expect(actualSLAResponse.fulfillmentSLAHours).to.equal(expectedLocationSLAUpdate.fulfillmentSLAHours);
+      expect(actualSLAResponse.operatingDays[0].day).to.equal(expectedLocationSLAUpdate.operatingDays[0].day);
+      expect(actualSLAResponse.operatingDays[0].end).to.equal(expectedLocationSLAUpdate.operatingDays[0].end);
+      expect(actualSLAResponse.operatingDays[0].fulfillmentCutoffTime).to
+        .equal(expectedLocationSLAUpdate.operatingDays[0].fulfillmentCutoffTime);
+      expect(actualSLAResponse.operatingDays[0].id).to.equal(expectedLocationSLAUpdate.operatingDays[0].id);
+      expect(actualSLAResponse.operatingDays[0].open).to.equal(expectedLocationSLAUpdate.operatingDays[0].open);
+      expect(actualSLAResponse.operatingDays[0].createdAt).to
+        .equal(expectedLocationSLAUpdate.operatingDays[0].createdAt);
+      expect(actualSLAResponse.operatingDays[0].updatedAt).to
+        .equal(expectedLocationSLAUpdate.operatingDays[0].updatedAt);
+
+    });
+    it('And exception is thrown ' +
+    'When updating location SLA then return rejected promise with errors', async () => {
+
+      const expectedError = {
+        stack: expectedChannelApeErrorResponse
+      };
+      const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put')
+        .yields(expectedError, null, null);
+
+      const locationsService: LocationsService = new LocationsService(client);
+
+      try {
+        await locationsService.updateSla('location-id', expectedLocationSLAUpdate);
+        fail('Successfully ran location update but should have failed');
+      } catch (error) {
+        expect(clientPutStub.args[0][0]).to
+        .equal(`/${Version.V1}${Resource.LOCATIONS}/${expectedLocationSLAUpdate.locationId}/sla`);
+        expect(clientPutStub.args[0][1].data).to.equal(expectedLocationSLAUpdate);
+        expect(error.stack.statusCode).to.equal(404);
+        expect(error.stack.errors[0].code).to.equal(70);
+        expect(error).to.equal(expectedError);
+      }
+    });
     it('And valid location id ' +
       'When retrieving closure information then return resolved promise with closures', async () => {
 
