@@ -835,6 +835,24 @@ channelApeClient.locations().getClosures(locationId)
   });
 ```
 
+### Update location closures
+```typescript
+const closesDates: LocationClosureRequest = {
+   closedDays: [
+    '2021/02/01',
+    '2021/03/01',
+    '2021/04/01',
+    '2021/05/01',
+    '2021/06/01'
+    ]
+  };
+const locationId: string = '1';
+channelApeClient.locations().updateClosures(locationId, closedDates)
+  .then((locationClosures: LocationClosedDay[]) => {
+    // Do what you need with the locations closures update
+  });
+```
+
 ### Steps
 
 #### Get step by ID

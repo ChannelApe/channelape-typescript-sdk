@@ -10,6 +10,8 @@ import { fail } from 'assert';
 import LocationsService from './../../../src/locations/service/LocationsService';
 import LocationCreateRequest from './../../../src/locations/model/LocationCreateRequest';
 import LocationUpdateRequest from './../../../src/locations/model/LocationUpdateRequest';
+import LocationClosureRequest from './../../../src/locations/model/LocationClosureRequest';
+
 
 describe('Locations Service', () => {
 
@@ -37,6 +39,15 @@ describe('Locations Service', () => {
       sandbox.restore();
       done();
     });
+    const closesDates: LocationClosureRequest = {
+      closedDays: [
+        '2021/02/01',
+        '2021/03/01',
+        '2021/04/01',
+        '2021/05/01',
+        '2021/06/01'
+      ]
+    };
 
     const expectedChannelApeErrorResponse: ChannelApeApiErrorResponse = {
       statusCode: 404,
@@ -574,6 +585,131 @@ describe('Locations Service', () => {
       expect(actualClosuresResponse[1].id).to.equal(expectedClosures[1].id);
       expect(actualClosuresResponse[1].date).to.equal(expectedClosures[1].date);
 
+    });
+    it('And valid location update closed dates request ' +
+    'When update location closed dates then update location closed dates and ' +
+    'return resolved promise with location closed dates', async () => {
+
+      const response = {
+        status: 200,
+        config: {
+          method: 'PUT'
+        }
+      };
+
+      const expectedLocationClosures = {
+        closedDays: [
+          {
+            createdAt: '2021-12-30T09:27:38.000Z',
+            date: '2021/04/01',
+            id: '12',
+            updatedAt: '2021-12-30T10:05:28.787Z'
+          },
+          {
+            createdAt: '2021-12-30T09:27:38.000Z',
+            date: '2021/05/01',
+            id: '10',
+            updatedAt: '2021-12-30T10:05:28.787Z'
+          },
+          {
+            createdAt: '2021-12-30T10:05:28.787Z',
+            date: '2021/02/01',
+            id: '16',
+            updatedAt: '2021-12-30T10:05:28.787Z'
+          },
+          {
+            createdAt: '2021-12-30T09:27:38.000Z',
+            date: '2021/03/01',
+            id: '11',
+            updatedAt: '2021-12-30T10:05:28.787Z'
+          },
+          {
+            createdAt: '2021-12-30T09:27:38.000Z',
+            date: '2021/06/01',
+            id: '13',
+            updatedAt: '2021-12-30T10:05:28.787Z'
+          }
+        ],
+        errors: [],
+        locationId: 'location-id'
+      };
+
+      const locationId = 'location-id';
+      const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put')
+          .yields(null, response, expectedLocationClosures);
+
+      const locationsService: LocationsService = new LocationsService(client);
+      const actualLocationResponse = await locationsService.updateClosures(locationId, closesDates);
+      expect(clientPutStub.args[0][0]).to
+      .equal(`/${Version.V1}${Resource.LOCATIONS}/${locationId}/closures`);
+      expect(actualLocationResponse[0].createdAt).
+       to.equal(expectedLocationClosures.closedDays[0]['createdAt']);
+      expect(actualLocationResponse[0].id).
+       to.equal(expectedLocationClosures.closedDays[0]['id']);
+      expect(actualLocationResponse[0].date).
+       to.equal(expectedLocationClosures.closedDays[0]['date']);
+      expect(actualLocationResponse[0].updatedAt).
+       to.equal(expectedLocationClosures.closedDays[0]['updatedAt']);
+
+    });
+    it('And invalid location update closed dates request ' +
+      'When updating location closed dates then return rejected promise with errors', async () => {
+
+      const response = {
+        status: 400,
+        config: {
+          method: 'PUT'
+        }
+      };
+
+      const locationId = 'location-id';
+      const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put')
+        .yields(null, response, expectedChannelApeErrorResponse);
+
+      const locationsService: LocationsService = new LocationsService(client);
+
+      try {
+        await locationsService.updateClosures(locationId, closesDates);
+        fail('Successfully ran location update closed but should have failed');
+      } catch (error) {
+        expect(clientPutStub.args[0][0]).to
+        .equal(`/${Version.V1}${Resource.LOCATIONS}/${locationId}/closures`);
+        expect(clientPutStub.args[0][1].data).to.equal(closesDates);
+        expect(error.Response.statusCode).to.equal(400);
+        expect(error.ApiErrors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
+        expect(error.ApiErrors[0].message)
+              .to.equal(expectedChannelApeErrorResponse.errors[0].message);
+      }
+    });
+    it('And not found location id' +
+    'When updating location closed dates then return rejected promise with errors', async () => {
+
+      const response = {
+        status: 404,
+        config: {
+          method: 'PUT'
+        }
+      };
+
+      const locationId = 'invalid-location-id';
+
+      const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put')
+          .yields(null, response, expectedChannelApeErrorResponse);
+
+      const locationsService: LocationsService = new LocationsService(client);
+
+      try {
+        await locationsService.updateClosures(locationId, closesDates);
+        fail('Successfully ran location update closed using location id but should have failed');
+      } catch (error) {
+        expect(clientPutStub.args[0][0]).to
+        .equal(`/${Version.V1}${Resource.LOCATIONS}/${locationId}/closures`);
+        expect(clientPutStub.args[0][1].data).to.equal(closesDates);
+        expect(error.Response.statusCode).to.equal(404);
+        expect(error.ApiErrors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
+        expect(error.ApiErrors[0].message)
+              .to.equal(expectedChannelApeErrorResponse.errors[0].message);
+      }
     });
   });
 });
