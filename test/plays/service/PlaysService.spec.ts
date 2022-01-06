@@ -71,48 +71,48 @@ describe('Plays Service', () => {
     };
 
     const expectedPlayWithSchedule: Play = {
-      id: "9c728601-0286-457d-b0d6-ec19292d4485",
-      name: "Updated Play",
-      createdAt: new Date("2018-02-22T16:04:29.030Z"),
-      updatedAt: new Date("2018-04-02T13:04:27.299Z"),
+      id: '9c728601-0286-457d-b0d6-ec19292d4485',
+      name: 'Updated Play',
+      createdAt: new Date('2018-02-22T16:04:29.030Z'),
+      updatedAt: new Date('2018-04-02T13:04:27.299Z'),
       steps: [
         {
           environmentVariableKeys: [],
-          id: "3803b9ff-e3f3-4762-9642-9bdf1f6504a0",
-          name: "Order Management",
+          id: '3803b9ff-e3f3-4762-9642-9bdf1f6504a0',
+          name: 'Order Management',
           public: true,
-          createdAt: new Date("2018-02-22T16:04:29.030Z"),
-          updatedAt: new Date("2018-04-02T13:04:27.299Z"),
+          createdAt: new Date('2018-02-22T16:04:29.030Z'),
+          updatedAt: new Date('2018-04-02T13:04:27.299Z'),
         },
         {
           environmentVariableKeys: [],
-          id: "78417f87-82ff-4e82-a0eb-674b52305bc1",
-          name: "CSV - Send Order",
+          id: '78417f87-82ff-4e82-a0eb-674b52305bc1',
+          name: 'CSV - Send Order',
           public: true,
-          createdAt: new Date("2018-02-22T16:04:29.030Z"),
-          updatedAt: new Date("2018-04-02T13:04:27.299Z"),
+          createdAt: new Date('2018-02-22T16:04:29.030Z'),
+          updatedAt: new Date('2018-04-02T13:04:27.299Z'),
         },
       ],
       scheduleConfigurations: [
         {
           id: 1,
-          targetAction: "INVOKE_PLAY",
-          daysOfWeek: ["MONDAY", "TUESDAY", "WEDNESDAY"],
+          targetAction: 'INVOKE_PLAY',
+          daysOfWeek: ['MONDAY', 'TUESDAY', 'WEDNESDAY'],
           endTimeInMinutes: 1440,
           intervalTimeInMinutes: 1337,
           startTimeInMinutes: 544,
-          createdAt: new Date("2018-02-22T16:04:29.030Z"),
-          updatedAt: new Date("2018-04-02T13:04:27.299Z"),
+          createdAt: new Date('2018-02-22T16:04:29.030Z'),
+          updatedAt: new Date('2018-04-02T13:04:27.299Z'),
         },
         {
           id: 2,
-          targetAction: "PUSH_ORDERS",
-          daysOfWeek: ["MONDAY", "WEDNESDAY"],
+          targetAction: 'PUSH_ORDERS',
+          daysOfWeek: ['MONDAY', 'WEDNESDAY'],
           endTimeInMinutes: 1440,
           intervalTimeInMinutes: 1334,
           startTimeInMinutes: 544,
-          createdAt: new Date("2018-02-22T16:04:29.030Z"),
-          updatedAt: new Date("2018-04-02T13:04:27.299Z"),
+          createdAt: new Date('2018-02-22T16:04:29.030Z'),
+          updatedAt: new Date('2018-04-02T13:04:27.299Z'),
         },
       ],
     };
@@ -258,15 +258,27 @@ describe('Plays Service', () => {
       }
       if (expectedPlay.scheduleConfigurations) {
         if (!actualPlay.scheduleConfigurations) {
-          fail("Expected actual play result to have steps");
+          fail('Expected actual play result to have steps');
         } else {
           expect(actualPlay.scheduleConfigurations.length).to.equal(expectedPlay.scheduleConfigurations.length);
           expect(actualPlay.scheduleConfigurations[0].id).to.equal(expectedPlay.scheduleConfigurations[0].id);
-          expect(actualPlay.scheduleConfigurations[0].targetAction).to.equal(expectedPlay.scheduleConfigurations[0].targetAction);
-          expect(actualPlay.scheduleConfigurations[0].startTimeInMinutes).to.equal(expectedPlay.scheduleConfigurations[0].startTimeInMinutes);
-          expect(actualPlay.scheduleConfigurations[0].endTimeInMinutes).to.equal(expectedPlay.scheduleConfigurations[0].endTimeInMinutes);
-          expect(actualPlay.scheduleConfigurations[0].intervalTimeInMinutes).to.equal(expectedPlay.scheduleConfigurations[0].intervalTimeInMinutes);
-          expect(actualPlay.scheduleConfigurations[0].daysOfWeek).to.equal(expectedPlay.scheduleConfigurations[0].daysOfWeek);
+          expect(actualPlay.scheduleConfigurations[0].targetAction).to.equal(
+            expectedPlay.scheduleConfigurations[0].targetAction
+          );
+          expect(
+            actualPlay.scheduleConfigurations[0].startTimeInMinutes
+          ).to.equal(expectedPlay.scheduleConfigurations[0].startTimeInMinutes);
+          expect(
+            actualPlay.scheduleConfigurations[0].endTimeInMinutes
+          ).to.equal(expectedPlay.scheduleConfigurations[0].endTimeInMinutes);
+          expect(
+            actualPlay.scheduleConfigurations[0].intervalTimeInMinutes
+          ).to.equal(
+            expectedPlay.scheduleConfigurations[0].intervalTimeInMinutes
+          );
+          expect(actualPlay.scheduleConfigurations[0].daysOfWeek).to.equal(
+            expectedPlay.scheduleConfigurations[0].daysOfWeek
+          );
           expect(actualPlay.scheduleConfigurations[0].createdAt.toISOString()).to.equal(
             expectedPlay.scheduleConfigurations[0].createdAt.toISOString()
           );
