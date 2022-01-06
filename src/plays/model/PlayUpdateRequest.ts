@@ -1,4 +1,4 @@
-import Play from "./Play";
+import Play from './Play';
 
 export default interface PlayUpdateRequest extends Partial<Play> {
   createdAt?: Date;
