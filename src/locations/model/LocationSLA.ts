@@ -1,3 +1,4 @@
+import ChannelApeApiError from '../../../src/model/ChannelApeApiError';
 import LocationSLAOperatingDay from './LocationSLAOperatingDay';
 
 export default interface LocationSLA {
@@ -6,4 +7,5 @@ export default interface LocationSLA {
   locationId: string;
   operatingDays: LocationSLAOperatingDay[];
   updatedAt: Date;
+  errors: ChannelApeApiError[];
 }

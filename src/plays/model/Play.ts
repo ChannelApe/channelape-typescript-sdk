@@ -4,6 +4,6 @@ export default interface Play {
   createdAt: Date;
   id: string;
   name: string;
-  steps: Step[];
+  steps?: Step[];
   updatedAt: Date;
 }

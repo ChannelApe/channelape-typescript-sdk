@@ -826,12 +826,65 @@ channelApeClient.locations().getSLA(locationId)
   });
 ```
 
+### Update location SLA information
+```typescript
+const LocationSLAUpdate: LocationSLA = {
+	createdAt: '2018-04-24T14:02:34.703Z',
+	fulfillmentSLAHours: '1',
+	locationId: '1',
+	operatingDays: [
+		{
+			createdAt: '2018-04-24T14:02:34.703Z',
+			day: 'T',
+			end: '10:00',
+			fulfillmentCutoffTime: '09:30',
+			id: '23',
+			open: '08:00',
+			updatedAt: '2018-04-24T14:02:34.703Z'
+		},
+		{
+			createdAt: '2018-04-24T14:02:34.703Z',
+			day: 'W',
+			end: '10:00',
+			fulfillmentCutoffTime: '09:50',
+			id: '24',
+			open: '08:00',
+			updatedAt: '2018-04-24T14:02:34.703Z'
+		}
+	],
+	updatedAt: '2018-04-24T14:02:34.703Z'
+};
+const locationId: string = '1';
+channelApeClient.locations().updateSla(locationId, sla)
+	.then((locationSLA: LocationSLA) => {
+		// Do what you need with the locations update
+	});
+```
+
 ### Get location closures
 ```typescript
 const locationId: string = '1';
 channelApeClient.locations().getClosures(locationId)
   .then((locationClosures: LocationClosedDay[]) => {
     // Do what you need with the locations
+  });
+```
+
+### Update location closures
+```typescript
+const closesDates: LocationClosureRequest = {
+	closedDays: [
+	'2021/02/01',
+	'2021/03/01',
+	'2021/04/01',
+	'2021/05/01',
+	'2021/06/01'
+	]
+};
+const locationId: string = '1';
+channelApeClient.locations().updateClosures(locationId, closedDates)
+  .then((locationClosures: LocationClosedDay[]) => {
+    // Do what you need with the locations closures update
   });
 ```
 
@@ -852,5 +905,12 @@ channelapeClient.steps().get(stepId)
 channelapeClient.plays().get(playId)
   .then((play: Play) => {
     // do what you need to do with play data here
+  });
+```
+#### Get All Plays
+```typescript
+channelapeClient.plays().get()
+  .then((plays: Play[]) => {
+    // do what you need to do with all play data here
   });
 ```
