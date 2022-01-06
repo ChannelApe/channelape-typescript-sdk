@@ -28,7 +28,7 @@ export default class PlaysService {
     return deferred.promise as any;
   }
   public update(play: PlayUpdateRequest): Promise<Play> {
-    const deferred = Q.defer<Play>();
+    const deferred = Q.defer<Play | Play[]>();
     const requestUrl = `/${Version.V2}${Resource.PLAYS}/${play.id}`;
     this.client.put(requestUrl, { data: play }, (error, response, body) => {
       this.mapPlayPromise(requestUrl, deferred, error, response, body, EXPECTED_PUT_STATUS);
