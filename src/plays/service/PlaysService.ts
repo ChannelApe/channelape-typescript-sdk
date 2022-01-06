@@ -7,8 +7,11 @@ import Resource from '../../model/Resource';
 import Play from '../model/Play';
 import GenerateApiError from '../../utils/GenerateApiError';
 import StepsService from '../../steps/service/StepsService';
+import PlaySchedule from '../model/PlaySchedule';
+import PlayUpdateRequest from '../model/PlayUpdateRequest';
 
 const EXPECTED_GET_STATUS = 200;
+const EXPECTED_PUT_STATUS = 200;
 
 export default class PlaysService {
   constructor(
@@ -23,7 +26,14 @@ export default class PlaysService {
       this.mapPlayPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
     });
     return deferred.promise as any;
-
+  }
+  public update(play: PlayUpdateRequest): Promise<Play> {
+    const deferred = Q.defer<Play>();
+    const requestUrl = `/${Version.V2}${Resource.PLAYS}/${play.id}`;
+    this.client.put(requestUrl, { data: play }, (error, response, body) => {
+      this.mapPlayPromise(requestUrl, deferred, error, response, body, EXPECTED_PUT_STATUS);
+    });
+    return deferred.promise as any;
   }
   private mapPlayPromise(requestUrl: string, deferred: Q.Deferred<Play | Play[]>, error: any, response: AxiosResponse,
     body: any, expectedStatusCode: number) {
@@ -44,7 +54,16 @@ export default class PlaysService {
     if (play.steps) {
       play.steps = play.steps.map((item: any) => this.stepsService.formatStep(item));
     }
+    if (play.scheduleConfigurations) {
+      play.scheduleConfigurations = play.scheduleConfigurations.map((item: any) => this.formatPlaySchedule(item));
+    }
     return play as Play;
+  }
+
+  private formatPlaySchedule(playSchedule: any): PlaySchedule {
+    playSchedule.createdAt = new Date(playSchedule.createdAt);
+    playSchedule.updatedAt = new Date(playSchedule.updatedAt);
+    return playSchedule as PlaySchedule;
   }
 
 }
