@@ -67,31 +67,6 @@ describe('Plays Service', () => {
           createdAt: new Date('2018-02-22T16:04:29.030Z'),
           updatedAt: new Date('2018-04-02T13:04:27.299Z'),
         }
-      ]
-    };
-
-    const expectedPlayWithSchedule: Play = {
-      id: '9c728601-0286-457d-b0d6-ec19292d4485',
-      name: 'Updated Play',
-      createdAt: new Date('2018-02-22T16:04:29.030Z'),
-      updatedAt: new Date('2018-04-02T13:04:27.299Z'),
-      steps: [
-        {
-          environmentVariableKeys: [],
-          id: '3803b9ff-e3f3-4762-9642-9bdf1f6504a0',
-          name: 'Order Management',
-          public: true,
-          createdAt: new Date('2018-02-22T16:04:29.030Z'),
-          updatedAt: new Date('2018-04-02T13:04:27.299Z'),
-        },
-        {
-          environmentVariableKeys: [],
-          id: '78417f87-82ff-4e82-a0eb-674b52305bc1',
-          name: 'CSV - Send Order',
-          public: true,
-          createdAt: new Date('2018-02-22T16:04:29.030Z'),
-          updatedAt: new Date('2018-04-02T13:04:27.299Z'),
-        },
       ],
       scheduleConfigurations: [
         {
@@ -114,7 +89,7 @@ describe('Plays Service', () => {
           createdAt: new Date('2018-02-22T16:04:29.030Z'),
           updatedAt: new Date('2018-04-02T13:04:27.299Z'),
         },
-      ],
+      ]
     };
 
     const expectedChannelApeErrorResponse: ChannelApeApiErrorResponse = {
@@ -228,12 +203,12 @@ describe('Plays Service', () => {
         }
       };
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'put')
-        .yields(null, response, expectedPlayWithSchedule);
+        .yields(null, response, expectedPlay);
 
       const playssService: PlaysService = new PlaysService(client, stepsService);
-      return playssService.update(expectedPlayWithSchedule as PlayUpdateRequest).then((actualAction) => {
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V2}${Resource.PLAYS}/${expectedPlayWithSchedule.id}`);
-        expectPlay(expectedPlayWithSchedule);
+      return playssService.update(expectedPlay as PlayUpdateRequest).then((actualAction) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V2}${Resource.PLAYS}/${expectedPlay.id}`);
+        expectPlay(expectedPlay);
       });
     });
 
