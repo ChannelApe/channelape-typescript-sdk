@@ -101,7 +101,10 @@ export { default as ApiAccount } from './businesses/apiaccounts/model/ApiAccount
 export { default as InvitationResponse } from './businesses/model/InvitationResponse';
 export { default as SupplierCreateRequest } from './suppliers/model/SupplierCreateRequest';
 export { default as PlaySettings } from './suppliers/model/PlaySettings';
-export { default as Play } from './plays/service/PlaysService';
+export { default as Play } from './plays/model/Play';
+export { default as PlaySchedule } from "./plays/model/PlaySchedule";
+export { default as PlayUpdateRequest } from "./plays/model/PlayUpdateRequest";
+export { default as PlaysService } from "./plays/service/PlaysService";
 export { default as LocationClosureRequest } from './locations/model/LocationClosureRequest';
 export { default as LocationSLAUpdateRequest } from './locations/model/LocationSLAUpdateRequest';
 export { default as LocationSLAOperatingDayUpdateRequest }

@@ -205,8 +205,8 @@ describe('Plays Service', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'put')
         .yields(null, response, expectedPlay);
 
-      const playssService: PlaysService = new PlaysService(client, stepsService);
-      return playssService.update(expectedPlay as PlayUpdateRequest).then((actualAction) => {
+      const playsService: PlaysService = new PlaysService(client, stepsService);
+      return playsService.update(expectedPlay as PlayUpdateRequest).then((actualAction) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V2}${Resource.PLAYS}/${expectedPlay.id}`);
         expectPlay(expectedPlay);
       });
