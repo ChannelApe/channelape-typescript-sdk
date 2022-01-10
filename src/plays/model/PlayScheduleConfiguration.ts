@@ -1,4 +1,4 @@
-export default interface PlaySchedule {
+export default interface PlayScheduleConfiguration {
   id: number;
   createdAt: Date;
   updatedAt: Date;

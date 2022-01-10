@@ -7,7 +7,7 @@ import Resource from '../../model/Resource';
 import Play from '../model/Play';
 import GenerateApiError from '../../utils/GenerateApiError';
 import StepsService from '../../steps/service/StepsService';
-import PlaySchedule from '../model/PlaySchedule';
+import PlayScheduleConfiguration from "../model/PlayScheduleConfiguration";
 import PlayUpdateRequest from '../model/PlayUpdateRequest';
 
 const EXPECTED_GET_STATUS = 200;
@@ -60,10 +60,10 @@ export default class PlaysService {
     return play as Play;
   }
 
-  private formatPlaySchedule(playSchedule: any): PlaySchedule {
-    playSchedule.createdAt = new Date(playSchedule.createdAt);
-    playSchedule.updatedAt = new Date(playSchedule.updatedAt);
-    return playSchedule as PlaySchedule;
+  private formatPlaySchedule(playScheduleConfiguration: any): PlayScheduleConfiguration {
+    playScheduleConfiguration.createdAt = new Date(playScheduleConfiguration.createdAt);
+    playScheduleConfiguration.updatedAt = new Date(playScheduleConfiguration.updatedAt);
+    return playScheduleConfiguration as PlayScheduleConfiguration;
   }
 
 }
