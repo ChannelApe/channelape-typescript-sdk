@@ -1,5 +1,5 @@
 import Step from '../../steps/model/Step';
-import PlayScheduleConfiguration from "./PlayScheduleConfiguration";
+import PlayScheduleConfiguration from './PlayScheduleConfiguration';
 
 export default interface Play {
   createdAt: Date;

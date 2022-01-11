@@ -7,7 +7,7 @@ import Resource from '../../model/Resource';
 import Play from '../model/Play';
 import GenerateApiError from '../../utils/GenerateApiError';
 import StepsService from '../../steps/service/StepsService';
-import PlayScheduleConfiguration from "../model/PlayScheduleConfiguration";
+import PlayScheduleConfiguration from '../model/PlayScheduleConfiguration';
 import PlayUpdateRequest from '../model/PlayUpdateRequest';
 
 const EXPECTED_GET_STATUS = 200;
