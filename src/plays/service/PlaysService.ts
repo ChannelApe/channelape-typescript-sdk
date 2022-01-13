@@ -32,7 +32,7 @@ export default class PlaysService {
   public create(play: PlayCreateRequest): Promise<Play> {
     const deferred = Q.defer<Play | Play[]>();
     const requestUrl = `/${Version.V2}${Resource.PLAYS}`;
-    this.client.put(requestUrl, { data: play }, (error, response, body) => {
+    this.client.post(requestUrl, { data: play }, (error, response, body) => {
       this.mapPlayPromise(requestUrl, deferred, error, response, body, EXPECTED_POST_STATUS);
     });
     return deferred.promise as any;
