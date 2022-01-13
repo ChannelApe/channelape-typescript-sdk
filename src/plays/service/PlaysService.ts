@@ -15,9 +15,6 @@ const EXPECTED_GET_STATUS = 200;
 const EXPECTED_PUT_STATUS = 200;
 const EXPECTED_POST_STATUS = 200;
 
-const EXPECTED_GET_STATUS = 200;
-const EXPECTED_PUT_STATUS = 200;
-
 export default class PlaysService {
   constructor(
     private readonly client: RequestClientWrapper,
