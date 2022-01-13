@@ -15,6 +15,9 @@ const EXPECTED_GET_STATUS = 200;
 const EXPECTED_PUT_STATUS = 200;
 const EXPECTED_POST_STATUS = 200;
 
+const EXPECTED_GET_STATUS = 200;
+const EXPECTED_PUT_STATUS = 200;
+
 export default class PlaysService {
   constructor(
     private readonly client: RequestClientWrapper,
@@ -37,6 +40,7 @@ export default class PlaysService {
     });
     return deferred.promise as any;
   }
+
   public update(play: PlayUpdateRequest): Promise<Play> {
     const deferred = Q.defer<Play | Play[]>();
     const requestUrl = `/${Version.V2}${Resource.PLAYS}/${play.id}`;

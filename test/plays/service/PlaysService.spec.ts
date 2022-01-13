@@ -11,6 +11,7 @@ import PlaysService from '../../../src/plays/service/PlaysService';
 import Play from '../../../src/plays/model/Play';
 import StepsService from '../../../src/steps/service/StepsService';
 import { fail } from 'assert';
+import PlayUpdateRequest from '../../../src/plays/model/PlayUpdateRequest';
 
 describe('Plays Service', () => {
 
@@ -228,6 +229,7 @@ describe('Plays Service', () => {
         expectPlay(expectedPlay);
       });
     });
+
 
     function expectPlay(actualPlay: Play) {
       expect(actualPlay.id).to.equal(expectedPlay.id);
