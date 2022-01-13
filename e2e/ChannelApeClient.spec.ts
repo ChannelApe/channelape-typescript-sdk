@@ -522,7 +522,7 @@ describe('ChannelApe Client', () => {
                 expect(actualOrders.length).to.equal(273);
                 expect(actualOrders[0].id).to.equal('7f68efb0-3143-4bed-9944-27fe933326a2');
               });
-            }).timeout(40000);
+            }).timeout(60000);
           });
         });
 
