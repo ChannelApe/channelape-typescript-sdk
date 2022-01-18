@@ -9,9 +9,11 @@ import GenerateApiError from '../../utils/GenerateApiError';
 import StepsService from '../../steps/service/StepsService';
 import PlayScheduleConfiguration from '../model/PlayScheduleConfiguration';
 import PlayUpdateRequest from '../model/PlayUpdateRequest';
+import PlayCreateRequest from '../model/PlayCreateRequest';
 
 const EXPECTED_GET_STATUS = 200;
 const EXPECTED_PUT_STATUS = 200;
+const EXPECTED_POST_STATUS = 200;
 
 export default class PlaysService {
   constructor(
@@ -27,6 +29,15 @@ export default class PlaysService {
     });
     return deferred.promise as any;
   }
+  public create(play: PlayCreateRequest): Promise<Play> {
+    const deferred = Q.defer<Play | Play[]>();
+    const requestUrl = `/${Version.V2}${Resource.PLAYS}`;
+    this.client.post(requestUrl, { data: play }, (error, response, body) => {
+      this.mapPlayPromise(requestUrl, deferred, error, response, body, EXPECTED_POST_STATUS);
+    });
+    return deferred.promise as any;
+  }
+
   public update(play: PlayUpdateRequest): Promise<Play> {
     const deferred = Q.defer<Play | Play[]>();
     const requestUrl = `/${Version.V2}${Resource.PLAYS}/${play.id}`;

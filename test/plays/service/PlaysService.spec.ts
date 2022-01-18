@@ -6,12 +6,11 @@ import Resource from '../../../src/model/Resource';
 import Environment from '../../../src/model/Environment';
 import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
-import { ChannelApeError } from '../../../src/index';
+import { ChannelApeError, PlayCreateRequest, PlayUpdateRequest } from '../../../src/index';
 import PlaysService from '../../../src/plays/service/PlaysService';
 import Play from '../../../src/plays/model/Play';
 import StepsService from '../../../src/steps/service/StepsService';
 import { fail } from 'assert';
-import PlayUpdateRequest from '../../../src/plays/model/PlayUpdateRequest';
 
 describe('Plays Service', () => {
 
@@ -212,6 +211,23 @@ describe('Plays Service', () => {
       });
     });
 
+    it('And valid create play data ' +
+      'When creating play Then return resolved promise with play', () => {
+      const response = {
+        status: 200,
+        config: {
+          method: 'POST'
+        }
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'post')
+        .yields(null, response, expectedPlay);
+
+      const playsService: PlaysService = new PlaysService(client, stepsService);
+      return playsService.create(expectedPlay as PlayCreateRequest).then((actualAction) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V2}${Resource.PLAYS}`);
+        expectPlay(expectedPlay);
+      });
+    });
     function expectPlay(actualPlay: Play) {
       expect(actualPlay.id).to.equal(expectedPlay.id);
       expect(actualPlay.name).to.equal(expectedPlay.name);
@@ -265,13 +281,11 @@ describe('Plays Service', () => {
         expect(actualPlay.scheduleConfigurations).to.be.undefined;
       }
     }
-
     function expectPlayApeErrorResponse(error: ChannelApeError) {
       expect(error.Response.statusCode).to.equal(404);
       expect(error.ApiErrors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
       expect(error.ApiErrors[0].message)
         .to.equal(expectedChannelApeErrorResponse.errors[0].message);
     }
-
   });
 });
