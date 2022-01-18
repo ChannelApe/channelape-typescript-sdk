@@ -1,4 +1,5 @@
 import Step from '../../steps/model/Step';
+import PlayScheduleConfiguration from './PlayScheduleConfiguration';
 
 export default interface Play {
   createdAt: Date;
@@ -6,4 +7,5 @@ export default interface Play {
   name: string;
   steps?: Step[];
   updatedAt: Date;
+  scheduleConfigurations?: PlayScheduleConfiguration[];
 }

@@ -6,7 +6,7 @@ import Resource from '../../../src/model/Resource';
 import Environment from '../../../src/model/Environment';
 import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorResponse';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
-import { ChannelApeError } from '../../../src/index';
+import { ChannelApeError, PlayCreateRequest, PlayUpdateRequest } from '../../../src/index';
 import PlaysService from '../../../src/plays/service/PlaysService';
 import Play from '../../../src/plays/model/Play';
 import StepsService from '../../../src/steps/service/StepsService';
@@ -66,6 +66,28 @@ describe('Plays Service', () => {
           createdAt: new Date('2018-02-22T16:04:29.030Z'),
           updatedAt: new Date('2018-04-02T13:04:27.299Z'),
         }
+      ],
+      scheduleConfigurations: [
+        {
+          id: 1,
+          targetAction: 'INVOKE_PLAY',
+          daysOfWeek: ['MONDAY', 'TUESDAY', 'WEDNESDAY'],
+          endTimeInMinutes: 1440,
+          intervalTimeInMinutes: 1337,
+          startTimeInMinutes: 544,
+          createdAt: new Date('2018-02-22T16:04:29.030Z'),
+          updatedAt: new Date('2018-04-02T13:04:27.299Z'),
+        },
+        {
+          id: 2,
+          targetAction: 'PUSH_ORDERS',
+          daysOfWeek: ['MONDAY', 'WEDNESDAY'],
+          endTimeInMinutes: 1440,
+          intervalTimeInMinutes: 1334,
+          startTimeInMinutes: 544,
+          createdAt: new Date('2018-02-22T16:04:29.030Z'),
+          updatedAt: new Date('2018-04-02T13:04:27.299Z'),
+        },
       ]
     };
 
@@ -106,7 +128,7 @@ describe('Plays Service', () => {
         .yields(null, response, expectedPlay);
       const playsService: PlaysService = new PlaysService(client, stepsService);
       return playsService.get(expectedPlay.id).then((actualPlay: Play | Play[]) => {
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.PLAYS}/${expectedPlay.id}`);
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V2}${Resource.PLAYS}/${expectedPlay.id}`);
         if (!Array.isArray(actualPlay)) {
           expectPlay(actualPlay);
         }
@@ -144,7 +166,7 @@ describe('Plays Service', () => {
       return playsService.get(expectedPlay.id).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.PLAYS}/${expectedPlay.id}`);
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V2}${Resource.PLAYS}/${expectedPlay.id}`);
         expect(e).to.equal(expectedError);
       });
     });
@@ -166,11 +188,46 @@ describe('Plays Service', () => {
       return playsService.get(expectedPlay.id).then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((e) => {
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.PLAYS}/${expectedPlay.id}`);
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V2}${Resource.PLAYS}/${expectedPlay.id}`);
         expectPlayApeErrorResponse(e);
       });
     });
 
+    it('And valid play ' +
+      'When updating play Then return resolved promise with play', () => {
+      const response = {
+        status: 200,
+        config: {
+          method: 'PUT'
+        }
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'put')
+        .yields(null, response, expectedPlay);
+
+      const playsService: PlaysService = new PlaysService(client, stepsService);
+      return playsService.update(expectedPlay as PlayUpdateRequest).then((actualAction) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V2}${Resource.PLAYS}/${expectedPlay.id}`);
+        expectPlay(expectedPlay);
+      });
+    });
+
+    it('And valid create play data ' +
+      'When creating play Then return resolved promise with play', () => {
+      const response = {
+        status: 200,
+        config: {
+          method: 'POST'
+        }
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'post')
+        .yields(null, response, expectedPlay);
+
+      const playsService: PlaysService = new PlaysService(client, stepsService);
+      return playsService.create(expectedPlay as PlayCreateRequest).then((actualAction) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V2}${Resource.PLAYS}`);
+        expectPlay(expectedPlay);
+      });
+    });
     function expectPlay(actualPlay: Play) {
       expect(actualPlay.id).to.equal(expectedPlay.id);
       expect(actualPlay.name).to.equal(expectedPlay.name);
@@ -190,14 +247,45 @@ describe('Plays Service', () => {
       } else {
         expect(actualPlay.steps).to.be.undefined;
       }
+      if (expectedPlay.scheduleConfigurations) {
+        if (!actualPlay.scheduleConfigurations) {
+          fail('Expected actual play result to have steps');
+        } else {
+          expect(actualPlay.scheduleConfigurations.length).to.equal(expectedPlay.scheduleConfigurations.length);
+          expect(actualPlay.scheduleConfigurations[0].id).to.equal(expectedPlay.scheduleConfigurations[0].id);
+          expect(actualPlay.scheduleConfigurations[0].targetAction).to.equal(
+            expectedPlay.scheduleConfigurations[0].targetAction
+          );
+          expect(
+            actualPlay.scheduleConfigurations[0].startTimeInMinutes
+          ).to.equal(expectedPlay.scheduleConfigurations[0].startTimeInMinutes);
+          expect(
+            actualPlay.scheduleConfigurations[0].endTimeInMinutes
+          ).to.equal(expectedPlay.scheduleConfigurations[0].endTimeInMinutes);
+          expect(
+            actualPlay.scheduleConfigurations[0].intervalTimeInMinutes
+          ).to.equal(
+            expectedPlay.scheduleConfigurations[0].intervalTimeInMinutes
+          );
+          expect(actualPlay.scheduleConfigurations[0].daysOfWeek).to.equal(
+            expectedPlay.scheduleConfigurations[0].daysOfWeek
+          );
+          expect(actualPlay.scheduleConfigurations[0].createdAt.toISOString()).to.equal(
+            expectedPlay.scheduleConfigurations[0].createdAt.toISOString()
+          );
+          expect(actualPlay.scheduleConfigurations[0].updatedAt.toISOString()).to.equal(
+            expectedPlay.scheduleConfigurations[0].updatedAt.toISOString()
+          );
+        }
+      } else {
+        expect(actualPlay.scheduleConfigurations).to.be.undefined;
+      }
     }
-
     function expectPlayApeErrorResponse(error: ChannelApeError) {
       expect(error.Response.statusCode).to.equal(404);
       expect(error.ApiErrors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
       expect(error.ApiErrors[0].message)
         .to.equal(expectedChannelApeErrorResponse.errors[0].message);
     }
-
   });
 });
