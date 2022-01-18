@@ -228,8 +228,6 @@ describe('Plays Service', () => {
         expectPlay(expectedPlay);
       });
     });
-
-
     function expectPlay(actualPlay: Play) {
       expect(actualPlay.id).to.equal(expectedPlay.id);
       expect(actualPlay.name).to.equal(expectedPlay.name);
@@ -283,13 +281,11 @@ describe('Plays Service', () => {
         expect(actualPlay.scheduleConfigurations).to.be.undefined;
       }
     }
-
     function expectPlayApeErrorResponse(error: ChannelApeError) {
       expect(error.Response.statusCode).to.equal(404);
       expect(error.ApiErrors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
       expect(error.ApiErrors[0].message)
         .to.equal(expectedChannelApeErrorResponse.errors[0].message);
     }
-
   });
 });
