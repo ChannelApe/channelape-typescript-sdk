@@ -182,7 +182,7 @@ describe('Channels Service', () => {
       .yields(null, response, updateChannel);
 
       const channelsService: ChannelsService = new ChannelsService(client);
-      return channelsService.create(createChannel).then((actualAction) => {
+      return channelsService.update(updateChannel).then((actualAction) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.CHANNELS}/${updateChannel.id}`);
         expectChannel(expectedChannel);
       });
