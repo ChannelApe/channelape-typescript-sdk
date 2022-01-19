@@ -125,7 +125,7 @@ describe('Channels Service', () => {
         name: 'inbound_orders',
         value: 'true'
       }],
-      id: '9c728601-0286-457d-b0d6-ec19292d4485', 
+      id: '9c728601-0286-457d-b0d6-ec19292d4485',
       integrationId: '02df0b31-a071-4791-b9c2-aa01e4fb0ce6',
       name: 'Purchase Orders',
       credentials: {
