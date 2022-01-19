@@ -10,8 +10,10 @@ import RequestCallbackParams from '../../model/RequestCallbackParams';
 import ChannelsResponse from '../model/ChannelsResponse';
 import GenerateApiError from '../../utils/GenerateApiError';
 import ChannelCreateRequest from '../model/ChannelCreateRequest';
+import ChannelUpdateRequest from '../model/ChannelUpdateRequest';
 
 const EXPECTED_GET_STATUS = 200;
+const EXPECTED_PUT_STATUS = 200;
 
 export default class ChannelsService {
 
@@ -35,6 +37,18 @@ export default class ChannelsService {
     };
     this.client.post(requestUrl, options, (error, response, body) => {
       this.mapChannelPromise(requestUrl, deferred, error, response, body, 201);
+    });
+    return deferred.promise as any;
+  }
+
+  public update(data: ChannelUpdateRequest): Promise<Channel> {
+    const deferred = Q.defer<Channel>();
+    const requestUrl = `/${Version.V1}${Resource.CHANNELS}/${data.id}`;
+    const options: AxiosRequestConfig = {
+      data
+    };
+    this.client.put(requestUrl, options, (error, response, body) => {
+      this.mapChannelPromise(requestUrl, deferred, error, response, body, EXPECTED_PUT_STATUS);
     });
     return deferred.promise as any;
   }
