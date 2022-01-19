@@ -10,5 +10,6 @@ export default interface Supplier {
   integrationId: string;
   name: string;
   stepSettings?: StepSettings;
+  synchronous?: boolean;
   updatedAt: Date;
 }
