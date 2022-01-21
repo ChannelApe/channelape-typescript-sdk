@@ -193,7 +193,7 @@ channelapeClient.suppliers().update(supplierUpdateRequest)
     // do what you need to do with supplier data here
   });
 ```
-#### Create a Play supplier
+#### Create a supplier
 ```typescript
 channelapeClient.suppliers().create(SupplierCreateRequest)
   .then((supplier: Supplier) => {
