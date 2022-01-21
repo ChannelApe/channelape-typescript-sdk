@@ -149,6 +149,25 @@ channelapeClient.channels().create({
   });
 ```
 
+#### Update a channels for a business
+```typescript
+channelapeClient.channels().update({
+      additionalFields: [],
+      id: 'valid-channel-id'
+      integrationId: 'some-valid-integration-id',
+      name: 'channel-name',
+      credentials: {
+        healthCheckInterval: 300,
+        payloadUrl: 'channelape.com'
+      },
+      businessId: 'some-valid-business-id',
+      enabled: true
+    })
+  .then((channels: Channel) => {
+    // do what you need to do with channel data here
+  });
+```
+
 ### Suppliers
 
 #### Get supplier
