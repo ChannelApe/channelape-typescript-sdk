@@ -1,6 +1,6 @@
 {
   "name": "channelape-sdk",
-  "version": "1.37.0-develop.0",
+  "version": "1.37.0-credential.1",
   "description": "A client for interacting with ChannelApe's API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,7 +16,8 @@
     "posttest": "npm run cover",
     "cover": "nyc npm run unit-test && nyc check-coverage --lines 90 --branches 90 --statements 90 --functions 90",
     "lint": "tslint -p tsconfig.json && tslint -p test/tsconfig.json && tslint -p e2e/tsconfig.json",
-    "e2e": "mocha --config ./e2e/.mocharc.json \"e2e/**/*.spec.*\""
+    "e2e": "mocha --config ./e2e/.mocharc.json \"e2e/**/*.spec.*\"",
+    "driver": "mocha --config ./driver/.mocharc.json \"driver/ChannelApeClientDriver.spec.ts\""
   },
   "files": [
     "dist"
