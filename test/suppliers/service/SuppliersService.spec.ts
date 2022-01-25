@@ -34,6 +34,7 @@ describe('Suppliers Service', () => {
       enabled: true,
       integrationId: '02df0b31-a071-4791-b9c2-aa01e4fb0ce6',
       name: 'Test Play',
+      synchronous: true,
       playSettings: {
         playId: 'playid4c1596c2-1b01-4621-aead-8c25e966b61a',
         environmentVariables: [],
@@ -104,6 +105,7 @@ describe('Suppliers Service', () => {
       return suppliersService.create(expectedPlaySupplier).then((actualAction) => {
         expect(actualAction.businessId).to.equal('4baafa5b-4fbf-404e-9766-8a02ad45c3a4');
         expect(actualAction.integrationId).to.equal('02df0b31-a071-4791-b9c2-aa01e4fb0ce6');
+        expect(actualAction.synchronous).to.equal(expectedPlaySupplier.synchronous);
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.SUPPLIERS}`);
       });
     });

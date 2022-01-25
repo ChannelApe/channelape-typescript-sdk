@@ -10,6 +10,7 @@ import Channel from '../../../src/channels/model/Channel';
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import { ChannelApeError } from '../../../src/index';
 import ChannelCreateRequest from '../../../src/channels/model/ChannelCreateRequest';
+import ChannelUpdateRequest from '../../../src/channels/model/ChannelUpdateRequest';
 
 describe('Channels Service', () => {
 
@@ -119,6 +120,22 @@ describe('Channels Service', () => {
       enabled: true
     };
 
+    const updateChannel: ChannelUpdateRequest = {
+      additionalFields: [{
+        name: 'inbound_orders',
+        value: 'true'
+      }],
+      id: '9c728601-0286-457d-b0d6-ec19292d4485',
+      integrationId: '02df0b31-a071-4791-b9c2-aa01e4fb0ce6',
+      name: 'Purchase Orders',
+      credentials: {
+        healthCheckInterval: 300,
+        payloadUrl: 'channelape.com'
+      },
+      businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4',
+      enabled: true
+    };
+
     const expectedError = {
       stack: 'oh no an error'
     };
@@ -148,6 +165,25 @@ describe('Channels Service', () => {
       const channelsService: ChannelsService = new ChannelsService(client);
       return channelsService.create(createChannel).then((actualAction) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.CHANNELS}`);
+        expectChannel(expectedChannel);
+      });
+    });
+
+    it('And valid channel ' +
+    'When updating channel with credentails Then return resolved promise with channel', () => {
+
+      const response = {
+        status: 200,
+        config: {
+          method: 'PUT'
+        }
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'put')
+      .yields(null, response, updateChannel);
+
+      const channelsService: ChannelsService = new ChannelsService(client);
+      return channelsService.update(updateChannel).then((actualAction) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.CHANNELS}/${updateChannel.id}`);
         expectChannel(expectedChannel);
       });
     });
