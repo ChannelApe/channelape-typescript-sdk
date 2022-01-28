@@ -6,8 +6,12 @@ import Version from '../../model/Version';
 import RequestClientWrapper from '../../RequestClientWrapper';
 import GenerateApiError from '../../utils/GenerateApiError';
 import Step from '../model/Step';
+import StepCreateRequest from '../model/StepCreateRequest';
+import StepUpdateRequest from '../model/StepUpdateRequest';
 
 const EXPECTED_GET_STATUS = 200;
+const EXPECTED_POST_STATUS = 201;
+const EXPECTED_PUT_STATUS = 200;
 
 export default class StepsService {
 
@@ -18,6 +22,24 @@ export default class StepsService {
     const requestUrl = `/${Version.V1}${Resource.STEPS}/${stepId}`;
     this.client.get(requestUrl, {}, (error, response, body) => {
       this.mapStepPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
+    });
+    return deferred.promise as any;
+  }
+
+  public create(step: StepCreateRequest): Promise<Step> {
+    const deferred = Q.defer<Step>();
+    const requestUrl = `/${Version.V1}${Resource.STEPS}`;
+    this.client.post(requestUrl, { data: step }, (error, response, body) => {
+      this.mapStepPromise(requestUrl, deferred, error, response, body, EXPECTED_POST_STATUS);
+    });
+    return deferred.promise as any;
+  }
+
+  public update(step: StepUpdateRequest): Promise<Step> {
+    const deferred = Q.defer<Step>();
+    const requestUrl = `/${Version.V1}${Resource.STEPS}/${step.id}`;
+    this.client.put(requestUrl, { data: step }, (error, response, body) => {
+      this.mapStepPromise(requestUrl, deferred, error, response, body, EXPECTED_PUT_STATUS);
     });
     return deferred.promise as any;
   }

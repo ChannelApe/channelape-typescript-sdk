@@ -9,6 +9,8 @@ import ChannelApeApiErrorResponse from '../../../src/model/ChannelApeApiErrorRes
 import RequestClientWrapper from '../../../src/RequestClientWrapper';
 import { ChannelApeError } from '../../../src/index';
 import Step from '../../../src/steps/model/Step';
+import StepUpdateRequest from '../../../src/steps/model/StepUpdateRequest';
+import StepCreateRequest from '../../../src/steps/model/StepCreateRequest';
 
 describe('Steps Service', () => {
 
@@ -33,9 +35,11 @@ describe('Steps Service', () => {
       name: 'Custom Step',
       environmentVariableKeys: [{
         name: 'CHANNEL_APE_TOKEN',
+        description: 'SOME_DESCRIPTION_1',
         secured: true
       }, {
         name: 'MFT_USER_ID',
+        description: 'SOME_DESCRIPTION_2',
         secured: false,
         defaultValue: 'channelape'
       }],
@@ -120,6 +124,42 @@ describe('Steps Service', () => {
       }).catch((e) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.STEPS}/${expectedStep.id}`);
         expectStepApeErrorResponse(e);
+      });
+    });
+
+    it('And valid step ' +
+      'When updating step Then return resolved promise with step', () => {
+      const response = {
+        status: 200,
+        config: {
+          method: 'PUT'
+        }
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'put')
+        .yields(null, response, expectedStep);
+
+      const stepService: StepsService = new StepsService(client);
+      return stepService.update(expectedStep as StepUpdateRequest).then((actualStep) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.STEPS}/${expectedStep.id}`);
+        expectStep(actualStep);
+      });
+    });
+
+    it('And valid step data ' +
+      'When creating step Then return resolved promise with step', () => {
+      const response = {
+        status: 201,
+        config: {
+          method: 'POST'
+        }
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'post')
+        .yields(null, response, expectedStep);
+
+        const stepsService: StepsService = new StepsService(client);
+      return stepsService.create(expectedStep as StepCreateRequest).then((actualStep) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.STEPS}`);
+        expectStep(actualStep);
       });
     });
 
