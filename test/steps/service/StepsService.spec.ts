@@ -156,7 +156,7 @@ describe('Steps Service', () => {
       const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'post')
         .yields(null, response, expectedStep);
 
-        const stepsService: StepsService = new StepsService(client);
+      const stepsService: StepsService = new StepsService(client);
       return stepsService.create(expectedStep as StepCreateRequest).then((actualStep) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.STEPS}`);
         expectStep(actualStep);
