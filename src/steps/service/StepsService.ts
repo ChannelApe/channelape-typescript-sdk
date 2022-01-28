@@ -10,8 +10,6 @@ import Step from '../model/Step';
 import StepCreateRequest from '../model/StepCreateRequest';
 import StepUpdateRequest from '../model/StepUpdateRequest';
 
-const EXPECTED_GET_STATUS = 200;
-
 export default class StepsService {
 
   constructor(private readonly client: RequestClientWrapper) { }
@@ -57,7 +55,7 @@ export default class StepsService {
       const step: Step = this.formatStep(body);
       deferred.resolve(step);
     } else {
-      const stepApeErrorResponse = GenerateApiError(requestUrl, response, body, EXPECTED_GET_STATUS);
+      const stepApeErrorResponse = GenerateApiError(requestUrl, response, body, ResponseStatus.OK);
       deferred.reject(stepApeErrorResponse);
     }
   }
