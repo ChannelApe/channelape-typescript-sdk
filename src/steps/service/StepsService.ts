@@ -1,5 +1,6 @@
 import { AxiosResponse } from 'axios';
 import * as Q from 'q';
+import ResponseStatus from '../../model/ResponseStatus';
 
 import Resource from '../../model/Resource';
 import Version from '../../model/Version';
@@ -10,8 +11,6 @@ import StepCreateRequest from '../model/StepCreateRequest';
 import StepUpdateRequest from '../model/StepUpdateRequest';
 
 const EXPECTED_GET_STATUS = 200;
-const EXPECTED_POST_STATUS = 201;
-const EXPECTED_PUT_STATUS = 200;
 
 export default class StepsService {
 
@@ -21,7 +20,7 @@ export default class StepsService {
     const deferred = Q.defer<Step>();
     const requestUrl = `/${Version.V1}${Resource.STEPS}/${stepId}`;
     this.client.get(requestUrl, {}, (error, response, body) => {
-      this.mapStepPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
+      this.mapStepPromise(requestUrl, deferred, error, response, body, ResponseStatus.OK);
     });
     return deferred.promise as any;
   }
@@ -30,7 +29,7 @@ export default class StepsService {
     const deferred = Q.defer<Step>();
     const requestUrl = `/${Version.V1}${Resource.STEPS}`;
     this.client.post(requestUrl, { data: step }, (error, response, body) => {
-      this.mapStepPromise(requestUrl, deferred, error, response, body, EXPECTED_POST_STATUS);
+      this.mapStepPromise(requestUrl, deferred, error, response, body, ResponseStatus.CREATED);
     });
     return deferred.promise as any;
   }
@@ -39,7 +38,7 @@ export default class StepsService {
     const deferred = Q.defer<Step>();
     const requestUrl = `/${Version.V1}${Resource.STEPS}/${step.id}`;
     this.client.put(requestUrl, { data: step }, (error, response, body) => {
-      this.mapStepPromise(requestUrl, deferred, error, response, body, EXPECTED_PUT_STATUS);
+      this.mapStepPromise(requestUrl, deferred, error, response, body, ResponseStatus.OK);
     });
     return deferred.promise as any;
   }
