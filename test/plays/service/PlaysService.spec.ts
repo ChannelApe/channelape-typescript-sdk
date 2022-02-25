@@ -214,7 +214,7 @@ describe('Plays Service', () => {
     it('And valid create play data ' +
       'When creating play Then return resolved promise with play', () => {
       const response = {
-        status: 200,
+        status: 201,
         config: {
           method: 'POST'
         }
