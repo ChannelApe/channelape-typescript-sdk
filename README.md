@@ -933,3 +933,17 @@ channelapeClient.plays().get()
     // do what you need to do with all play data here
   });
 ```
+#### Get All Recipe
+```typescript
+channelapeClient.recipes().get(businessId)
+  .then((recipes: Recipe[]) => {
+    // do what you need to do with all play data here
+  });
+```
+#### Get All Schedule
+```typescript
+channelapeClient.schedules().get(businessId)
+  .then((schedules: Schedule[]) => {
+    // do what you need to do with all play data here
+  });
+```
