@@ -13,7 +13,7 @@ import PlayCreateRequest from '../model/PlayCreateRequest';
 
 const EXPECTED_GET_STATUS = 200;
 const EXPECTED_PUT_STATUS = 200;
-const EXPECTED_POST_STATUS = 200;
+const EXPECTED_POST_STATUS = 201;
 
 export default class PlaysService {
   constructor(
