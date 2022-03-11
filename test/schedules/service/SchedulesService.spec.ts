@@ -45,6 +45,22 @@ describe('Schedules Service', () => {
         }
       ]
     };
+    const expectedSchedule: Schedule = {
+      businessId: '64d70831-c365-4238-b3d8-6077bebca788',
+      daysOfWeek: [
+        'WEDNESDAY',
+        'MONDAY',
+        'THURSDAY',
+        'SUNDAY',
+        'FRIDAY',
+        'TUESDAY',
+        'SATURDAY'
+      ],
+      endTimeInMinutes: 1439,
+      id: '6f0c1636-f61f-41b7-a0ee-b5303071f006',
+      intervalInMinutes: 240,
+      startTimeInMinutes: 1
+    };
     const expectedChannelApeErrorResponse: ChannelApeApiErrorResponse = {
       statusCode: 404,
       errors: [
@@ -63,6 +79,54 @@ describe('Schedules Service', () => {
       sandbox.restore();
       done();
     });
+    it('And retrieve a Schedule' +
+    ' When retrieving Schedule Then return resolved promise with a Schedules', () => {
+      const response = {
+        status: 200,
+        config: {
+          method: 'GET'
+        }
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+      .yields(null, response, expectedSchedule);
+      const scheduleId = '6f0c1636-f61f-41b7-a0ee-b5303071f006';
+
+      const scheduleservice: SchedulesService = new SchedulesService(client);
+      return scheduleservice.get(scheduleId).then((actualSchedule: Schedule) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.SCHEDULES}/${scheduleId}`);
+        expect(actualSchedule['businessId']).to.equal(expectedSchedule['businessId']);
+        expect(actualSchedule['endTimeInMinutes']).to.equal(expectedSchedule['endTimeInMinutes']);
+        expect(actualSchedule['intervalInMinutes']).
+        to.equal(expectedSchedule['intervalInMinutes']);
+        expect(actualSchedule['startTimeInMinutes'])
+        .to.equal(expectedSchedule['startTimeInMinutes']);
+        expect(actualSchedule['daysOfWeek']).to.equal(expectedSchedule['daysOfWeek']);
+      });
+    });
+    it('And invalid Scheduled ID ' +
+    'When retrieving Schedule Then return a rejected promise with 404 status code ' +
+    'And Schedule not found error message', () => {
+
+      const response = {
+        status: 404,
+        config: {
+          method: 'GET'
+        }
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+        .yields(null, response, expectedChannelApeErrorResponse);
+
+      const scheduleservice: SchedulesService = new SchedulesService(client);
+      return scheduleservice.get('invalid-schedule-id').then((actualResponse) => {
+        expect(actualResponse).to.be.undefined;
+      }).catch((error) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.SCHEDULES}/${'invalid-schedule-id'}`);
+        expect(error.Response.statusCode).to.equal(404);
+        expect(error.ApiErrors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
+        expect(error.ApiErrors[0].message)
+        .to.equal(expectedChannelApeErrorResponse.errors[0].message);
+      });
+    });
     it('And retrieve a list of all Schedules' +
     ' When retrieving Schedule Then return resolved promise with all Schedules', () => {
       const response = {
@@ -75,7 +139,7 @@ describe('Schedules Service', () => {
       .yields(null, response, expectedAllSchedule);
 
       const scheduleservice: SchedulesService = new SchedulesService(client);
-      return scheduleservice.get(businessId).then((actualSchedule: Schedule[]) => {
+      return scheduleservice.getAll(businessId).then((actualSchedule: Schedule[]) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.SCHEDULES}?businessId=${businessId}`);
         expect(actualSchedule[0]['businessId']).to.equal(expectedAllSchedule.schedules[0]['businessId']);
         expect(actualSchedule[0]['endTimeInMinutes']).to.equal(expectedAllSchedule.schedules[0]['endTimeInMinutes']);
@@ -100,7 +164,7 @@ describe('Schedules Service', () => {
         .yields(null, response, expectedChannelApeErrorResponse);
 
       const scheduleservice: SchedulesService = new SchedulesService(client);
-      return scheduleservice.get('invalid-business-id').then((actualResponse) => {
+      return scheduleservice.getAll('invalid-business-id').then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((error) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.SCHEDULES}?businessId=invalid-business-id`);

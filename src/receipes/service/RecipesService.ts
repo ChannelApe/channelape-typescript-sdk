@@ -11,15 +11,35 @@ export default class RecipesService {
   constructor(
       private readonly client: RequestClientWrapper
     ) { }
-  public get(businessId: string): Promise<Recipe[]> {
+  public getAll(businessId: string): Promise<Recipe[]> {
     const deferred = Q.defer<Recipe[]>();
     const requestUrl = `/${Version.V1}${Resource.RECIPES}?businessId=${businessId}`;
+    this.client.get(requestUrl, {}, (error, response, body) => {
+      this.mapRecipePromises(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
+    });
+    return deferred.promise as any;
+  }
+  public get(recipeId: string): Promise<Recipe> {
+    const deferred = Q.defer<Recipe>();
+    const requestUrl = `/${Version.V1}${Resource.RECIPES}/${recipeId}`;
     this.client.get(requestUrl, {}, (error, response, body) => {
       this.mapRecipePromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
     });
     return deferred.promise as any;
   }
-  private mapRecipePromise(requestUrl: string, deferred: Q.Deferred<Recipe[]>, error: any, response: AxiosResponse,
+  private mapRecipePromise(requestUrl: string, deferred: Q.Deferred<Recipe>, error: any, response: AxiosResponse,
+    body: any, expectedStatusCode: number) {
+    if (error) {
+      deferred.reject(error);
+    } else if (response.status === expectedStatusCode) {
+      const recipe: Recipe = body;
+      deferred.resolve(recipe);
+    } else {
+      const recipeApeErrorResponse = GenerateApiError(requestUrl, response, body, EXPECTED_GET_STATUS);
+      deferred.reject(recipeApeErrorResponse);
+    }
+  }
+  private mapRecipePromises(requestUrl: string, deferred: Q.Deferred<Recipe[]>, error: any, response: AxiosResponse,
     body: any, expectedStatusCode: number) {
     if (error) {
       deferred.reject(error);

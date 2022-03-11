@@ -11,15 +11,35 @@ export default class SchedulesService {
   constructor(
       private readonly client: RequestClientWrapper
     ) { }
-  public get(businessId: string): Promise<Schedule[]> {
-    const deferred = Q.defer<Schedule[]>();
-    const requestUrl = `/${Version.V1}${Resource.SCHEDULES}?businessId=${businessId}`;
+  public get(scheduleId: string): Promise<Schedule> {
+    const deferred = Q.defer<Schedule>();
+    const requestUrl = `/${Version.V1}${Resource.SCHEDULES}/${scheduleId}`;
     this.client.get(requestUrl, {}, (error, response, body) => {
       this.mapSchedulePromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
     });
     return deferred.promise as any;
   }
-  private mapSchedulePromise(requestUrl: string, deferred: Q.Deferred<Schedule[]>, error: any, response: AxiosResponse,
+  public getAll(businessId: string): Promise<Schedule[]> {
+    const deferred = Q.defer<Schedule[]>();
+    const requestUrl = `/${Version.V1}${Resource.SCHEDULES}?businessId=${businessId}`;
+    this.client.get(requestUrl, {}, (error, response, body) => {
+      this.mapSchedulesPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
+    });
+    return deferred.promise as any;
+  }
+  private mapSchedulePromise(requestUrl: string, deferred: Q.Deferred<Schedule>, error: any, response: AxiosResponse,
+    body: any, expectedStatusCode: number) {
+    if (error) {
+      deferred.reject(error);
+    } else if (response.status === expectedStatusCode) {
+      const schedule: Schedule = body;
+      deferred.resolve(schedule);
+    } else {
+      const scheduleApeErrorResponse = GenerateApiError(requestUrl, response, body, EXPECTED_GET_STATUS);
+      deferred.reject(scheduleApeErrorResponse);
+    }
+  }
+  private mapSchedulesPromise(requestUrl: string, deferred: Q.Deferred<Schedule[]>, error: any, response: AxiosResponse,
     body: any, expectedStatusCode: number) {
     if (error) {
       deferred.reject(error);

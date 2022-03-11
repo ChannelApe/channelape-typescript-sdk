@@ -935,15 +935,29 @@ channelapeClient.plays().get()
 ```
 #### Get All Recipe
 ```typescript
-channelapeClient.recipes().get(businessId)
+channelapeClient.recipes().getAll(businessId)
   .then((recipes: Recipe[]) => {
-    // do what you need to do with all play data here
+    //do what you need to do with all recipes data here
+  });
+```
+#### Get a Recipe
+```typescript
+channelapeClient.recipes().get(scheduleId)
+  .then((recipes: Recipe) => {
+    //do what you need to do with the recipe data here
   });
 ```
 #### Get All Schedule
 ```typescript
-channelapeClient.schedules().get(businessId)
+channelapeClient.schedules().getAll(businessId)
   .then((schedules: Schedule[]) => {
-    // do what you need to do with all play data here
+    // do what you need to do with all schedules data here
+  });
+```
+#### Get a Schedule
+```typescript
+channelapeClient.schedules().get(recipeId)
+  .then((schedules: Schedule) => {
+    // do what you need to do with the schedule data here
   });
 ```

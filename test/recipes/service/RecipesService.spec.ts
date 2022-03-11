@@ -51,6 +51,17 @@ describe('Recipes Service', () => {
         }
       ]
     };
+    const expectedRecipe: Recipe = {
+      businessId: '64d70831-c365-4238-b3d8-6077bebca788',
+      enabled: false,
+      errors: [],
+      id: '6f0c1636-f61f-41b7-a0ee-b5303071f006',
+      sourceId: '19415e65-e02b-41a3-b0df-e05556be1b13',
+      sourceType: 'schedule',
+      targetAction: 'INVOKE_PLAY',
+      targetId: '060b602c-212f-4a74-ab9e-ac246bd972d5',
+      targetType: 'supplier'
+    };
     const expectedChannelApeErrorResponse: ChannelApeApiErrorResponse = {
       statusCode: 404,
       errors: [
@@ -69,6 +80,55 @@ describe('Recipes Service', () => {
       sandbox.restore();
       done();
     });
+    it('And retrieve a recipe' +
+    ' When retrieving Recipe Then return resolved promise with a Recipe', () => {
+      const response = {
+        status: 200,
+        config: {
+          method: 'GET'
+        }
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+      .yields(null, response, expectedRecipe);
+      const recipeId = '6f0c1636-f61f-41b7-a0ee-b5303071f006';
+
+      const recipeService: RecipesService = new RecipesService(client);
+      return recipeService.get(recipeId).then((actualRecipe: Recipe) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.RECIPES}/${recipeId}`);
+        expect(actualRecipe['businessId']).to.equal(expectedRecipe['businessId']);
+        expect(actualRecipe['sourceId']).to.equal(expectedRecipe['sourceId']);
+        expect(actualRecipe['sourceType']).to.equal(expectedRecipe['sourceType']);
+        expect(actualRecipe['targetAction']).to.equal(expectedRecipe['targetAction']);
+        expect(actualRecipe['targetId']).to.equal(expectedRecipe['targetId']);
+        expect(actualRecipe['targetType']).to.equal(expectedRecipe['targetType']);
+        expect(actualRecipe['enabled']).to.equal(expectedRecipe['enabled']);
+      });
+    });
+    it('And invalid schedule ID ' +
+    'When retrieving Recipe Then return a rejected promise with 404 status code ' +
+    'And Recipe not found error message', () => {
+
+      const response = {
+        status: 404,
+        config: {
+          method: 'GET'
+        }
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+        .yields(null, response, expectedChannelApeErrorResponse);
+      const recipeId = 'invalid-schedule-id';
+
+      const recipeService: RecipesService = new RecipesService(client);
+      return recipeService.get(recipeId).then((actualResponse) => {
+        expect(actualResponse).to.be.undefined;
+      }).catch((error) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.RECIPES}/${recipeId}`);
+        expect(error.Response.statusCode).to.equal(404);
+        expect(error.ApiErrors[0].code).to.equal(expectedChannelApeErrorResponse.errors[0].code);
+        expect(error.ApiErrors[0].message)
+        .to.equal(expectedChannelApeErrorResponse.errors[0].message);
+      });
+    });
     it('And retrieve a list of all recipes' +
     ' When retrieving Recipe Then return resolved promise with all Recipes', () => {
       const response = {
@@ -81,7 +141,7 @@ describe('Recipes Service', () => {
       .yields(null, response, expectedAllRecipe);
 
       const recipeService: RecipesService = new RecipesService(client);
-      return recipeService.get(businessId).then((actualRecipe: Recipe[]) => {
+      return recipeService.getAll(businessId).then((actualRecipe: Recipe[]) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.RECIPES}?businessId=${businessId}`);
         expect(actualRecipe[0]['businessId']).to.equal(expectedAllRecipe.recipes[0]['businessId']);
         expect(actualRecipe[0]['sourceId']).to.equal(expectedAllRecipe.recipes[0]['sourceId']);
@@ -106,7 +166,7 @@ describe('Recipes Service', () => {
         .yields(null, response, expectedChannelApeErrorResponse);
 
       const recipeService: RecipesService = new RecipesService(client);
-      return recipeService.get('invalid-business-id').then((actualResponse) => {
+      return recipeService.getAll('invalid-business-id').then((actualResponse) => {
         expect(actualResponse).to.be.undefined;
       }).catch((error) => {
         expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.RECIPES}?businessId=invalid-business-id`);
