@@ -942,7 +942,7 @@ channelapeClient.recipes().getAll(businessId)
 ```
 #### Get a Recipe
 ```typescript
-channelapeClient.recipes().get(scheduleId)
+channelapeClient.recipes().get(recipeId)
   .then((recipes: Recipe) => {
     //do what you need to do with the recipe data here
   });
@@ -956,7 +956,7 @@ channelapeClient.schedules().getAll(businessId)
 ```
 #### Get a Schedule
 ```typescript
-channelapeClient.schedules().get(recipeId)
+channelapeClient.schedules().get(scheduleId)
   .then((schedules: Schedule) => {
     // do what you need to do with the schedule data here
   });
