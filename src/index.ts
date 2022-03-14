@@ -110,3 +110,5 @@ export { default as LocationClosureRequest } from './locations/model/LocationClo
 export { default as LocationSLAUpdateRequest } from './locations/model/LocationSLAUpdateRequest';
 export { default as LocationSLAOperatingDayUpdateRequest }
   from './locations/model/LocationSLAOperatingDayUpdateRequest';
+export { default as Recipe } from './receipes/model/Recipe';
+export { default as Schedule } from './schedules/model/Schedule';
