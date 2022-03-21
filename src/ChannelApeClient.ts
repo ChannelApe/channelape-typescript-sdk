@@ -17,6 +17,8 @@ import InventoriesService from './inventories/service/InventoriesService';
 import LocationsService from './locations/service/LocationsService';
 import StepsService from './steps/service/StepsService';
 import PlaysService from './plays/service/PlaysService';
+import RecipesService from './receipes/service/RecipesService';
+import SchedulesService from './schedules/service/SchedulesService';
 
 const MISSING_SESSION_ID_ERROR_MESSAGE = 'sessionId is required.';
 const MINIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_SMALL_ERROR_MESSAGE =
@@ -57,6 +59,8 @@ export default class ChannelApeClient {
   private readonly locationsService: LocationsService;
   private readonly stepsService: StepsService;
   private readonly playsService: PlaysService;
+  private readonly recipesService: RecipesService;
+  private readonly schedulesService: SchedulesService;
 
   constructor(clientConfiguration: ClientConfiguration) {
     const configurationErrors = this.validateConfiguration(clientConfiguration);
@@ -108,6 +112,8 @@ export default class ChannelApeClient {
     this.inventoriesService = new InventoriesService(this.requestClientWrapper, this.locationsService);
     this.stepsService = new StepsService(this.requestClientWrapper);
     this.playsService = new PlaysService(this.requestClientWrapper, this.stepsService);
+    this.recipesService = new RecipesService(this.requestClientWrapper);
+    this.schedulesService = new SchedulesService(this.requestClientWrapper);
   }
 
   get SessionId(): string {
@@ -192,6 +198,12 @@ export default class ChannelApeClient {
 
   plays(): PlaysService {
     return this.playsService;
+  }
+  recipes(): RecipesService {
+    return this.recipesService;
+  }
+  schedules(): SchedulesService {
+    return this.schedulesService;
   }
 
   private validateConfiguration(clientConfiguration: ClientConfiguration): string | undefined {
