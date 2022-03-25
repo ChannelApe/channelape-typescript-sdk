@@ -11,4 +11,6 @@ export default interface Subscription {
   subscriptionId?: string;
   subscriptionProductHandle?: string;
   updatedAt?: Date;
+  apiRateLimitPerSecond?: number;
+  userRateLimitPerSecond?: number;
 }
