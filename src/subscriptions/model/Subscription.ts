@@ -1,8 +1,8 @@
 import ChannelApeApiError from '../../model/ChannelApeApiError';
 
 /**
- * apiRateLimitPerSecond - for internal purpose to startup batch fargate task.
- * userRateLimitPerSecond - for internal purpose to startup batch fargate task.
+ * @property {number} apiRateLimitPerSecond - for internal purpose to startup batch fargate task.
+ * @property {number} userRateLimitPerSecond - for internal purpose to startup batch fargate task.
  */
 export default interface Subscription {
   active?: boolean;
