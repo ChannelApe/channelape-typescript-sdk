@@ -853,8 +853,8 @@ describe('ChannelApe Client', () => {
               expect(actualSubscription.subscriptionId).to.not.equal(undefined);
               expect(actualSubscription.subscriptionProductHandle).to.not.equal(undefined);
               expect(actualSubscription.updatedAt!.toISOString()).to.be.a('string');
-              expect(actualSubscription.apiRateLimitPerSecond).to.equal(20);
-              expect(actualSubscription.userRateLimitPerSecond).to.equal(20);
+              expect(actualSubscription.apiRateLimitPerSecond).to.not.equal(undefined);
+              expect(actualSubscription.userRateLimitPerSecond).to.not.equal(undefined);
             });
           });
         });
