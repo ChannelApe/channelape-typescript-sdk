@@ -35,6 +35,8 @@ describe('Subscriptions Service', () => {
     const subscriptionId = '1701701';
     const subscriptionProductHandle = 'fake-handle';
     const updatedAt = '2019-01-08T16:20:45.865Z';
+    const apiRateLimitPerSecond = 20;
+    const userRateLimitPerSecond = 20;
     const subscriptionsService = new SubscriptionsService(client);
 
     let sandbox: sinon.SinonSandbox;
@@ -62,7 +64,9 @@ describe('Subscriptions Service', () => {
         periodStartedAt,
         subscriptionId,
         subscriptionProductHandle,
-        updatedAt
+        updatedAt,
+        apiRateLimitPerSecond,
+        userRateLimitPerSecond
       };
 
       const response = {
@@ -87,6 +91,8 @@ describe('Subscriptions Service', () => {
         expect(actualResponse.subscriptionId).to.equal(subscriptionId);
         expect(actualResponse.subscriptionProductHandle).to.equal(subscriptionProductHandle);
         expect(actualResponse.updatedAt!.toISOString()).to.equal(updatedAt);
+        expect(actualResponse.apiRateLimitPerSecond).to.equal(apiRateLimitPerSecond);
+        expect(actualResponse.userRateLimitPerSecond).to.equal(userRateLimitPerSecond);
       });
     });
 
@@ -119,6 +125,8 @@ describe('Subscriptions Service', () => {
         expect(actualResponse.subscriptionId).to.equal(undefined);
         expect(actualResponse.subscriptionProductHandle).to.equal(undefined);
         expect(actualResponse.updatedAt).to.equal(undefined);
+        expect(actualResponse.apiRateLimitPerSecond).to.equal(undefined);
+        expect(actualResponse.userRateLimitPerSecond).to.equal(undefined);
       });
     });
 
