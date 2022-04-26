@@ -18,6 +18,7 @@ enum Resource {
   BUSINESS_MEMBER_VERIFICATIONS = '/businessmemberverifications',
   USERS = '/users',
   INVENTORIES = '/inventories',
+  BATCHES = '/batches',
   LOCATIONS = '/locations',
   STEPS = '/steps',
   API_ACCOUNTS = '/apiaccounts',
