@@ -11,10 +11,10 @@ import Version from '../../model/Version';
 import RequestClientWrapper from '../../RequestClientWrapper';
 import RestService from '../../service/RestService';
 
-export class InventoryBatchCreationService extends RestService {
+export class BatchCreationService extends RestService {
   private EXPECTED_POST_STATUS: number = 201;
 
-  private readonly logger = new Logger('InventoryBatchCreationService', LogLevel.VERBOSE);
+  private readonly logger = new Logger('BatchCreationService', LogLevel.VERBOSE);
 
   constructor(
     private readonly client: RequestClientWrapper,
@@ -48,9 +48,6 @@ export class InventoryBatchCreationService extends RestService {
       = `/${Version.V1}${Resource.BATCHES}`;
     const options: AxiosRequestConfig = {
       data: batchCreationRequest,
-      headers: {
-        'X-Channel-Ape-Idempotent-Key': uuidV4()
-      }
     };
     this.client.post(requestUrl, options,
       (error, response, body) =>

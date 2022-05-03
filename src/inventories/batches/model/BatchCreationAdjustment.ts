@@ -1,7 +1,7 @@
 export default interface BatchCreationAdjustment {
   sku: string;
   quantity: number;
-  idempotentKey?: string;
+  idempotentKey: string;
   locationId: string;
   operation: string;
   memo?:string;

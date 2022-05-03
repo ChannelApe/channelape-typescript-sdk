@@ -624,6 +624,30 @@ channelApeClient.users().get(userId)
   });
 ```
 
+### Batches
+
+### Create new Batch
+```typescript
+const inventoryItemId = '34';
+const locationId = '28';
+const quantity = 31;
+const batchCreationAdjustment: BatchCreationAdjustment = {
+  quantity,
+  locationId,
+  operation: 'ADJUST',
+};
+
+const batchCreateRequest: BatchCreateRequest = {
+  businessId: '1',
+  batchId: 'ABC-123',
+  adjustments: [batchCreationAdjustment]
+};
+channelApeClient.batches().create(batchCreateRequest)
+  .then((inventoryItem: InventoryItem) => {
+    // Do what you need with the created inventory item
+  });
+```
+
 ### Inventories
 
 ### Get inventory item
