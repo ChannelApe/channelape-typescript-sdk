@@ -54,4 +54,8 @@ export class BatchCreationService extends RestService {
         this.mapResponseToPromise(requestUrl, deferred, error, response, body, this.EXPECTED_POST_STATUS));
     return deferred.promise as any;
   }
+
+  // todo: public set
+
+  // todo: public adjust
 }
