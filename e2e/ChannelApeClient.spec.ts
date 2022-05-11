@@ -32,7 +32,8 @@ import AdjustmentsBySku from '../src/inventories/quantities/model/AdjustmentsByS
 import Step from '../src/steps/model/Step';
 import StepVersion from '../src/suppliers/model/StepVersion';
 import SupplierUpdateRequest from '../src/suppliers/model/SupplierUpdateRequest';
-import { uuid } from '../../../Development_Integrations/channelape-playbook/libs/utils/strings/src';
+import { AdjustmentType } from '../src/inventories/enum/AdjustmentType';
+import * as uuidV4 from 'uuid/v4';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
@@ -47,25 +48,25 @@ describe('ChannelApe Client', () => {
     });
     describe('And valid inventory batch request', () => {
       context('When creating inventory batch', () => {
-        it.only('Then create batch and return response', () => {
+        it('Then create batch and return response', () => {
           const actualBatchPromise = channelApeClient
             .batches()
             .createInventoryQuantityBatch({
               businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4',
               adjustments: [
                 {
-                  idempotentKey: uuid(),
+                  idempotentKey: uuidV4(),
                   locationId: '47',
-                  operation: 'ADJUST',
+                  operation: AdjustmentType.ADJUST,
                   sku: 'ABC-123',
                   memo: 'This is a test adjustment from e2e test',
                   quantity: 1,
                   inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
                 },
                 {
-                  idempotentKey: uuid(),
+                  idempotentKey: uuidV4(),
                   locationId: '47',
-                  operation: 'ADJUST',
+                  operation: AdjustmentType.SET,
                   sku: 'ABC-124',
                   memo: 'This is a test adjustment from e2e test2',
                   quantity: 1,
@@ -724,7 +725,7 @@ describe('ChannelApe Client', () => {
                   '7f68efb0-3143-4bed-9944-27fe933326a2'
                 );
               });
-            }).timeout(60000);
+            }).timeout(180000);
           });
         });
 
@@ -1228,7 +1229,7 @@ describe('ChannelApe Client', () => {
         context('When creating inventory item', () => {
           it('Then create and return inventory item', async () => {
             const businessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
-            const generatedSku = `ABC-${Math.floor(
+            const generatedSku = `ABCZ-${Math.floor(
               Math.random() * 100000 + 1
             ).toString()}`;
             const generatedTitle = `Some Testing title ${generatedSku}`;

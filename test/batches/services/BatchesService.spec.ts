@@ -36,7 +36,7 @@ describe('Batches Service', () => {
   describe('When creating inventory adjustment batch', () => {
     it('Given some valid adjustment batch then expect correct values', async () => {
       const response = {
-        status: 201,
+        status: 202,
         config: {
           method: 'POST',
         },

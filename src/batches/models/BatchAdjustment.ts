@@ -1,3 +1,4 @@
+import { AdjustmentType } from '../../inventories/enum/AdjustmentType';
 import { InventoryStatus } from '../../inventories/enum/InventoryStatus';
 
 export interface BatchAdjustment {
