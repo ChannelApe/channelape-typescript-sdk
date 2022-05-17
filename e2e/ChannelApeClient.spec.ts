@@ -51,7 +51,7 @@ describe('ChannelApe Client', () => {
         it('Then create batch and return response', () => {
           const actualBatchPromise = channelApeClient
             .batches()
-            .createInventoryQuantityBatch({
+            .createInventoryAdjustmentBatch({
               businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4',
               adjustments: [
                 {

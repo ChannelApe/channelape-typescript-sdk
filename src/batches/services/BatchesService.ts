@@ -16,7 +16,7 @@ export class BatchesService extends RestService {
     super();
   }
 
-  public createInventoryQuantityBatch(
+  public createInventoryAdjustmentBatch(
     batchCreationRequest: BatchAdjustmentCreationRequest
   ): Promise<BatchResponse> {
     const requestUrl = `/${Version.V1}${Resource.BATCHES}`;

@@ -77,7 +77,7 @@ describe('Batches Service', () => {
         .yields(null, response, batchResponse);
 
       const batchesService: BatchesService = new BatchesService(client);
-      const actualResponse = await batchesService.createInventoryQuantityBatch(
+      const actualResponse = await batchesService.createInventoryAdjustmentBatch(
         batchInventoryCreation
       );
       expect(actualResponse).to.not.be.null;
@@ -135,7 +135,7 @@ describe('Batches Service', () => {
 
       const batchesService: BatchesService = new BatchesService(client);
       try {
-        await batchesService.createInventoryQuantityBatch(
+        await batchesService.createInventoryAdjustmentBatch(
           batchInventoryCreation
         );
         fail();
@@ -189,7 +189,7 @@ describe('Batches Service', () => {
       };
       const batchesService: BatchesService = new BatchesService(client);
       try {
-        await batchesService.createInventoryQuantityBatch(
+        await batchesService.createInventoryAdjustmentBatch(
           batchInventoryCreation
         );
         fail();

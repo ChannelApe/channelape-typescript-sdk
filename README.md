@@ -25,6 +25,8 @@ TypeScript and JavaScript SDK for the [ChannelApe REST API](https://docs.channel
 - [Locations](#locations)
 - [Steps](#steps)
 - [Plays](#plays)
+- [Batches](#batches)
+  - [Batch Inventory Adjustments](#batchInventoryAdjustments)
 
 ### Getting Started
 
@@ -961,3 +963,48 @@ channelapeClient.schedules().get(scheduleId)
     // do what you need to do with the schedule data here
   });
 ```
+
+### Batches
+#### Get a batches information
+```typescript
+channelapeClient.batches().get(batchId)
+  .then((batch: Batch) => {
+    // do what you need to do with the batch data here
+  });
+```
+
+### Batch Inventory Quantity Adjustments (Asynchronous)
+You can trigger a new batch by following the format below. The max number of adjustments per batch is 5000.
+
+```typescript
+const batchRequest = BatchAdjustmentCreationRequest = {
+    businessId: '91f47fdf-fd71-484c-9b3b-db4e2877a229',
+    adjustments: [
+      {
+        idempotentKey: 'some-predictable-idempotent-key-1',
+        locationId: '47',
+        operation: AdjustmentType.ADJUST,
+        sku: 'ABC-123',
+        memo: 'Adjusting for intraday inventory.',
+        quantity: 1,
+        inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+      },
+      {
+        idempotentKey: 'some-predictable-idempotent-key-2',
+        locationId: '12',
+        operation: AdjustmentType.SET,
+        inventoryItemId: 123,
+        memo: 'Adjusting for nightly true up.',
+        quantity: 1,
+        inventoryStatus: InventoryStatus.COMMITTED,
+      },
+    ],
+  }
+
+  channelapeClient.batches().createInventoryAdjustmentBatch(batchId)
+  .then((batch: Batch) => {
+    // do what you need to do with the batch data here
+  });
+```
+
+
