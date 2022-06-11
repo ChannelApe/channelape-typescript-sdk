@@ -35,6 +35,8 @@ export default class SubscriptionsService {
     subscription.businessId = subscriptionResponse.businessId;
     subscription.subscriptionId = subscriptionResponse.subscriptionId;
     subscription.subscriptionProductHandle = subscriptionResponse.subscriptionProductHandle;
+    subscription.apiRateLimitPerSecond = subscriptionResponse.apiRateLimitPerSecond;
+    subscription.userRateLimitPerSecond = subscriptionResponse.userRateLimitPerSecond;
 
     if (subscriptionResponse.createdAt) {
       subscription.createdAt = new Date(subscriptionResponse.createdAt);

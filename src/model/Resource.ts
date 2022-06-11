@@ -23,7 +23,8 @@ enum Resource {
   API_ACCOUNTS = '/apiaccounts',
   PLAYS = '/plays',
   RECIPES = '/recipes',
-  SCHEDULES = '/schedules'
+  SCHEDULES = '/schedules',
+  BATCHES = '/batches',
 }
 
 export default Resource;

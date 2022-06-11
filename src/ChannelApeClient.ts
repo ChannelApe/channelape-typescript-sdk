@@ -19,6 +19,7 @@ import StepsService from './steps/service/StepsService';
 import PlaysService from './plays/service/PlaysService';
 import RecipesService from './receipes/service/RecipesService';
 import SchedulesService from './schedules/service/SchedulesService';
+import { BatchesService } from './batches/services/BatchesService';
 
 const MISSING_SESSION_ID_ERROR_MESSAGE = 'sessionId is required.';
 const MINIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_SMALL_ERROR_MESSAGE =
@@ -34,7 +35,6 @@ const TWO_SECONDS_IN_MS = 2000;
 const ONE_SECOND_IN_MS = 1000;
 const FIVE_SECONDS_IN_MS = 5000;
 export default class ChannelApeClient {
-
   private readonly sessionId: string;
   private readonly timeout: number;
   private readonly maximumRequestRetryTimeout: number;
@@ -61,6 +61,7 @@ export default class ChannelApeClient {
   private readonly playsService: PlaysService;
   private readonly recipesService: RecipesService;
   private readonly schedulesService: SchedulesService;
+  private readonly batchesService: BatchesService;
 
   constructor(clientConfiguration: ClientConfiguration) {
     const configurationErrors = this.validateConfiguration(clientConfiguration);
@@ -69,23 +70,36 @@ export default class ChannelApeClient {
     }
 
     this.sessionId = clientConfiguration.sessionId;
-    this.endpoint = (clientConfiguration.endpoint == null) ? Environment.PRODUCTION : clientConfiguration.endpoint;
-    this.timeout = (clientConfiguration.timeout == null || clientConfiguration.timeout < TWO_SECONDS_IN_MS)
-      ? THREE_MINUTES_IN_MS : clientConfiguration.timeout;
+    this.endpoint =
+      clientConfiguration.endpoint == null
+        ? Environment.PRODUCTION
+        : clientConfiguration.endpoint;
+    this.timeout =
+      clientConfiguration.timeout == null ||
+      clientConfiguration.timeout < TWO_SECONDS_IN_MS
+        ? THREE_MINUTES_IN_MS
+        : clientConfiguration.timeout;
     this.maximumRequestRetryTimeout =
-      (clientConfiguration.maximumRequestRetryTimeout == null ||
-        clientConfiguration.maximumRequestRetryTimeout < TWO_SECONDS_IN_MS)
-        ? THREE_MINUTES_IN_MS : clientConfiguration.maximumRequestRetryTimeout;
-    this.logLevel = (clientConfiguration.logLevel == null) ? LogLevel.OFF : clientConfiguration.logLevel;
+      clientConfiguration.maximumRequestRetryTimeout == null ||
+      clientConfiguration.maximumRequestRetryTimeout < TWO_SECONDS_IN_MS
+        ? THREE_MINUTES_IN_MS
+        : clientConfiguration.maximumRequestRetryTimeout;
+    this.logLevel =
+      clientConfiguration.logLevel == null
+        ? LogLevel.OFF
+        : clientConfiguration.logLevel;
     this.minimumRequestRetryRandomDelay =
-      clientConfiguration.minimumRequestRetryRandomDelay ?
-      clientConfiguration.minimumRequestRetryRandomDelay : ONE_SECOND_IN_MS;
+      clientConfiguration.minimumRequestRetryRandomDelay
+        ? clientConfiguration.minimumRequestRetryRandomDelay
+        : ONE_SECOND_IN_MS;
     this.maximumRequestRetryRandomDelay =
-      clientConfiguration.maximumRequestRetryRandomDelay ?
-      clientConfiguration.maximumRequestRetryRandomDelay : FIVE_SECONDS_IN_MS;
+      clientConfiguration.maximumRequestRetryRandomDelay
+        ? clientConfiguration.maximumRequestRetryRandomDelay
+        : FIVE_SECONDS_IN_MS;
     this.maximumConcurrentConnections =
-      clientConfiguration.maximumConcurrentConnections ?
-      clientConfiguration.maximumConcurrentConnections : 5;
+      clientConfiguration.maximumConcurrentConnections
+        ? clientConfiguration.maximumConcurrentConnections
+        : 5;
 
     this.requestClientWrapper = new RequestClientWrapper({
       timeout: this.timeout,
@@ -95,7 +109,7 @@ export default class ChannelApeClient {
       maximumRequestRetryTimeout: this.maximumRequestRetryTimeout,
       minimumRequestRetryRandomDelay: this.minimumRequestRetryRandomDelay,
       maximumRequestRetryRandomDelay: this.maximumRequestRetryRandomDelay,
-      maximumConcurrentConnections: this.maximumConcurrentConnections
+      maximumConcurrentConnections: this.maximumConcurrentConnections,
     });
     this.actionsService = new ActionsService(this.requestClientWrapper);
     this.channelsService = new ChannelsService(this.requestClientWrapper);
@@ -104,16 +118,27 @@ export default class ChannelApeClient {
     this.variantsService = new VariantsService(this.requestClientWrapper);
     this.businessesService = new BusinessesService(this.requestClientWrapper);
     this.sessionsService = new SessionsService(this.requestClientWrapper);
-    this.subscriptionsService = new SubscriptionsService(this.requestClientWrapper);
+    this.subscriptionsService = new SubscriptionsService(
+      this.requestClientWrapper
+    );
     this.analyticsService = new AnalyticsService(this.requestClientWrapper);
-    this.productFiltersService = new ProductFiltersService(this.requestClientWrapper);
+    this.productFiltersService = new ProductFiltersService(
+      this.requestClientWrapper
+    );
     this.usersService = new UsersService(this.requestClientWrapper);
     this.locationsService = new LocationsService(this.requestClientWrapper);
-    this.inventoriesService = new InventoriesService(this.requestClientWrapper, this.locationsService);
+    this.inventoriesService = new InventoriesService(
+      this.requestClientWrapper,
+      this.locationsService
+    );
     this.stepsService = new StepsService(this.requestClientWrapper);
-    this.playsService = new PlaysService(this.requestClientWrapper, this.stepsService);
+    this.playsService = new PlaysService(
+      this.requestClientWrapper,
+      this.stepsService
+    );
     this.recipesService = new RecipesService(this.requestClientWrapper);
     this.schedulesService = new SchedulesService(this.requestClientWrapper);
+    this.batchesService = new BatchesService(this.requestClientWrapper);
   }
 
   get SessionId(): string {
@@ -205,26 +230,43 @@ export default class ChannelApeClient {
   schedules(): SchedulesService {
     return this.schedulesService;
   }
+  batches(): BatchesService {
+    return this.batchesService;
+  }
 
-  private validateConfiguration(clientConfiguration: ClientConfiguration): string | undefined {
+  private validateConfiguration(
+    clientConfiguration: ClientConfiguration
+  ): string | undefined {
     const errors: string[] = [];
     if (clientConfiguration.sessionId.length === 0) {
       errors.push(MISSING_SESSION_ID_ERROR_MESSAGE);
     }
-    if (clientConfiguration.minimumRequestRetryRandomDelay &&
-        clientConfiguration.minimumRequestRetryRandomDelay < ONE_SECOND_IN_MS) {
+    if (
+      clientConfiguration.minimumRequestRetryRandomDelay &&
+      clientConfiguration.minimumRequestRetryRandomDelay < ONE_SECOND_IN_MS
+    ) {
       errors.push(MINIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_SMALL_ERROR_MESSAGE);
     }
-    if (clientConfiguration.maximumRequestRetryRandomDelay &&
-        clientConfiguration.maximumRequestRetryRandomDelay < TWO_SECONDS_IN_MS) {
+    if (
+      clientConfiguration.maximumRequestRetryRandomDelay &&
+      clientConfiguration.maximumRequestRetryRandomDelay < TWO_SECONDS_IN_MS
+    ) {
       errors.push(MAXIMUM_REQUEST_RETRY_RANDOM_DELAY_TOO_SMALL_ERROR_MESSAGE);
     }
-    if (clientConfiguration.maximumRequestRetryRandomDelay && clientConfiguration.minimumRequestRetryRandomDelay &&
-        clientConfiguration.minimumRequestRetryRandomDelay > clientConfiguration.maximumRequestRetryRandomDelay) {
-      errors.push(MINIMUM_REQUEST_RETRY_RANDOM_DELAY_GREATER_THAN_MAXIMUM_REQUEST_RETRY_RANDOM_ERROR_MESSAGE);
+    if (
+      clientConfiguration.maximumRequestRetryRandomDelay &&
+      clientConfiguration.minimumRequestRetryRandomDelay &&
+      clientConfiguration.minimumRequestRetryRandomDelay >
+        clientConfiguration.maximumRequestRetryRandomDelay
+    ) {
+      errors.push(
+        MINIMUM_REQUEST_RETRY_RANDOM_DELAY_GREATER_THAN_MAXIMUM_REQUEST_RETRY_RANDOM_ERROR_MESSAGE
+      );
     }
-    if (clientConfiguration.maximumConcurrentConnections &&
-        clientConfiguration.maximumConcurrentConnections < 1) {
+    if (
+      clientConfiguration.maximumConcurrentConnections &&
+      clientConfiguration.maximumConcurrentConnections < 1
+    ) {
       errors.push(MAXIMUM_CONCURRENT_CONNECTIONS_MINIMUM_VALUE_MESSAGE);
     }
     if (errors.length > 0) {
