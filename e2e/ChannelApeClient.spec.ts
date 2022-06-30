@@ -1406,12 +1406,14 @@ describe('ChannelApe Client', () => {
                     inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
                     deduplicationKey: currentDateTime,
                     locationId: '28',
+                    operation: AdjustmentType.ADJUST
                   },
                   {
                     quantity: 3,
                     inventoryStatus: InventoryStatus.ON_HOLD,
                     deduplicationKey: currentDateTime,
                     locationId: '28',
+                    operation: AdjustmentType.ADJUST
                   },
                 ],
               },
@@ -1423,12 +1425,14 @@ describe('ChannelApe Client', () => {
                     inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
                     deduplicationKey: currentDateTime,
                     locationId: '28',
+                    operation: AdjustmentType.ADJUST
                   },
                   {
                     quantity: 0,
                     inventoryStatus: InventoryStatus.ON_HOLD,
                     deduplicationKey: currentDateTime,
                     locationId: '28',
+                    operation: AdjustmentType.ADJUST
                   },
                 ],
               },
@@ -1452,12 +1456,14 @@ describe('ChannelApe Client', () => {
                     inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
                     deduplicationKey: currentDateTime,
                     locationId: '28',
+                    operation: AdjustmentType.SET
                   },
                   {
                     quantity: 3,
                     inventoryStatus: InventoryStatus.ON_HOLD,
                     deduplicationKey: currentDateTime,
                     locationId: '28',
+                    operation: AdjustmentType.SET
                   },
                 ],
               },
@@ -1469,12 +1475,14 @@ describe('ChannelApe Client', () => {
                     inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
                     deduplicationKey: currentDateTime,
                     locationId: '28',
+                    operation: AdjustmentType.SET
                   },
                   {
                     quantity: 0,
                     inventoryStatus: InventoryStatus.ON_HOLD,
                     deduplicationKey: currentDateTime,
                     locationId: '28',
+                    operation: AdjustmentType.SET
                   },
                 ],
               },
