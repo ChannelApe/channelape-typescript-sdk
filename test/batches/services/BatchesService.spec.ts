@@ -60,6 +60,7 @@ describe('Batches Service', () => {
             inventoryStatus: InventoryStatus.ON_ORDER,
             quantity: 10,
             locationId: '100',
+            deduplicationKey: 'some-deduplication-key'
           },
           {
             idempotentKey: 'some-uuid-1',
@@ -69,6 +70,7 @@ describe('Batches Service', () => {
             inventoryStatus: InventoryStatus.ON_ORDER,
             quantity: 10,
             locationId: '100',
+            deduplicationKey: 'some-deduplication-key'
           },
         ],
       };
@@ -117,6 +119,7 @@ describe('Batches Service', () => {
             inventoryStatus: InventoryStatus.ON_ORDER,
             quantity: 10,
             locationId: '100',
+            deduplicationKey: 'some-deduplication-key'
           },
           {
             idempotentKey: 'some-uuid-1',
@@ -126,6 +129,7 @@ describe('Batches Service', () => {
             inventoryStatus: InventoryStatus.ON_ORDER,
             quantity: 10,
             locationId: '100',
+            deduplicationKey: 'some-deduplication-key'
           },
         ],
       };
@@ -175,6 +179,7 @@ describe('Batches Service', () => {
             inventoryStatus: InventoryStatus.ON_ORDER,
             quantity: 10,
             locationId: '100',
+            deduplicationKey: 'some-deduplication-key'
           },
           {
             idempotentKey: 'some-uuid-1',
@@ -184,6 +189,7 @@ describe('Batches Service', () => {
             inventoryStatus: InventoryStatus.ON_ORDER,
             quantity: 10,
             locationId: '100',
+            deduplicationKey: 'some-deduplication-key'
           },
         ],
       };

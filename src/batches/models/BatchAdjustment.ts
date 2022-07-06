@@ -5,6 +5,7 @@ export interface BatchAdjustment {
   quantity: number;
   inventoryStatus: InventoryStatus;
   idempotentKey: string;
+  deduplicationKey: string;
   locationId: string;
   operation: AdjustmentType;
   effectiveTime?: Date;

@@ -62,6 +62,7 @@ describe('ChannelApe Client', () => {
                   memo: 'This is a test adjustment from e2e test',
                   quantity: 1,
                   inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+                  deduplicationKey: 'some-deduplication-key'
                 },
                 {
                   idempotentKey: uuidV4(),
@@ -71,6 +72,7 @@ describe('ChannelApe Client', () => {
                   memo: 'This is a test adjustment from e2e test2',
                   quantity: 1,
                   inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+                  deduplicationKey: 'some-deduplication-key'
                 },
               ],
             });
@@ -1521,7 +1523,8 @@ describe('ChannelApe Client', () => {
     });
 
     function getSessionId(): string {
-      const sessionIdEnvironmentVariable = process.env.CHANNEL_APE_SESSION_ID;
+      const sessionIdEnvironmentVariable = '82ade3e7-9eb7-490e-b005-ea326c49d375';
+      // const sessionIdEnvironmentVariable = process.env.CHANNEL_APE_SESSION_ID;
       if (sessionIdEnvironmentVariable == null) {
         throw new Error(
           'CHANNEL_APE_SESSION_ID environment variable is required.'

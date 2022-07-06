@@ -988,6 +988,7 @@ const batchRequest = BatchAdjustmentCreationRequest = {
         memo: 'Adjusting for intraday inventory.',
         quantity: 1,
         inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+        deduplicationKey: 'some-deduplication-key'
       },
       {
         idempotentKey: 'some-predictable-idempotent-key-2',
@@ -997,6 +998,7 @@ const batchRequest = BatchAdjustmentCreationRequest = {
         memo: 'Adjusting for nightly true up.',
         quantity: 1,
         inventoryStatus: InventoryStatus.COMMITTED,
+        deduplicationKey: 'some-deduplication-key'
       },
     ],
   }
