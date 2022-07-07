@@ -53,7 +53,7 @@ describe('Batches Service', () => {
         businessId: '123',
         adjustments: [
           {
-            idempotentKey: 'some-uuid-1',
+            idempotentKey: 'some-deduplication-key_100_123_ON_ORDER',
             inventoryItemId: 123,
             operation: AdjustmentType.SET,
             memo: 'Memo',
@@ -63,7 +63,7 @@ describe('Batches Service', () => {
             deduplicationKey: 'some-deduplication-key'
           },
           {
-            idempotentKey: 'some-uuid-1',
+            idempotentKey: 'some-deduplication-key_100_ABC_ON_ORDER',
             sku: 'ABC',
             operation: AdjustmentType.ADJUST,
             memo: 'Memo',
@@ -112,7 +112,7 @@ describe('Batches Service', () => {
         businessId: '123',
         adjustments: [
           {
-            idempotentKey: 'some-uuid-1',
+            idempotentKey: 'some-deduplication-key_100_123_ON_ORDER',
             inventoryItemId: 123,
             operation: AdjustmentType.SET,
             memo: 'Memo',
@@ -122,7 +122,7 @@ describe('Batches Service', () => {
             deduplicationKey: 'some-deduplication-key'
           },
           {
-            idempotentKey: 'some-uuid-1',
+            idempotentKey: 'some-deduplication-key_100_ABC_ON_ORDER',
             sku: 'ABC',
             operation: AdjustmentType.ADJUST,
             memo: 'Memo',
@@ -172,7 +172,7 @@ describe('Batches Service', () => {
         businessId: '123',
         adjustments: [
           {
-            idempotentKey: 'some-uuid-1',
+            idempotentKey: 'some-deduplication-key_100_123_ON_ORDER',
             inventoryItemId: 123,
             operation: AdjustmentType.SET,
             memo: 'Memo',
@@ -182,7 +182,7 @@ describe('Batches Service', () => {
             deduplicationKey: 'some-deduplication-key'
           },
           {
-            idempotentKey: 'some-uuid-1',
+            idempotentKey: 'some-deduplication-key_100_ABC_ON_ORDER',
             sku: 'ABC',
             operation: AdjustmentType.ADJUST,
             memo: 'Memo',
