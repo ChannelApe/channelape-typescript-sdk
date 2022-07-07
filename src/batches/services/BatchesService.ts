@@ -64,22 +64,23 @@ export class BatchesService extends RestService {
   private mapIdempotentKey(
     batchCreationRequest: BatchAdjustmentCreationRequest
   ) {
-    const adjustmentsWithidempotentKey = batchCreationRequest.adjustments.map((adjustment:(BatchAdjustmentBySku | BatchAdjustmentByInventoryItemId)) => {
-      return {
-        ...adjustment,
-        idempotentKey: this.generateIdempotentKey(
-          adjustment.inventoryStatus, 
-          adjustment.locationId, 
-          adjustment.deduplicationKey,
-          (adjustment.sku ? adjustment.sku : 'n/a'), 
-          adjustment.inventoryItemId, 
-        )
-      }
-    });
+    const adjustmentsWithidempotentKey = batchCreationRequest.adjustments.map(
+      (adjustment:(BatchAdjustmentBySku | BatchAdjustmentByInventoryItemId)) => {
+        return {
+          ...adjustment,
+          idempotentKey: this.generateIdempotentKey(
+            adjustment.inventoryStatus,
+            adjustment.locationId,
+            adjustment.deduplicationKey,
+            (adjustment.sku ? adjustment.sku : 'n/a'),
+            adjustment.inventoryItemId,
+          )
+        };
+      });
     return {
       ...batchCreationRequest,
       adjustments: adjustmentsWithidempotentKey
-    }
+    };
   }
 
   private generateIdempotentKey(
