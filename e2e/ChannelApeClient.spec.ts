@@ -1523,8 +1523,7 @@ describe('ChannelApe Client', () => {
     });
 
     function getSessionId(): string {
-      const sessionIdEnvironmentVariable = '82ade3e7-9eb7-490e-b005-ea326c49d375';
-      // const sessionIdEnvironmentVariable = process.env.CHANNEL_APE_SESSION_ID;
+      const sessionIdEnvironmentVariable = process.env.CHANNEL_APE_SESSION_ID;
       if (sessionIdEnvironmentVariable == null) {
         throw new Error(
           'CHANNEL_APE_SESSION_ID environment variable is required.'
