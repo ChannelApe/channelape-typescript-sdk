@@ -6,8 +6,6 @@ import Resource from '../../model/Resource';
 import RestService from '../../service/RestService';
 import { BatchAdjustmentCreationRequest } from '../models/BatchAdjustmentCreationRequest';
 import { BatchResponse } from '../models/BatchResponse';
-import { BatchAdjustmentBySku } from '../models/BatchAdjustmentBySku';
-import { BatchAdjustmentByInventoryItemId } from '..';
 
 export class BatchesService extends RestService {
   private readonly logger = new Logger('BatchService', LogLevel.VERBOSE);
@@ -25,9 +23,8 @@ export class BatchesService extends RestService {
     this.logger.info(
       `Attempting to create a batch with ${batchCreationRequest.adjustments.length} adjustments`
     );
-    const mappedBatchCreationRequest:BatchAdjustmentCreationRequest = this.mapIdempotentKey(batchCreationRequest);
     const options: AxiosRequestConfig = {
-      data: mappedBatchCreationRequest,
+      data: batchCreationRequest,
     };
     return new Promise((resolve, reject) => {
       this.client.post(requestUrl, options, (error, response, body) => {
@@ -60,36 +57,14 @@ export class BatchesService extends RestService {
       });
     });
   }
+}
 
-  private mapIdempotentKey(
-    batchCreationRequest: BatchAdjustmentCreationRequest
-  ) {
-    const adjustmentsWithidempotentKey = batchCreationRequest.adjustments.map(
-      (adjustment:(BatchAdjustmentBySku | BatchAdjustmentByInventoryItemId)) => {
-        return {
-          ...adjustment,
-          idempotentKey: this.generateIdempotentKey(
-            adjustment.inventoryStatus,
-            adjustment.locationId,
-            adjustment.deduplicationKey,
-            (adjustment.sku ? adjustment.sku : 'n/a'),
-            adjustment.inventoryItemId,
-          )
-        };
-      });
-    return {
-      ...batchCreationRequest,
-      adjustments: adjustmentsWithidempotentKey
-    };
-  }
-
-  private generateIdempotentKey(
-    status: string,
-    locationId: string,
-    deduplicationKey: string,
-    sku:string,
-    inventoryItemId?: number,
-  ): string {
-    return inventoryItemId ? `${deduplicationKey}_${locationId}_${inventoryItemId}_${status}` : `${deduplicationKey}_${locationId}_${sku}_${status}`;
-  }
+export function generateDeduplicationKey(
+  status: string,
+  locationId: string,
+  deduplicationKey: string,
+  sku:string,
+  inventoryItemId?: number,
+): string {
+  return inventoryItemId ? `${deduplicationKey}_${locationId}_${inventoryItemId}_${status}` : `${deduplicationKey}_${locationId}_${sku}_${status}`;
 }

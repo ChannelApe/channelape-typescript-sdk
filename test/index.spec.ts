@@ -1,6 +1,5 @@
 import * as ChannelApe from '../src/index';
 import { expect } from 'chai';
-import { AdjustmentType } from '../src/inventories/enum/AdjustmentType';
 
 describe('Index', () => {
   it('Expect ChannelApeClient to be exported', () => {
@@ -972,8 +971,7 @@ describe('Index', () => {
       inventoryStatus: ChannelApe.InventoryStatus.COMMITTED,
       quantity: 44,
       deduplicationKey: 'tracking-number-1',
-      locationId: 'location-1',
-      operation: AdjustmentType.ADJUST
+      locationId: 'location-1'
     };
     expect(adjustmentBySku.quantity).to.equal(44);
   });
@@ -986,15 +984,13 @@ describe('Index', () => {
           inventoryStatus: ChannelApe.InventoryStatus.COMMITTED,
           quantity: 44,
           deduplicationKey: 'tracking-number-1',
-          locationId: 'location-1',
-          operation: AdjustmentType.ADJUST
+          locationId: 'location-1'
         },
         {
           inventoryStatus: ChannelApe.InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 20,
           deduplicationKey: 'tracking-number-2',
-          locationId: 'location-1',
-          operation: AdjustmentType.ADJUST
+          locationId: 'location-1'
         }
       ]
     };

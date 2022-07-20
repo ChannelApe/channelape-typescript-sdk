@@ -53,31 +53,28 @@ describe('Batches Service', () => {
         businessId: '123',
         adjustments: [
           {
-            idempotentKey: 'some-deduplication-key_100_123_ON_ORDER',
             inventoryItemId: 123,
             operation: AdjustmentType.SET,
             memo: 'Memo',
             inventoryStatus: InventoryStatus.ON_ORDER,
             quantity: 10,
             locationId: '100',
-            deduplicationKey: 'some-deduplication-key'
+            idempotentKey: 'some-deduplication-key_100_123_ON_ORDER'
           },
           {
-            idempotentKey: 'some-deduplication-key_100_ABC_ON_ORDER',
             sku: 'ABC',
             operation: AdjustmentType.ADJUST,
             memo: 'Memo',
             inventoryStatus: InventoryStatus.ON_ORDER,
             quantity: 10,
             locationId: '100',
-            deduplicationKey: 'some-deduplication-key'
+            idempotentKey: 'some-deduplication-key_100_ABC_ON_ORDER'
           },
         ],
       };
       const clientPostStub: sinon.SinonStub = sandbox
         .stub(client, 'post')
         .yields(null, response, batchResponse);
-
       const batchesService: BatchesService = new BatchesService(client);
       const actualResponse = await batchesService.createInventoryAdjustmentBatch(
         batchInventoryCreation
@@ -112,31 +109,28 @@ describe('Batches Service', () => {
         businessId: '123',
         adjustments: [
           {
-            idempotentKey: 'some-deduplication-key_100_123_ON_ORDER',
             inventoryItemId: 123,
             operation: AdjustmentType.SET,
             memo: 'Memo',
             inventoryStatus: InventoryStatus.ON_ORDER,
             quantity: 10,
             locationId: '100',
-            deduplicationKey: 'some-deduplication-key'
+            idempotentKey: 'some-deduplication-key_100_123_ON_ORDER'
           },
           {
-            idempotentKey: 'some-deduplication-key_100_ABC_ON_ORDER',
             sku: 'ABC',
             operation: AdjustmentType.ADJUST,
             memo: 'Memo',
             inventoryStatus: InventoryStatus.ON_ORDER,
             quantity: 10,
             locationId: '100',
-            deduplicationKey: 'some-deduplication-key'
+            idempotentKey: 'some-deduplication-key_100_ABC_ON_ORDER'
           },
         ],
       };
       const clientPostStub: sinon.SinonStub = sandbox
         .stub(client, 'post')
         .yields(null, response, expectedChannelApeErrorResponse);
-
       const batchesService: BatchesService = new BatchesService(client);
       try {
         await batchesService.createInventoryAdjustmentBatch(
@@ -172,24 +166,22 @@ describe('Batches Service', () => {
         businessId: '123',
         adjustments: [
           {
-            idempotentKey: 'some-deduplication-key_100_123_ON_ORDER',
             inventoryItemId: 123,
             operation: AdjustmentType.SET,
             memo: 'Memo',
             inventoryStatus: InventoryStatus.ON_ORDER,
             quantity: 10,
             locationId: '100',
-            deduplicationKey: 'some-deduplication-key'
+            idempotentKey: 'some-deduplication-key_100_123_ON_ORDER'
           },
           {
-            idempotentKey: 'some-deduplication-key_100_ABC_ON_ORDER',
             sku: 'ABC',
             operation: AdjustmentType.ADJUST,
             memo: 'Memo',
             inventoryStatus: InventoryStatus.ON_ORDER,
             quantity: 10,
             locationId: '100',
-            deduplicationKey: 'some-deduplication-key'
+            idempotentKey: 'some-deduplication-key_100_ABC_ON_ORDER'
           },
         ],
       };
