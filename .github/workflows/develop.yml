@@ -2,7 +2,7 @@ name: Develop Branch CI/CD
 
 on:
   push:
-    branches: [ develop, hotfix/** ]
+    branches: [ develop ]
   pull_request:
     branches: [ develop ]
 
