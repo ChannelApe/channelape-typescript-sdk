@@ -58,3 +58,13 @@ export class BatchesService extends RestService {
     });
   }
 }
+
+export function generateDeduplicationKey(
+  status: string,
+  locationId: string,
+  deduplicationKey: string,
+  sku:string,
+  inventoryItemId?: number,
+): string {
+  return inventoryItemId ? `${deduplicationKey}_${locationId}_${inventoryItemId}_${status}` : `${deduplicationKey}_${locationId}_${sku}_${status}`;
+}

@@ -33,7 +33,6 @@ import Step from '../src/steps/model/Step';
 import StepVersion from '../src/suppliers/model/StepVersion';
 import SupplierUpdateRequest from '../src/suppliers/model/SupplierUpdateRequest';
 import { AdjustmentType } from '../src/inventories/enum/AdjustmentType';
-import * as uuidV4 from 'uuid/v4';
 
 describe('ChannelApe Client', () => {
   describe('Given valid session ID', () => {
@@ -55,22 +54,23 @@ describe('ChannelApe Client', () => {
               businessId: '4baafa5b-4fbf-404e-9766-8a02ad45c3a4',
               adjustments: [
                 {
-                  idempotentKey: uuidV4(),
                   locationId: '47',
                   operation: AdjustmentType.ADJUST,
                   sku: 'ABC-123',
                   memo: 'This is a test adjustment from e2e test',
                   quantity: 1,
                   inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+                  idempotentKey: 'some-deduplication-key_47_ABC-123_AVAILABLE_TO_SELL',
+
                 },
                 {
-                  idempotentKey: uuidV4(),
                   locationId: '47',
                   operation: AdjustmentType.SET,
                   sku: 'ABC-124',
                   memo: 'This is a test adjustment from e2e test2',
                   quantity: 1,
                   inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+                  idempotentKey: 'some-deduplication-key_47_ABC-124_AVAILABLE_TO_SELL',
                 },
               ],
             });
@@ -1422,14 +1422,12 @@ describe('ChannelApe Client', () => {
                     quantity: 2,
                     inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
                     deduplicationKey: currentDateTime,
-                    locationId: '28',
-                  },
+                    locationId: '28'                  },
                   {
                     quantity: 0,
                     inventoryStatus: InventoryStatus.ON_HOLD,
                     deduplicationKey: currentDateTime,
-                    locationId: '28',
-                  },
+                    locationId: '28'                  },
                 ],
               },
             ];
@@ -1451,13 +1449,13 @@ describe('ChannelApe Client', () => {
                     quantity: 1,
                     inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
                     deduplicationKey: currentDateTime,
-                    locationId: '28',
+                    locationId: '28'
                   },
                   {
                     quantity: 3,
                     inventoryStatus: InventoryStatus.ON_HOLD,
                     deduplicationKey: currentDateTime,
-                    locationId: '28',
+                    locationId: '28'
                   },
                 ],
               },
