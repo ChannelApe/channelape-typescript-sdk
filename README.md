@@ -981,22 +981,22 @@ const batchRequest = BatchAdjustmentCreationRequest = {
     businessId: '91f47fdf-fd71-484c-9b3b-db4e2877a229',
     adjustments: [
       {
-        idempotentKey: 'some-predictable-idempotent-key-1',
         locationId: '47',
         operation: AdjustmentType.ADJUST,
         sku: 'ABC-123',
         memo: 'Adjusting for intraday inventory.',
         quantity: 1,
         inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
+        idempotentKey: 'some-idempotent-key'
       },
       {
-        idempotentKey: 'some-predictable-idempotent-key-2',
         locationId: '12',
         operation: AdjustmentType.SET,
         inventoryItemId: 123,
         memo: 'Adjusting for nightly true up.',
         quantity: 1,
         inventoryStatus: InventoryStatus.COMMITTED,
+        idempotentKey: 'some-idempotent-key'
       },
     ],
   }
