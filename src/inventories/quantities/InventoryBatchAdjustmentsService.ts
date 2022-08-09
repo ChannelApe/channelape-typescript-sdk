@@ -229,6 +229,10 @@ export class InventoryBatchAdjustmentsService {
       adjustmentRequest.memo = adjustment.memo;
     }
 
+    if (adjustment.aggregateChannelSync) {
+      adjustmentRequest.aggregateChannelSync = adjustment.aggregateChannelSync;
+    }
+
     try {
       let result;
       if (adjustmentType === AdjustmentType.SET) {
