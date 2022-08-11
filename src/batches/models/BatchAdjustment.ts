@@ -9,4 +9,5 @@ export interface BatchAdjustment {
   operation: AdjustmentType;
   effectiveTime?: Date;
   memo?: string;
+  aggregateChannelSync?: boolean;
 }

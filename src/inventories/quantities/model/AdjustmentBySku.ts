@@ -7,4 +7,5 @@ export default interface AdjustmentBySku {
   deduplicationKey: string;
   locationId: string;
   memo?: string;
+  aggregateChannelSync?: boolean;
 }
