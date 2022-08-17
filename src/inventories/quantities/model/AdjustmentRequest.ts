@@ -9,4 +9,5 @@ export default interface AdjustmentRequest {
   memo?:string;
   effectiveAt?: Date;
   idempotentKey?: string;
+  aggregateChannelSync?: boolean;
 }

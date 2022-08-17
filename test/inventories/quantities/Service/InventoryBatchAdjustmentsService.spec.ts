@@ -63,7 +63,8 @@ describe('Inventory Quantities Service', () => {
           inventoryStatus: InventoryStatus.AVAILABLE_TO_SELL,
           quantity: 3,
           locationId: location.id,
-          memo: 'Test memo'
+          memo: 'Test memo',
+          aggregateChannelSync: false
         }]
       }];
       const createdInventoryItem = {
@@ -100,7 +101,8 @@ describe('Inventory Quantities Service', () => {
         inventoryItemId: createdInventoryItem.id,
         inventoryStatus: expectedStatus,
         idempotentKey: buildKey(deduplicationKey, location.id, createdInventoryItem.id, expectedStatus),
-        memo: adjustmentsBySku[0].adjustments[0].memo
+        memo: adjustmentsBySku[0].adjustments[0].memo,
+        aggregateChannelSync: false
       });
     });
 

@@ -222,7 +222,8 @@ export class InventoryBatchAdjustmentsService {
       locationId: adjustment.locationId,
       quantity: adjustment.quantity,
       inventoryItemId: inventoryItem.id,
-      inventoryStatus: adjustment.inventoryStatus
+      inventoryStatus: adjustment.inventoryStatus,
+      aggregateChannelSync: !!adjustment.aggregateChannelSync
     };
 
     if (adjustment.memo) {
