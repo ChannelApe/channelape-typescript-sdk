@@ -1012,7 +1012,8 @@ describe('Index', () => {
       name: 'My 3PL',
       businessId: '440404',
       createdAt: new Date('2018-05-03T18:07:58.009Z'),
-      updatedAt: new Date('2018-05-05T18:07:58.009Z')
+      updatedAt: new Date('2018-05-05T18:07:58.009Z'),
+      aggregateLocationIds: []
     };
     expect(location.name).to.equal('My 3PL');
   });
