@@ -274,7 +274,8 @@ describe('Locations Service', () => {
 
       const locationCreationRequest: LocationCreateRequest = {
         businessId: '3ad989ac-6d12-4498-b13a-9b61a2768e54',
-        name: 'some-location name'
+        name: 'some-location name',
+        aggregateLocationIds: []
       };
 
       const clientPostStub: sinon.SinonStub = sandbox.stub(client, 'post')
@@ -305,7 +306,8 @@ describe('Locations Service', () => {
 
       const locationCreationRequest: LocationCreateRequest = {
         businessId: '3ad989ac-6d12-4498-b13a-9b61a2768e54',
-        name: 'some-location name'
+        name: 'some-location name',
+        aggregateLocationIds: []
       };
 
       const clientPostStub: sinon.SinonStub = sandbox.stub(client, 'post')
@@ -336,7 +338,8 @@ describe('Locations Service', () => {
 
       const locationCreationRequest: LocationCreateRequest = {
         businessId: '3ad989ac-6d12-4498-b13a-9b61a2768e54',
-        name: 'some-location name'
+        name: 'some-location name',
+        aggregateLocationIds: []
       };
 
       const clientPostStub: sinon.SinonStub = sandbox.stub(client, 'post')
@@ -377,7 +380,8 @@ describe('Locations Service', () => {
 
       const locationUpdateRequest: LocationUpdateRequest = {
         id: '33',
-        name: 'some-location name'
+        name: 'some-location name',
+        aggregateLocationIds: []
       };
 
       const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put')
@@ -409,7 +413,8 @@ describe('Locations Service', () => {
 
       const locationUpdateRequest: LocationUpdateRequest = {
         id: '33',
-        name: 'some-location name'
+        name: 'some-location name',
+        aggregateLocationIds: []
       };
 
       const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put')
@@ -441,7 +446,8 @@ describe('Locations Service', () => {
 
       const locationUpdateRequest: LocationUpdateRequest = {
         id: '33',
-        name: 'some-location name'
+        name: 'some-location name',
+        aggregateLocationIds: []
       };
 
       const clientPutStub: sinon.SinonStub = sandbox.stub(client, 'put')

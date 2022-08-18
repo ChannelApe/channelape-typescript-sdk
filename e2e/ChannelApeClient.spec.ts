@@ -1301,6 +1301,7 @@ describe('ChannelApe Client', () => {
             const locationCreateRequest: LocationCreateRequest = {
               businessId,
               name: generatedName,
+              aggregateLocationIds: []
             };
             const location = await channelApeClient
               .locations()
@@ -1324,6 +1325,7 @@ describe('ChannelApe Client', () => {
             const locationUpdateRequest: LocationUpdateRequest = {
               id: '28',
               name: generatedName,
+              aggregateLocationIds: []
             };
             const location = await channelApeClient
               .locations()
