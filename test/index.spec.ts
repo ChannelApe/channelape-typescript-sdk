@@ -1012,7 +1012,8 @@ describe('Index', () => {
       name: 'My 3PL',
       businessId: '440404',
       createdAt: new Date('2018-05-03T18:07:58.009Z'),
-      updatedAt: new Date('2018-05-05T18:07:58.009Z')
+      updatedAt: new Date('2018-05-05T18:07:58.009Z'),
+      aggregateLocationIds: []
     };
     expect(location.name).to.equal('My 3PL');
   });
@@ -1021,6 +1022,7 @@ describe('Index', () => {
     const locationCreateRequest: ChannelApe.LocationCreateRequest = {
       name: 'My 3PL',
       businessId: '440404',
+      aggregateLocationIds: []
     };
     expect(locationCreateRequest.name).to.equal('My 3PL');
   });
@@ -1028,7 +1030,8 @@ describe('Index', () => {
   it('Expect LocationUpdateRequest to be exported', () => {
     const locationUpdateRequest: ChannelApe.LocationUpdateRequest = {
       name: 'My 3PL',
-      id: '3432'
+      id: '3432',
+      aggregateLocationIds: []
     };
     expect(locationUpdateRequest.name).to.equal('My 3PL');
   });

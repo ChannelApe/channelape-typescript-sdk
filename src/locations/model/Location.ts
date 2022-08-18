@@ -4,4 +4,5 @@ export default interface Location {
   businessId: string;
   createdAt: Date;
   updatedAt: Date;
+  aggregateLocationIds: string[];
 }
