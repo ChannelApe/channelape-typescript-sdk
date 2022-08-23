@@ -17,7 +17,7 @@ export default class ApiAccountsService {
    * Do Not Use. This is for internal use only
    *
    */
-  public getById(apiAccountId: string) {
+  public getById(apiAccountId: string): Promise<ApiAccount> {
     const deferred = q.defer<any>();
     const requestUrl = `/${Version.V1}${Resource.BUSINESSES}${Resource.API_ACCOUNTS}`;
     this.client.get(requestUrl, {
