@@ -19,8 +19,12 @@ export default class ApiAccountsService {
    */
   public getById(apiAccountId: string) {
     const deferred = q.defer<any>();
-    const requestUrl = `/${Version.V1}${Resource.API_ACCOUNTS}/${apiAccountId}`;
-    this.client.get(requestUrl, {}, (error, response, body) => {
+    const requestUrl = `/${Version.V1}${Resource.BUSINESSES}${Resource.API_ACCOUNTS}`;
+    this.client.get(requestUrl, {
+      params: {
+        apiAccountId
+      }
+    }, (error, response, body) => {
       this.mapApiAccountPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
     });
     return deferred.promise as any;

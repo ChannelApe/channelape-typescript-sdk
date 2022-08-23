@@ -128,7 +128,8 @@ describe('Api Accounts Service', () => {
         .yields(null, response, expectedApiAccount);
       const apiAccountsService: ApiAccountsService = new ApiAccountsService(client);
       return apiAccountsService.getById(expectedApiAccount.id).then((apiAccountResponse: ApiAccount) => {
-        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.API_ACCOUNTS}/${expectedApiAccount.id}`);
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.BUSINESSES}${Resource.API_ACCOUNTS}`);
+        expect(clientGetStub.args[0][1]).to.deep.equal({ params: { apiAccountId: expectedApiAccount.id } });
         expectApiAccount(apiAccountResponse);
       });
     });
