@@ -116,6 +116,23 @@ describe('Api Accounts Service', () => {
       });
     });
 
+    it(`And valid API Account ID When retrieving API Account by id
+    Then return resolved promise with API Account`, () => {
+      const response = {
+        status: 200,
+        config: {
+          method: 'GET'
+        }
+      };
+      const clientGetStub: sinon.SinonStub = sandbox.stub(client, 'get')
+        .yields(null, response, expectedApiAccount);
+      const apiAccountsService: ApiAccountsService = new ApiAccountsService(client);
+      return apiAccountsService.getById(expectedApiAccount.id).then((apiAccountResponse: ApiAccount) => {
+        expect(clientGetStub.args[0][0]).to.equal(`/${Version.V1}${Resource.API_ACCOUNTS}/${expectedApiAccount.id}`);
+        expectApiAccount(apiAccountResponse);
+      });
+    });
+
     it(`And not found API Account ID When retrieving API
     Account ID for business Then return resolved promise with error`, () => {
       const response = {

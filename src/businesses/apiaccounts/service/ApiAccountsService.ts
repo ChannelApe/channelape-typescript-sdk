@@ -13,6 +13,19 @@ export default class ApiAccountsService {
 
   constructor(private readonly client: RequestClientWrapper) {}
 
+  /**
+   * Do Not Use. This is for internal use only
+   *
+   */
+  public getById(apiAccountId: string) {
+    const deferred = q.defer<any>();
+    const requestUrl = `/${Version.V1}${Resource.API_ACCOUNTS}/${apiAccountId}`;
+    this.client.get(requestUrl, {}, (error, response, body) => {
+      this.mapApiAccountPromise(requestUrl, deferred, error, response, body, EXPECTED_GET_STATUS);
+    });
+    return deferred.promise as any;
+  }
+
   public get(businessId: string, apiAccountId?: string): Promise<ApiAccount | ApiAccount[]> {
     if (typeof (apiAccountId) === 'undefined') {
       const deferred = q.defer<any>();
