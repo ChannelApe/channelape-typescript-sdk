@@ -13,7 +13,8 @@ describe('JsonOrderFormatterService', () => {
         try {
           JsonOrderFormatterService.formatOrder('{"id":"order-id"}');
         } catch (e) {
-          expect(e.message).to.equal("Cannot read property 'map' of undefined");
+          // @ts-ignore
+          expect(e.message).to.equal("Cannot read properties of undefined (reading 'map')");
         }
       });
     });
@@ -31,6 +32,7 @@ describe('JsonOrderFormatterService', () => {
               const order = JsonOrderFormatterService.formatOrder(validOrderJson);
               expect(order.id).to.equal('c0f45529-cbed-4e90-9a38-c208d409ef2a');
               expect(order.updatedAt.getFullYear()).to.equal(2018);
+              // @ts-ignore
               resolve();
             } catch (e) {
               reject(e);
@@ -48,7 +50,8 @@ describe('JsonOrderFormatterService', () => {
           JsonOrderFormatterService.formatOrder({ id: 'order-id' });
           fail('Expected exception to be thrown but none occurred');
         } catch (e) {
-          expect(e.message).to.equal("Cannot read property 'map' of undefined");
+          // @ts-ignore
+          expect(e.message).to.equal("Cannot read properties of undefined (reading 'map')");
         }
       });
     });
