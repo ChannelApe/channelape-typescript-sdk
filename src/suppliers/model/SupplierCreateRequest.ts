@@ -1,6 +1,6 @@
-import FileSettings from '../../model/fileSettings/FileSettings';
-import PlaySettings from './PlaySettings';
-import StepSettings from './StepSettings';
+import FileSettings from "../../model/fileSettings/FileSettings";
+import PlaySettings from "./PlaySettings";
+import StepSettings from "./StepSettings";
 
 export default interface SupplierCreateRequest {
   businessId: string;
@@ -11,4 +11,5 @@ export default interface SupplierCreateRequest {
   stepSettings?: StepSettings;
   playSettings?: PlaySettings;
   synchronous?: boolean;
+  authenticatedCallback?: boolean;
 }
