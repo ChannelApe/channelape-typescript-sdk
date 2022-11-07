@@ -14,7 +14,7 @@ describe('JsonOrderFormatterService', () => {
           JsonOrderFormatterService.formatOrder('{"id":"order-id"}');
         } catch (e) {
           // @ts-ignore
-          expect(e.message).to.equal("Cannot read properties of undefined (reading 'map')");
+          expect(e.message).to.equal("Cannot read property 'map' of undefined");
         }
       });
     });
@@ -51,7 +51,7 @@ describe('JsonOrderFormatterService', () => {
           fail('Expected exception to be thrown but none occurred');
         } catch (e) {
           // @ts-ignore
-          expect(e.message).to.equal("Cannot read properties of undefined (reading 'map')");
+          expect(e.message).to.equal("Cannot read property 'map' of undefined");
         }
       });
     });
