@@ -10,4 +10,6 @@ export default interface AdjustmentRequest {
   effectiveAt?: Date;
   idempotentKey?: string;
   aggregateChannelSync?: boolean;
+  futureAppliedAtpPercentage?: number;
+  expirationDate?: string;
 }
