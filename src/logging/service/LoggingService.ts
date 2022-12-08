@@ -1,11 +1,11 @@
-import RequestClientWrapper from "../../RequestClientWrapper";
-import Version from "../../model/Version";
-import RestService from "../../service/RestService";
-import LoggingRequest from "../model/LoggingRequest";
-import LoggingResponse from "../model/LoggingResponse";
-import { AxiosRequestConfig } from "axios";
-import RequestCallbackParams from "../../model/RequestCallbackParams";
-import GenerateApiError from "../../utils/GenerateApiError";
+import RequestClientWrapper from '../../RequestClientWrapper';
+import Version from '../../model/Version';
+import RestService from '../../service/RestService';
+import LoggingRequest from '../model/LoggingRequest';
+import LoggingResponse from '../model/LoggingResponse';
+import { AxiosRequestConfig } from 'axios';
+import RequestCallbackParams from '../../model/RequestCallbackParams';
+import GenerateApiError from '../../utils/GenerateApiError';
 
 export default class LoggingService extends RestService {
   private readonly EXPECTED_CREATE_STATUS = 201;
@@ -22,7 +22,7 @@ export default class LoggingService extends RestService {
       };
       if (loggingRequest.flow) {
         options.headers = {
-          "X-Channel-Ape-Logs-Flow": loggingRequest.flow,
+          'X-Channel-Ape-Logs-Flow': loggingRequest.flow,
         };
       }
       this.client.post(requestUrl, options, (error, response, body) => {
