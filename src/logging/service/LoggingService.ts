@@ -19,12 +19,10 @@ export default class LoggingService extends RestService {
       const requestUrl = `/${Version.V1}/logs`;
       const options: AxiosRequestConfig = {
         data: loggingRequest.body,
-      };
-      if (loggingRequest.flow) {
-        options.headers = {
+        headers: {
           'X-Channel-Ape-Logs-Flow': loggingRequest.flow,
-        };
-      }
+        },
+      };
       this.client.post(requestUrl, options, (error, response, body) => {
         const requestResponse: RequestCallbackParams = {
           error,
@@ -48,9 +46,7 @@ export default class LoggingService extends RestService {
     expectedStatusCode: number
   ): Promise<LoggingResponse> {
     return new Promise((resolve, reject) => {
-      if (requestCallbackParams.error) {
-        reject(requestCallbackParams.error);
-      } else if (requestCallbackParams.response.status === expectedStatusCode) {
+      if (requestCallbackParams.response.status === expectedStatusCode) {
         resolve(requestCallbackParams.body as LoggingResponse);
       } else {
         const channelApeErrorResponse = GenerateApiError(

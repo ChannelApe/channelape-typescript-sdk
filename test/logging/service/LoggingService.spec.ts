@@ -58,7 +58,6 @@ describe('Logging Service', () => {
       const loggingService: LoggingService = new LoggingService(client);
       return loggingService.logPayload(payload).then((result: any) => {
         expect(clientPostStub.args[0][0]).to.equal(`/${Version.V1}/logs`);
-        // console.log(JSON.stringify(clientPostStub., null, 2));
         expect(result.flow).to.equal(expectedResult.flow);
         expect(result.logtime).to.equal(expectedResult.logtime);
         expect(result.businessId).to.equal(expectedResult.businessId);
