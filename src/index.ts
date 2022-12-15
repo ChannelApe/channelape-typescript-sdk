@@ -113,3 +113,5 @@ export { default as LocationSLAOperatingDayUpdateRequest }
 export { default as Recipe } from './receipes/model/Recipe';
 export { default as Schedule } from './schedules/model/Schedule';
 export * from './batches/index';
+export { default as LoggingRequest } from './logging/model/LoggingRequest';
+export { default as LoggingResponse } from './logging/model/LoggingRequest';
