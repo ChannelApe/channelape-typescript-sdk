@@ -1001,9 +1001,9 @@ const batchRequest = BatchAdjustmentCreationRequest = {
     ],
   }
 
-  channelapeClient.batches().createInventoryAdjustmentBatch(batchId)
-  .then((batch: Batch) => {
-    // do what you need to do with the batch data here
+  channelapeClient.batches().createInventoryAdjustmentBatch(batchRequest)
+  .then((batchResponse: BatchResponse) => {
+    // do what you need to do with the batch response here
   });
 ```
 
