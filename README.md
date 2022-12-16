@@ -1007,6 +1007,28 @@ const batchRequest = BatchAdjustmentCreationRequest = {
   });
 ```
 
+#### Adjustment Expiration Date
+You can make adjustments with an `expirationDate`,
+just provide an `expirationDate` and we'll stage an adjustment with the quantity inversed, -15 in this example, for that specific time:
+
+```typescript
+const batchRequest = BatchAdjustmentCreationRequest = {
+    businessId: '91f47fdf-fd71-484c-9b3b-db4e2877a229',
+    adjustments: [
+      {
+        locationId: '47',
+        operation: AdjustmentType.ADJUST,
+        sku: 'ABC-123',
+        memo: 'Reserving for reason xyz.',
+        quantity: 15,
+        expirationDate: new Date('2023-12-20T12:30:00Z'),
+        inventoryStatus: InventoryStatus.RESERVE,
+        idempotentKey: 'some-idempotent-key'
+      },
+    ],
+  }
+```
+
 #### Reserve Percentage Adjustments
 You can also make reserve adjustments based on a percentage amount by switching out `quantity` for `futureAppliedAtpPercentage` and adding an `expirationDate`:
 
