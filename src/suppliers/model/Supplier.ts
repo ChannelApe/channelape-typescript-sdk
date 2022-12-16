@@ -13,5 +13,6 @@ export default interface Supplier {
   playSettings?: PlaySettings;
   stepSettings?: StepSettings;
   synchronous?: boolean;
+  authenticatedCallback?: boolean;
   updatedAt: Date;
 }

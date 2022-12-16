@@ -11,4 +11,5 @@ export default interface SupplierCreateRequest {
   stepSettings?: StepSettings;
   playSettings?: PlaySettings;
   synchronous?: boolean;
+  authenticatedCallback?: boolean;
 }
