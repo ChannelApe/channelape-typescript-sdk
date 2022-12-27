@@ -4,7 +4,7 @@ import { InventoryStatus } from '../../inventories/enum/InventoryStatus';
 export interface BatchAdjustment {
   quantity?: number;
   futureAppliedAtpPercentage?: number;
-  expirationDate?: Date;
+  expirationTime?: Date;
   inventoryStatus: InventoryStatus;
   idempotentKey: string;
   locationId: string;
