@@ -705,7 +705,7 @@ describe('ChannelApe Client', () => {
       });
 
       describe('And valid business ID', () => {
-        describe('And an updatedStartDate of "2018-03-29T17:00:51.000Z" and an updatedEndDate of "2018-08-23T12:41:33.000Z"', () => {
+        describe.skip('And an updatedStartDate of "2018-03-29T17:00:51.000Z" and an updatedEndDate of "2018-08-23T12:41:33.000Z"', () => {
           context('When retrieving orders', () => {
             it('Then return the 273 orders between those dates', () => {
               const expectedBusinessId = '4baafa5b-4fbf-404e-9766-8a02ad45c3a4';
