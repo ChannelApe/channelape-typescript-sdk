@@ -4,7 +4,7 @@
 export default interface AdjustmentRequest {
   quantity?: number;
   futureAppliedAtpPercentage?: number;
-  expirationDate?: Date;
+  expiresAt?: Date;
   inventoryItemId: string;
   inventoryStatus: string;
   locationId: string;
