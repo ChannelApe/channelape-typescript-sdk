@@ -1,4 +1,4 @@
 export default interface LoggingRequest {
-  body: string;
+  body: unknown;
   flow?: string;
 }
