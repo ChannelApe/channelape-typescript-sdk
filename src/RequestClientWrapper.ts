@@ -88,9 +88,9 @@ export default class RequestClientWrapper {
       method: HttpRequestMethod.DELETE
     });
   }
-  prepareRequest(requestConfig: RequestConfig): void {
+  async prepareRequest(requestConfig: RequestConfig): Promise<void> {
     this.pendingRequests = this.pendingRequests + 1;
-    this.makeRequest(
+    await this.makeRequest(
       requestConfig.method,
       new Date(),
       0,
@@ -100,29 +100,26 @@ export default class RequestClientWrapper {
     );
   }
 
-  private makeRequest(
+  private async makeRequest(
     method: HttpRequestMethod,
     callStart: Date,
     numberOfCalls: number,
     url: string,
     options: AxiosRequestConfig,
     callback: RequestCallback
-  ): void {
+  ): Promise<void> {
     const callDetails: CallDetails = { options, callStart, callCountForThisRequest: numberOfCalls };
     options.baseURL = this.requestClientWrapperConfiguration.endpoint;
     if (options.headers === undefined) {
       options.headers = {};
     }
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    options.headers['X-Channel-Ape-Authorization-Token'] = this.requestClientWrapperConfiguration.session;
-    options.headers['Content-Type'] = 'application/json';
-    /*
-    if (this.requestClientWrapperConfiguration.jwtToken) {
-      check for expiration
-      options.headers['X-Channel-Ape-Authorization-Token'] = this.requestClientWrapperConfiguration.jwtToken;
+    if (this.isItJwtToken(this.requestClientWrapperConfiguration.session)) {
+      options.headers['X-Channel-Ape-Jwt'] = await this.refreshSupabaseSession();
+      options.headers['Content-Type'] = 'application/json';
+    } else {
+      options.headers['X-Channel-Ape-Authorization-Token'] = this.requestClientWrapperConfiguration.session;
       options.headers['Content-Type'] = 'application/json';
     }
-    */
     options.timeout = this.requestClientWrapperConfiguration.timeout;
     options.method = method;
     try {
@@ -283,20 +280,20 @@ export default class RequestClientWrapper {
     return body.errors.length > 0;
   }
 
-  private retryRequest(
+  private async retryRequest(
     method: HttpRequestMethod,
     url: string,
     callback: RequestCallback,
     callDetails: CallDetails
   ) {
     const jitterDelayAmountMs = this.getJitterDelayMs();
-    setTimeout(() => {
+    setTimeout(async () => {
       callDetails.callCountForThisRequest += 1;
       this.requestLogger.logDelay(callDetails.callCountForThisRequest, jitterDelayAmountMs, {
         method,
         endpoint: url
       });
-      this.makeRequest(
+      await this.makeRequest(
         method,
         callDetails.callStart,
         callDetails.callCountForThisRequest,
@@ -339,14 +336,32 @@ export default class RequestClientWrapper {
     }
   }
 
-  private checkIfJwt(token: string): boolean {
-    let output: string;
+  private isItJwtToken(token: string): boolean {
     try {
-      output = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+      JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
     } catch (e) {
       return false;
     }
 
     return true;
+  }
+
+  private async refreshSupabaseSession(): Promise<string> {
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { data, error } = await supabase.auth.setSession({
+      access_token: this.requestClientWrapperConfiguration.session,
+      refresh_token: this.requestClientWrapperConfiguration.session
+    });
+    if (data && data.session) {
+      const { access_token } = data.session;
+      if (access_token) {
+        return access_token;
+      }
+    }
+    if (error) {
+      // TODO - gussy this up
+      throw error;
+    }
+    return '';
   }
 }
