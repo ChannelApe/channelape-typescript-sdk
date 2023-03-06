@@ -6,8 +6,11 @@ import RequestResponse from './model/RequestResponse';
 import { RequestCallback } from './model/RequestCallback';
 import RequestClientWrapperConfiguration from './model/RequestClientWrapperConfiguration';
 import { RequestConfig } from './model/RequestConfig';
+import { createClient } from '@supabase/supabase-js';
 
 const GENERIC_ERROR_CODE = -1;
+const SUPABASE_URL = '';
+const SUPABASE_ANON_KEY = '';
 
 interface CallDetails {
   callStart: Date;
@@ -110,8 +113,16 @@ export default class RequestClientWrapper {
     if (options.headers === undefined) {
       options.headers = {};
     }
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     options.headers['X-Channel-Ape-Authorization-Token'] = this.requestClientWrapperConfiguration.session;
     options.headers['Content-Type'] = 'application/json';
+    /*
+    if (this.requestClientWrapperConfiguration.jwtToken) {
+      check for expiration
+      options.headers['X-Channel-Ape-Authorization-Token'] = this.requestClientWrapperConfiguration.jwtToken;
+      options.headers['Content-Type'] = 'application/json';
+    }
+    */
     options.timeout = this.requestClientWrapperConfiguration.timeout;
     options.method = method;
     try {
@@ -326,5 +337,16 @@ export default class RequestClientWrapper {
 
       return stringValue.startsWith(number.toString());
     }
+  }
+
+  private checkIfJwt(token: string): boolean {
+    let output: string;
+    try {
+      output = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+    } catch (e) {
+      return false;
+    }
+
+    return true;
   }
 }
