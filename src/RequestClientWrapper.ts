@@ -114,12 +114,18 @@ export default class RequestClientWrapper {
       options.headers = {};
     }
     if (this.isItJwtToken(this.requestClientWrapperConfiguration.session)) {
-      options.headers['X-Channel-Ape-Jwt'] = await this.refreshSupabaseSession();
-      options.headers['Content-Type'] = 'application/json';
+      let accessToken = this.requestClientWrapperConfiguration.session;
+      const session = await this.checkSupabaseSession();
+      if (session) {
+        accessToken = session.access_token;
+      } else if (this.isJwtTokenExpired(accessToken)) {
+        accessToken = await this.refreshSupabaseSession();
+      }
+      options.headers['X-Channel-Ape-Jwt'] = accessToken;
     } else {
       options.headers['X-Channel-Ape-Authorization-Token'] = this.requestClientWrapperConfiguration.session;
-      options.headers['Content-Type'] = 'application/json';
     }
+    options.headers['Content-Type'] = 'application/json';
     options.timeout = this.requestClientWrapperConfiguration.timeout;
     options.method = method;
     try {
@@ -336,16 +342,6 @@ export default class RequestClientWrapper {
     }
   }
 
-  private isItJwtToken(token: string): boolean {
-    try {
-      JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
-    } catch (e) {
-      return false;
-    }
-
-    return true;
-  }
-
   private async refreshSupabaseSession(): Promise<string> {
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const { data, error } = await supabase.auth.setSession({
@@ -363,5 +359,41 @@ export default class RequestClientWrapper {
       throw error;
     }
     return '';
+  }
+
+  private parseJwt(token: string) {
+    let output: string;
+    try {
+      return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+    } catch (e) {
+      output = '';
+    }
+
+    return output;
+  }
+
+  private isItJwtToken(token: string): boolean {
+    if (this.parseJwt(token)) {
+      return true;
+    }
+    return false;
+  }
+
+  private isJwtTokenExpired(token: string) {
+    const parsedToken = this.parseJwt(token);
+    if (parsedToken) {
+      return parsedToken.exp * 1000 < Date.now();
+    }
+    return false;
+  }
+
+  private async checkSupabaseSession() {
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { data } = await supabase.auth.getSession();
+
+    if (data && data.session) {
+      return data.session;
+    }
+    return;
   }
 }
