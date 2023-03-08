@@ -22,6 +22,7 @@ export default class RequestClientWrapper {
 
   private readonly maximumConcurrentConnections: number;
   private readonly requestLogger: RequestLogger;
+  private readonly isJwtToken: boolean;
   requestQueue: RequestConfig[];
   pendingRequests: number;
 
@@ -35,6 +36,7 @@ export default class RequestClientWrapper {
       this.requestClientWrapperConfiguration.endpoint
     );
     this.maximumConcurrentConnections = requestClientWrapperConfiguration.maximumConcurrentConnections;
+    this.isJwtToken = this.isItJwtToken(this.requestClientWrapperConfiguration.session);
   }
 
   public get(url: string, params: AxiosRequestConfig, callback: RequestCallback): void {
@@ -113,7 +115,7 @@ export default class RequestClientWrapper {
     if (options.headers === undefined) {
       options.headers = {};
     }
-    if (this.isItJwtToken(this.requestClientWrapperConfiguration.session)) {
+    if (this.isJwtToken) {
       let accessToken = this.requestClientWrapperConfiguration.session;
       const session = await this.checkSupabaseSession();
       if (session) {
@@ -355,7 +357,7 @@ export default class RequestClientWrapper {
       }
     }
     if (error) {
-      // TODO - gussy this up
+      console.error(`Error refreshing Supabase session: ${JSON.stringify(error, null, 2)}}`);
       throw error;
     }
     return '';

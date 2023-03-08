@@ -691,6 +691,17 @@ Code: 0 Message: You didnt pass any body`;
       });
     });
 
+    describe('Which has a JWT Token passed in for authentication', () => {
+      it('When making a request, then expect the JWT token to be passed in the header', (done) => {
+        requestClientWrapper = buildRequestClientWrapper(
+          1,
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNjc4MTE0OTQzLCJzdWIiOiIwZmRmYzJiYi0wZTczLTQxNWYtOWIyMC00MGZjMzNhZjI1MmMiLCJlbWFpbCI6ImNkdWRhQGNoYW5uZWxhcGUuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJnb29nbGUiLCJwcm92aWRlcnMiOlsiZ29vZ2xlIl19LCJ1c2VyX21ldGFkYXRhIjp7ImF2YXRhcl91cmwiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BRWRGVHA3MjRjLTRXM0lmTnlpbVhROHFmcTl3U245T3I5cnJMVmVHMVdoej1zOTYtYyIsImVtYWlsIjoiY2R1ZGFAY2hhbm5lbGFwZS5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZnVsbF9uYW1lIjoiQ2hyaXMgRHVkYSIsImlzcyI6Imh0dHBzOi8vd3d3Lmdvb2dsZWFwaXMuY29tL3VzZXJpbmZvL3YyL21lIiwibmFtZSI6IkNocmlzIER1ZGEiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUVkRlRwNzI0Yy00VzNJZk55aW1YUThxZnE5d1NuOU9yOXJyTFZlRzFXaHo9czk2LWMiLCJwcm92aWRlcl9pZCI6IjExMjM1OTU4MjU5MzA3MTM4NDM5NCIsInN1YiI6IjExMjM1OTU4MjU5MzA3MTM4NDM5NCJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6Im9hdXRoIiwidGltZXN0YW1wIjoxNjc3MDgwMjE1fV0sInNlc3Npb25faWQiOiI2NDI0NTM5ZC01NjM4LTQyZTUtYTM5NS1lMmRhZDllZTA1ZmMifQ.pMOIrMhHY3GzesN-WagLvNiTJVFRuvCtwnXaXk1tjOU',
+          'PAyuVCmFADzTm6zfHISV1A'
+        );
+        const requestClientWrapperPrepareRequestSpy = sandbox.spy(requestClientWrapper, 'prepareRequest');
+      });
+    });
+
     function createQueuedRequests(count: number, requestClientWrapper: RequestClientWrapper) {
       for (let requestNumber = 1; requestNumber <= count; requestNumber = requestNumber + 1) {
         mockedAxios.onGet(`/v1/orders/${requestNumber}`).reply(200, { request: requestNumber });
@@ -727,13 +738,14 @@ Code: 0 Message: You didnt pass any body`;
       }
     }
 
-    function buildRequestClientWrapper(maximumConcurrentConnections: number) {
+    function buildRequestClientWrapper(maximumConcurrentConnections: number, session: string = 'valid-session-id', refreshToken: string = '') {
       return new RequestClientWrapper({
         maximumConcurrentConnections,
         endpoint,
         maximumRequestRetryTimeout,
+        session,
+        refreshToken,
         timeout: 60000,
-        session: 'valid-session-id',
         logLevel: LogLevel.INFO,
         minimumRequestRetryRandomDelay: JITTER_DELAY_MIN,
         maximumRequestRetryRandomDelay: JITTER_DELAY_MAX
