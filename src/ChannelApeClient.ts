@@ -37,6 +37,7 @@ const ONE_SECOND_IN_MS = 1000;
 const FIVE_SECONDS_IN_MS = 5000;
 export default class ChannelApeClient {
   private readonly sessionId: string;
+  private readonly refreshToken: string;
   private readonly timeout: number;
   private readonly maximumRequestRetryTimeout: number;
   private readonly minimumRequestRetryRandomDelay: number;
@@ -72,6 +73,7 @@ export default class ChannelApeClient {
     }
 
     this.sessionId = clientConfiguration.sessionId;
+    this.refreshToken = clientConfiguration.refreshToken ?? '';
     this.endpoint =
       clientConfiguration.endpoint == null
         ? Environment.PRODUCTION
@@ -106,6 +108,7 @@ export default class ChannelApeClient {
     this.requestClientWrapper = new RequestClientWrapper({
       timeout: this.timeout,
       session: this.sessionId,
+      refreshToken: this.refreshToken,
       logLevel: this.logLevel,
       endpoint: this.endpoint,
       maximumRequestRetryTimeout: this.maximumRequestRetryTimeout,

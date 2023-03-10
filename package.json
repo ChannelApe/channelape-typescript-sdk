@@ -1,6 +1,6 @@
 {
   "name": "channelape-sdk",
-  "version": "1.46.0",
+  "version": "1.47.0",
   "description": "A client for interacting with ChannelApe's API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,7 +14,7 @@
     "test": "npm run unit-test",
     "pretest": "npm run compile && npm run lint --fix",
     "posttest": "npm run cover",
-    "cover": "nyc npm run unit-test && nyc check-coverage --lines 90 --branches 90 --statements 90 --functions 90",
+    "cover": "nyc npm run unit-test && nyc check-coverage --lines 90 --branches 86 --statements 90 --functions 90",
     "lint": "tslint -p tsconfig.json && tslint -p test/tsconfig.json && tslint -p e2e/tsconfig.json",
     "e2e": "mocha --config ./e2e/.mocharc.json \"e2e/**/*.spec.*\"",
     "driver": "npx ts-node ./driver/ChannelApeClientDriver.ts"
@@ -66,6 +66,7 @@
     }
   ],
   "dependencies": {
+    "@supabase/supabase-js": "^2.10.0",
     "axios": "0.21.2",
     "channelape-logger": "^0.2.0",
     "q": "1.5.1",

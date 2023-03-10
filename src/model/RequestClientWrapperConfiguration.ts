@@ -3,6 +3,7 @@ import LogLevel from './LogLevel';
 export default interface RequestClientWrapperConfiguration {
   readonly timeout: number;
   readonly session: string;
+  readonly refreshToken?: string;
   readonly logLevel: LogLevel;
   readonly endpoint: string;
   readonly maximumRequestRetryTimeout: number;
