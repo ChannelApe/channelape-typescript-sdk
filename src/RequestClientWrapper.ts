@@ -9,8 +9,8 @@ import { RequestConfig } from './model/RequestConfig';
 import { createClient } from '@supabase/supabase-js';
 
 const GENERIC_ERROR_CODE = -1;
-const SUPABASE_URL = '';
-const SUPABASE_ANON_KEY = '';
+const SUPABASE_URL = 'https://api.channelape.io/';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpyaHNvbmphY3NqZmZ5bXpoY2FuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzE0NjQyODAsImV4cCI6MTk4NzA0MDI4MH0.FerXC5W_JZuP5v66e98dfZ6Lajej_FDd-8sltJHcFd8';
 
 interface CallDetails {
   callStart: Date;
@@ -366,8 +366,14 @@ export default class RequestClientWrapper {
   private parseJwt(token: string) {
     let output: string;
     try {
-      return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) =>  {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
     } catch (e) {
+      console.error(`Error parsing JWT token: ${e}`);
       output = '';
     }
 
