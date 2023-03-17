@@ -373,7 +373,6 @@ export default class RequestClientWrapper {
       }).join(''));
       return JSON.parse(jsonPayload);
     } catch (e) {
-      console.error(`Error parsing JWT token: ${e}`);
       output = '';
     }
 
