@@ -118,10 +118,6 @@ export default class RequestClientWrapper {
       options.headers = {};
     }
     this.setSupabaseEnv(options.baseURL);
-    console.log(`options: ${JSON.stringify(options, null, 2)}`);
-    console.log(`url: ${url}`);
-    console.log(`supabaseUrl: ${this.supabaseUrl}`);
-    // console.log(`supabaseAnonKey: ${this.supabaseAnonKey}`);
     if (this.isJwtToken) {
       let accessToken = this.requestClientWrapperConfiguration.session;
       const session = await this.checkSupabaseSession();
