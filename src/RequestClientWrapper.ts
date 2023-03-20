@@ -9,8 +9,6 @@ import { RequestConfig } from './model/RequestConfig';
 import { createClient } from '@supabase/supabase-js';
 
 const GENERIC_ERROR_CODE = -1;
-const SUPABASE_URL = 'https://api.channelape.io/';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpyaHNvbmphY3NqZmZ5bXpoY2FuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzE0NjQyODAsImV4cCI6MTk4NzA0MDI4MH0.FerXC5W_JZuP5v66e98dfZ6Lajej_FDd-8sltJHcFd8';
 
 interface CallDetails {
   callStart: Date;
@@ -23,6 +21,8 @@ export default class RequestClientWrapper {
   private readonly maximumConcurrentConnections: number;
   private readonly requestLogger: RequestLogger;
   private readonly isJwtToken: boolean;
+  private supabaseUrl: string;
+  private supabaseAnonKey: string;
   requestQueue: RequestConfig[];
   pendingRequests: number;
 
@@ -37,6 +37,8 @@ export default class RequestClientWrapper {
     );
     this.maximumConcurrentConnections = requestClientWrapperConfiguration.maximumConcurrentConnections;
     this.isJwtToken = this.isItJwtToken(this.requestClientWrapperConfiguration.session);
+    this.supabaseUrl = '';
+    this.supabaseAnonKey = '';
   }
 
   public get(url: string, params: AxiosRequestConfig, callback: RequestCallback): void {
@@ -115,6 +117,11 @@ export default class RequestClientWrapper {
     if (options.headers === undefined) {
       options.headers = {};
     }
+    this.setSupabaseEnv(options.baseURL);
+    console.log(`options: ${JSON.stringify(options, null, 2)}`);
+    console.log(`url: ${url}`);
+    console.log(`supabaseUrl: ${this.supabaseUrl}`);
+    // console.log(`supabaseAnonKey: ${this.supabaseAnonKey}`);
     if (this.isJwtToken) {
       let accessToken = this.requestClientWrapperConfiguration.session;
       const session = await this.checkSupabaseSession();
@@ -345,7 +352,7 @@ export default class RequestClientWrapper {
   }
 
   private async refreshSupabaseSession(): Promise<string> {
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = createClient(this.supabaseUrl, this.supabaseAnonKey);
     const { data, error } = await supabase.auth.setSession({
       access_token: this.requestClientWrapperConfiguration.session,
       refresh_token: this.requestClientWrapperConfiguration.session
@@ -396,12 +403,22 @@ export default class RequestClientWrapper {
   }
 
   private async checkSupabaseSession() {
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = createClient(this.supabaseUrl, this.supabaseAnonKey);
     const { data } = await supabase.auth.getSession();
 
     if (data && data.session) {
       return data.session;
     }
     return;
+  }
+
+  private setSupabaseEnv(apiCall: string) {
+    if (apiCall.toLowerCase().includes('staging-api.channelape')) {
+      this.supabaseUrl = 'https://ufnoklzgjzgwleigkkdo.supabase.co';
+      this.supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmbm9rbHpnanpnd2xlaWdra2RvIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzIzNDU3MTQsImV4cCI6MTk4NzkyMTcxNH0.3_tAAJCznS7s8-PSB8KHCGtacWwYDMb72Mx5LnznOQk';
+    } else {
+      this.supabaseUrl = 'https://api.channelape.io/';
+      this.supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpyaHNvbmphY3NqZmZ5bXpoY2FuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzE0NjQyODAsImV4cCI6MTk4NzA0MDI4MH0.FerXC5W_JZuP5v66e98dfZ6Lajej_FDd-8sltJHcFd8';
+    }
   }
 }
