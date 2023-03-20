@@ -351,7 +351,7 @@ export default class RequestClientWrapper {
     const supabase = createClient(this.supabaseUrl, this.supabaseAnonKey);
     const { data, error } = await supabase.auth.setSession({
       access_token: this.requestClientWrapperConfiguration.session,
-      refresh_token: this.requestClientWrapperConfiguration.session
+      refresh_token: this.requestClientWrapperConfiguration.refreshToken ?? ''
     });
     if (data && data.session) {
       const { access_token } = data.session;
