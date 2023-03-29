@@ -4,7 +4,9 @@ export enum InventoryStatus {
   ON_HAND = 'ON_HAND',
   COMMITTED = 'COMMITTED',
   ON_ORDER = 'ON_ORDER',
-  RESERVE = 'RESERVE'
+  RESERVE = 'RESERVE',
+  INCOMING = 'INCOMING',
+  UNAVAILABLE = 'UNAVAILABLE',
 }
 
 export default InventoryStatus;
