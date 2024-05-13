@@ -113,7 +113,7 @@ export default class RequestClientWrapper {
       options.headers = {};
     }
     if (this.isJwtToken) {
-      let accessToken = this.requestClientWrapperConfiguration.session;
+      const accessToken = this.requestClientWrapperConfiguration.session;
       options.headers.Authorization = `Bearer ${accessToken}`;
     } else {
       options.headers['X-Channel-Ape-Authorization-Token'] = this.requestClientWrapperConfiguration.session;
