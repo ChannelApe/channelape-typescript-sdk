@@ -1,12 +1,11 @@
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosPromise } from 'axios';
-import RequestLogger from './utils/RequestLogger';
+import axios, { AxiosPromise, AxiosRequestConfig, AxiosResponse } from 'axios';
 import ChannelApeError from './model/ChannelApeError';
 import HttpRequestMethod from './model/HttpRequestMethod';
-import RequestResponse from './model/RequestResponse';
 import { RequestCallback } from './model/RequestCallback';
 import RequestClientWrapperConfiguration from './model/RequestClientWrapperConfiguration';
 import { RequestConfig } from './model/RequestConfig';
-import { createClient } from '@supabase/supabase-js';
+import RequestResponse from './model/RequestResponse';
+import RequestLogger from './utils/RequestLogger';
 
 const GENERIC_ERROR_CODE = -1;
 
@@ -21,8 +20,6 @@ export default class RequestClientWrapper {
   private readonly maximumConcurrentConnections: number;
   private readonly requestLogger: RequestLogger;
   private readonly isJwtToken: boolean;
-  private supabaseUrl: string;
-  private supabaseAnonKey: string;
   requestQueue: RequestConfig[];
   pendingRequests: number;
 
@@ -37,8 +34,6 @@ export default class RequestClientWrapper {
     );
     this.maximumConcurrentConnections = requestClientWrapperConfiguration.maximumConcurrentConnections;
     this.isJwtToken = this.isItJwtToken(this.requestClientWrapperConfiguration.session);
-    this.supabaseUrl = '';
-    this.supabaseAnonKey = '';
   }
 
   public get(url: string, params: AxiosRequestConfig, callback: RequestCallback): void {
@@ -117,16 +112,9 @@ export default class RequestClientWrapper {
     if (options.headers === undefined) {
       options.headers = {};
     }
-    this.setSupabaseEnv(options.baseURL);
     if (this.isJwtToken) {
       let accessToken = this.requestClientWrapperConfiguration.session;
-      const session = await this.checkSupabaseSession();
-      if (session) {
-        accessToken = session.access_token;
-      } else if (this.isJwtTokenExpired(accessToken)) {
-        accessToken = await this.refreshSupabaseSession();
-      }
-      options.headers['X-Channel-Ape-Jwt'] = accessToken;
+      options.headers.Authorization = `Bearer ${accessToken}`;
     } else {
       options.headers['X-Channel-Ape-Authorization-Token'] = this.requestClientWrapperConfiguration.session;
     }
@@ -347,25 +335,6 @@ export default class RequestClientWrapper {
     }
   }
 
-  private async refreshSupabaseSession(): Promise<string> {
-    const supabase = createClient(this.supabaseUrl, this.supabaseAnonKey);
-    const { data, error } = await supabase.auth.setSession({
-      access_token: this.requestClientWrapperConfiguration.session,
-      refresh_token: this.requestClientWrapperConfiguration.refreshToken ?? ''
-    });
-    if (data && data.session) {
-      const { access_token } = data.session;
-      if (access_token) {
-        return access_token;
-      }
-    }
-    if (error) {
-      console.error(`Error refreshing Supabase session: ${JSON.stringify(error, null, 2)}}`);
-      throw error;
-    }
-    return '';
-  }
-
   private parseJwt(token: string) {
     let output: string;
     try {
@@ -388,33 +357,5 @@ export default class RequestClientWrapper {
       return true;
     }
     return false;
-  }
-
-  private isJwtTokenExpired(token: string) {
-    const parsedToken = this.parseJwt(token);
-    if (parsedToken) {
-      return parsedToken.exp * 1000 < Date.now();
-    }
-    return false;
-  }
-
-  private async checkSupabaseSession() {
-    const supabase = createClient(this.supabaseUrl, this.supabaseAnonKey);
-    const { data } = await supabase.auth.getSession();
-
-    if (data && data.session) {
-      return data.session;
-    }
-    return;
-  }
-
-  private setSupabaseEnv(apiCall: string) {
-    if (apiCall.toLowerCase().includes('staging-api.channelape')) {
-      this.supabaseUrl = 'https://ufnoklzgjzgwleigkkdo.supabase.co';
-      this.supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmbm9rbHpnanpnd2xlaWdra2RvIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzIzNDU3MTQsImV4cCI6MTk4NzkyMTcxNH0.3_tAAJCznS7s8-PSB8KHCGtacWwYDMb72Mx5LnznOQk';
-    } else {
-      this.supabaseUrl = 'https://api.channelape.io/';
-      this.supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpyaHNvbmphY3NqZmZ5bXpoY2FuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzE0NjQyODAsImV4cCI6MTk4NzA0MDI4MH0.FerXC5W_JZuP5v66e98dfZ6Lajej_FDd-8sltJHcFd8';
-    }
   }
 }
