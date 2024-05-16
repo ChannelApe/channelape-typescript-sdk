@@ -1,19 +1,19 @@
 // tslint:disable:no-trailing-whitespace
-import * as sinon from 'sinon';
-import { expect } from 'chai';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import axiosMockAdapter from 'axios-mock-adapter';
+import { expect } from 'chai';
 import { Logger } from 'channelape-logger';
+import * as sinon from 'sinon';
 
+import { fail } from 'assert';
+import { ChannelApeError, LogLevel } from '../src';
 import RequestClientWrapper from '../src/RequestClientWrapper';
+import ChannelApeApiError from '../src/model/ChannelApeApiError';
+import HttpRequestMethod from '../src/model/HttpRequestMethod';
+import { RequestConfig } from '../src/model/RequestConfig';
+import multipleOrders from './orders/resources/multipleOrders';
 import singleOrder from './orders/resources/singleOrder';
 import singleOrderToUpdate from './orders/resources/singleOrderToUpdate';
-import multipleOrders from './orders/resources/multipleOrders';
-import ChannelApeApiError from '../src/model/ChannelApeApiError';
-import { ChannelApeError, LogLevel } from '../src';
-import { RequestConfig } from '../src/model/RequestConfig';
-import HttpRequestMethod from '../src/model/HttpRequestMethod';
-import { fail } from 'assert';
 
 const maximumRequestRetryTimeout = 600;
 
@@ -146,7 +146,7 @@ describe('RequestClientWrapper', () => {
             expect(error).not.to.be.null;
             expect(error.message).includes('A problem with the ChannelApe API has been encountered.');
             expect(error.message).includes('Your request was tried a total of ');
-            expect(warnLogSpy.args[0][0]).to.equal('get /v1/orders -- FAILED WITH STATUS: Network Error');
+            expect(warnLogSpy.args[1][0]).to.equal('get /v1/orders -- FAILED WITH STATUS: Network Error');
             done();
           });
         }).timeout(3000);
@@ -179,7 +179,7 @@ describe('RequestClientWrapper', () => {
             expect(error).not.to.be.null;
             expect(error.message).includes('A problem with the ChannelApe API has been encountered.');
             expect(error.message).includes('Your request was tried a total of ');
-            expect(warnLogSpy.args[0][0]).to.equal('get /v1/orders -- FAILED WITH STATUS: ECONNREFUSED');
+            expect(warnLogSpy.args[1][0]).to.equal('get /v1/orders -- FAILED WITH STATUS: ECONNREFUSED');
             done();
           });
         }).timeout(2000);
@@ -421,11 +421,11 @@ Code: 0 Message: You didnt pass any body`;
 
       requestClientWrapper.get(requestUrl, {}, (error, response, body) => {
         expect(warnLogSpy.called).to.be.true;
-        expect(warnLogSpy.args[1][0])
+        expect(warnLogSpy.args[2][0])
             .to.include(`DELAYING GET ${endpoint}${requestUrl} for `, 'should log 1st delay correctly');
-        expect(warnLogSpy.args[3][0])
-            .to.include(`DELAYING GET ${endpoint}${requestUrl} for `, 'should log 2nd delay correctly');
         expect(warnLogSpy.args[5][0])
+            .to.include(`DELAYING GET ${endpoint}${requestUrl} for `, 'should log 2nd delay correctly');
+        expect(warnLogSpy.args[8][0])
             .to.include(`DELAYING GET ${endpoint}${requestUrl} for `, 'should log 3rd delay correctly');
         expect(error).to.be.null;
         expect(body.id).to.equal(orderId);
@@ -479,20 +479,20 @@ Code: 0 Message: You didnt pass any body`;
 
         expect(error).to.be.null;
         expect(warnLogSpy.called).to.be.true;
-        const delayMs1 = parseInt(warnLogSpy.args[1][0].match(/\s(\d*)ms/g)[0].trim().replace('ms', ''), 10);
+        const delayMs1 = parseInt(warnLogSpy.args[2][0].match(/\s(\d*)ms/g)[0].trim().replace('ms', ''), 10);
         expect(delayMs1).to.be.lessThan(JITTER_DELAY_MAX + 1);
         expect(delayMs1).to.be.greaterThan(JITTER_DELAY_MIN - 1);
-        expect(warnLogSpy.args[1][0])
+        expect(warnLogSpy.args[2][0])
           .to.include(`DELAYING PUT ${endpoint}${requestUrl} for `, 'should log 1st delay correctly');
-        const delayMs2 = parseInt(warnLogSpy.args[3][0].match(/\s(\d*)ms/g)[0].trim().replace('ms', ''), 10);
+        const delayMs2 = parseInt(warnLogSpy.args[5][0].match(/\s(\d*)ms/g)[0].trim().replace('ms', ''), 10);
         expect(delayMs2).to.be.lessThan(JITTER_DELAY_MAX + 1);
         expect(delayMs2).to.be.greaterThan(JITTER_DELAY_MIN - 1);
-        expect(warnLogSpy.args[3][0])
+        expect(warnLogSpy.args[5][0])
           .to.include(`DELAYING PUT ${endpoint}${requestUrl} for `, 'should log 2nd delay correctly');
-        const delayMs3 = parseInt(warnLogSpy.args[5][0].match(/\s(\d*)ms/g)[0].trim().replace('ms', ''), 10);
+        const delayMs3 = parseInt(warnLogSpy.args[8][0].match(/\s(\d*)ms/g)[0].trim().replace('ms', ''), 10);
         expect(delayMs3).to.be.lessThan(JITTER_DELAY_MAX + 1);
         expect(delayMs3).to.be.greaterThan(JITTER_DELAY_MIN - 1);
-        expect(warnLogSpy.args[5][0])
+        expect(warnLogSpy.args[8][0])
           .to.include(`DELAYING PUT ${endpoint}${requestUrl} for `, 'should log 3rd delay correctly');
         expect(body.id).to.equal(orderId);
         expect(infoLogSpy.args[0][0])
