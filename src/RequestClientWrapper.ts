@@ -1,4 +1,5 @@
 import axios, { AxiosPromise, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { LogLevel, Logger } from 'channelape-logger';
 import ChannelApeError from './model/ChannelApeError';
 import HttpRequestMethod from './model/HttpRequestMethod';
 import { RequestCallback } from './model/RequestCallback';
@@ -17,6 +18,7 @@ interface CallDetails {
 
 export default class RequestClientWrapper {
 
+  private readonly logger = new Logger('RequestClientWrapper', LogLevel.VERBOSE);
   private readonly maximumConcurrentConnections: number;
   private readonly requestLogger: RequestLogger;
   private readonly isJwtToken: boolean;
@@ -116,6 +118,7 @@ export default class RequestClientWrapper {
       const accessToken = this.requestClientWrapperConfiguration.session;
       options.headers.Authorization = `Bearer ${accessToken}`;
     } else {
+      this.logger.warn('Using deprecated method of authentication. Please update to use JWT.');
       options.headers['X-Channel-Ape-Authorization-Token'] = this.requestClientWrapperConfiguration.session;
     }
     options.headers['Content-Type'] = 'application/json';
